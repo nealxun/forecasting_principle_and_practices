@@ -1,7 +1,17 @@
-p.caption {
-  color: #777;
-  margin-top: 10px;
+.book-body {
+  font-family: 'Droid Serif', Georgia, 'Times New Roman', Times, serif;
 }
+
+p.caption {
+  color: #333333;
+  margin-top: 10px;
+  font-style: "italic";
+  align-content: "center";
+  background-color: #f7f7f7;
+  font-family: "Droid Sans",Arial,Sans;
+  padding-left: 20px;
+}
+
 p code {
   white-space: inherit;
 }
@@ -11,4 +21,51 @@ pre {
 }
 pre code {
   white-space: inherit;
+}
+
+h1, h2, h3 {
+  color: #3c6900;
+  font-family: "Droid Sans",Arial,Sans;
+}
+
+a {
+color: #3c6900;
+}
+
+.book-body ul, ol {
+  margin: 0 0 0.8em;
+}
+
+dt {
+  color: #3c6900;
+}
+
+dd {
+  margin-bottom: 12px;
+  margin-left: 20px;
+  padding-left: 20px;
+}
+
+.book-body table {
+  background: #ececec;
+  border: 0px;
+}
+
+.book-body td {
+  color: #000000;
+  border: 0px;
+}
+
+.book-body th {
+  background: #D9E6CA;
+  color: #000000;
+  text-shadow: none;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal blockquote {
+  quotes: none;
+  text-shadow: none;
+  background: #D9E6CA;
+  padding:  5px 20px 2px 20px;
+  color: #000000;
 }

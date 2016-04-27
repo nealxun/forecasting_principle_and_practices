@@ -1,0 +1,32 @@
+## Exercises
+
+1. For each of the following series (from the <b>fma</b> package), make a graph of the data. If transforming seems appropriate, do so and describe the effect.
+
+    a.  Monthly total of people on unemployed benefits in Australia (January 1956 -- July 1992).
+    b.  Monthly total of accidental deaths in the United States (January 1973 -- December 1978).
+    c.  Quarterly production of bricks (in millions of units) at Portland, Australia (March 1956–September 1994).
+
+**Hints:**
+
+ -  `data(package="fma")` will give a list of the available data.
+ -  To plot a transformed data set, use `plot(BoxCox(x,0.5))`` where `x` is the name of the data set and 0.5 is the Box-Cox parameter.
+
+2. Use the Dow Jones index (data set `dowjones`) to do the following:
+
+    a.  Produce a time plot of the series.
+    b.  Produce forecasts using the drift method and plot them.
+    c.  Show that the graphed forecasts are identical to extending the line drawn between the first and last observations.
+    d.  Try some of the other benchmark functions to forecast the same data set. Which do you think is best? Why?
+
+3. Consider the daily closing IBM stock prices (data set `ibmclose`).
+
+    a. Produce some plots of the data in order to become familiar with it.
+    b.  Split the data into a training set of 300 observations and a test set of 69 observations.
+    c.  Try various benchmark methods to forecast the training set and compare the results on the test set. Which method did best?
+
+
+4.  Consider the sales of new one-family houses in the USA, Jan 1973 -- Nov 1995 (data set `hsales`).
+
+    a. Produce some plots of the data in order to become familiar with it.
+    b.  Split the `hsales` data set into a training set and a test set, where the test set is the last two years of data.
+    c.  Try various benchmark methods to forecast the training set and compare the results on the test set. Which method did best?

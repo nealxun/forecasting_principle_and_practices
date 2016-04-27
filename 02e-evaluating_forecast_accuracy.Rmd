@@ -1,0 +1,247 @@
+## Evaluating forecast accuracy
+
+###Forecast accuracy measures {-}
+
+Let $y_{i}$ denote the $i$th observation and $\hat{y}_{i}$
+denote a forecast of $y_{i}$.
+
+### Scale-dependent errors {-}
+
+The forecast error is simply $e_{i}=y_{i}-\hat{y}_{i}$, which is
+on the same scale as the data. Accuracy measures that are based on
+$e_{i}$ are therefore scale-dependent and cannot be used to make
+comparisons between series that are on different scales.
+
+The two most
+commonly used scale-dependent measures are based on the absolute errors
+or squared errors:
+\begin{align*}
+\text{Mean absolute error: MAE} & = \text{mean}(|e_{i}|),\\
+\text{Root mean squared error: RMSE} & = \sqrt{\text{mean}(e_{i}^2)}.
+\end{align*}
+When comparing forecast
+methods on a single data set, the MAE is popular as it is easy to
+understand and compute.
+
+### Percentage errors {-}
+
+The percentage error is given by $p_{i} = 100 e_{i}/y_{i}$.
+Percentage errors have the advantage of being scale-independent, and so
+are frequently used to compare forecast performance between different
+data sets. The most commonly used measure is:
+$$
+\text{Mean absolute percentage error: MAPE} = \text{mean}(|p_{i}|).
+$$
+Measures
+based on percentage errors have the disadvantage of being infinite or
+undefined if $y_{i}=0$ for any $i$ in the period of interest, and
+having extreme values when any $y_{i}$ is close to zero. Another
+problem with percentage errors that is often overlooked is that they
+assume a meaningful zero. For example, a percentage error makes no sense
+when measuring the accuracy of temperature forecasts on the Fahrenheit
+or Celsius scales.
+
+They also have the disadvantage that they put a
+heavier penalty on negative errors than on positive errors. This
+observation led to the use of the so-called "symmetric" MAPE (sMAPE)
+proposed by Armstrong (1985, p.348), which was used in the M3
+forecasting competition. It is defined by
+$$ \text{sMAPE} = \text{mean}\left(200|y_{i} - \hat{y}_{i}|/(y_{i}+\hat{y}_{i})\right). $$
+However, if
+$y_{i}$ is close to zero, $\hat{y}_{i}$ is also likely to be
+close to zero. Thus, the measure still involves division by a number
+close to zero, making the calculation unstable. Also, the value of sMAPE
+can be negative, so it is not really a measure of "absolute percentage
+errors" at all.
+
+Hyndman and Koehler (2006) recommend that the sMAPE not
+be used. It is included here only because it is widely used, although we
+will not use it in this book.
+
+### Scaled errors {-}
+
+Scaled errors were proposed by Hyndman and Koehler (2006) as an
+alternative to using percentage errors when comparing forecast accuracy
+across series on different scales. They proposed scaling the errors
+based on the *training* MAE from a simple forecast method. For a
+non-seasonal time series, a useful way to define a scaled error uses
+naïve forecasts:
+$$q_{j} = \frac{\displaystyle e_{j}}{\displaystyle\frac{1}{T-1}\sum_{t=2}^T |y_{t}-y_{t-1}|}.$$
+
+Because the numerator and denominator both involve values on the
+scale of the original data, $q_{j}$ is independent of the scale of
+the data. A scaled error is less than one if it arises from a better
+forecast than the average naïve forecast computed on the training data.
+Conversely, it is greater than one if the forecast is worse than the
+average naïve forecast computed on the training data. For seasonal time
+series, a scaled error can be defined using seasonal naïve forecasts:
+$$ q_{j} = \frac{\displaystyle e_{j}}{\displaystyle\frac{1}{T-m}\sum_{t=m+1}^T
+|y_{t}-y_{t-m}|}. $$
+
+The *mean absolute scaled error* is simply
+$$
+\text{MASE} = \text{mean}(|q_{j}|).
+$$
+Similarly, the *mean squared scaled error*
+(MSSE) can be defined where the errors (on the training data and test
+data) are squared instead of using absolute values.
+
+###Examples {-}
+
+```{r beeraccuracy, fig.cap="Forecasts of Australian quarterly beer production using data up to the end of 2005."}
+beer2 <- window(ausbeer,start=1992,end=2006-.1)
+
+beerfit1 <- meanf(beer2,h=11)
+beerfit2 <- rwf(beer2,h=11)
+beerfit3 <- snaive(beer2,h=11)
+
+plot(beerfit1, plot.conf=FALSE,
+  main="Forecasts for quarterly beer production")
+lines(beerfit2$mean,col=2)
+lines(beerfit3$mean,col=3)
+lines(ausbeer)
+legend("topright", lty=1, col=c(4,2,3),
+  legend=c("Mean method","Naive method","Seasonal naive method"))
+```
+
+
+Figure 2.17 shows three forecast methods applied to the quarterly
+Australian beer production using data only to the end of 2005. The
+actual values for the period 2006-2008 are also shown. We compute the
+forecast accuracy measures for this period.
+
+| Method                | RMSE  | MAE   | MAPE  | MASE |
+| :-----                | :---  | :--   | :---  | :--- |
+| Mean method           | 38.01 | 33.78 | 8.17  | 2.30 |
+| Naïve method          | 70.91 | 63.91 | 15.88 | 4.35 |
+| Seasonal naïve method | 12.97 | 11.27 | 2.73  | 0.77 |
+
+```r
+beer3 <- window(ausbeer, start=2006)
+accuracy(beerfit1, beer3)
+accuracy(beerfit2, beer3)
+accuracy(beerfit3, beer3)
+```
+
+It is obvious from the graph that the seasonal naïve method is best for
+these data, although it can still be improved, as we will discover
+later. Sometimes, different accuracy measures will lead to different
+results as to which forecast method is best. However, in this case, all
+the results point to the seasonal naïve method as the best of these
+three methods for this data set.
+
+To take a non-seasonal example,
+consider the Dow Jones Index. The following graph shows the 250
+observations ending on 15 July 1994, along with forecasts of the next 42
+days obtained from three different methods.
+
+```{r, fig.cap="Forecasts of the Dow Jones Index from 16 July 1994."}
+dj2 <- window(dj, end=250)
+plot(dj2, main="Dow Jones Index (daily ending 15 Jul 94)",
+  ylab="", xlab="Day", xlim=c(2,290))
+lines(meanf(dj2,h=42)$mean, col=4)
+lines(rwf(dj2,h=42)$mean, col=2)
+lines(rwf(dj2,drift=TRUE,h=42)$mean, col=3)
+legend("topleft", lty=1, col=c(4,2,3),
+  legend=c("Mean method","Naive method","Drift method"))
+lines(dj)
+```
+
+
+| Method       | RMSE   | MAE    | MAPE | MASE |
+| :-----       | :---   | :--    | :--- | :--- |
+| Mean method  | 148.24 | 142.42 | 3.66 | 8.70 |
+| Naïve method | 62.03  | 54.44  | 1.40 | 3.32 |
+| Drift method | 53.70  | 45.73  | 1.18 | 2.79 |
+
+```r
+dj3 <- window(dj, start=251)
+accuracy(meanf(dj2,h=42), dj3)
+accuracy(rwf(dj2,h=42), dj3)
+accuracy(rwf(dj2,drift=TRUE,h=42), dj3)
+```
+
+Here, the best method is the drift method (regardless of which accuracy
+measure is used).
+
+###Training and test sets {-}
+
+It is important to evaluate forecast accuracy using genuine forecasts.
+That is, it is invalid to look at how well a model fits the historical
+data; the accuracy of forecasts can only be determined by considering
+how well a model performs on new data that were not used when fitting
+the model. When choosing models, it is common to use a portion of the
+available data for fitting, and use the rest of the data for testing the
+model, as was done in the above examples. Then the testing data can be
+used to measure how well the model is likely to forecast on new data.
+
+The size of the test set is typically about 20% of the total sample,
+although this value depends on how long the sample is and how far ahead
+you want to forecast. The size of the test set should ideally be at
+least as large as the maximum forecast horizon required. The following
+points should be noted.
+
+-   A model which fits the data well does not necessarily forecast well.
+-   A perfect fit can always be obtained by using a model with enough
+    parameters.
+-   Over-fitting a model to data is as bad as failing to identify the
+    systematic pattern in the data.
+
+Some references describe the test set as the "hold-out set" because
+these data are "held out" of the data used for fitting. Other
+references call the training set the "in-sample data" and the test
+set the "out-of-sample data". We prefer to use "training set"
+and "test set" in this book.
+
+###Cross-validation {-}
+
+A more sophisticated version of training/test sets is cross-validation.
+For cross-sectional data, cross-validation works as follows.
+
+1.  Select observation $i$ for the test set, and use the remaining
+    observations in the training set. Compute the error on the test
+    observation.
+2.  Repeat the above step for $i=1,2,\dots,N$ where $N$ is the
+    total number of observations.
+3.  Compute the forecast accuracy measures based on the errors obtained.
+
+This is a much more efficient use of the available data, as you only
+omit one observation at each step. However, it can be very time
+consuming to implement.
+
+For time series data, the procedure is similar
+but the training set consists only of observations that occurred *prior*
+to the observation that forms the test set. Thus, no future observations
+can be used in constructing the forecast. However, it is not possible to
+get a reliable forecast based on a very small training set, so the
+earliest observations are not considered as test sets. Suppose $k$
+observations are required to produce a reliable forecast. Then the
+process works as follows.
+
+1.  Select the observation at time $k+i$ for the test set, and use the
+    observations at times $1,2,\dots,k+i-1$ to estimate the
+    forecasting model. Compute the error on the forecast for time
+    $k+i$.
+2.  Repeat the above step for $i=1,2,\dots,T-k$ where $T$ is the
+    total number of observations.
+3.  Compute the forecast accuracy measures based on the errors obtained.
+
+This procedure is sometimes known as a "rolling forecasting origin"
+because the "origin" ($k+i-1$) at which the forecast is based rolls
+forward in time.
+
+With time series forecasting, one-step forecasts may
+not be as relevant as multi-step forecasts. In this case, the
+cross-validation procedure based on a rolling forecasting origin can be
+modified to allow multi-step errors to be used. Suppose we are
+interested in models that produce good $h$-step-ahead forecasts.
+
+1.  Select the observation at time $k+h+i-1$ for the test set, and use
+    the observations at times $1,2,\dots,k+i-1$ to estimate the
+    forecasting model. Compute the $h$-step error on the forecast for
+    time $k+h+i-1$.
+2.  Repeat the above step for $i=1,2,\dots,T-k-h+1$ where $T$ is
+    the total number of observations.
+3.  Compute the forecast accuracy measures based on the errors obtained.
+
+When $h=1$, this gives the same procedure as outlined above.

@@ -1,2 +1,3 @@
 book_filename: "fpp"
 chapter_name: "Chapter "
+before_chapter_script: ["before-each-chapter.R"]

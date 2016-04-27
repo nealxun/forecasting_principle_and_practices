@@ -1,0 +1,202 @@
+#Time series decomposition {#ch6}
+
+Time series data can exhibit a huge variety of patterns and it is
+helpful to categorize some of the patterns and behaviours that can be
+seen in time series. It is also sometimes useful to try to split a time
+series into several components, each representing one of the underlying
+categories of patterns.
+
+In this chapter, we consider some common patterns and methods to extract
+the associated components from a time series. Often this is done to help
+understand the time series better, but it can also be used to improve
+forecasts.
+
+## Time series components {#sec-6-1-TSpatterns}
+
+### Time series patterns {-}
+
+In this chapter, we will refer to three types of time series patterns.
+
+Trend
+:   A trend exists when there is a long-term increase or decrease in the
+    data. It does not have to be linear. Sometimes we will refer to a
+    trend “changing direction” when it might go from an increasing trend
+    to a decreasing trend.
+
+Seasonal
+:   A seasonal pattern exists when a series is influenced by seasonal
+    factors (e.g., the quarter of the year, the month, or day of the
+    week). Seasonality is always of a fixed and known period.
+
+Cyclic
+:   A cyclic pattern exists when data exhibit rises and falls that are
+    *not of fixed period*. The duration of these fluctuations is usually
+    of at least 2 years.
+
+Many people confuse cyclic behaviour with seasonal behaviour, but they
+are really quite different. If the fluctuations are not of fixed period
+then they are cyclic; if the period is unchanging and associated with
+some aspect of the calendar, then the pattern is seasonal. In general,
+the average length of cycles is longer than the length of a seasonal
+pattern, and the magnitude of cycles tends to be more variable than the
+magnitude of seasonal patterns.
+
+The following four examples shows different combinations of the above
+components.
+
+```{r 6-decomp1}
+par(mfrow=c(2,2)) 
+plot(hsales,xlab=“Year”,ylab=“Monthly housing sales (millions)”) 
+plot(ustreas,xlab=“Day”,ylab=“US treasury bill contracts”)
+plot(elec,xlab=“Year”,ylab=“Australian monthly electricity production”)
+plot(diff(dj),xlab=“Day”,ylab=“Daily change in Dow Jones index”)
+```
+
+1.  The monthly housing sales (top left) show strong seasonality within each
+    year, as well as some strong cyclic behaviour with period about 6--10
+    years. There is no apparent trend in the data over this period.
+
+2.  The US treasury bill contracts (top right) show results from the Chicago
+    market for 100 consecutive trading days in 1981. Here there is no
+    seasonality, but an obvious downward trend. Possibly, if we had a much
+    longer series, we would see that this downward trend is actually part of a
+    long cycle, but when viewed over only 100 days it appears to be a trend.
+
+3.  The Australian monthly electricity production (bottom left) shows a strong
+    increasing trend, with strong seasonality. There is no evidence of any
+    cyclic behaviour here.
+
+4.  The daily change in the Dow Jones index (bottom right) has no trend,
+    seasonality or cyclic behaviour. There are random fluctuations which do not
+    appear to be very predictable, and no strong patterns that would help with
+    developing a forecasting model.
+
+### Time series decomposition  {-}{#time-series-decomposition}
+
+We shall think of the time series $y_{t}$ as comprising three
+mponents: a seasonal component, a trend-cycle component (containing
+both trend and cycle), and a remainder component (containing anything
+else in the time series). For example, if we assume an additive model,en we can write $$y_{t} = S_{t} + T_{t} + E_{t},$$ where $y_{t}$ is
+the data at period $t$, $S_{t}$ is the seasonal component at period $t$,
+$T_{t}$ is the trend-cycle component at period $t$ and $E_{t}$ is the
+remainder (or irregular or error) component at period $t$.
+Alternatively, a multiplicative model would be written as
+$$y_{t} = S_{t} \times T_{t} \times E_{t}.$$
+
+The additive model is most appropriate if the magnitude of the seasonal
+fluctuations or the variation around the trend-cycle does not vary with
+the level of the time series. When the variation in the seasonal
+pattern, or the variation around the trend-cycle, appears to be
+proportional to the level of the time series, then a multiplicative
+model is more appropriate. With economic time series, multiplicative
+models are common.
+
+An alternative to using a multiplicative model, is to first transform
+the data until the variation in the series appears to be stable over
+time, and then use an additive model. When a log transformation has been
+used, this is equivalent to using a multiplicative decomposition because
+$$  
+y_{t} = S_{t} \times T_{t} \times E_{t} \quad\text{is equivalent to}\quad
+\log y_{t} = \log S_{t} + \log T_{t} + \log E_{t}.
+$$
+
+Sometimes, the trend-cycle component is simply called the “trend”
+component, even though it may contain cyclic behaviour as well.
+
+### Electrical equipment manufacturing {-}
+
+We will look at several methods for obtaining the components $S_{t}$,
+$T_{t}$ and $E_{t}$ later in this chapter. But first, it is helpful to
+see an example. We will decompose the new orders index for electrical
+equipment shown in Figure \@ref(fig:6-elecequip-trend). These data show the
+number of new orders for electrical equipment (computer, electronic and
+optical products) in the Euro area (16 countries). The data have been
+adjusted by working days and normalized so a value of 100 corresponds to
+2005.
+
+```{r 6-elecequip-trend, 
+    fig.cap="Electrical equipment orders: the trend-cycle component (red) and
+    raw data (grey)."}
+fit <- stl(elecequip, s.window=5) 
+plot(elecequip, col="gray",
+  main="Electrical equipment manufacturing", 
+  ylab="New orders index",
+  xlab="") 
+lines(fit[["time.series"]][,2],col="red",ylab="Trend")
+```
+
+Figure \@ref(fig:6-elecequip-trend) shows the trend-cycle component, $T_t$,
+in red and the original data, $y_t$, in grey. The trend-cycle shows the overall
+movement in the series, ignoring the seasonality and any small
+random fluctuations.
+
+Figure \@ref(fig:6-elecequip-stl) shows an additive decomposition of these
+data. The method used for extracting components in this example is STL which is
+discussed in Section \@ref{sec:6-stl}.
+
+```{r 6-elecequip-stl, 
+    fig.cap="The electricial equipment orders (top) and its three additive components."}
+plot(fit)
+```
+
+All three components are shown in the bottom three panels of Figure \@ref
+(fig:6-elecequip-stl). These three components can be added together to
+reconstruct the data shown in the top panel. Notice that the seasonal component
+changes very slowly over time, so any two consecutive years have very similar
+pattern, but years far apart may have different seasonal patterns. The
+remainder component shown in the bottom panel is what is left over when the
+seasonal and trend-cycle components have been subtracted from the data.
+
+The grey bars to the right of each panel show the relative scales of the
+components. Each grey bar represents the same length but because the plots are
+on different scales, the bars vary in size. The large grey bar in the bottom
+panel shows that the variation in the remainder component is small compared to
+the variation in the data which has a bar about one quarter the size. In other
+words, if we shrunk the bottom three panels until their bars became the same
+size as that in the data panel, then all the panels would be on the same scale.
+
+```{r 6-elecequip3, 
+    fig.cap="Seasonal sub-series plot of the seasonal component from the STL
+    decomposition shown in Figure \@ref(fig:6-elecequip-stl)."}
+monthplot(fit$time.series[,"seasonal"], main="", ylab="Seasonal")
+```
+
+It can be useful to use seasonal plots and seasonal sub-series plots of the
+seasonal component. These help us to visualize the variation in the seasonal
+component over time. Figure \@ref(fig:6-elecequip3) shows a seasonal sub-series
+plot of the seasonal component from Figure \@ref(fig:6-elecequip-stl). In this
+case, there are only very small changes over time.
+
+### Seasonally adjusted data {-}
+
+If the seasonal component is removed from the original data, the
+resulting values are called the “seasonally adjusted” data. For an
+additive model, the seasonally adjusted data are given by $y_{t}-S_{t}$,
+and for multiplicative data, the seasonally adjusted values are obtained
+using $y_{t}/S_{t}$. Figure \@ref(fig:6-elecequip-sa) shows the seasonally
+adjusted electrical equipment orders.
+
+```{r 6-elecequip-sa, 
+    fig.cap="Seasonally adjusted electrical equipment orders (red) and the
+    original data (grey)."}
+plot(elecequip, col="grey", main="Electrical equipment manufacturing",
+xlab="", ylab="New orders index")
+lines(seasadj(fit), col="red", ylab="Seasonally adjusted")
+```
+
+If the variation due to seasonality is not of primary interest, the seasonally
+adjusted series can be useful. For example, monthly unemployment data are
+usually seasonally adjusted to highlight variation due to the underlying state
+of the economy than the seasonal variation. An increase in unemployment due to
+school leavers seeking work is seasonal variation while an increase in
+unemployment due to large employers laying off workers is non-seasonal. Most
+people who study unemployment data are more interested in the non-seasonal
+variation. Consequently, employment data (and many other economic series) are
+usually seasonally adjusted.
+
+Seasonally adjusted series contain the remainder component as well as the
+trend-cycle. Therefore they are not “smooth” and “downturns” or “upturns” can
+be misleading. If the purpose is to look for turning points in the series, and
+interpret any changes in the series, then it is better to use the trend-cycle
+component rather than the seasonally adjusted data.
+

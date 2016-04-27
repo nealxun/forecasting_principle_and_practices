@@ -3,5 +3,10 @@
 .RData
 .*.Rnb.cached
 _publish.R
-_book/*
 _book
+_bookdown_files
+fpp.aux
+fpp.out
+fpp.fdb_latexmk
+fpp.log
+fpp.toc

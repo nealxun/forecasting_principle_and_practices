@@ -8,9 +8,8 @@ output:
     fig_caption: yes
     fig_height: 4
     fig_width: 6.4
-#  bookdown::pdf_book:
-#    keep_tex: yes
----
+  bookdown::pdf_book:
+    keep_tex: yes
 documentclass: book
 bibliography: [FPP.bib]
 biblio-style: apalike

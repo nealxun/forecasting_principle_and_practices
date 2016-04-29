@@ -76,7 +76,7 @@ with optimism or wishful thinking. For example, it would be highly unlikely
 that a team working towards launching a new product would forecast its failure.
 As we will discuss later, this optimism can be accentuated in a group meeting
 setting. “Beware of the enthusiasm of your marketing and sales
-colleagues”@Fildes2007a.
+colleagues” ???@Fildes2007a.
 
 Another undesirable property commonly seen in judgmental forecasting is the
 effect of anchoring. In this case, subsequent forecasts tend to converge or be
@@ -190,27 +190,7 @@ categories, a total of 672 series. This forecasting process aids in setting the
 government budget allocated to the PBS which is over \$7 billion per year or
 approximately 1% of GDP.
 
-[!htbp]
 
-[node distance = 1.8cm, auto]
-
-[every node/.style=block] (MAdata) <span> Monthly script and cost data</span>;
-(adjMA) <span> Adjusted monthly script and cost data</span>; (pcdata) <span>
-Monthly per capita data</span>; (newlistings) <span> New listing
-estimates</span>; (policy) <span> Policy impact estimates</span>; (abs) <span>
-Total population data</span>; (conc) <span> Concession population data</span>;
-(absf) <span> Total\ population\ forecasts</span>; (concf) <span> Concession
-population forecasts</span>; (pcf) <span> Monthly per capita forecasts</span>;
-(basef) <span> Monthly base forecasts</span>; (adjf) <span> Monthly adjusted
-forecasts</span>;
-
-[every path/.style=line] (MAdata) – (adjMA); (adjMA) – (pcdata); (newlistings)
-– (adjMA); (policy) – (adjMA); (abs) – (pcdata); (conc) – (pcdata); (conc) –
-(concf); (abs) – (absf); (pcdata) – (pcf); (pcf) – (basef); (basef) – (adjf);
-(concf) – (basef); (absf) – (basef); (newlistings) |- (adjf); (policy) |-
-(adjf);
-
-[fig-3-PBSdiagram]
 
 Figure [fig-3-PBSdiagram] summarises the forecasting process. Judgmental
 forecasts are generated for new listings of medicines and for estimating the
@@ -255,16 +235,16 @@ assumptions underly them, etc.
 
 Consequently we recommended several changes:
 
-that guidelines for forecasting new policy impacts be developed to encourage a
+ - that guidelines for forecasting new policy impacts be developed to encourage a
 more systematic and structured forecasting approach;
 
-that the forecast methodology be documented in each case including all
+ - that the forecast methodology be documented in each case including all
 assumptions made in forming the forecasts;
 
-that new policy forecasts be made by at least two people from different areas
+ - that new policy forecasts be made by at least two people from different areas
 of the organisation;
 
-that a review of forecasts be conducted one year after the implementation of
+ - that a review of forecasts be conducted one year after the implementation of
 each new policy by a review committee, especially for new policies that have a
 significant annual projected cost or saving. The review committee should
 include those involved in generating the forecasts but also others.
@@ -317,7 +297,7 @@ based on seniority or personality. There are suggestions that even something as
 simple as seating arrangements in a group setting can influence the group
 dynamics. Furthermore, there is ample evidence that a group meetingsetting
 promotes enthusiasm and influences individual judgement leading to optimism and
-overconfidence.@Buehler2005
+overconfidence. ????@Buehler2005
 
 A byproduct of anonymity is that the experts do not need to meet as a group in
 a physical location. An important advantage of this is that it increases the
@@ -426,7 +406,7 @@ ranking will always be useful.
 ### A structured analogy {-}
 
 Alternatively a structured approach comprising a panel of experts can be
-implemented as proposed by Green and Armstrong@Green2007. The concept is
+implemented as proposed by Green and Armstrong @???Green2007. The concept is
 similar to that of a Delphi; however, the forecasting task is completed by
 considering analogies. First of all a facilitator is appointed. Then the
 structured approach involves the following steps.
@@ -541,7 +521,7 @@ example, highly likely, likely, possible, unlikely, highly unlikely.
 
 Survey design challenges such as collecting a representative sample, applying a
 time- and cost-effective method, and dealing with non-responses, need to be
-addressed@Groves2009.
+addressed @????Groves2009.
 
 Furthermore, in this survey setting we must think about the relationship
 between purchase intention and purchase behaviour. Customers may not always do
@@ -629,13 +609,11 @@ economists and independent advisors) adjusts the model-based forecasts. In the
 second and final round, the TFC (comprising industry and government experts)
 makes final adjustments. Adjustments in both rounds are made by consensus.
 
-![Long run annual forecasts for domestic visitor nights for Australia. We study
+Long run annual forecasts for domestic visitor nights for Australia. We study
 regression models in Chapters 4 and 5, and ETS (ExponenTial Smoothing) models
-in Chapter 7.](fig_3_tfc)
+in Chapter 7.
 
-[fig-3-tfc]
-
-In 2008 we@austourism analysed forecasts for Australian domestic tourism. We
+In 2008 we????@austourism analysed forecasts for Australian domestic tourism. We
 concluded that the published TFC forecasts were optimistic, especially for the
 long-run, and we proposed alternative model-based forecasts. We now have
 observed data up to and including 2011. In Figure [fig-3-tfc] we plot the
@@ -654,8 +632,7 @@ in the day?
 [^2]: These are Australian dollar amounts published by the Australian
     government for 2012.
 
-[^3]: For further reading, refer to:\ .\
-    .
+[^3]: For further reading, refer to: ????.
 
 [^4]: This example is extracted from .
 

@@ -24,7 +24,6 @@
     b.  Split the data into a training set of 300 observations and a test set of 69 observations.
     c.  Try various benchmark methods to forecast the training set and compare the results on the test set. Which method did best?
 
-
 4.  Consider the sales of new one-family houses in the USA, Jan 1973 -- Nov 1995 (data set `hsales`).
 
     a. Produce some plots of the data in order to become familiar with it.

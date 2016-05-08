@@ -5,8 +5,7 @@ Forecasting has fascinated people for thousands of years, sometimes being consid
 > *Tell us what the future holds, so we may know that you are gods.*<br>
 > (Isaiah 41:23)
 
-One hundred years later, in ancient Babylon, forecasters would foretell the future based on the distribution of maggots in a rotten sheep’s liver. By 300 BC, people wanting forecasts would journey to Delphi in Greece to consult the Oracle, who would provide her predictions while
-intoxicated by ethylene vapours. Forecasters had a tougher time under the emperor Constantine, who issued a decree in AD357 forbidding anyone “to consult a soothsayer, a mathematician, or a forecaster … May curiosity to foretell the future be silenced forever.” A similar ban on forecasting occurred in England in 1736 when it became an offence to defraud by charging money for predictions. The punishment was three months’ imprisonment with hard labour!
+One hundred years later, in ancient Babylon, forecasters would foretell the future based on the distribution of maggots in a rotten sheep’s liver. By 300 BC, people wanting forecasts would journey to Delphi in Greece to consult the Oracle, who would provide her predictions while intoxicated by ethylene vapours. Forecasters had a tougher time under the emperor Constantine, who issued a decree in AD357 forbidding anyone “to consult a soothsayer, a mathematician, or a forecaster … May curiosity to foretell the future be silenced forever.” A similar ban on forecasting occurred in England in 1736 when it became an offence to defraud by charging money for predictions. The punishment was three months’ imprisonment with hard labour!
 
 The varying fortunes of forecasters arise because good forecasts can seem almost magical, while bad forecasts may be dangerous. Consider the following famous predictions about computing.
 
@@ -35,8 +34,7 @@ Some things are easier to forecast than others. The time of the sunrise tomorrow
 
 For example, forecasts of electricity demand can be highly accurate because all three conditions are usually satisfied. We have a good idea on the contributing factors: electricity demand is driven largely by temperatures, with smaller effects for calendar variation such as holidays, and economic conditions. Provided there is a sufficient history of data on electricity demand and weather conditions, and we have the skills to develop a good model linking electricity demand and the key driver variables, the forecasts can be remarkably accurate.
 
-On the other hand, when forecasting currency exchange rates, only one of the conditions is satisfied: there is plenty of available data. However, we have a very limited understanding of the factors that affect exchange rates, and forecasts of the exchange rate have a direct effect on the rates themselves. If there are well-publicized forecasts that the exchange rate will increase, then people will immediately adjust the price they are willing to pay and so the forecasts are self-fulfilling. In a sense the exchange rates become their own forecasts. This is an
-example of the “efficient market hypothesis”. Consequently, forecasting whether the exchange rate will rise or fall tomorrow is about as predictable as forecasting whether a tossed coin will come down as a head or a tail. In both situations, you will be correct about 50% of the time whatever you forecast. In situations like this, forecasters need to be aware of their own limitations, and not claim more than is possible.
+On the other hand, when forecasting currency exchange rates, only one of the conditions is satisfied: there is plenty of available data. However, we have a very limited understanding of the factors that affect exchange rates, and forecasts of the exchange rate have a direct effect on the rates themselves. If there are well-publicized forecasts that the exchange rate will increase, then people will immediately adjust the price they are willing to pay and so the forecasts are self-fulfilling. In a sense the exchange rates become their own forecasts. This is an example of the “efficient market hypothesis”. Consequently, forecasting whether the exchange rate will rise or fall tomorrow is about as predictable as forecasting whether a tossed coin will come down as a head or a tail. In both situations, you will be correct about 50% of the time whatever you forecast. In situations like this, forecasters need to be aware of their own limitations, and not claim more than is possible.
 
 Often in forecasting, a key step is knowing when something can be forecast accurately, and when forecasts will be no better than tossing a coin. Good forecasts capture the genuine patterns and relationships which exist in the historical data, but do not replicate past events that will not occur again. In this book, we will learn how to tell the difference between a random fluctuation in the past data that should be ignored, and a genuine pattern that should be modelled and extrapolated.
 
@@ -128,29 +126,25 @@ Time series models used for forecasting include ARIMA models, exponential smooth
 ### Predictor variables and time series forecasting {-}
 
 Predictor variables can also be used in time series forecasting. For example, suppose we wish to forecast the hourly electricity demand (ED) of a hot region during the summer period. A model with predictor variables might be of the form
-
 \begin{align*}
-\text{ED} = & f(\text{current temperature, strength of economy, population,}\\
+  \text{ED} = & f(\text{current temperature, strength of economy, population,}\\
  &  \qquad\text{time of day, day of week, error}).
 \end{align*}
-
-The relationship is not exact---there will always be changes in electricity demand that cannot be accounted for by the predictor variables. The “error” term on the right allows for random variation and the effects of relevant variables that not included in the model. We call this an “explanatory model” because it helps explain what causes
-the variation in electricity demand.
+The relationship is not exact---there will always be changes in electricity demand that cannot be accounted for by the predictor variables. The “error” term on the right allows for random variation and the effects of relevant variables that not included in the model. We call this an “explanatory model” because it helps explain what causes the variation in electricity demand.
 
 Because the electricity demand data form a time series, we could also use a time series model for forecasting. In this case, a suitable time series forecasting equation is of the form
-$$\text{ED}_{t+1} = f(\text{ED}_{t}, \text{ED}_{t-1}, \text{ED}_{t-2}, \text{ED}_{t-3},\dots, \text{error}),$$
+$$
+  \text{ED}_{t+1} = f(\text{ED}_{t}, \text{ED}_{t-1}, \text{ED}_{t-2}, \text{ED}_{t-3},\dots, \text{error}),
+$$
 where $t$ is the present hour, $t+1$ is the next hour, $t-1$ is the previous hour, $t-2$ is two hours ago, and so on. Here, prediction of the future is based on past values of a variable, but not on external variables which may affect the system. Again, the “error” term on the right allows for random variation and the effects of relevant variables that are not included in the model.
 
-There is also a third type of model which combines the features of the
-above two models. For example, it might be given by
-$$\text{ED}_{t+1} = f(\text{ED}_{t}, \text{current temperature, time of day, day of week, error}).$$
-These types of mixed models have been given various names in different disciplines. They are known as dynamic regression models, panel data models, longitudinal models, transfer function models, and linear system models (assuming $f$ is linear). These models are discussed in
-Chapter \@ref(??).
+There is also a third type of model which combines the features of the above two models. For example, it might be given by
+$$
+ \text{ED}_{t+1} = f(\text{ED}_{t}, \text{current temperature, time of day, day of week, error}).
+$$
+These types of mixed models have been given various names in different disciplines. They are known as dynamic regression models, panel data models, longitudinal models, transfer function models, and linear system models (assuming $f$ is linear). These models are discussed in Chapter \@ref(??).
 
-An explanatory model is very useful because it incorporates information about other variables, rather than only historical values of the variable to be forecast. However, there are several reasons a forecaster might select a time series model rather than an explanatory model.
-First, the system may not be understood, and even if it was understood it may be extremely difficult to measure the relationships that are assumed to govern its behavior.
-Second, it is necessary to know or forecast the future values of the various predictors in order to be able to forecast the variable of interest, and this may be too difficult.
-Third, the main concern may be only to predict what will happen, not to know why it happens. Finally, the time series model may give more accurate forecasts than an explanatory or mixed model.
+An explanatory model is very useful because it incorporates information about other variables, rather than only historical values of the variable to be forecast. However, there are several reasons a forecaster might select a time series model rather than an explanatory model. First, the system may not be understood, and even if it was understood it may be extremely difficult to measure the relationships that are assumed to govern its behavior. Second, it is necessary to know or forecast the future values of the various predictors in order to be able to forecast the variable of interest, and this may be too difficult. Third, the main concern may be only to predict what will happen, not to know why it happens. Finally, the time series model may give more accurate forecasts than an explanatory or mixed model.
 
 The model to be used in forecasting depends on the resources and data available, the accuracy of the competing models, and how the forecasting model is to be used.
 
@@ -185,8 +179,7 @@ Thus we needed to find a forecasting method that allowed for trend and seasonali
 
 #### Case 3 {-}
 
-A large car fleet company asked us to help them forecast vehicle re-sale values. They purchase new vehicles, lease them out for three years, and then sell them. Better forecasts of vehicle sales values would mean better control of profits; understanding what affects resale values may
-allow leasing and sales policies to be developed in order to maximize profits.
+A large car fleet company asked us to help them forecast vehicle re-sale values. They purchase new vehicles, lease them out for three years, and then sell them. Better forecasts of vehicle sales values would mean better control of profits; understanding what affects resale values may allow leasing and sales policies to be developed in order to maximize profits.
 
 At the time, the resale values were being forecast by a group of specialists. Unfortunately, they saw any statistical model as a threat to their jobs and were uncooperative in providing information. Nevertheless, the company provided a large amount of data on previous vehicles and their eventual resale values.
 
@@ -231,11 +224,8 @@ With time series forecasting, it is often useful to specify exactly what informa
 
 ## Exercises
 
- 1. For cases 3 and 4 in Section \@ref(case-studies), list the possible
-predictor variables that might be useful, assuming that the relevant
-data are available.
+ 1. For cases 3 and 4 in Section \@ref(case-studies), list the possible predictor variables that might be useful, assuming that the relevant data are available.
 
- 2. For case 3 in Section \@ref(case-studies), describe the five steps of
-forecasting in the context of this project.
+ 2. For case 3 in Section \@ref(case-studies), describe the five steps of forecasting in the context of this project.
 
 

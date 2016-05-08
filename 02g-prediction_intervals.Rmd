@@ -1,44 +1,24 @@
 
 ## Prediction intervals
 
-As discussed in [Section 1/7](../../1/7), a prediction interval gives an
-interval within which we expect $y_{i}$ to lie with a specified
-probability. For example, assuming the forecast errors are uncorrelated
-and normally distributed, then a simple 95% prediction interval for the
-next observation in a time series is
+As discussed in [Section 1/7](../../1/7), a prediction interval gives an interval within which we expect $y_{i}$ to lie with a specified probability. For example, assuming the forecast errors are uncorrelated and normally distributed, then a simple 95% prediction interval for the next observation in a time series is
 $$
-\hat{y}_{t} \pm 1.96 \hat\sigma,
+  \hat{y}_{t} \pm 1.96 \hat\sigma,
 $$
-where $\hat\sigma$ is an estimate of the standard
-deviation of the forecast distribution. In forecasting, it is common to
-calculate 80% intervals and 95% intervals, although any percentage may
-be used.
+where $\hat\sigma$ is an estimate of the standard deviation of the forecast distribution. In forecasting, it is common to calculate 80% intervals and 95% intervals, although any percentage may be used.
 
-When forecasting one-step ahead, the standard deviation of the
-forecast distribution is almost the same as the standard deviation of
-the residuals. (In fact, the two standard deviations are identical if
-there are no parameters to be estimated such as with the naïve method.
-For forecasting methods involving parameters to be estimated, the
-standard deviation of the forecast distribution is slightly larger than
-the residual standard deviation, although this difference is often
-ignored.)
+When forecasting one-step ahead, the standard deviation of the forecast distribution is almost the same as the standard deviation of the residuals. (In fact, the two standard deviations are identical if there are no parameters to be estimated such as with the naïve method. For forecasting methods involving parameters to be estimated, the standard deviation of the forecast distribution is slightly larger than the residual standard deviation, although this difference is often ignored.)
 
-For example, consider a naïve forecast for the Dow-Jones
-Index. The last value of the observed series is 3830, so the forecast of
-the next value of the DJI is 3830. The standard deviation of the
-residuals from the naïve method is 21.99. Hence, a 95% prediction
-interval for the next value of the DJI is
+For example, consider a naïve forecast for the Dow-Jones Index. The last value of the observed series is 3830, so the forecast of the next value of the DJI is 3830. The standard deviation of the residuals from the naïve method is 21.99. Hence, a 95% prediction interval for the next value of the DJI is
 $$
-3830 \pm 1.96(21.99) = [3787, 3873].
+  3830 \pm 1.96(21.99) = [3787, 3873].
 $$
 Similarly, an 80% prediction interval is given by
 $$
-3830 \pm 1.28(21.99) = [3802,3858].
+  3830 \pm 1.28(21.99) = [3802,3858].
 $$
 
-The value of the multiplier
-(1.96 or 1.28) determines the percentage of the prediction interval. The
-following table gives the values to be used for different percentages.
+The value of the multiplier (1.96 or 1.28) determines the percentage of the prediction interval. The following table gives the values to be used for different percentages.
 
 
 ```{r echo=FALSE}
@@ -48,37 +28,12 @@ knitr::kable(tab, digits=2, booktabs=TRUE,
              caption="Multipliers to be used for prediction intervals.")
 ```
 
-The use of this table and the formula $\hat{y}_{i} \pm k \hat\sigma$ (where $k$ is the multiplier) assumes that the
-residuals are normally distributed and uncorrelated. If either of these
-conditions does not hold, then this method of producing a prediction
-interval cannot be used.
+The use of this table and the formula $\hat{y}_{i} \pm k \hat\sigma$ (where $k$ is the multiplier) assumes that the residuals are normally distributed and uncorrelated. If either of these conditions does not hold, then this method of producing a prediction interval cannot be used.
 
-The value of prediction intervals is that they
-express the uncertainty in the forecasts. If we only produce point
-forecasts, there is no way of telling how accurate the forecasts are.
-But if we also produce prediction intervals, then it is clear how much
-uncertainty is associated with each forecast. For this reason, point
-forecasts can be of almost no value without accompanying prediction
-intervals.
+The value of prediction intervals is that they express the uncertainty in the forecasts. If we only produce point forecasts, there is no way of telling how accurate the forecasts are. But if we also produce prediction intervals, then it is clear how much uncertainty is associated with each forecast. For this reason, point forecasts can be of almost no value without accompanying prediction intervals.
 
-To produce a prediction interval, it is necessary to have an
-estimate of the standard deviation of the forecast distribution. For
-one-step forecasts for time series, the residual standard deviation
-provides a good estimate of the forecast standard deviation. But for all
-other situations, including multi-step forecasts for time series, a more
-complicated method of calculation is required. These calculations are
-usually done with standard forecasting software and need not trouble the
-forecaster (unless he or she is writing the software!).
+To produce a prediction interval, it is necessary to have an estimate of the standard deviation of the forecast distribution. For one-step forecasts for time series, the residual standard deviation provides a good estimate of the forecast standard deviation. But for all other situations, including multi-step forecasts for time series, a more complicated method of calculation is required. These calculations are usually done with standard forecasting software and need not trouble the forecaster (unless he or she is writing the software!).
 
-A common feature of prediction intervals is that they increase in length as the forecast
-horizon increases. The further ahead we forecast, the more uncertainty
-is associated with the forecast, and so the prediction intervals grow
-wider. However, there are some (non-linear) forecasting methods that do
-not have this attribute.
+A common feature of prediction intervals is that they increase in length as the forecast horizon increases. The further ahead we forecast, the more uncertainty is associated with the forecast, and so the prediction intervals grow wider. However, there are some (non-linear) forecasting methods that do not have this attribute.
 
-If a transformation has been used, then the
-prediction interval should be computed on the transformed scale, and the
-end points back-transformed to give a prediction interval on the
-original scale. This approach preserves the probability coverage of the
-prediction interval, although it will no longer be symmetric around the
-point forecast.
+If a transformation has been used, then the prediction interval should be computed on the transformed scale, and the end points back-transformed to give a prediction interval on the original scale. This approach preserves the probability coverage of the prediction interval, although it will no longer be symmetric around the point forecast.

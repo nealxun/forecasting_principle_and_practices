@@ -1,46 +1,25 @@
 ## Transformations and adjustments
 
-Adjusting the historical data can often lead to a simpler forecasting
-model. Here we deal with four kinds of adjustments: mathematical
-transformations, calendar adjustments, population adjustments and
-inflation adjustments. The purpose of all these transformations and
-adjustments is to simplify the patterns in the historical data by
-removing known sources of variation or by making the pattern more
-consistent across the whole data set. Simpler patterns usually lead to
-more accurate forecasts.
+Adjusting the historical data can often lead to a simpler forecasting model. Here we deal with four kinds of adjustments: mathematical transformations, calendar adjustments, population adjustments and inflation adjustments. The purpose of all these transformations and adjustments is to simplify the patterns in the historical data by removing known sources of variation or by making the pattern more consistent across the whole data set. Simpler patterns usually lead to more accurate forecasts.
 
 ###Mathematical transformations {-}
 
-If the data show variation that increases or decreases with the level of
-the series, then a transformation can be useful. For example, a
-logarithmic transformation is often useful. If we denote the original
-observations as $y\_{1},\dots,y\_{T}$ and the transformed
-observations as $w_{1}, \dots, w_{T}$, then $w_t = \log(y_t)$.
-Logarithms are useful because they are interpretable: changes in a log
-value are relative (or percentage) changes on the original scale. So if
-log base 10 is used, then an increase of 1 on the log scale corresponds
-to a multiplication of 10 on the original scale. Another useful feature of log transformations is that they constrain the forecasts to stay positive on the original scale.
+If the data show variation that increases or decreases with the level of the series, then a transformation can be useful. For example, a logarithmic transformation is often useful. If we denote the original observations as $y\_{1},\dots,y\_{T}$ and the transformed observations as $w_{1}, \dots, w_{T}$, then $w_t = \log(y_t)$. Logarithms are useful because they are interpretable: changes in a log value are relative (or percentage) changes on the original scale. So if log base 10 is used, then an increase of 1 on the log scale corresponds to a multiplication of 10 on the original scale. Another useful feature of log transformations is that they constrain the forecasts to stay positive on the original scale.
 
-Sometimes other transformations are also used (although they are not so interpretable).
-For example, square roots and cube roots can be used. These are called
-*power transformations* because they can be written in the form $w_{t}
-= y_{t}^p$. 
+Sometimes other transformations are also used (although they are not so interpretable). For example, square roots and cube roots can be used. These are called *power transformations* because they can be written in the form $w_{t} = y_{t}^p$.
 
-A useful family of transformations that includes
-logarithms and power transformations is the family of "Box-Cox
-transformations", which depend on the parameter $\lambda$ and are
-defined as follows: 
+A useful family of transformations that includes logarithms and power transformations is the family of "Box-Cox transformations", which depend on the parameter $\lambda$ and are defined as follows:
+$$ 
+w_t  = 
+  \begin{cases} 
+    \log(y_t) & \text{if $\lambda=0$};  \\ 
+    (y_t^\lambda-1)/\lambda & \text{otherwise}. 
+  \end{cases}
+$$
 
-$$ w_t  = \begin{cases} \log(y_t) & \text{if $\lambda=0$};  \\ (y_t^\lambda-1)/\lambda & \text{otherwise}. \end{cases}$$
+The logarithm in a Box-Cox transformation is always a natural logarithm (i.e., to base $e$). So if $\lambda=0$, natural logarithms are used, but if $\lambda\ne0$, a power transformation is used followed by some simple scaling.
 
-The logarithm in a Box-Cox transformation is always a natural logarithm (i.e., to base $e$). So
-if $\lambda=0$, natural logarithms are used, but if
-$\lambda\ne0$, a power transformation is used followed by some
-simple scaling. 
-
-The following figure shows a logarithmic transformation
-of the monthly electricity demand data. *Click the figure to see a
-series of other transformations.* 
+The following figure shows a logarithmic transformation of the monthly electricity demand data. *Click the figure to see a series of other transformations.*
 
 ```{r bcelec, fig.cap="Power transformations for Australian monthly electricity data."}
 plot(log(elec), ylab="Transformed electricity demand",
@@ -48,11 +27,7 @@ plot(log(elec), ylab="Transformed electricity demand",
 title(main="Log",line=-1)
 ```
 
-A good value of $\lambda$ is one which makes the size of the seasonal
-variation about the same across the whole series, as that makes the
-forecasting model simpler. In this case, $\lambda=0.30$ works quite
-well, although any value of $\lambda$ between 0 and 0.5 would give
-similar results.
+A good value of $\lambda$ is one which makes the size of the seasonal variation about the same across the whole series, as that makes the forecasting model simpler. In this case, $\lambda=0.30$ works quite well, although any value of $\lambda$ between 0 and 0.5 would give similar results.
 
 ```r
 # The BoxCox.lambda() function will choose a value of lambda for you.
@@ -60,34 +35,28 @@ lambda <- BoxCox.lambda(elec) # = 0.27
 plot(BoxCox(elec,lambda))
 ```
 
-Having chosen a transformation, we need to forecast the transformed
-data. Then, we need to reverse the transformation (or *back-transform*)
-to obtain forecasts on the original scale. The reverse Box-Cox
-transformation is given by 
-
-$$ y_{t} = \begin{cases} \exp(w_{t}) & \lambda=0;\\ (\lambda w_t+1)^{1/\lambda} & \text{otherwise}.\end{cases} $$
+Having chosen a transformation, we need to forecast the transformed data. Then, we need to reverse the transformation (or *back-transform*) to obtain forecasts on the original scale. The reverse Box-Cox transformation is given by
+$$ 
+  y_{t} = 
+    \begin{cases} 
+      \exp(w_{t}) & \lambda=0;\\ 
+      (\lambda w_t+1)^{1/\lambda} & \text{otherwise}.
+    \end{cases} 
+  $$
 
 ### Features of power transformations {-}
 
--   If some $y_{t}\le0$, no power transformation is possible unless
-    all observations are adjusted by adding a constant to all values.
+-   If some $y_{t}\le0$, no power transformation is possible unless all observations are adjusted by adding a constant to all values.
 -   Choose a simple value of $\lambda$. It makes explanations easier.
--   Forecasting results are relatively insensitive to the value of
-    $\lambda$.
+-   Forecasting results are relatively insensitive to the value of $\lambda$.
 -   Often no transformation is needed.
--   Transformations sometimes make little difference to the forecasts
-    but have a large effect on prediction intervals.
+-   Transformations sometimes make little difference to the forecasts but have a large effect on prediction intervals.
 
 ###Calendar adjustments {-}
 
-Some variation seen in seasonal data may be due to simple calendar
-effects. In such cases, it is usually much easier to remove the
-variation before fitting a forecasting model. 
+Some variation seen in seasonal data may be due to simple calendar effects. In such cases, it is usually much easier to remove the variation before fitting a forecasting model.
 
-For example, if you are
-studying monthly milk production on a farm, then there will be variation
-between the months simply because of the different numbers of days in
-each month in addition to seasonal variation across the year. 
+For example, if you are studying monthly milk production on a farm, then there will be variation between the months simply because of the different numbers of days in each month in addition to seasonal variation across the year.
 
 ```{r cowmilk, fig.cap="Monthly milk production per cow. Source: Cryer (2006)."}
 monthdays <- rep(c(31,28,31,30,31,30,31,31,30,31,30,31),14)
@@ -99,48 +68,16 @@ plot(milk/monthdays, main="Average milk production per cow per day",
   ylab="Pounds", xlab="Years")
 ```
 
-Notice how much simpler the seasonal pattern is in the average daily
-production plot compared to the average monthly production plot. By
-looking at average daily production instead of average monthly
-production, we effectively remove the variation due to the different
-month lengths. Simpler patterns are usually easier to model and lead to
-more accurate forecasts. 
+Notice how much simpler the seasonal pattern is in the average daily production plot compared to the average monthly production plot. By looking at average daily production instead of average monthly production, we effectively remove the variation due to the different month lengths. Simpler patterns are usually easier to model and lead to more accurate forecasts.
 
-A similar adjustment can be done for sales data
-when the number of trading days in each month will vary. In this case,
-the sales per trading day can be modelled instead of the total sales for
-each month.
+A similar adjustment can be done for sales data when the number of trading days in each month will vary. In this case, the sales per trading day can be modelled instead of the total sales for each month.
 
 ###Population adjustments {-}
 
-Any data that are affected by population changes can be adjusted to give
-per-capita data. That is, consider the data per person (or per thousand
-people, or per million people) rather than the total. For example, if
-you are studying the number of hospital beds in a particular region over
-time, the results are much easier to interpret if you remove the effect
-of population changes by considering number of beds per thousand people.
-Then you can see if there have been real increases in the number of
-beds, or whether the increases are entirely due to population increases.
-It is possible for the total number of beds to increase, but the number
-of beds per thousand people to decrease. This occurs when the population
-is increasing faster than the number of hospital beds. For most data
-that are affected by population changes, it is best to use per-capita
-data rather than the totals.
+Any data that are affected by population changes can be adjusted to give per-capita data. That is, consider the data per person (or per thousand people, or per million people) rather than the total. For example, if you are studying the number of hospital beds in a particular region over time, the results are much easier to interpret if you remove the effect of population changes by considering number of beds per thousand people. Then you can see if there have been real increases in the number of beds, or whether the increases are entirely due to population increases. It is possible for the total number of beds to increase, but the number of beds per thousand people to decrease. This occurs when the population is increasing faster than the number of hospital beds. For most data that are affected by population changes, it is best to use per-capita data rather than the totals.
 
 ###Inflation adjustments {-}
 
-Data that are affected by the value of money are best adjusted before
-modelling. For example, data on the average cost of a new house will
-have increased over the last few decades due to inflation. A \$200,000
-house this year is not the same as a \$200,000 house twenty years ago.
-For this reason, financial time series are usually adjusted so all
-values are stated in dollar values from a particular year. For example,
-the house price data may be stated in year 2000 dollars. 
+Data that are affected by the value of money are best adjusted before modelling. For example, data on the average cost of a new house will have increased over the last few decades due to inflation. A \$200,000 house this year is not the same as a \$200,000 house twenty years ago. For this reason, financial time series are usually adjusted so all values are stated in dollar values from a particular year. For example, the house price data may be stated in year 2000 dollars.
 
-To make these
-adjustments a price index is used. If $z_{t}$ denotes the price index
-and $y_{t}$ denotes the original house price in year $t$, then
-$x_{t} = y_{t}/z_{t} * z_{2000}$ gives the adjusted house price
-at year 2000 dollar values. Price indexes are often constructed by
-government agencies. For consumer goods, a common price index is the
-Consumer Price Index (or CPI).
+To make these adjustments a price index is used. If $z_{t}$ denotes the price index and $y_{t}$ denotes the original house price in year $t$, then $x_{t} = y_{t}/z_{t} * z_{2000}$ gives the adjusted house price at year 2000 dollar values. Price indexes are often constructed by government agencies. For consumer goods, a common price index is the Consumer Price Index (or CPI).

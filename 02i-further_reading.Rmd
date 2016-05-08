@@ -12,23 +12,14 @@ output:
 
 ###Graphics and data summary {-}
 
--   [Cleveland, W. S. (1993). *Visualizing Data*. Hobart
-    Press.](http://www.amazon.com/Visualizing-Data-William-S-Cleveland/dp/0963488406?tag=ote09-20)
--   [Maindonald, J. and H. Braun (2010). *Data analysis and graphics
-    using R: an example-based approach*. 3rd ed. Cambridge, UK:
-    Cambridge University
-    Press.](http://www.amazon.com/Data-Analysis-Graphics-Using-Example-Based/dp/0521762936?tag=ote09-20)
+-   [Cleveland, W. S. (1993). *Visualizing Data*. Hobart Press.](http://www.amazon.com/Visualizing-Data-William-S-Cleveland/dp/0963488406?tag=ote09-20)
+-   [Maindonald, J. and H. Braun (2010). *Data analysis and graphics using R: an example-based approach*. 3rd ed. Cambridge, UK: Cambridge University Press.](http://www.amazon.com/Data-Analysis-Graphics-Using-Example-Based/dp/0521762936?tag=ote09-20)
 
 ###Simple forecasting methods {-}
 
--   [Ord, J. K. and R. Fildes (2012). *Principles of business
-    forecasting*. South-Western College
-    Pub.](http://www.amazon.com/Principles-Business-Forecasting-Keith-Ord/dp/0324311273?tag=ote09-20)
+-   [Ord, J. K. and R. Fildes (2012). *Principles of business forecasting*. South-Western College Pub.](http://www.amazon.com/Principles-Business-Forecasting-Keith-Ord/dp/0324311273?tag=ote09-20)
 
 ###Evaluating forecast accuracy {-}
 
--   [Hyndman, R. J. and A. B. Koehler (2006). Another look at measures
-    of forecast accuracy. *International Journal of Forecasting*
-    **22**(4),
-    679–688.](http://robjhyndman.com/papers/another-look-at-measures-of-forecast-accuracy/)
+-   [Hyndman, R. J. and A. B. Koehler (2006). Another look at measures of forecast accuracy. *International Journal of Forecasting* **22**(4), 679–688.](http://robjhyndman.com/papers/another-look-at-measures-of-forecast-accuracy/)
     

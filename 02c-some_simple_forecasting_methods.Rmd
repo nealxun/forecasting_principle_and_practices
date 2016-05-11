@@ -56,7 +56,7 @@ rwf(y, h, drift=TRUE)
 
 Figure \@ref(fig:beerf) shows the first three methods applied to the quarterly beer production data. 
 
-```{r beerf, fig.cap="Forecasts of Australian quarterly beer production.", warnings=FALSE, message=FALSE}
+```{r beerf, fig.cap="Forecasts of Australian quarterly beer production.", warning=FALSE, message=FALSE}
 beer2 <- window(ausbeer,start=1992,end=2006-.1)
 beerdf <- cbind(Actual = beer2, 
   Mean = meanf(beer2, h=11)$mean,
@@ -72,7 +72,7 @@ autoplot(beerdf) +
 
 In Figure \@ref(fig:djf), the non-seasonal methods were applied to a series of 250 days of the Dow Jones Index. 
 
-```{r djf, fig.cap="Forecasts based on 250 days of the Dow Jones Index.", warnings=FALSE}
+```{r djf, fig.cap="Forecasts based on 250 days of the Dow Jones Index.", warnings=FALSE, message=FALSE}
 dj2 <- window(dj,end=250)
 djdf <- cbind(Actual=dj2, 
               Mean=meanf(dj2, h=42)$mean,

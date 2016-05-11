@@ -830,7 +830,7 @@ you fall for the “dummy variable trap” (having the same number of dummy
 variables as there are categories of a categorical predictor).
 
 The residual variance is estimated using $$\hat{\sigma}^2 =
-\frac{1}{N-k}(\bm{Y} - \bm{X}\hat{\bm{\beta}})'(\bm{Y} -
+\frac{1}{N-k-1}(\bm{Y} - \bm{X}\hat{\bm{\beta}})'(\bm{Y} -
 \bm{X}\hat{\bm{\beta}}).$$
 
 ### Fitted values and cross {-}-validation

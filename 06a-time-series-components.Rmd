@@ -70,7 +70,7 @@ Sometimes, the trend-cycle component is simply called the "trend" component, eve
 
 ### Electrical equipment manufacturing {-}
 
-We will look at several methods for obtaining the components $S_{t}$, $T_{t}$ and $E_{t}$ later in this chapter. But first, it is helpful to see an example. We will decompose the new orders index for electrical equipment shown in Figure \@ref(fig:6-elecequip-trend). These data show the number of new orders for electrical equipment (computer, electronic and optical products) in the Euro area (16 countries). The data have been adjusted by working days and normalized so a value of 100 corresponds to 2005.
+We will look at several methods for obtaining the components $S_{t}$, $T_{t}$ and $E_{t}$ later in this chapter. But first, it is helpful to see an example. We will decompose the new orders index for electrical equipment shown in Figure \@ref(fig:elecequip-trend). These data show the number of new orders for electrical equipment (computer, electronic and optical products) in the Euro area (16 countries). The data have been adjusted by working days and normalized so a value of 100 corresponds to 2005.
 
 ```{r elecequip-trend,  fig.cap="Electrical equipment orders: the trend-cycle component (red) and raw data (grey)."}
 fit <- stl(elecequip, s.window=5) 

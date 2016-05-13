@@ -53,37 +53,44 @@ Similarly, the *mean squared scaled error* (MSSE) can be defined where the error
 
 ###Examples {-}
 
-```{r beeraccuracy, fig.cap="Forecasts of Australian quarterly beer production using data up to the end of 2005."}
-beer2 <- window(ausbeer,start=1992,end=2006-.1)
-
-beerfit1 <- meanf(beer2,h=11)
-beerfit2 <- rwf(beer2,h=11)
-beerfit3 <- snaive(beer2,h=11)
-
-plot(beerfit1, plot.conf=FALSE,
-  main="Forecasts for quarterly beer production")
-lines(beerfit2$mean,col=2)
-lines(beerfit3$mean,col=3)
-lines(ausbeer)
-legend("topright", lty=1, col=c(4,2,3),
-  legend=c("Mean method","Naive method","Seasonal naive method"))
+```{r beeraccuracy, fig.cap="Forecasts of Australian quarterly beer production using data up to the end of 2007."}
+beer2 <- window(ausbeer,start=1992,end=c(2007,4))
+beerfit1 <- meanf(beer2,h=10)
+beerfit2 <- rwf(beer2,h=10)
+beerfit3 <- snaive(beer2,h=10)
+tmp <- cbind(Data=window(ausbeer, start=1992),
+             Mean=beerfit1$mean, 
+             Naive=beerfit2$mean, 
+             SeasonalNaive=beerfit3$mean)
+autoplot(tmp) + xlab("Year") + ylab("Megalitres") +
+  ggtitle("Forecasts for quarterly beer production") + 
+  scale_color_manual(values=c('#000000','#1b9e77','#d95f02','#7570b3'),
+                     breaks=c("Mean","Naive","SeasonalNaive"),
+                     name="Forecast Method")
 ```
 
 
-Figure 2.17 shows three forecast methods applied to the quarterly Australian beer production using data only to the end of 2005. The actual values for the period 2006-2008 are also shown. We compute the forecast accuracy measures for this period.
+Figure \ref@(fig:beeraccuracy) shows three forecast methods applied to the quarterly Australian beer production using data only to the end of 2007. The actual values for the period 2008--2010 are also shown. We compute the forecast accuracy measures for this period.
 
-| Method                | RMSE  | MAE   | MAPE  | MASE |
-| :-----                | :---  | :--   | :---  | :--- |
-| Mean method           | 38.01 | 33.78 | 8.17  | 2.30 |
-| Naïve method          | 70.91 | 63.91 | 15.88 | 4.35 |
-| Seasonal naïve method | 12.97 | 11.27 | 2.73  | 0.77 |
 
 ```r
-beer3 <- window(ausbeer, start=2006)
+beer3 <- window(ausbeer, start=2008)
 accuracy(beerfit1, beer3)
 accuracy(beerfit2, beer3)
 accuracy(beerfit3, beer3)
 ```
+
+```{r echo=FALSE}
+beer3 <- window(ausbeer, start=2008)
+tab <- matrix(NA,ncol=4,nrow=3)
+tab[1,] <- accuracy(beerfit1, beer3)[2,c(2,3,5,6)]
+tab[2,] <- accuracy(beerfit2, beer3)[2,c(2,3,5,6)]
+tab[3,] <- accuracy(beerfit3, beer3)[2,c(2,3,5,6)]
+colnames(tab) <- c("RMSE","MAE","MAPE","MASE")
+rownames(tab) <- c("Mean method", "Naïve method", "Seasonal naïve method")
+knitr::kable(tab, digits=2)
+```
+
 
 It is obvious from the graph that the seasonal naïve method is best for these data, although it can still be improved, as we will discover later. Sometimes, different accuracy measures will lead to different results as to which forecast method is best. However, in this case, all the results point to the seasonal naïve method as the best of these three methods for this data set.
 
@@ -91,27 +98,34 @@ To take a non-seasonal example, consider the Dow Jones Index. The following grap
 
 ```{r, fig.cap="Forecasts of the Dow Jones Index from 16 July 1994."}
 dj2 <- window(dj, end=250)
-plot(dj2, main="Dow Jones Index (daily ending 15 Jul 94)",
-  ylab="", xlab="Day", xlim=c(2,290))
-lines(meanf(dj2,h=42)$mean, col=4)
-lines(rwf(dj2,h=42)$mean, col=2)
-lines(rwf(dj2,drift=TRUE,h=42)$mean, col=3)
-legend("topleft", lty=1, col=c(4,2,3),
-  legend=c("Mean method","Naive method","Drift method"))
-lines(dj)
-```
+djfc1 <- meanf(dj2, h=42)
+djfc2 <- rwf(dj2, h=42)
+djfc3 <- rwf(dj2, drift=TRUE, h=42)
 
-| Method       | RMSE   | MAE    | MAPE | MASE |
-| :-----       | :---   | :--    | :--- | :--- |
-| Mean method  | 148.24 | 142.42 | 3.66 | 8.70 |
-| Naïve method | 62.03  | 54.44  | 1.40 | 3.32 |
-| Drift method | 53.70  | 45.73  | 1.18 | 2.79 |
+tmp <- cbind(Data=dj, Mean=djfc1$mean, Naive=djfc2$mean, Drift=djfc3$mean)
+autoplot(tmp) + xlab("Day") + ylab("") +
+  ggtitle("Dow Jones Index (daily ending 15 Jul 94)") +
+  scale_color_manual(values=c('#000000','#1b9e77','#d95f02','#7570b3'),
+                     breaks=c("Mean","Naive","Drift"),
+                     name="Forecast Method")
+```
 
 ```r
 dj3 <- window(dj, start=251)
-accuracy(meanf(dj2,h=42), dj3)
-accuracy(rwf(dj2,h=42), dj3)
-accuracy(rwf(dj2,drift=TRUE,h=42), dj3)
+accuracy(djfc1, dj3)
+accuracy(djfc2, dj3)
+accuracy(djfc3, dj3)
+```
+
+```{r echo=FALSE}
+dj3 <- window(dj, start=251)
+tab <- matrix(NA,ncol=4,nrow=3)
+tab[1,] <- accuracy(djfc1, dj3)[2,c(2,3,5,6)]
+tab[2,] <- accuracy(djfc2, dj3)[2,c(2,3,5,6)]
+tab[3,] <- accuracy(djfc3, dj3)[2,c(2,3,5,6)]
+colnames(tab) <- c("RMSE","MAE","MAPE","MASE")
+rownames(tab) <- c("Mean method", "Naïve method", "Drift method")
+knitr::kable(tab, digits=2)
 ```
 
 Here, the best method is the drift method (regardless of which accuracy measure is used).

@@ -1,3 +1,14 @@
+---
+output: 
+  html_document: 
+    fig_caption: yes
+    fig_height: 4
+    fig_width: 6
+    number_sections: yes
+    theme: flatly
+    toc: yes
+---
+
 #Getting started {#ch1}
 
 Forecasting has fascinated people for thousands of years, sometimes being considered a sign of divine inspiration, and sometimes being seen as a criminal activity. The Jewish prophet Isaiah wrote in about 700 BC
@@ -88,9 +99,9 @@ Once it has been determined what forecasts are required, it is then necessary to
 
 The appropriate forecasting methods depend largely on what data are available.
 
-If there are no data available, or if the data available are not relevant to the forecasts, then **qualitative forecasting** methods must be used. These methods are not purely guesswork—there are well-developed structured approaches to obtaining good forecasts without using historical data. These methods are discussed in Chapter \@ref(judgment).
+If there are no data available, or if the data available are not relevant to the forecasts, then *qualitative forecasting* methods must be used. These methods are not purely guesswork—there are well-developed structured approaches to obtaining good forecasts without using historical data. These methods are discussed in Chapter \@ref(judgmental).
 
-**Quantitative forecasting** can be applied when two conditions are satisfied:
+*Quantitative forecasting* can be applied when two conditions are satisfied:
 
  1. numerical information about the past is available;
  2. it is reasonable to assume that some aspects of the past patterns will continue into the future.
@@ -228,4 +239,10 @@ With time series forecasting, it is often useful to specify exactly what informa
 
  2. For case 3 in Section \@ref(case-studies), describe the five steps of forecasting in the context of this project.
 
+
+## Further reading
+
+-   [Armstrong, J. S., ed. (2001). *Principles of forecasting: a handbook for researchers and practitioners*. Boston, MA: Kluwer Academic Publishers.](http://amzn.com/0792374010/?tag=otexts-20)
+
+-   [Ord, J. K. and R. Fildes (2012). *Principles of business forecasting*. South-Western College Pub.](http://amzn.com/0324311273/?tag=otexts-20)
 

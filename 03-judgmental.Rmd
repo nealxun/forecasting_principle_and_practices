@@ -1,4 +1,4 @@
-#Judgmental forecasts {#ch3}
+#Judgmental forecasts {#judgmental}
 
 
 ##Introduction {#sec-3-intro}

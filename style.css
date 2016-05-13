@@ -1,5 +1,8 @@
+.book.font-family-0 {
+  font-family: 'Droid Serif', Georgia, serif;
+}
 .book.font-family-1 {
-  font-family: 'Droid Serif', Georgia, 'Times New Roman', Times, serif;
+  font-family: "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 p.caption {
@@ -8,24 +11,14 @@ p.caption {
   font-style: "italic";
   align-content: "center";
   background-color: #f7f7f7;
-  font-family: "Droid Sans",Arial,Sans;
+/*  font-family: "Droid Sans",Arial,Sans; */
   padding-left: 20px;
 }
 
-p code {
-  white-space: inherit;
-}
-pre {
-  word-break: normal;
-  word-wrap: normal;
-}
-pre code {
-  white-space: inherit;
-}
 
 h1, h2, h3 {
   color: #3c6900;
-  font-family: "Droid Sans",Arial,Sans;
+/*  font-family: "Droid Sans",Arial,Sans; */
 }
 
 a {
@@ -52,7 +45,7 @@ dd {
 }
 
 .book .book-body .page-wrapper .page-inner section.normal table td, .book .book-body .page-wrapper .page-inner section.normal table th {
-  font-family: "Droid Sans",Arial,Sans;
+/*  font-family: "Droid Sans",Arial,Sans;*/
   color: #000000;
   border: 1px;
   font-size: 11pt;
@@ -77,3 +70,8 @@ dd {
   color: #000000;
 }
 
+.book .book-body .page-wrapper .page-inner section.normal pre {
+    background: #dddddd;
+    padding: 5px 10px 5px 10px;
+    margin: 0px 0px 5px 0px;
+}

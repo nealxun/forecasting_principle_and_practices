@@ -6,56 +6,71 @@ Numerical summaries of data sets are widely used to capture some essential featu
 
 For a single data set, the most widely used statistics are the *average* and *median*.
 
-Suppose $N$ denotes the total number of observations and $x_i$ denotes the $i$th observation. Then the average can be written as[^1]
+Suppose $T$ denotes the total number of observations and $x_t$ denotes the $t$th observation. Then the average can be written as[^1]
 $$ 
- \bar{x} = \frac{1}{N}\sum_{i=1}^N x_{i} = (x_{1} + x_{2} + x_3 + \cdots + x_{N})/N .
+ \bar{x} = \frac{1}{T}\sum_{t=1}^T x_{t} = (x_{1} + x_{2} + x_3 + \cdots + x_{T})/T .
 $$ 
 The average is also called the *sample mean*.
 
-[^1]:  The $\sum$ indicates that the values of $x_{i}$ are to be summed from $i=1$ to $i=N$.
+[^1]:  The $\sum$ indicates that the values of $x_{i}$ are to be summed from $i=1$ to $i=T$.
 
 By way of illustration, consider the maximum temperatures at Moorabbin Airport (not far from Monash University in Melbourne, Australia) from 2001 to 2016:
 
 ```{r, echo=FALSE}
 temps <- window(maxtemp, start=2001)
 temptable <- matrix(temps, nrow=2)
-pander::pander(temptable)
+pander::pander(format(temptable, digits=3))
 ```
 
-In this example, $N=16$ and $x_{i}$ denotes the maximum temperature in year $i$. Then the average carbon footprint is
+In this example, $N=16$ and $x_{t}$ denotes the maximum temperature in year $t$. Then the average maximum temperature is
 \begin{align*}
-\bar{x} & = \frac{1}{16}\sum_{i=1}^{16} x_{i} \\
+\bar{x} & = \frac{1}{16}\sum_{t=1}^{16} x_{t} \\
         & = (x_{1} + x_{2} + x_{3} + \dots + x_{16})/16 \\
-        & = (38.8 + 44.3 + 43.0 + \dots + 39.7 + 43.7 + 42.9)/16 \\
-        & = 668.1/16  = 41.8 \text{ degrees Celsius}.
+        & = (`r temps[1]` + `r temps[2]` + `r temps[3]` + \dots + 
+        `r temps[14]` + `r temps[15]` + `r temps[16]`)/16 \\
+        & = `r sum(temps)`/16  = `r round(mean(temps),2)` \text{ degrees Celsius}.
 \end{align*}
 
 The *median*, on the other hand, is the middle observation when the data are placed in order. In this case, there are 16 observations and so the median is the average of the 8th and 9th largest observations. That is
 $$ 
- \text{median} = (41.5+42.7)/2 = 42.1.
+ \text{median} = (`r sort(temps)[8]` + `r sort(temps)[9]`)/2 
+               = `r median(temps)`.
 $$
 
-*Percentiles* are useful for describing the distribution of data. For example, 90% of the data are no larger than the 90th percentile. In the maximum temperature example, the 90th percentile is 44.1 because 90% of the data (14 observations) are less than or equal to 44.1. Similarly, the 75th percentile is 43.25 and the 25th percentile is 39.70. The median is the 50th percentile.
+*Percentiles* are useful for describing the distribution of data. For example, 90% of the data are no larger than the 90th percentile. In the maximum temperature example, the 90th percentile is 
+ `r quantile(temps,0.9)`
+because 90% of the data (14 observations) are less than or equal to 
+ `r quantile(temps,0.9)`. 
+Similarly, the 75th percentile is `r quantile(temps,0.75)` and the 25th percentile is `r quantile(temps,0.25)`. The median is the 50th percentile.
 
 A useful measure of how spread out the data are is the *interquartile range* or IQR. This is simply the difference between the 75th and 25th percentiles. Thus it contains the middle 50% of the data. For the example,
 $$ 
- \text{IQR} = (43.25 - 39.70) = 3.55. 
+ \text{IQR} = (`r quantile(temps,0.75)` - 
+ `r format(quantile(temps,0.25),nsmall=2)`) = 
+ `r IQR(temps)`. 
 $$
 
 An alternative and more common measure of spread is the *standard deviation*. This is given by the formula
 $$ 
-  s = \sqrt{\frac{1}{N-1} \sum_{i=1}^N (x_{i} - \bar{x})^2}. 
+  s = \sqrt{\frac{1}{T-1} \sum_{t=1}^T (x_{t} - \bar{x})^2}. 
 $$
 In the example, the standard deviation is
+```{r echo=FALSE}
+meantemp <- round(mean(temps),2)
+```
 $$ 
-  s = \sqrt{\frac{1}{19} \left[ (38.8-42.1)^2 + (44.3 - 42.1)^2 + 
-          \cdots + (42.9-42.1)^2\right]} = 2.52. 
+  s = \sqrt{\frac{1}{15} \left[ 
+  (`r temps[1]`- `r meantemp`)^2 + 
+  (`r temps[2]`- `r meantemp`)^2 + 
+  \cdots + 
+  (`r temps[16]`- `r meantemp`)^2 \right]} 
+  = `r round(sd(temps),2)`
 $$
 
-```r
-fuel2 <- fuel[fuel$Litres<2,]
-summary(fuel2[,"Carbon"])
-sd(fuel2[,"Carbon"])
+```{r}
+temps <- window(maxtemp, start=2001)
+summary(temps)
+sd(temps)
 ```
 
 ###Bivariate statistics {-}
@@ -66,7 +81,9 @@ $$
 $$
 where the first variable is denoted by $x$ and the second variable by $y$. The correlation coefficient only measures the strength of the *linear* relationship; it is possible for two variables to have a strong non-linear relationship but low correlation coefficient. The value of $r$ always lies between -1 and 1 with negative values indicating a negative relationship and positive values indicating a postive relationship.
 
-For example, the correlation between the carbon footprint and city mpg variables shown in Figure [2.5](http://www.otexts.org/fpp/2/1#fuel.png) is -0.97. The value is negative because the carbon footprint decreases as the city mpg increases. While a value of -0.97 is very high, the relationship is even stronger than that number suggests due to its nonlinear nature.
+For example, the correlation between the Roomnights and Takings shown in Figure \@ref(fig:motel2) is 
+  `r round(cor(motel[,"Roomnights"], motel[,"Takings"]),2)`. 
+The value is positive because the Takings increases as the Roomnights increases. 
 
 ```{r corplot, echo=FALSE, fig.cap="Examples of data sets with different levels of correlation."}
 library(gridExtra)
@@ -120,9 +137,9 @@ Just as correlation measures the extent of a linear relationship between two var
 
 Figure \@ref(fig:beerlagplot) displays scatterplots of the beer production time series where the horizontal axis shows lagged values of the time series. Each graph shows $y_{t}$ plotted against $y_{t-k}$ for different values of $k$. The autocorrelations are the correlations associated with these scatterplots.
 
-```{r beerlagplot, fig.cap="Lagged scatterplots for quarterly beer production."}
+```{r beerlagplot, fig.cap="Lagged scatterplots for quarterly beer production.", fig.width=8, fig.height=8}
 beer2 <- window(ausbeer, start=1992, end=2006-.1)
-lag.plot(beer2, lags=9, do.lines=FALSE)
+gglagplot(beer2, lags=9, do.lines=FALSE)
 ```
 
 The value of $r_{k}$ can be written as

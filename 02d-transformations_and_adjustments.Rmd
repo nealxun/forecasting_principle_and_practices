@@ -22,9 +22,8 @@ The logarithm in a Box-Cox transformation is always a natural logarithm (i.e., t
 The following figure shows a logarithmic transformation of the monthly electricity demand data. *Click the figure to see a series of other transformations.*
 
 ```{r bcelec, fig.cap="Power transformations for Australian monthly electricity data."}
-plot(log(elec), ylab="Transformed electricity demand",
- xlab="Year", main="Transformed monthly electricity demand")
-title(main="Log",line=-1)
+autoplot(log(elec)) + ylab("Transformed electricity demand") +
+ xlab("Year") + ggtitle("Log monthly electricity demand")
 ```
 
 A good value of $\lambda$ is one which makes the size of the seasonal variation about the same across the whole series, as that makes the forecasting model simpler. In this case, $\lambda=0.30$ works quite well, although any value of $\lambda$ between 0 and 0.5 would give similar results.
@@ -61,11 +60,9 @@ For example, if you are studying monthly milk production on a farm, then there w
 ```{r cowmilk, fig.cap="Monthly milk production per cow. Source: Cryer (2006)."}
 monthdays <- rep(c(31,28,31,30,31,30,31,31,30,31,30,31),14)
 monthdays[26 + (4*12)*(0:2)] <- 29
-par(mfrow=c(2,1))
-plot(milk, main="Monthly milk production per cow",
-  ylab="Pounds",xlab="Years")
-plot(milk/monthdays, main="Average milk production per cow per day", 
-  ylab="Pounds", xlab="Years")
+tmp <- cbind(Monthly = milk, DailyAverage=milk/monthdays)
+autoplot(tmp, facet=TRUE) + xlab("Years") + ylab("Pounds") +
+  ggtitle("Milk production per cow")
 ```
 
 Notice how much simpler the seasonal pattern is in the average daily production plot compared to the average monthly production plot. By looking at average daily production instead of average monthly production, we effectively remove the variation due to the different month lengths. Simpler patterns are usually easier to model and lead to more accurate forecasts.

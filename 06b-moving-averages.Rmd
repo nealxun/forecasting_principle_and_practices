@@ -15,16 +15,18 @@ autoplot(elecsales) + xlab("Year") + ylab("GWh") +
   ggtitle("Annual electricity sales: South Australia")
 ```
 
-For example, consider Figure \@ref(fig:ressales1) showing the volume of electricity sold to residential customers in South Australia each year from 1989 to 2008 (hot water sales have been excluded). The data are also shown in Table \@ref(fig:elecsales).
+For example, consider Figure \@ref(fig:ressales1) showing the volume of electricity sold to residential customers in South Australia each year from 1989 to 2008 (hot water sales have been excluded). The data are also shown in Table \@ref(tab:elecsales).
 
 ```{r}
 ma5 <- ma(elecsales, 5)
 ```
 ```{r elecsales, echo=FALSE}
 tab <- cbind(Year=time(elecsales), 
-             Sales=elecsales, 
+             "Sales (GWh)"=elecsales, 
              "5-MA"=ma5)
-out <- knitr::kable(tab)
+out <- knitr::kable(tab, booktabs=TRUE,
+    caption = "Annual electricity sales to residential customers in South Australia. 1989--2008.",     
+    format.args=list(digits=6, trim=FALSE))
 out <- gsub('NA','  ', out)
 out
 ```
@@ -44,7 +46,7 @@ Notice how the trend (in red) is smoother than the original data and captures th
 
 The order of the moving average determines the smoothness of the trend-cycle estimate. In general, a larger order means a smoother curve. Figure \@ref(fig:ressales3) shows the effect of changing the order of the moving average for the residential electricity sales data.
 
-```{r ressales3}
+```{r ressales3, fig.cap="Different moving averages applied to the residential electricity sales data."}
 grobs <- list()
 mak <- c(3,5,7,9)
 for(m in seq(mak))
@@ -175,8 +177,7 @@ if(max(abs(tmp-1)) > 0.02)
   stop("Weights incorrect")
 
 # Show table
-out <- knitr::kable(weights,digits=3,padding=0,
-    booktabs=TRUE,
+out <- knitr::kable(weights,digits=3,booktabs=TRUE,
     caption = "Commonly used weights in weighted moving averages. S=Spencer's weighted moving average. H=Henderson's weighted moving average",
     format.args=list(digits=3, trim=FALSE))
 out <- gsub('NA','  ', out)

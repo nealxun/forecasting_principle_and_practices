@@ -9,7 +9,7 @@ A good forecasting method will yield residuals with the following properties:
 
 Any forecasting method that does not satisfy these properties can be improved. That does not mean that forecasting methods that satisfy these properties can not be improved. It is possible to have several forecasting methods for the same data set, all of which satisfy these properties. Checking these properties is important to see if a method is using all available information well, but it is not a good way for selecting a forecasting method.
 
-If either of these two properties is not satisfied, then the forecasting method can be modified to give better forecasts. Adjusting for bias is easy: if the residuals have mean $m$, then simply add $m$ to all forecasts and the bias problem is solved. Fixing the correlation problem is harder and we will not address it until [Chapter 8](http://otexts.com/fpp/8).
+If either of these two properties is not satisfied, then the forecasting method can be modified to give better forecasts. Adjusting for bias is easy: if the residuals have mean $m$, then simply add $m$ to all forecasts and the bias problem is solved. Fixing the correlation problem is harder and we will not address it until Chapter \@ref(????).
 
 In addition to these essential properties, it is useful (but not necessary) for the residuals to also have the following two properties.
 
@@ -29,22 +29,23 @@ The following graphs show the Dow Jones Index (DJI), and the residuals obtained 
 
 ```{r, fig.cap="The Dow Jones Index measured daily to 15 July 1994."}
 dj2 <- window(dj, end=250)
-plot(dj2, main="Dow Jones Index (daily ending 15 Jul 94)",
-  ylab="", xlab="Day")
+autoplot(dj2) + xlab("Day") + ylab("") + 
+  ggtitle("Dow Jones Index (daily ending 15 Jul 94)")
 ```
 
 ```{r, fig.cap="Residuals from forecasting the Dow Jones Index with the naïve method."}
 res <- residuals(naive(dj2))
-plot(res, main="Residuals from naive method",
-  ylab="", xlab="Day")
+autoplot(res) + xlab("Day") + ylab("") + 
+  ggtitle("Residuals from naive method")
 ```
 
 ```{r, fig.cap="Histogram of the residuals from the naïve method applied to the Dow Jones Index. The left tail is a little too long for a normal distribution."}
-hist(res, nclass="FD", main="Histogram of residuals")
+qplot(res, bins=nclass.FD(na.omit(res))) +
+  ggtitle("Histogram of residuals")
 ```
 
 ```{r, fig.cap="ACF of the residuals from the naïve method applied to the Dow Jones Index. The lack of correlation suggests the forecasts are good."}
-Acf(res, main="ACF of residuals")
+ggAcf(res) + ggtitle("ACF of residuals")
 ```
 
 These graphs show that the naïve method produces forecasts that appear to account for all available information. The mean of the residuals is very close to zero and there is no significant correlation in the residuals series. The time plot of the residuals shows that the variation of the residuals stays much the same across the historical data, so the residual variance can be treated as constant. However, the histogram suggests that the residuals may not follow a normal distribution --- the left tail looks a little too long. Consequently, forecasts from this method will probably be quite good but prediction intervals computed assuming a normal distribution may be inaccurate.
@@ -74,13 +75,9 @@ How large is too large? If the autocorrelations did come from a white noise seri
 
 For the Dow-Jones example, the naive model has no parameters, so $K=0$ in that case also. For both $Q$ and $Q^*$, the results are not significant (i.e., the p-values are relatively large). So we can conclude that the residuals are not distinguishable from a white noise series.
 
-```r
+```{r}
 # lag=h and fitdf=K
-> Box.test(res, lag=10, fitdf=0)
-	Box-Pierce test
-X-squared = 10.6425, df = 10, p-value = 0.385
+Box.test(res, lag=10, fitdf=0)
 
-> Box.test(res,lag=10, fitdf=0, type="Lj")
-	Box-Ljung test
-X-squared = 11.0729, df = 10, p-value = 0.3507
+Box.test(res,lag=10, fitdf=0, type="Lj")
 ```

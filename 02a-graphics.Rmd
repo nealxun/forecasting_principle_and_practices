@@ -1,4 +1,4 @@
-# The forecaster's toolbox
+# The forecaster's toolbox {#toolbox}
 
 Before we discuss any forecasting methods, it is necessary to build a toolbox of techniques that will be useful for many different forecasting situations. Each of the tools discussed in this chapter will be used repeatedly in subsequent chapters as we develop and explore a range of forecasting methods.
 
@@ -38,11 +38,11 @@ Here there is a clear and increasing trend. There is also a strong seasonal patt
 
 In describing these time series, we have used words such as "trend" and "seasonal" which need to be more carefully defined.
 
--   A **trend** exists when there is a long-term increase or decrease in the data. There is a trend in the antidiabetic drug sales data shown above.
--   A **seasonal** pattern occurs when a time series is affected by seasonal factors such as the time of the year or the day of the week. The monthly sales of antidiabetic drugs above shows seasonality partly induced by the change in cost of the drugs at the end of the calendar year.
--   A **cycle** occurs when the data exhibit rises and falls that are not of a fixed period. These fluctuations are usually due to economic conditions and are often related to the "business cycle". The economy class passenger data above showed some indications of cyclic effects.
+-   A *trend* exists when there is a long-term increase or decrease in the data. There is a trend in the antidiabetic drug sales data shown above.
+-   A *seasonal* pattern occurs when a time series is affected by seasonal factors such as the time of the year or the day of the week. The monthly sales of antidiabetic drugs above shows seasonality partly induced by the change in cost of the drugs at the end of the calendar year.
+-   A *cycle* occurs when the data exhibit rises and falls that are not of a fixed period. These fluctuations are usually due to economic conditions and are often related to the "business cycle". The economy class passenger data above showed some indications of cyclic effects.
 
-It is important to distinguish cyclic patterns and seasonal patterns. Seasonal patterns have a fixed and known length, while cyclic patterns have variable and unknown length. The average length of a cycle is usually longer than that of seasonality, and the magnitude of cyclic variation is usually more variable than that of seasonal variation. Cycles and seasonality are discussed further in Section \@ref(cycles).
+It is important to distinguish cyclic patterns and seasonal patterns. Seasonal patterns have a fixed and known length, while cyclic patterns have variable and unknown length. The average length of a cycle is usually longer than that of seasonality, and the magnitude of cyclic variation is usually more variable than that of seasonal variation. Cycles and seasonality are discussed further in Section \@ref(sec-6-1-TSpatterns).
 
 Many time series include trend, cycles and seasonality. When choosing a forecasting method, we will first need to identify the time series patterns in the data, and then choose a method that is able to capture the patterns properly.
 
@@ -52,9 +52,8 @@ A seasonal plot is similar to a time plot except that the data are plotted again
 
 
 ```{r, fig.cap="Seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%"}
-ggseasonplot(a10, ylab="$ million", xlab="Year",
-  main="Seasonal plot: antidiabetic drug sales",
-  year.labels=TRUE, year.labels.left=TRUE)
+ggseasonplot(a10, year.labels=TRUE, year.labels.left=TRUE) +
+  ylab("$ million") + ggtitle("Seasonal plot: antidiabetic drug sales")
 ```
 
 These are exactly the same data shown earlier, but now the data from each season are overlapped. A seasonal plot allows the underlying seasonal pattern to be seen more clearly, and is especially useful in identifying years in which the pattern changes.
@@ -66,8 +65,8 @@ In this case, it is clear that there is a large jump in sales in January each ye
 An alternative plot that emphasises the seasonal patterns is where the data for each season are collected together in separate mini time plots.
 
 ```{r, fig.cap="Seasonal subseries plot of monthly antidiabetic drug sales in Australia."}
-ggmonthplot(a10, ylab="$ million", xlab="Month", 
-  main="Seasonal subseries plot: antidiabetic drug sales")
+ggmonthplot(a10) + ylab("$ million") + 
+  ggtitle("Seasonal subseries plot: antidiabetic drug sales")
 ```
 
 The horizontal lines indicate the means for each month. This form of plot enables the underlying seasonal pattern to be seen clearly, and also shows the changes in seasonality over time. It is especially useful in identifying changes within particular seasons. In this example, the plot is not particularly revealing; but in some cases, this is the most useful way of viewing seasonal changes over time.
@@ -78,18 +77,16 @@ The graphs discussed so far are useful for visualizing individual time series. I
 
 Figure \@ref(fig:motel) shows two time series: monthly takings (in \$million) from accommodation at hotels, motels and guest houses in Victoria (top) and total room nights for each corresponding month (in thousands). "Room nights" is the total number of rooms booked multiplied by the number of nights people stayed in those rooms.
 
-```{r motel}
-autoplot(motel[,2:1]/1000, 
-         main="Total monthly accommodation: Victoria, Australia", 
-         facet=TRUE) +
-  ylab("") + xlab("Year")
+```{r motel, fig.cap="Monthly takings and room nights for accommodation in Victoria, Australia."}
+autoplot(motel[,2:1]/1000, facet=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Total monthly accommodation: Victoria, Australia")
 ```
 
 We can study how relationship between takings and roomnights by plotting one series against the other.
 
-```{r}
-ggplot(as.data.frame(motel), aes(x=Roomnights/1000, y=Takings/1000)) +
-  geom_point() + 
+```{r motel2, fig.cap="Monthly takings plotted against room nights for accommodation in Victoria, Australia."}
+qplot(Roomnights/1000, Takings/1000, data=as.data.frame(motel)) +
   ylab("Takings ($million)") + xlab("Room nights (thousands)") 
 ```
 
@@ -97,11 +94,11 @@ This scatterplot helps us visualize the relationship between the variables.
 
 
 
-####Scatterplot matrices {-}
+<!-- ####Scatterplot matrices {-} -->
 
-When there are several potential predictor variables, it is useful to plot each variable against each other variable. These plots can be arranged in a scatterplot matrix, as shown in Figure ??
+<!-- When there are several potential predictor variables, it is useful to plot each variable against each other variable. These plots can be arranged in a scatterplot matrix, as shown in Figure ?? -->
 
-For each panel, the variable on the vertical axis is given by the variable name in that row, and the variable on the horizontal axis is given by the variable name in that column. For example,
+<!-- For each panel, the variable on the vertical axis is given by the variable name in that row, and the variable on the horizontal axis is given by the variable name in that column. For example, -->
 
-The value of the scatterplot matrix is that it enables a quick view of the relationships between all pairs of variables. Outliers can also be seen. In this example, there are
+<!-- The value of the scatterplot matrix is that it enables a quick view of the relationships between all pairs of variables. Outliers can also be seen. In this example, there are -->
 

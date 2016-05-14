@@ -6,13 +6,12 @@ Numerical summaries of data sets are widely used to capture some essential featu
 
 For a single data set, the most widely used statistics are the *average* and *median*.
 
-Suppose $T$ denotes the total number of observations and $x_t$ denotes the $t$th observation. Then the average can be written as[^1]
+Suppose $T$ denotes the total number of observations and $x_t$ denotes the $t$th observation. Then the average can be written as:^[The $\sum$ indicates that the values of $x_{i}$ are to be summed from $i=1$ to $i=T$.]
 $$ 
  \bar{x} = \frac{1}{T}\sum_{t=1}^T x_{t} = (x_{1} + x_{2} + x_3 + \cdots + x_{T})/T .
 $$ 
 The average is also called the *sample mean*.
 
-[^1]:  The $\sum$ indicates that the values of $x_{i}$ are to be summed from $i=1$ to $i=T$.
 
 By way of illustration, consider the maximum temperatures at Moorabbin Airport (not far from Monash University in Melbourne, Australia) from 2001 to 2016:
 

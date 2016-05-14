@@ -1,0 +1,52 @@
+##Classical decomposition
+
+The classical decomposition method originated in the 1920s. It is a relatively simple procedure and forms the basis for most other methods of time series decomposition. There are two forms of classical decomposition: an additive decomposition and a multiplicative decomposition. These are described below for a time series with seasonal period $m$ (e.g., $m=4$ for quarterly data, $m=12$ for monthly data, $m=7$ for daily data with a weekly pattern).
+
+In classical decomposition, we assume the seasonal component is constant from year to year. These $m$ values are sometimes called the “seasonal indices”.
+
+### Additive decomposition {-}
+
+Step 1
+:   If $m$ is an even number, compute the trend-cycle component using a    $2\times m$-MA to obtain $\hat{T}_t$. If $m$ is an odd number, compute the trend-cycle component using an $m$-MA to obtain $\hat{T}_t$.
+
+Step 2
+:   Calculate the detrended series: $y_t - \hat{T}_t$.
+
+Step 3
+:   To estimate the seasonal component for each month, simply average the detrended values for that month. For example, the seasonal index for March is the average of all the detrended March values in the data. These seasonal indexes are then adjusted to ensure that they add to zero. The seasonal component is obtained by stringing together all the seasonal indices for each year of data. This gives $\hat{S}_t$.
+
+Step 4
+:   The remainder component is calculated by subtracting the estimated seasonal and trend-cycle components: $\hat{E}_t = y_t - \hat{T}_t - \hat{S}_t$.
+
+### Multiplicative decomposition {-}
+
+A classical multiplicative decomposition is very similar except the subtractions are replaced by divisions.
+
+Step 1
+:   If $m$ is an even number, compute the trend-cycle component using a   $2\times m$-MA to obtain $\hat{T}_t$. If $m$ is an odd number, compute the trend-cycle component using an $m$-MA to obtain $\hat{T}_t$.
+
+Step 2
+:   Calculate the detrended series: $y_t/ \hat{T}_t$.
+
+Step 3
+:   To estimate the seasonal component for each month, simply average the detrended values for that month. For example, the seasonal index for March is the average of all the detrended March values in the data. These seasonal indexes are then adjusted to ensure that they add to $m$. The seasonal component is obtained by stringing together all the seasonal indices for each year of data. This gives $\hat{S}_t$.
+
+Step 4
+:   The remainder component is calculated by dividing out the estimated seasonal and trend-cycle components: $\hat{E}_t = y_t /( \hat{T}_t  \hat{S}_t)$.
+
+```{r
+# x is the time series 
+fit <- decompose(x, type=“multiplicative”)
+plot(fit)
+```
+
+### Comments on classical decomposition {-}
+
+While classical decomposition is still widely used, it is not recommended. There are now several much better methods. Some of the problems with classical decomposition are summarised below.
+
+- The estimate of the trend is unavailable for the first few and last few observations. For example, if $m=12$, there is no trend estimate for the first six and last six observations. Consequently, there is also no estimate of the remainder component for the same time periods.
+
+- Classical decomposition methods assume that the seasonal component repeats from year to year. For many series, this is a reasonable assumption, but for some longer series it is not. For example, electricity demand patterns have changed over time as air conditioning has become more widespread. So in many locations, the seasonal usage pattern from several decades ago had maximum demand in winter (due to heating), while the current seasonal pattern has maximum demand in summer (due to air conditioning). The classical decomposition methods are unable to capture these seasonal changes over time.
+ 
+- Occasionally, the value of the time series in a small number of periods may be particularly unusual. For example, monthly air passenger traffic may be affected by an industrial dispute making the traffic during the dispute very different from usual. The classical method is not robust to these kinds of unusual values.
+

@@ -82,7 +82,8 @@ tab <- data.frame(Year=trunc(time(beer2)),
              '4-MA'=ma4, 
              '2x4-MA'=ma2x4)
 colnames(tab)[4:5] <- c("4-MA","2x4-MA")
-out <- knitr::kable(tab[1:20,])
+out <- knitr::kable(tab[1:20,],booktabs=TRUE,
+        caption="A moving average of order 4 applied to the quarterly beer data, followed by a moving average of order 2.")
 out <- gsub('NA','  ', out)
 out
 ```
@@ -91,23 +92,17 @@ The notation “$2\times4$-MA” in the last column means a 4-MA followed by a 2
 `r ma4[2]`=(`r beer2[1]`+`r beer2[2]`+`r beer2[3]`+`r beer2[4]`)/4 
 and 
 `r ma4[3]`=(`r beer2[2]`+`r beer2[3]`+`r beer2[4]`+`r beer2[5]`)/4.
-
-451.2=(443+410+420+532)/4
-and 448.8=(410+420+532+433)/4. 
-
 The first value in the 2x4-MA column is the average of these two: 
 `r ma2x4[3]`=(`r ma4[2]`+`r ma4[3]`)/2.
 
-450.0=(451.2+448.8)/2.
-
-When a 2-MA follows a moving average of even order (such as 4), it is called a “centered moving average of order 4”. This is because theresults are now symmetric. To see that this is the case, we can writevthe $2\times4$-MA as follows:
-\begin{align}
+When a 2-MA follows a moving average of even order (such as 4), it is called a “centered moving average of order 4”. This is because the results are now symmetric. To see that this is the case, we can write the $2\times4$-MA as follows:
+\begin{align*}
   \hat{T}_{t} &= \frac{1}{2}\Big[
     \frac{1}{4} (y_{t-2}+y_{t-1}+y_{t}+y_{t+1}) +
     \frac{1}{4} (y_{t-1}+y_{t}+y_{t+1}+y_{t+2})\Big] \\
              &= \frac{1}{8}y_{t-2}+\frac14y_{t-1} +
              \frac14y_{t}+\frac14y_{t+1}+\frac18y_{t+2}.
-\end{align} 
+\end{align*} 
 It is now a weighted average of observations, but it is symmetric.
 
 Other combinations of moving averages are also possible. For example a $3\times3$-MA is often used, and consists of a moving average of order 3 followed by another moving average of order 3. In general, an even order MA should be followed by an even order MA to make it symmetric. Similarly, an odd order MA should be followed by an odd order MA.

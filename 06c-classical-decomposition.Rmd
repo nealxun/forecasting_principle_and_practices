@@ -7,7 +7,7 @@ In classical decomposition, we assume the seasonal component is constant from ye
 ### Additive decomposition {-}
 
 Step 1
-:   If $m$ is an even number, compute the trend-cycle component using a    $2\times m$-MA to obtain $\hat{T}_t$. If $m$ is an odd number, compute the trend-cycle component using an $m$-MA to obtain $\hat{T}_t$.
+:   If $m$ is an even number, compute the trend-cycle component using a $2\times m$-MA to obtain $\hat{T}_t$. If $m$ is an odd number, compute the trend-cycle component using an $m$-MA to obtain $\hat{T}_t$.
 
 Step 2
 :   Calculate the detrended series: $y_t - \hat{T}_t$.

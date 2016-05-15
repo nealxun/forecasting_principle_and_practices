@@ -1,0 +1,27 @@
+##STL decomposition {#sec-6-stl}
+
+STL is a very versatile and robust method for decomposing time series. STL is an acronym for “Seasonal and Trend decomposition using Loess”, while Loess is a method for estimating nonlinear relationships. The STL method was developed by @Cleveland1990.
+
+STL has several advantages over the classical decomposition method and X-12-ARIMA:
+
+- Unlike X-12-ARIMA, STL will handle any type of seasonality, not only monthly and quarterly data.
+
+- The seasonal component is allowed to change over time, and the rate of change can be controlled by the user.
+
+- The smoothness of the trend-cycle can also be controlled by the user.
+
+- It can be robust to outliers (i.e., the user can specify a robust decomposition). So occasional unusual observations will not affect the estimates of the trend-cycle and seasonal components. They will, however, affect the remainder component.
+
+On the other hand, STL has some disadvantages. In particular, it does not automatically handle trading day or calendar variation, and it only provides facilities for additive decompositions.
+
+It is possible to obtain a multiplicative decomposition by first taking logs of the data, and then back-transforming the components. Decompositions some way between additive and multiplicative can be obtained using a Box-Cox transformation of the data with $0<\lambda<1$. A value of $\lambda=0$ corresponds to the multiplicative decomposition while $\lambda=1$ is equivalent to an additive decomposition.
+
+The best way to begin learning how to use STL is to see some examples and experiment with the settings. Figure \@ref(fig:elecequip-stl) showed an example of STL applied to the electrical equipment orders data. Figure \@ref(fig:elecequip-stl2) shows an alternative STL decomposition where the trend is more flexible, the seasonal component does not change over time, and the robust option has been used. Here it is more obvious that there has been a down-turn at the end of the series, and that the orders in 2009 were unusually low (corresponding to some large negative values in the remainder component).
+
+```{r elecequip-stl2, fig.cap="The electrical equipment orders (top) and its three additive components obtained from a robust STL decomposition with flexible trend and fixed seasonality.",fig.width=8,fig.height=8}
+fit <- stl(elecequip, t.window=15, s.window="periodic", robust=TRUE)
+autoplot(fit)
+```
+
+The two main parameters to be chosen when using STL are the trend window (`t.window`) and seasonal window (`s.window`). These control how rapidly the trend and seasonal components can change. Small values allow more rapid change. Setting the seasonal window to be infinite is equivalent to forcing the seasonal component to be periodic (i.e., identical across years).
+

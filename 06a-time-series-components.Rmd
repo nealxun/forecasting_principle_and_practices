@@ -83,27 +83,27 @@ autoplot(tmp) + xlab("Year") + ylab("New orders index") +
 
 Figure \@ref(fig:elecequip-trend) shows the trend-cycle component, $T_t$, in red and the original data, $y_t$, in grey. The trend-cycle shows the overall movement in the series, ignoring the seasonality and any small random fluctuations.
 
-Figure \@ref(fig:6-elecequip-stl) shows an additive decomposition of these data. The method used for extracting components in this example is STL which is discussed in Section \@ref{sec:6-stl}.
+Figure \@ref(fig:elecequip-stl) shows an additive decomposition of these data. The method used for extracting components in this example is STL which is discussed in Section \@ref{sec:6-stl}.
 
-```{r 6-elecequip-stl, fig.cap="The electricial equipment orders (top) and its three additive components."}
+```{r elecequip-stl, fig.cap="The electricial equipment orders (top) and its three additive components."}
 autoplot(fit)
 ```
 
-All three components are shown in the bottom three panels of Figure \@ref(fig:6-elecequip-stl). These three components can be added together to reconstruct the data shown in the top panel. Notice that the seasonal component changes very slowly over time, so any two consecutive years have very similar pattern, but years far apart may have different seasonal patterns. The remainder component shown in the bottom panel is what is left over when the seasonal and trend-cycle components have been subtracted from the data.
+All three components are shown in the bottom three panels of Figure \@ref(fig:elecequip-stl). These three components can be added together to reconstruct the data shown in the top panel. Notice that the seasonal component changes very slowly over time, so any two consecutive years have very similar pattern, but years far apart may have different seasonal patterns. The remainder component shown in the bottom panel is what is left over when the seasonal and trend-cycle components have been subtracted from the data.
 
 The grey bars to the right of each panel show the relative scales of the components. Each grey bar represents the same length but because the plots are on different scales, the bars vary in size. The large grey bar in the bottom panel shows that the variation in the remainder component is small compared to the variation in the data which has a bar about one quarter the size. In other words, if we shrunk the bottom three panels until their bars became the same size as that in the data panel, then all the panels would be on the same scale.
 
-```{r 6-elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the STL decomposition shown in Figure \\@ref(fig:6-elecequip-stl)."}
+```{r elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the STL decomposition shown in Figure \\@ref(fig:elecequip-stl)."}
 ggmonthplot(fit$time.series[,"seasonal"]) + ylab("Seasonal")
 ```
 
-It can be useful to use seasonal plots and seasonal sub-series plots of the seasonal component. These help us to visualize the variation in the seasonal component over time. Figure \@ref(fig:6-elecequip3) shows a seasonal sub-series plot of the seasonal component from Figure \@ref(fig:6-elecequip-stl). In this case, there are only very small changes over time.
+It can be useful to use seasonal plots and seasonal sub-series plots of the seasonal component. These help us to visualize the variation in the seasonal component over time. Figure \@ref(fig:elecequip3) shows a seasonal sub-series plot of the seasonal component from Figure \@ref(fig:elecequip-stl). In this case, there are only very small changes over time.
 
 ### Seasonally adjusted data {-}
 
-If the seasonal component is removed from the original data, the resulting values are called the "seasonally adjusted" data. For an additive model, the seasonally adjusted data are given by $y_{t}-S_{t}$, and for multiplicative data, the seasonally adjusted values are obtained using $y_{t}/S_{t}$. Figure \@ref(fig:6-elecequip-sa) shows the seasonally adjusted electrical equipment orders.
+If the seasonal component is removed from the original data, the resulting values are called the "seasonally adjusted" data. For an additive model, the seasonally adjusted data are given by $y_{t}-S_{t}$, and for multiplicative data, the seasonally adjusted values are obtained using $y_{t}/S_{t}$. Figure \@ref(fig:elecequip-sa) shows the seasonally adjusted electrical equipment orders.
 
-```{r 6-elecequip-sa, fig.cap="Seasonally adjusted electrical equipment orders (red) and the original data (grey)."}
+```{r elecequip-sa, fig.cap="Seasonally adjusted electrical equipment orders (red) and the original data (grey)."}
 tmp <- cbind(Data=elecequip, 'Seasonally adjusted'=seasadj(fit))
 autoplot(tmp) + xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +

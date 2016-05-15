@@ -1,0 +1,170 @@
+#Exponential smoothing {#expsmooth}
+
+Exponential smoothing was proposed in the late 1950s (Brown 1959, Holt 1957 and Winters 1960 are key pioneering works) and has motivated some of the most successful forecasting methods. Forecasts produced using exponential smoothing methods are weighted averages of past observations, with the weights decaying exponentially as the observations get older. In other words, the more recent the observation the higher the associated weight. This framework generates reliable forecasts quickly and for a wide range of time series which is a great advantage and of major importance to applications in industry.
+
+This chapter is divided into two parts. In the first part (Sections \@ref(sec-7-1-SES)--\@ref(sec-7-6-Taxonomy)) we present in detail the mechanics of the most important exponential smoothing methods and their application in forecasting time series with various characteristics. This is key in understanding the intuition behind these methods. In this setting, selecting and using a forecasting method may appear to be somewhat ad hoc. The selection of the method is generally based on recognising key components of the time series (trend and seasonal) and how these enter the smoothing method (e.g., in an additive, damped or multiplicative manner).
+
+In the second part of the chapter (Section \@ref(sec-7-ETS)) we present statistical models that underlie exponential smoothing methods. These models generate identical point forecasts to the methods discussed in the first part of the chapter, but also generate prediction intervals. Furthermore, this statistical framework allows for genuine model selection between competing models.
+
+##Simple exponential smoothing {#sec-7-1-SES}
+
+The simplest of the exponentially smoothing methods is naturally called “simple exponential smoothing” (SES)[^1]. This method is suitable for forecasting data with no trend or seasonal pattern. For example, the data in Figure \@ref(fig:7-oil) do not display any clear trending behaviour or any seasonality, although the mean of the data may be changing slowly over time. We have already considered the naïve and the average as possible methods for forecasting such data (Section \@ref(sec-2-methods)).
+
+```{r oil, fig.cap="Oil production in Saudi Arabia from 1996 to 2007."}
+oildata <- window(oil,start=1996,end=2007) 
+autoplot(oildata) + ylab("Oil (millions of tonnes)") +
+  xlab("Year")
+```
+
+Using the naïve method, all forecasts for the future are equal to the last observed value of the series, 
+$$
+  \hat{y}_{T+h|T} = y_T,
+$$ 
+for $h=1,2,\dots$. Hence, the naïve method assumes that the most current observation is the only important one and all previous observations provide no information for the future. This can be thought of as a weighted average where all the weight is given to the last observation.
+
+Using the average method, all future forecasts are equal to a simple average of the observed data,
+$$
+  \hat{y}_{T+h|T} = \frac1T \sum_{t=1}^T y_t,
+$$ 
+for $h=1,2,\dots$. Hence, the average method assumes that all observations are of equal importance and they are given equal weight when generating forecasts.
+
+We often want something between these two extremes. For example it may be sensible to attach larger weights to more recent observations than to observations from the distant past. This is exactly the concept behind simple exponential smoothing. Forecasts are calculated using weighted averages where the weights decrease exponentially as observations come from further in the past --- the smallest weights are associated with the oldest observations:
+
+$$\label{eq-7-ses}
+\pred{y}{T+1}{T} = \alpha y_T + \alpha(1-\alpha) y_{T-1} + \alpha(1-\alpha)^2 y_{T-2}+ \alpha(1-\alpha)^3 y_{T-3}+\cdots,$$
+
+where $0 \le \alpha \le 1$ is the smoothing parameter. The one-step-ahead forecast for time $T+1$ is a weighted average of all the observations in the series $y_1,\dots,y_T$. The rate at which the weights decrease is controlled by the parameter $\alpha$.
+
+Table \@ref(tbl-7-alpha) shows the weights attached to observations for four different values of $\alpha$ when forecasting using simple exponential smoothing. Note that the sum of the weights even for a small $\alpha$ will be approximately one for any reasonable sample size.
+
+\@ref(tbl-7-alpha)
+
+<span>lllll</span> &\
+Observation & $\alpha = 0.2$ & $\alpha = 0.4$ & $\alpha = 0.6$ &
+$\alpha = 0.8$\
+$y_{T}$ & 0.2 & 0.4 & 0.6 & 0.8\
+$y_{T-1}$ & 0.16 & 0.24 & 0.24 & 0.16\
+$y_{T-2}$ & 0.128 & 0.144 & 0.096 & 0.032\
+$y_{T-3}$ & 0.1024 & 0.0864 & 0.0384 & 0.0064\
+$y_{T-4}$ & $(0.2)(0.8)^4$ & $(0.4)(0.6)^4$ & $(0.6)(0.4)^4$ &
+$(0.8)(0.2)^4$\
+$y_{T-5}$ & $(0.2)(0.8)^5$ & $(0.4)(0.6)^5$ & $(0.6)(0.4)^5$ &
+$(0.8)(0.2)^5$\
+
+For any $\alpha$ between 0 and 1, the weights attached to the observations decrease exponentially as we go back in time, hence the name “exponential smoothing”. If $\alpha$ is small (i.e., close to 0), more weight is given to observations from the more distant past. If $\alpha$ is large (i.e., close to 1), more weight is given to the more recent observations. At the extreme case where $\alpha=1$, $\pred{y}{T+1}{T}=y_T$ and forecasts are equal to the naïve forecasts.
+
+We present two equivalent forms of simple exponential smoothing, each of which leads to the forecast equation .
+
+### Weighted average form {-}
+
+The forecast at time $t+1$ is equal to a weighted average between the most recent observation $y_t$ and the most recent forecast $\pred{y}{t}{t-1}$,
+
+$$\pred{y}{t+1}{t} = \alpha y_t + (1-\alpha) \pred{y}{t}{t-1}$$
+
+for $t=1,\dots,T$, where $0 \le \alpha \le 1$ is the smoothing parameter.
+
+The process has to start somewhere, so we let the first forecast of $y_1$ be denoted by $\ell_0$ (which we will have to estimate). Then
+
+$$\begin{aligned}
+\pred{y}{2}{1} &= \alpha y_1 + (1-\alpha) \ell_0\\
+\pred{y}{3}{2} &= \alpha y_2 + (1-\alpha) \pred{y}21\\
+\pred{y}{4}{3} &= \alpha y_3 + (1-\alpha) \pred{y}32\\
+\vdots\\
+\pred{y}{T+1}{T} &= \alpha y_T + (1-\alpha) \pred{y}{T}{T-1}\end{aligned}$$
+
+Substituting each equation into the following equation, we obtain
+
+$$\begin{aligned}
+    \pred{y}{3}{2}   & = \alpha y_2 + (1-\alpha) \left[\alpha y_1 + (1-\alpha) \ell_0\right]                           \\
+                     & = \alpha y_2 + \alpha(1-\alpha) y_1 + (1-\alpha)^2 \ell_0                                       \\
+    \pred{y}{4}{3}   & = \alpha y_3 + (1-\alpha) [\alpha y_2 + \alpha(1-\alpha) y_1 + (1-\alpha)^2 \ell_0]             \\
+                     & = \alpha y_3 + \alpha(1-\alpha) y_2 + \alpha(1-\alpha)^2 y_1 + (1-\alpha)^3 \ell_0              \\
+                     & ~~\vdots                                                                                        \\
+    \pred{y}{T+1}{T} & =  \sum_{j=0}^{T-1} \alpha(1-\alpha)^j y_{T-j} + (1-\alpha)^T \ell_{0}.\label{eq-7-waforecasts}\end{aligned}$$
+
+So the weighted average form leads to the same forecast equation .
+
+### Component form {-}
+
+An alternative representation is the component form. For simple exponential smoothing the only component included is the level, $\ell_t$. (Other methods considered later in this chapter may also include a trend $b_t$ and seasonal component $s_t$.) Component form representations of exponential smoothing methods comprise a forecast equation and a smoothing equation for each of the components included in the method. The component form of simple exponential smoothing is given by:
+
+$$\begin{aligned}
+\text{Forecast equation}&&\pred{y}{t+1}{t} &= \ell_{t}\\
+\text{Smoothing equation}&&\ell_{t} &= \alpha y_{t} + (1 - \alpha)\ell_{t-1},\end{aligned}$$
+
+where $\ell_{t}$ is the level (or the smoothed value) of the series at time $t$. The forecast equation shows that the forecasted value at time $t+1$ is the estimated level at time $t$. The smoothing equation for the level (usually referred to as the level equation) gives the estimated level of the series at each period $t$.
+
+Applying the forecast equation for time $T$ gives, $\pred{y}{T+1}{T} = \ell_{T}$, the most recent estimated level.
+
+If we replace $\ell_t$ by $\pred{y}{t+1}{t}$ and $\ell_{t-1}$ by $\pred{y}{t}{t-1}$ in the smoothing equation, we will recover the weighted average form of simple exponential smoothing.
+
+### Multi {-}-horizon Forecasts
+
+So far we have given forecast equations for only one step ahead. Simple exponential smoothing has a “flat” forecast function, and therefore for longer forecast horizons, $$\pred{y}{T+h}{T}=\pred{y}{T+1}{T}=\ell_T, \qquad h=2,3,\dots.$$ Remember these forecasts will only be suitable if the time series has no trend or seasonal component.
+
+### Optimization {-}
+
+The application of every exponential smoothing method requires the smoothing parameters and the initial values to be chosen. In particular, for simple exponential smoothing, we need to select the values of $\alpha$ and $\ell_0$. All forecasts can be computed from the data once we know those values. For the methods that follow there is usually more than one smoothing parameter and more than one initial component to be chosen.
+
+There are cases where the smoothing parameters may be chosen in a subjective manner --- the forecaster specifies the value of the smoothing parameters based on previous experience. However, a more robust and objective way to obtain values for the unknown parameters included in any exponential smoothing method is to estimate them from the observed data.
+
+In Section \@ref(sec-4-2-LSprinciple) we estimated the coefficients of a regression model by minimizing the sum of the squared errors (SSE). Similarly, the unknown parameters and the initial values for any exponential smoothing method can be estimated by minimizing the SSE. The errors are specified as $e_t=y_t - \pred{y}{t}{t-1}$ for $t=1,\dots,T$ (the one-step-ahead training errors). Hence we find the values of the unknown parameters and the initial values that minimize
+
+$$\text{SSE}=\sum_{t=1}^T(y_t - \pred{y}{t}{t-1})^2=\sum_{t=1}^Te_t^2. \label{eq-7-SSE}$$
+
+Unlike the regression case (where we have formulae that return the values of the regression coefficients which minimize the SSE) this involves a non-linear minimization problem and we need to use an optimization tool to perform this.
+
+[Oil production]\@ref(ex-7-SES)
+
+![Simple exponential smoothing applied to oil production in Saudi Arabia
+(1996--2007).](fig_7_ses)
+
+\@ref(fig-7-ses)
+
+fit \<- ses(oildata, h=3) plot(fit, plot.conf=FALSE, ylab=“Oil (millions
+of tonnes)”, xlab=“Year”, main=“”, type=“o”) lines(fit[[“mean”]],
+col=“blue”) lines(fitted(fit), col=“red”, type=“o”)
+legend(“topleft”,lty=1, col=c(“black”,“red”,“blue”),
+c(“data”,“fitted”,“forecasts”),pch=c(1,1,20))
+
+\@ref(tbl-7-ses)
+
+<span>crYYY</span> & **Time** & **Observation** & **Level** &
+**Forecast**\
+**Year** & $t$ & $y_t$ & $\ell_t$ & $\hat{y}_{t+1|t}$\
+1995 & 0 & -- & 447.5 & --\
+1996 & 1 & 446.7 & 446.7 & 447.5\
+1997 & 2 & 454.5 & 453.6 & 446.7\
+1998 & 3 & 455.7 & 455.4 & 453.6\
+1999 & 4 & 423.6 & 427.1 & 455.4\
+2000 & 5 & 456.3 & 453.1 & 427.1\
+2001 & 6 & 440.6 & 441.9 & 453.1\
+2002 & 7 & 425.3 & 427.1 & 441.9\
+2003 & 8 & 485.1 & 478.9 & 427.1\
+2004 & 9 & 506.0 & 503.1 & 478.9\
+2005 & 10 & 526.8 & 524.2 & 503.1\
+2006 & 11 & 514.3 & 515.3 & 524.2\
+2007 & $T=12$ & 494.2 & 496.5 & 515.3\
+& $h$ & & & $\hat{y}_{T+h|T}$\
+2008 & $1$ & & & 496.5\
+2009 & $2$ & & & 496.5\
+2010 & $3$ & & & 496.5\
+& & & &\
+\
+ & 20.1\
+ & 25.1\
+ & 4.3\
+ & 7573.4\
+
+\
+$\alpha=0.89$ and $\ell_0=447.5$ are obtained by minimizing SSE over
+periods
+
+In this example, simple exponential smoothing is applied to forecast oil production in Saudi Arabia. The black line in Figure \@ref(fig-7-ses) is a plot of the data over the period 1996--2007, which shows a changing level over time but no obvious trending behaviour.
+
+In Table \@ref(tbl-7-ses) we demonstrate the application of simple exponential smoothing. The second last column shows the estimated level for times $t=0$ to $t=12$; the last column shows the forecasts for $h=1,2,3$. Using an optimization tool, we find the values of $\alpha=0.89$ and $\ell_0=447.5$ that minimize the SSE, subject to the restriction that $0\le\alpha\le1$. So the SSE value presented in the last row of the table is smaller for these values of $\alpha$ and $\ell_0$ than for any other values of $\alpha$ and $\ell_0$.
+
+The forecasts for the period 2008--2010 are plotted in
+Figure \@ref(fig-7-ses). Also plotted are one-step-ahead training forecasts
+alongside the data over the period 1996--2007.
+

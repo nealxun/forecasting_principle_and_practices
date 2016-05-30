@@ -1,14 +1,3 @@
----
-output: 
-  html_document: 
-    fig_caption: yes
-    fig_height: 4
-    fig_width: 6
-    number_sections: yes
-    theme: flatly
-    toc: yes
----
-
 #Getting started {#ch1}
 
 Forecasting has fascinated people for thousands of years, sometimes being considered a sign of divine inspiration, and sometimes being seen as a criminal activity. The Jewish prophet Isaiah wrote in about 700 BC

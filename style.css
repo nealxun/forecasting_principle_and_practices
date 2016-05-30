@@ -7,13 +7,10 @@
 
 .book-body p.caption {
   color: #333333;
-  margin-top: 10px;
-  font-style: "italic";
-  align-content: "center";
-  background-color: #f7f7f7;
+  background-color: #eeeeee;
   padding-left: 20px;
+  font-size: 8pt;
 }
-
 
 h1, h2, h3 {
   color: #3c6900;
@@ -38,13 +35,13 @@ dd {
 }
 
 .book-body table {
-  background: #ececec;
+  background: #eeeeee;
   border: 0px;
 }
 
 .book .book-body .page-wrapper .page-inner section.normal table td, .book .book-body .page-wrapper .page-inner section.normal table th {
 /*  font-family: "Droid Sans",Arial,Sans;*/
-  color: #000000;
+  color: #333333;
   border: 1px;
   font-size: 11pt;
   height: 15px;
@@ -64,12 +61,14 @@ dd {
   quotes: none;
   text-shadow: none;
   background: #D9E6CA;
-  padding:  5px 20px 2px 20px;
-  color: #000000;
+  padding:  7px 20px 1px 20px;
+  color: #333333;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px; 
 }
 
 .book .book-body .page-wrapper .page-inner section.normal pre {
-    background: #dddddd;
+    background: #eeeeee;
     padding: 5px 10px 5px 10px;
     margin: 0px 0px 5px 0px;
 }

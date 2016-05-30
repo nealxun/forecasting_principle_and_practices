@@ -4,8 +4,6 @@ bookdown::gitbook:
     toc:
       before: |
         <li><a href="./">Forecasting: Principles and Practice</a></li>
-      after: |
-        <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
     edit:
       link: https://github.com/robjhyndman/fpp2/edit/master/%s
 bookdown::pdf_book:

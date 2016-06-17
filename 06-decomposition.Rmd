@@ -56,7 +56,10 @@ We shall think of the time series $y_{t}$ as comprising three mponents: a season
 $$
   y_{t} = S_{t} + T_{t} + E_{t},
 $$ 
-where $y_{t}$ is the data at period $t$, $S_{t}$ is the seasonal component at period $t$, $T_{t}$ is the trend-cycle component at period $t$ and $E_{t}$ is the remainder (or irregular or error) component at period $t$. Alternatively, a multiplicative model would be written as $$y_{t} = S_{t} \times T_{t} \times E_{t}.$$
+where $y_{t}$ is the data at period $t$, $S_{t}$ is the seasonal component at period $t$, $T_{t}$ is the trend-cycle component at period $t$ and $E_{t}$ is the remainder (or irregular or error) component at period $t$. Alternatively, a multiplicative model would be written as
+$$
+  y_{t} = S_{t} \times T_{t} \times E_{t}.
+$$
 
 The additive model is most appropriate if the magnitude of the seasonal fluctuations or the variation around the trend-cycle does not vary with the level of the time series. When the variation in the seasonal pattern, or the variation around the trend-cycle, appears to be proportional to the level of the time series, then a multiplicative model is more appropriate. With economic time series, multiplicative models are common.
 

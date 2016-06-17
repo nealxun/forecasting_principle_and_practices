@@ -231,7 +231,6 @@ With time series forecasting, it is often useful to specify exactly what informa
 
 ## Further reading
 
--   [Armstrong, J. S., ed. (2001). *Principles of forecasting: a handbook for researchers and practitioners*. Boston, MA: Kluwer Academic Publishers.](http://amzn.com/0792374010/?tag=otexts-20)
-
--   [Ord, J. K. and R. Fildes (2012). *Principles of business forecasting*. South-Western College Pub.](http://amzn.com/0324311273/?tag=otexts-20)
+- @Armstrong01
+- @Ord2012
 

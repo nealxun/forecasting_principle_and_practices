@@ -12,3 +12,6 @@ fpp.log
 fpp.toc
 fpp.fls
 fpp.tex
+libs/*
+_bookdown_files/*
+_book/*

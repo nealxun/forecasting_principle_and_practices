@@ -1,3 +1,8 @@
+```{r include=FALSE, cache=FALSE}
+rm(list=ls(all=TRUE))
+library(fpp, quietly=TRUE)
+library(ggplot2, quietly=TRUE)
+```
 #The forecaster's toolbox {#toolbox}
 
 Before we discuss any forecasting methods, it is necessary to build a toolbox of techniques that will be useful for many different forecasting situations. Each of the tools discussed in this chapter will be used repeatedly in subsequent chapters as we develop and explore a range of forecasting methods.
@@ -396,11 +401,11 @@ Sometimes other transformations are also used (although they are not so interpre
 
 A useful family of transformations that includes logarithms and power transformations is the family of "Box-Cox transformations", which depend on the parameter $\lambda$ and are defined as follows:
 $$ 
-w_t  = 
-  \begin{cases} 
-    \log(y_t) & \text{if $\lambda=0$};  \\ 
-    (y_t^\lambda-1)/\lambda & \text{otherwise}. 
-  \end{cases}
+  w_t  = 
+    \begin{cases} 
+      \log(y_t) & \text{if $\lambda=0$};  \\ 
+      (y_t^\lambda-1)/\lambda & \text{otherwise}. 
+    \end{cases}
 $$
 
 The logarithm in a Box-Cox transformation is always a natural logarithm (i.e., to base $e$). So if $\lambda=0$, natural logarithms are used, but if $\lambda\ne0$, a power transformation is used followed by some simple scaling.
@@ -504,7 +509,6 @@ $$
   q_{j} = \frac{\displaystyle e_{j}}
     {\displaystyle\frac{1}{T-1}\sum_{t=2}^T |y_{t}-y_{t-1}|}.
 $$
-
 Because the numerator and denominator both involve values on the scale of the original data, $q_{j}$ is independent of the scale of the data. A scaled error is less than one if it arises from a better forecast than the average naïve forecast computed on the training data. Conversely, it is greater than one if the forecast is worse than the average naïve forecast computed on the training data. For seasonal time series, a scaled error can be defined using seasonal naïve forecasts: 
 $$ 
   q_{j} = \frac{\displaystyle e_{j}}
@@ -755,6 +759,45 @@ To produce a prediction interval, it is necessary to have an estimate of the sta
 A common feature of prediction intervals is that they increase in length as the forecast horizon increases. The further ahead we forecast, the more uncertainty is associated with the forecast, and so the prediction intervals grow wider. However, there are some (non-linear) forecasting methods that do not have this attribute.
 
 If a transformation has been used, then the prediction interval should be computed on the transformed scale, and the end points back-transformed to give a prediction interval on the original scale. This approach preserves the probability coverage of the prediction interval, although it will no longer be symmetric around the point forecast.
+
+    
+## The forecast package in R
+
+This book uses the facilities in the `forecast` package in R (which is automatically loaded whenever you load the `fpp` package). This appendix briefly summarizes some of the features of the package. Please refer to the help files for individual functions to learn more, and to see some examples of their use.
+
+### Functions that output a forecast object: {-}
+
+ * `meanf()|
+ * `naive()`, `snaive()`
+ * `rwf()`
+ * `croston()`
+ * `stlf()`
+ * `ses()`
+ * `holt()`, `hw()`
+ * `splinef()`
+ * `thetaf()`
+ * `forecast()`
+
+###The forecast class contains {-}
+
+ * Original series
+ * Point forecasts
+ * Prediction interval
+ * Forecasting method used
+ * Residuals and in-sample (training) one-step forecasts
+
+
+### `forecast()` function
+
+ * Takes a time series or time series model as its main argument
+ * If first argument is of class `ts|, it returns forecasts from automatic ETS algorithm.
+ * Methods are available for objects of class `Arima`, `ar`, `HoltWinters`, `StructTS`, etc.
+ * Output as class `forecast|.
+
+```{r}
+forecast(ausbeer)
+```
+
 ## Exercises
 
 1. For each of the following series (from the <b>fma</b> package), make a graph of the data. If transforming seems appropriate, do so and describe the effect.
@@ -791,14 +834,14 @@ If a transformation has been used, then the prediction interval should be comput
 
 ###Graphics and data summary {-}
 
--   [Cleveland, W. S. (1993). *Visualizing Data*. Hobart Press.](http://www.amazon.com/Visualizing-Data-William-S-Cleveland/dp/0963488406?tag=ote09-20)
--   [Maindonald, J. and H. Braun (2010). *Data analysis and graphics using R: an example-based approach*. 3rd ed. Cambridge, UK: Cambridge University Press.](http://www.amazon.com/Data-Analysis-Graphics-Using-Example-Based/dp/0521762936?tag=ote09-20)
+- @Cleveland1993
+- @MB10
 
 ###Simple forecasting methods {-}
 
--   [Ord, J. K. and R. Fildes (2012). *Principles of business forecasting*. South-Western College Pub.](http://www.amazon.com/Principles-Business-Forecasting-Keith-Ord/dp/0324311273?tag=ote09-20)
+- @Ord2012
 
 ###Evaluating forecast accuracy {-}
 
--   [Hyndman, R. J. and A. B. Koehler (2006). Another look at measures of forecast accuracy. *International Journal of Forecasting* **22**(4), 679–688.](http://robjhyndman.com/papers/another-look-at-measures-of-forecast-accuracy/)
-    
+- @HK06
+

@@ -585,7 +585,7 @@ The procedure is most easily understood via an example. We will illustrate it us
 $$
   (1-\hat{\phi}_1B -\hat{\phi}_2B^2-\hat{\phi}_3B^3)(1-B) y_t = (1+\hat{\theta}_1B)e_{t},
 $$
-where $\hat{\phi}_1=0.0519$, $\hat{\phi}_2=0.1191$, $\hat{\phi}_3=0.3730 $ and $\hat{\theta}_1=-0.4542$. Then we expand the left hand side to obtain
+where $\hat{\phi}_1=0.0519$, $\hat{\phi}_2=0.1191$, $\hat{\phi}_3=0.3730$ and $\hat{\theta}_1=-0.4542$. Then we expand the left hand side to obtain
 $$
   \left[1-(1+\hat{\phi}_1)B +(\hat{\phi}_1-\hat{\phi}_2)B^2 + (\hat{\phi}_2-\hat{\phi}_3)B^3 +\hat{\phi}_3B^4\right] y_t = (1+\hat{\theta}_1B)e_{t},
 $$
@@ -648,14 +648,11 @@ So far, we have restricted our attention to non-seasonal data and non-seasonal A
 
 A seasonal ARIMA model is formed by including additional seasonal terms in the ARIMA models we have seen so far. It is written as follows:
 
-\begin{tabular}{cl}
-ARIMA $~\underbrace{(p, d, q)}$~ $\underbrace{(P, D, Q)_{m}}$ &\\
-\hspace*{1.2cm} ${\uparrow}$ \hspace{1.2cm} ${\uparrow}$ \\
-\hspace*{.2cm}{$\left(\text{\begin{tabular}{l}
-Non-seasonal part\\ of the model \end{tabular}}\right)$}
-\hspace*{.2cm}{$\left(\text{\begin{tabular}{l}
-Seasonal part\\ of the model\end{tabular}}\right)$}
-\end{tabular}
+| ARIMA | $~\underbrace{(p, d, q)}$   $\underbrace{(P, D, Q)_{m}}$ |
+| :-    | :-----------------------: | :--------------------------: |
+|       | ${\uparrow}$              | ${\uparrow}$                 |
+|       | Non-seasonal part         | Seasonal part of             |
+|       | of the model              | of the model                 |
 
 where $m =$ number of observations per year. We use uppercase notation for the seasonal parts of the model, and lowercase notation for the non-seasonal parts of the model.
 

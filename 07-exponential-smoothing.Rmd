@@ -457,13 +457,17 @@ hw(x, damped=TRUE, seasonal="multiplicative")
 
 Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combination of the trend and seasonal components, fifteen exponential smoothing methods are possible, listed in Table \@ref(tbl-7-classification). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (M,N) is the method with multiplicative trend and no seasonality; and so on.
 
+```{r, include=FALSE}
+
+
+```
 
 Table: A two way classification of exponential smoothing methods.
 
-|:---------------------|:-------:|:----------:|:----------------:| 
-|                      | Seasonal Component   |                  |
+|                      | Seasonal|Component   |                  |
 | Trend                | N       | A          | M                |
 | Component            | (None)  | (Additive) | (Multiplicative) |
+|:---------------------|:-------:|:----------:|:----------------:| 
 | N (None)             | (N,N)   | (N,A)      | (N,M)            |
 | A (Additive)         | (A,N)   | (A,A)      | (A,M)            |
 | Ad (Additive damped) | (Ad,N)  | (Ad,A)     | (Ad,M)           |
@@ -471,14 +475,16 @@ Table: A two way classification of exponential smoothing methods.
 
 Some of these methods we have already seen:
 
-|:-----:|:------------------------------------|
-| (N,N) | simple exponential smoothing        |
-| (A,N) | Holt’s linear method                |
-| (A,N) | additive damped trend method        |
-| (A,A) | additive Holt-Winters method        |
-| (A,M) | multiplicative Holt-Winters method  |
-| (A,M) | Holt-Winters damped method          |
-
+```{r, include=FALSE}
+tab <- rbind(
+  c("(N,N)","Simple exponential smoothing"),
+  c("(A,N)","Holt's linear method"),
+  c("(Ad,N","Additive damped trend method"),
+  c("(A,A)","Additive Holt-Winters method"),
+  c("(A,M)","Multiplicative Holt-Winters method"),
+  c("(Ad,M)","Holt-Winters damped method"))
+knitr::kable(tab,booktabs=TRUE, col.names=c("",""))
+```
 
 \begin{table*}[!t]
 \def\dampfactor{\phi_h}

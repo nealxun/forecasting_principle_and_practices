@@ -1,0 +1,1191 @@
+#Linear regression models {#ch-regression}
+
+In this chapter we discuss linear regression models. The basic concept is that we forecast the time series of interest ($y$) assuming it has a linear relationship with other time series ($x$) we observe.
+
+For example, we might wish to  forecast monthly sales ($y$) with total advertising spend ($x$) as the predictor.  Or we might forecast daily electricity demand ($y$) using temperature ($x_1$) and the day of week ($x_2$) as predictors.
+
+The forecast variable ($y$) is sometimes also called the regressand, dependent or explained variable. The predictor variables ($x$) are sometimes also called the regressors, independent or explanatory variables. In this book we will always refer to them as the "forecast variable" and "predictor variables".
+
+## The linear model {#sec-4-1-Intro}
+
+### Simple linear regression {-}
+
+In the simplest case there is only one predictor variable, and it is related to the forecast variable by the simple linear model: 
+$$
+  y = \beta_0 + \beta_1 x + \varepsilon.
+$$
+
+An example of data from such a model is shown in Figure \@ref(fig:SLRpop1). The parameters $\beta_0$ and $\beta_1$ denote the intercept and the slope of the line respectively. The intercept $\beta_0$ represents the predicted value of $y$ when $x=0$. The slope $\beta_1$ represents the predicted increase in $y$ resulting from a one unit increase in $x$.
+
+```{r SLRpop1, fig.cap="An example of data from a linear regression model.", echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
+set.seed(2)
+x <- runif(50, 0, 4)
+df <- data.frame(x=x, 
+                 y=3 + 10*x + rnorm(50, 0, 10))
+ggplot(df, aes(x, y)) + 
+  geom_point() +
+  geom_abline(slope=10,intercept=3, col="#990000",
+              size=0.3) +
+  geom_label(x=.3,y=40,parse=TRUE, col="#990000",
+             label="y == beta[0] + beta[1] * x") +
+  geom_segment(x=.3, y=36, xend=0, yend=4, 
+        arrow=arrow(length = unit(0.02, "npc")),
+        size=0.2, col='#990000') +
+  geom_label(x=1.5,y=55,parse=TRUE, col="#000099",
+           label="y[t] == beta[0] + beta[1] * x[t] + epsilon[t]") +
+  geom_segment(x=1.5, y=52, xend=df$x[19]-0.03, yend=df$y[19]+1.5, 
+               arrow=arrow(length = unit(0.02, "npc")),
+               size=0.2, col='#000099') +
+  geom_segment(x=df$x[19], y=df$y[19],
+               xend=df$x[19], yend=3+10*df$x[19],
+               col="#009900", size=0.2,
+               arrow=arrow(length=unit(0.02,"npc"),
+                           ends="both")) +
+  geom_label(x=df$x[19]-0.07, 
+             y=(df$y[19]+ 3+10*df$x[19])/2,
+             col="#009900", label="epsilon[t]",
+             parse=TRUE)
+```
+
+Notice that the observations do not lie on the straight line but are scattered around it. We can think of each observation $y_t$ consisting of the systematic or explained part of the model, $\beta_0+\beta_1x_t$, and the random "error", $\varepsilon_t$. The "error" term does not imply a mistake, but a deviation from the underlying straight line model. It captures anything that may affect $y_t$ other than $x_t$.
+
+
+
+### US consumption expenditure {-}
+  
+```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure for the US."}
+autoplot(usconsumption, ylab="", xlab="Year", facet=TRUE) 
+```
+
+Figure \@ref(fig:ConsInc) shows time series plots of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US for the period March 1970 to Dec 2010. 
+
+```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Plot"}
+plot(consumption ~ income, data=usconsumption, ylab="")
+fit.ex3 <- lm(consumption ~ income, data=usconsumption) 
+abline(fit.ex3) 
+```
+
+A scatter plot of consumption against income is shown in Figure \@ref(fig:ConsInc2), along with the estimated regression line
+$$
+  \hat{y}=0.52+0.32x.
+$$
+The estimate results are given below.
+
+```{r ConsInc3, echo=TRUE, cache=TRUE}
+summary(fit.ex3)
+```
+
+(We will show how this line can be estimated in Section \@ref().
+
+This equation shows that a value of 1 for $x$ (the percentage increase in personal disposable income) will result in a forecast value of $0.52+0.32\times1 = 0.84$ for $y$ (the percentage increase in personal consumption expenditure). When $x$ is zero (there is no change in personal disposal income since the last quarter), $y$ takes the value $0.52$ --- there is an increase in consumption of 0.52%.
+
+In general, the slope coefficient can be interpreted as the effect on $y$ of an increase of 1 in $x$ . 
+
+The interpretation of the intercept requires that a value of $x=0$ makes sense. When $x=0$ makes sense, the intercept $\hat{\beta}_0$ is the predicted value of $y$ corresponding to $x=0$. Even when $x=0$ does not make sense, the intercept is an important part of the model. Without it, the slope coefficient can be distorted unnecessarily.
+
+### Multiple linear regression {-}
+
+When there are two or more predictor variables, the model is called a "multiple regression model". The general form of a multiple regression model is
+\begin{equation}
+  y = \beta_{0} + \beta_{1} x_{1} + \beta_{2} x_{2} + \cdots + \beta_{k} x_{k} + \varepsilon,
+  (\#eq:lm)
+\end{equation}
+where $y$ is the variable to be forecast and $x_{1},\dots,x_{k}$ are the $k$ predictor variables. Each of the predictor variables must be numerical. The coefficients $\beta_{1},\dots,\beta_{k}$ measure the effect of each predictor after taking account of the effect of all other predictors in the model. Thus, the coefficients measure the *marginal effects* of the predictor variables.
+
+### Assumptions {-}
+
+When we use a linear regression model, we are implicitly making some assumptions about the variables in equation \@ref(eq:lm).
+
+First, we assume that the model is a reasonable approximation to reality; that is, that the relationship between the forecast variable and the predictor variables satisfies this linear equation.
+
+Second, we make these assumptions about the errors $(\varepsilon_{1},\dots,\varepsilon_{T})$:
+
+  * they have mean zero; otherwise the forecasts will be systematically biased.
+  * they are not autocorrelated; otherwise the forecasts will be inefficient as there is more information to be exploited in the data.
+  * they are unrelated to the predictor variables; otherwise there would be more information that should be included in the systematic part of the model.
+
+It is also useful to have the errors normally distributed with constant variance in order to easily produce prediction intervals. 
+
+## Some useful predictors {#sec-5-2-UsefulPredictors}
+
+There are several very useful predictors that occur frequently when using regression for time series data.
+
+### Trend {-}
+
+A linear trend can be included by using the predictor $x_{1,t}=t$.
+A quadratic or higher order trend is obtained by specifying 
+\[
+  x_{1,t} =t,\quad x_{2,t}=t^2,\quad \dots
+\]
+However, it is not recommended that quadratic or higher order trends are used in forecasting. When they are extrapolated, the resulting forecasts are often very unrealistic.
+
+A better approach is to use a piecewise linear trend which bends at some time. If the trend bends at time $\tau$, then it can be specified by including the following predictors in the model.
+\begin{align*}
+  x_{1,t} & = t \\ 
+  x_{2,t} &= \left\{ 
+             \begin{array}{ll} 
+               0 & t < \tau\\ 
+               (t-\tau) &  t \ge \tau
+             \end{array}\right.
+\end{align*}
+If the associated coefficients of $x_{1,t}$ and $x_{2,t}$ are $\beta_1$ and $\beta_2$, then $\beta_1$ gives the slope of the trend before time $\tau$, while the slope of the line after time $\tau$ is given by $\beta_1+\beta_2$.
+
+An extension of this idea is to use a spline (see Section \@ref(sec-5-6-NonLinear)).
+
+  
+### Dummy variables {-}
+
+So far, we have assumed that each predictor takes numerical values. But what about when a predictor is a categorical variable taking only two values (e.g., "yes" and "no"). Such a variable might arise, for example, when forecasting daily sales and you want to take account of whether the day is a public holiday or not.  So the predictor takes value "yes" on a public holiday, and  "no" otherwise.
+
+This situation can still be handled within the framework of multiple regression models by creating a "dummy variable" taking value 1 corresponding to "yes" and 0 corresponding to "no". A dummy variable is also known as an "indicator variable".
+
+If there is an outlier in the data, rather than omit it, you can use a dummy variable to remove its effect. In this case, the dummy variable takes value one for that observation and zero everywhere else.
+
+If there are more than two categories, then the variable can be coded using several dummy variables (one fewer than the total number of categories).
+
+
+### Seasonal dummy variables {-}
+
+For example, suppose we are forecasting daily electricity demand and we want toaccount for the day of the week as a predictor. Then the following dummy variables can be created.
+
+```{r dowdummy, echo=FALSE, cache=TRUE}
+df <- matrix("0", nrow=13, ncol=6)
+df[1:6,] <- paste(diag(6))
+df[8:12,] <- paste(diag(6)[1:5,])
+rownames(df) <- rep(c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"),2)[1:13]
+colnames(df) <- paste("$x_{",1:6,",t}$",sep="")
+df[13,] <- "&#8942;"
+rownames(df)[13] <- "&#8942;"
+knitr::kable(df)
+```
+
+Notice that only six dummy variables are needed to code seven categories. That is because the seventh category (in this case Sunday) is specified when the dummy variables are all set to zero.
+
+Many beginners will try to add a seventh dummy variable for the seventh category. This is known as the "dummy variable trap" because it will cause the regression to fail. There will be too many parameters to estimate. The general rule is to use one fewer dummy variables than categories. So for quarterly data, use three dummy variables; for monthly data, use 11 dummy variables; and for daily data, use six dummy variables.
+
+The interpretation of each of the coefficients associated with the dummy variables is that it is *a measure of the effect of that category relative to the omitted category*. In the above example, the coefficient associated with Monday will measure the effect of Monday compared to Sunday on the forecast variable.
+
+### Easter {-}
+
+Easter is different from most holidays because it is not held on the same date each year and the effect can last for several days. In this case, a dummy variable can be used with value one where any part of the holiday falls in the particular time period and zero otherwise.
+
+For example, with monthly data, when Easter falls in March then the dummy variable takes value 1 in March, when it falls in April, the dummy variable
+takes value 1 in April, and when it starts in March and finishes in April, the dummy variable takes value 1 for both months.
+
+## Least squares estimation {#sec-4-2-LSprinciple}
+
+In practice, of course, we have a collection of observations but we do not know the values of the coefficients $\beta_0,\beta_1, \dots, \beta_k$. These need to be estimated from the data.
+
+The least squares principle provides a way of choosing the coefficients effectively by minimizing the sum of the squared errors. That is, we choose the values of $\beta_0, \beta_1, \dots, \beta_k$ that minimize
+$$
+  \sum_{t=1}^T \varepsilon_t^2 = \sum_{t=1}^T (y_t - 
+  \beta_{0} - \beta_{1} x_{1,t} - \beta_{2} x_{2,t} - \cdots - \beta_{k} x_{k,t})^2.
+$$
+
+This is called "least squares" estimation because it gives the least value for the sum of squared errors.  Finding the best estimates of the coefficients is often called "fitting" the model to the data, or sometimes "learning" or "training" the model. The line shown in Figure \@ref(fig:ConsInc2) was obtained in this way.
+
+When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section&nbsp;\@ref(sec:matrixequations).
+
+The estimated coefficients are used for forecasting. For each set of values for the predictors $x_1,\dots,x_k$ we can forecast a corresponding value of $y$ using 
+$$
+  \hat{y} = \hat\beta_{0} + \hat\beta_{1} x_{1} + \hat\beta_{2} x_{2} + \cdots + \hat\beta_{k} x_{k}.
+$$ 
+
+### Example: Australian quarterly beer production {-}
+
+Recall the Australian quarterly beer production data shown below.
+
+```{r beeragain, echo=TRUE, cache=TRUE, warning=FALSE, message=FALSE}
+beer2 <- window(ausbeer, start=1992)
+autoplot(beer2)
+```
+
+We want to forecast the value of future beer production. There are no other variables available for predictors. Instead, we can use the number of quarters since the start of the series as a predictor variable (the trend). We may also use the quarter of the year corresponding to each observation as a predictor variable (a seasonal dummy variable). Then, knowing the number of quarters since the start of the series and the specific quarter of interest, we can forecast the value of beer production in that quarter.
+
+```{r ausbeerfit, echo=TRUE, cache=TRUE}
+fit <- tslm(beer2 ~ trend + season) 
+summary(fit)
+```
+
+Thus, we model the Australian beer production data using a regression model with a linear trend and quarterly dummy variables: 
+\[
+  y_{t} = \beta_{0} + \beta_{1} t + \beta_{2}d_{2,t} + \beta_3 d_{3,t} + \beta_4 d_{4,t} + \varepsilon_{t},
+\]
+where $d_{i,t} = 1$ if $t$ is in quarter $i$ and 0 otherwise. The first quarter variable has been omitted, so the coefficients associated with the other quarters are measures of the difference between those quarters and the first quarter.
+
+There is a strong downward trend of `r round(fit$coef['trend'], 3)` megalitres per quarter. On average, the second quarter has production of `r -round(fit$coef['season2'], 1)` megalitres lower than the first quarter, the third quarter has production of `r -round(fit$coef['season3'], 1)` megalitres lower than the first quarter, and the fourth quarter has production `r round(fit$coef['season4'], 1)` megalitres higher than the first quarter. The model explains `r round(summary(fit)$r.squared*100,1)`% of the variation in the beer production data.
+
+### Fitted values {-}
+
+Predictions of $y$ can be calculated by ignoring the error in the regression equation. That is
+\[
+  \hat{y} = \hat\beta_{0} + \hat\beta_{1} x_{1} + \hat\beta_{2} x_{2} + \cdots + \hat\beta_{k} x_{k}.
+\]
+Plugging in values of $x_1,\dots,x_k$ into the right hand side of this equation gives a prediction of $y$ for that combination of predictors.
+
+When the values of $x_1,\dots,x_k$ are new values (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
+
+When this calculation is done using values of the predictors from the data that were used to estimate the model, we call the resulting values of $y$ the "fitted values".  We write these as 
+$$
+  \hat{y}_t = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t},
+$$ 
+for $t=1,\dots,T$. Each $\hat{y}_t$ is the forecast corresponding to the observation $y_t$ using the predictor information. These are "predictions" of the data used in estimating the model. They are not genuine forecasts as the actual value of $y$ for that set of predictors was used in estimating the model, and so the value of $\hat{y}$ is affected by the true value of $y$.
+
+The following plots show the actual values compared to the predicted (i.e., fitted) values for the Australian beer data.
+
+```{r beerlm2, echo=TRUE, cache=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
+df <- cbind(Data=beer2, fitted=fitted(fit))
+autoplot(df[,1:2]) + xlab("Year") + ylab("") +
+  ggtitle("Quarterly Beer Production")
+```
+
+```{r beerlm3, echo=TRUE, cache=TRUE, fig.cap="Actual beer production plotted against predicted beer production."}
+df <- as.data.frame(df)
+ggplot(df,aes(x=Data, y=fitted, colour=as.factor(cycle(beer2)))) + 
+  geom_point() +
+  xlab("Predicted values") + ylab("Actual values") + 
+  ggtitle("Quarterly beer production") +
+  scale_color_brewer(palette="Dark2", name="Quarter")
+```
+
+```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
+fcast <- forecast(fit) 
+autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
+```
+
+Forecasts obtained from the model are shown in Figure \@ref(fig:beerlm1).
+
+## Evaluating the regression model {#sec-4-4-EvaluatingSLR}
+
+The difference between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the forecast errors or "residuals": 
+\begin{align*}
+  e_t &= y_t - \hat{y}_t \\
+      &= y_t - \hat\beta_{0} - \hat\beta_{1} x_{1,t} - \hat\beta_{2} x_{2,t} - \cdots - \hat\beta_{k} x_{k,t}.
+\end{align*}
+Each residual is the unpredictable component of the associated observation.
+
+The residuals have some useful properties including the following two:
+$$
+  \sum_{t=1}^{T}{e_t}=0 \quad\text{and}\quad \sum_{t=1}^{T}{x_{k,t}e_t}=0.
+$$
+As a result of these properties, it is clear that the average of the residuals is zero, and that the correlation between the residuals and the observations for the predictor variable is also zero.
+
+After selecting the regression variables and fitting a regression model, it is necessary to plot the residuals to check that the assumptions of the model have been satisfied. There are a series of plots that should be produced in order to check different aspects of the fitted model and the underlying assumptions.
+
+### Residual plots against predictors {-}
+
+We would expect the residuals to be randomly scattered without showing any systematic patterns. A simple and quick way for a first check is to examine a scatterplot of the residuals against each of the predictor variables. 
+
+If these scatterplots show a pattern, then the relationship may be nonlinear and the model will need to be modified accordingly. See Section \@ref(sec-5-6-NonLinear) for a discussion of nonlinear regression.
+
+It is also necessary to plot the residuals against any predictors *not* in the model. If these show a pattern, then the predictor may need to be added to the model (possibly in a nonlinear form).
+
+### Residual plots against fitted values {-}
+
+A plot of the residuals against the fitted values should also show no pattern. If a pattern is observed, there may be "heteroscedasticity" in the errors. That is, the variance of the residuals may not be constant. To overcome this problem, a transformation of the forecast variable (such as a logarithm or square root) may be required.
+
+### ACF plot of residuals {-}
+
+You should always look at an ACF plot of the residuals. This will reveal if there is any autocorrelation in the residuals (suggesting that there is information that has not been accounted for in the model).
+
+Figure \@ref(fig:beerlm4) shows a time plot and ACF of the residuals from the model fitted to the beer production data.
+
+```{r beerlm4, echo=TRUE, cache=TRUE, fig.cap="Residuals from the regression model for beer production.", fig.height=3}
+fit <- tslm(beer2 ~ trend + season) 
+res <- residuals(fit) 
+
+p1 <- autoplot(res) + ylab("Residuals") + xlab("Year") 
+p2 <- ggAcf(res) + ggtitle("ACF of residuals")
+gridExtra::grid.arrange(p1, p2, nrow=1)
+```
+
+There is an outlier in the residuals (2004:Q4) which suggests there was something unusual happening in that quarter. It would be worth investigating that outlier to see if there were any unusual circumstances or events that may have reduced beer production for the quarter.
+
+The remaining residuals show that the model has captured the patterns in the data quite well, although there is a small amount of autocorrelation left in the residuals (seen in the significant spike in the ACF plot). This suggests that the model can be slightly improved, although it is unlikely to make much difference to the resulting forecasts.
+
+Another test of autocorrelation that is designed to take account of the regression model is the **Durbin-Watson** test. It is used to test the hypothesis that there is no lag one autocorrelation in the residuals.  A small p-value indicates there is significant autocorrelation remaining in the residuals. For the beer model, the Durbin-Watson test reveals some significant lag one autocorrelation.
+
+```{r dwtestbeer, echo=TRUE, cache=TRUE}
+dwtest(fit, alt="two.sided") 
+#It is recommended that the two-sided test always be used 
+#to check for negative as well as positive autocorrelation
+```
+
+Both the ACF plot and the Durbin-Watson test show that there is some autocorrelation remaining in the residuals. This means there is some information remaining in the residuals that can be exploited to obtain better forecasts. The forecasts from the current model are still unbiased, but will have larger prediction intervals than they need to. A better model in this case will be a dynamic-regression model which will be covered in Chapter \@ref(ch9).
+
+A third possible test is the **Breusch-Godfrey** test designed to look for significant higher-lag autocorrelations.
+
+```{r bgtestbeer, echo=TRUE, cache=TRUE}
+#Test for autocorrelations up to lag 5. 
+bgtest(fit,5)
+```
+
+With time series data it is highly likely that the value of a variable observed in the current time period will be influenced by its value in the previous period, or even the period before that, and so on. Therefore when fitting a regression model to time series data, it is very common to find autocorrelation in the residuals. In this case, the estimated model violates the assumption of no autocorrelation in the errors, and our forecasts may be inefficient --- there is some information left over which should be utilized in order to obtain better forecasts. The forecasts from a model with autocorrelated errors are still unbiased, and so are not "wrong", but they will usually have larger prediction intervals than they need to.
+
+
+### Histogram of residuals {-}
+
+Finally, it is a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier.
+
+```{r beerlm5, echo=TRUE, cache=TRUE, fig.cap="Histogram of residuals from regression model for beer production.", message=FALSE, warning=FALSE}
+x <- -43:43
+ggplot() + geom_histogram(aes(res), binwidth=7) + 
+  xlab("Residuals") + ggtitle("Histogram of residuals") +
+  geom_line(aes(x=x, y=length(res)*7*dnorm(x,0,sd(res)), col="red")) +
+  geom_rug() + guides(col=FALSE)
+```
+
+In this case, the residuals seem to be slightly negatively skewed, although that is partly due to the outlier.
+
+### Outliers and influential observations {-}
+
+Observations that take on extreme values compared to the majority of the data are called "outliers". Observations that have a large influence on the estimation results of a regression model are called "influential observations". Usually, influential observations are also outliers that are extreme in the $x$ direction.
+
+There are formal methods for detecting outliers and influential observations that are beyond the scope of this textbook. As we suggested at the beginning of Chapter \@ref(ch2), getting familiar with your data prior to performing any analysis is of vital importance. A scatter plot of $y$ against $x$ is always a useful starting point in regression analysis and often helps to identify unusual observations.
+
+One source for an outlier occurring is an incorrect data entry. Simple descriptive statistics of your data can identify minima and maxima that are not sensible. If such an observation is identified, and it has been incorrectly recorded, it should be immediately removed from the sample.
+
+Outliers also occur when some observations are simply different. In this case it may not be wise for these observations to be removed. If an observation has been identified as a likely outlier it is important to study it and analyze the possible reasons behind it. The decision of removing or retaining such an observation can be a challenging one (especially when outliers are influential observations). It is wise to report results both with and without the removal of such observations.
+
+### Goodness-of-fit {-}
+
+A common way to summarize how well a linear regression model fits the data is via the coefficient of determination or $R^2$. This can be calculated as **the square of the correlation between the observed $y$ values and the predicted $\hat{y}$ values**. Alternatively, it can also be calculated as: 
+$$
+  R^2 = \frac{\sum(\hat{y}_{t} - \bar{y})^2}{\sum(y_{t}-\bar{y})^2},
+$$ 
+where the summations are over all observations. Thus, it is also **the proportion of variation in the forecast variable that is accounted for (or explained) by the regression model**.
+
+If the predictions are close to the actual values, we would expect $R^2$ to be close to 1. On the other hand, if the predictions are unrelated to the actual values, then $R^2=0$. In all cases, $R^2$ lies between 0 and 1.
+
+In simple linear regression, the value of $R^2$ is also equal to the square of the correlation between $y$ and $x$. 
+
+
+
+The $R^2$ value is commonly used, often incorrectly, in forecasting. There are no set rules of what a good $R^2$ value is and typical values of $R^2$ depend on the type of data used. Validating a model’s forecasting performance on the test data is much better than measuring the $R^2$ value on the training data
+
+### Standard error of the regression {-}
+
+Another measure of how well the model has fitted the data is the standard deviation of the residuals, which is often known as the "standard error of the regression" and is calculated by
+$$\label{eq-4-se} 
+  s_e=\sqrt{\frac{1}{T-2}\sum_{t=1}^{T}{e_t^2}}.
+$$
+
+Notice that this calculation is slightly different from the usual standard deviation where we divide by $T-1$ (see p.). Here, we divide by $T-2$ because we have estimated two parameters (the intercept and slope) in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation.
+
+The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. In Figure \@ref(fig-4-car), $s_e$ is part of the R output labeled  `Residual standard error`" and takes the value 0.4703 tonnes per year.
+
+We should warn here that the evaluation of the standard error can be highly subjective as it is scale dependent. The main reason we introduce it here is that it is required when generating forecast intervals, discussed in Section \@ref(sec-4-5-ForeWithRegr).
+
+
+
+
+### Spurious regression {-}
+
+More often than not, time series data are "non-stationary"; that is, the values of the time series do not fluctuate around a constant mean or with a constant variance. We will deal with time series stationarity in more detail in Chapter \@ref(ch8), but here we need to address the effect non-stationary data can have on regression models.
+
+```{r spurious, echo=TRUE, cache=TRUE, fig.cap="Trending time series data can appear to be related, as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE,warning=FALSE}
+df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,AustralianPassengers=ausair))
+p1 <- autoplot(ausair) + xlab("Year") + ylab("Air Passengers in Australia (millions)")
+p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea (million tons)")
+gridExtra::grid.arrange(p1,p2,ncol=2)
+ggplot(df,aes(x=GuineaRiceProduction, y=AustralianPassengers)) + geom_point()
+```
+
+For example consider the two variables plotted in Figure \@ref(fig:spurious), which appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea. 
+
+Regressing non-stationary time series can lead to spurious regressions. High $R^2$s and high residual autocorrelation can be signs of spurious regression. We discuss the issues surrounding non-stationary data and spurious regressions in detail in Chapter \@ref(ch9).
+
+Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
+
+## Forecasting with regression {#sec-4-5-ForeWithRegr}
+
+Forecasts from a simple linear model are easily obtained using the equation
+$$
+  \hat{y}=\hat{\beta}_0+\hat{\beta}_1 x
+$$
+where $x$ is the value of the predictor for which we require a forecast. That is, if we input a value of $x$ in the equation we obtain a corresponding forecast $\hat{y}$. 
+
+When this calculation is done using an observed value of $x$ from the data, we call the resulting value of $\hat{y}$ a "fitted value". This is not a genuine forecast as the actual value of $y$ for that predictor value was used in estimating the model, and so the value of $\hat{y}$ is affected by the true value of $y$. When the values of $x$ is a new value (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
+
+Assuming that the regression errors are normally distributed, an approximate 95% **forecast interval** (also called a prediction interval) associated with this forecast is given by
+$$\label{eq-4-pi}
+  \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
+$$
+where $N$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is given by equation . Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28 in equation . Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab-2-pcmultipiers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation .
+
+Equation  shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is, we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
+
+The estimated regression line in the Car data example is 
+$$ 
+  \hat{y}=12.53-0.22x. 
+$$
+For the Chevrolet Aveo (the first car in the list) $x_1$=25 mpg and $y_1=6.6$ tons of CO$_2$ per year. The model returns a fitted value of $\hat{y}_1$=7.00, i.e., $e_1=-0.4$. For a car with City driving fuel economy $x=30$ mpg, the average footprint forecasted is $\hat{y}=5.90$ tons of CO$_2$ per year. The corresponding 95% and 80% forecast intervals are [4.95, 6.84] and [5.28, 6.51] respectively (calculated using R).
+
+![Forecast with 80% and 95% forecast intervals for a car with $x=30$ mpg in
+city driving.](fig_4_car2)
+
+fitted(fit)\@ref(1) fcast \<- forecast(fit, newdata=30) plot(fcast, xlab="City
+(mpg)", ylab="Carbon footprint (tons per year)") \# The displayed graph uses
+jittering, while the code above does not.
+
+
+### Scenario based forecasting {-}
+
+In this setting the forecaster assumes possible scenarios for the predictor variable that are of interest. For example the US policy maker may want to forecast consumption if there is a 1% growth in income for each of the quarters
+in 2011. Alternatively a 1% decline in income for each of the quarters may be
+of interest. The resulting forecasts are calculated and shown in Figure
+\@ref(fig:ConsInc4).
+
+```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US."}
+fcast <- forecast(fit.ex3, newdata=data.frame(income=c(-1,1))) 
+autoplot(fcast)
+```
+
+Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
+
+An alternative approach is to use genuine forecasts for the predictor variable. For example, a pure time series based approach can be used to generate forecasts for the predictor variable (more on this in Chapter \@ref(ch9)) or forecasts published by some other source such as a government agency can be used.
+
+### Ex-ante versus ex-post forecasts {-}
+
+When using regression models with time series data, we need to distinguish between two different types of forecasts that can be produced, depending on what is assumed to be known when the forecasts are computed.
+
+*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex ante forecasts of consumption for the four quarters in 2011 should only use information that was available *before*
+2011. These are the only genuine forecasts, made in advance using whatever information is available at the time.
+
+*Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption for each of the 2011 quarters may use the actual observations of income for each of these quarters, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
+
+The model from which ex-post forecasts are produced should not be estimated using data from the forecast period. That is, ex-post forecasts can assume knowledge of the predictor variable (the $x$ variable), but should not assume knowledge of the data that are to be forecast (the $y$ variable).
+
+A comparative evaluation of ex ante forecasts and ex post forecasts can help to separate out the sources of forecast uncertainty. This will show whether forecast errors have arisen due to poor forecasts of the predictor or due to a poor forecasting model.
+
+[Linear trend]\@ref(ex-4-LinTrend)
+
+A common feature of time series data is a trend. Using regression we can model and forecast the trend in time series data by including $t=1,\dots,T,$ as a predictor variable: 
+$$
+  y_t=\beta_0+\beta_1t+\varepsilon_t.
+$$
+Figure \@ref(fig-4-Tourism) shows a time series plot of aggregate tourist arrivals to Australia over the period 1980 to 2010 with the fitted linear trend line $\hat{y}_t= 0.3375+0.1761t$. Also plotted are the point and forecast intervals for the years 2011 to 2015.
+
+![Forecasting international tourist arrivals to Australia for the period
+2011-2015 using a linear trend. 80% and 95% forecast intervals are
+shown.](fig_4_Tourism)
+
+\@ref(fig-4-Tourism)
+
+fit.ex4 \<- tslm(austa   trend) f \<- forecast(fit.ex4, h=5,level=c(80,95))
+plot(f, ylab="International tourist arrivals to Australia (millions)",
+xlab="t") lines(fitted(fit.ex4),col="blue") summary(fit.ex4)
+
+Coefficients: Estimate Std. Error t value Pr(\>|t|) (Intercept) 0.337535
+0.100366 3.363 0.00218 \*\* trend 0.176075 0.005475 32.157 \< 2e-16
+\*\*\*
+
+
+
+
+### R$^2^$: the coefficient of determination {-}
+
+The $R^2^$ value was introduced in Section~\ref{sec-4-4-EvaluatingSLR}. It is
+the square of the correlation between the actual values and the predicted
+values. The following graph shows the actual values plotted against the fitted
+values for the credit score data.
+
+
+
+Recall that the value of $R^2$ can also be calculated as the proportion of
+variation in the forecast variable that is explained by the regression model:
+$$R^2 = \frac{\sum(\hat{y}_{i} - \bar{y})^2}{\sum(y_{i}-\bar{y})^2}$$ In this
+case, $R^2=0.47$, so about half of the variation in the scores can be predicted
+using the model.
+
+Thus, the model is not really sufficient to replace a more detailed approach to
+credit scoring, but it might be helpful in filtering out customers who will get
+a very low score. In the above graph it is evident that anyone with a predicted
+score below 35 has a true score not much more than 60. Consequently, if the
+bank wanted to identify high scoring customers quickly, using this model will
+provide a first filter, and more detailed information need only be collected on
+a subset of the customers.
+
+
+### Ex-post and ex ante forecasting
+
+As discussed in Section \@ref(sec-4-8-TimeSeries), ex ante forecasts are those
+that are made using only the information that is available in advance, while ex
+post forecasts are those that are made using later information on the
+predictors.
+
+Normally, we cannot use future values of the predictor variables when producing
+ex ante forecasts because their values will not be known in advance. However,
+the special predictors introduced in this section are all known in advance, as
+they are based on calendar variables (e.g., seasonal dummy variables or public
+holiday indicators) or deterministic functions of time. In such cases, there is
+no difference betweeen ex ante and ex post forecasts.
+
+
+### Intervention variables {-}
+
+It is often necessary to model interventions that may have affected the
+variable to be forecast. For example, competitor activity, advertising
+expenditure, industrial action, and so on, can all have an effect.
+
+When the effect lasts only for one period, we use a spike variable. This is a
+dummy variable taking value one in the period of the intervention and zero
+elsewhere. A spike variable is equivalent to a dummy variable for handling an
+outlier.
+
+Other interventions have an immediate and permanent effect. If an intervention
+causes a level shift (i.e., the value of the series changes suddenly and
+permanently from the time of intervention), then we use a step variable. A step
+variable takes value zero before the intervention and one from the time of
+intervention onwards.
+
+Another form of permanent effect is a change of slope. Here the intervention is
+handled using a piecewise linear trend as discussed earlier (where $\tau$ is
+the time of intervention).
+
+### Trading days {-}
+
+The number of trading days in a month can vary considerably and can have a
+substantial effect on sales data. To allow for this, the number of trading days
+in each month can be included as a predictor. An alternative that allows for
+the effects of different days of the week has the following predictors:
+
+$$\begin{aligned} x_{1} &= \text{\# Mondays in month;} \\ x_{2} &= \text{\#
+Tuesdays in month;} \\ & \vdots \\ x_{7} &= \text{\# Sundays in
+month.}\end{aligned}$$
+
+### Distributed lags {-}
+
+It is often useful to include advertising expenditure as a predictor. However,
+since the effect of advertising can last beyond the actual campaign, we need to
+include lagged values of advertising expenditure. So the following predictors
+may be used.
+
+$$\begin{aligned} x_{1} &= \text{advertising for previous month;} \\ x_{2} &=
+\text{advertising for two months previously;} \\ &\vdots \\ x_{m} &=
+\text{advertising for $m$ months previously.}\end{aligned}$$
+
+It is common to require the coefficients to decrease as the lag increases. In
+Chapter \@ref(ch9) we discuss methods to allow this constraint to be
+implemented.
+
+## Selecting predictors {#sec-5-3-SelectingPredictors}
+
+
+When there are many possible predictors, we need some strategy to select the
+best predictors to use in a regression model.
+
+A common approach that is *not recommended* is to plot the forecast variable
+against a particular predictor and if it shows no noticeable relationship, drop
+it. This is invalid because it is not always possible to see the relationship
+from a scatterplot, especially when the effect of other predictors has not been
+accounted for.
+
+Another common approach which is also invalid is to do a multiple linear
+regression on all the predictors and disregard all variables whose $p$-values
+are greater than 0.05. To start with, statistical significance does not always
+indicate predictive value. Even if forecasting is not the goal, this is not a
+good strategy because the $p$-values can be misleading when two or more
+predictors are correlated with each other (see Section
+\@ref(sec-5-8-MultiCol)).
+
+Instead, we will use a measure of predictive accuracy. Five such measures are
+introduced in this section.
+
+### Adjusted R {-}$^2$
+
+Computer output for regression will always give the $R^2$ value, discussed in
+Section \@ref(sec-5-1-IntroMR). However, it is not a good measure of the
+predictive ability of a model. Imagine a model which produces forecasts that
+are exactly 20% of the actual values. In that case, the $R^2$ value would be 1
+(indicating perfect correlation), but the forecasts are not very close to the
+actual values.
+
+In addition, $R^2$ does not allow for "degrees of freedom". Adding *any*
+variable tends to increase the value of $R^2$, even if that variable is
+irrelevant. For these reasons, forecasters should not use $R^2$ to determine
+whether a model will give good predictions.
+
+An equivalent idea is to select the model which gives the minimum sum of
+squared errors (SSE), given by $$\text{SSE} = \sum_{i=1}^N e_{i}^2.$$
+
+Minimizing the SSE is equivalent to maximizing $R^2$ and will always choose the
+model with the most variables, and so is not a valid way of selecting
+predictors.
+
+An alternative, designed to overcome these problems, is the adjusted $R^2$
+(also called "R-bar-squared"): $$\bar{R}^2 = 1-(1-R^2)\frac{N-1}{N-k-1},$$
+where $N$ is the number of observations and $k$ is the number of predictors.
+This is an improvement on $R^2$ as it will no longer increase with each added
+predictor. Using this measure, the best model will be the one with the largest
+value of $\bar{R}^2$.
+
+Maximizing $\bar{R}^2$ is equivalent to minimizing the following estimate of
+the variance of the forecast errors: $$\hat{\sigma}^2 =
+\frac{\text{SSE}}{N-k-1}.$$
+
+Maximizing $\bar{R}^2$ works quite well as a method of selecting predictors,
+although it does tend to err on the side of selecting too many predictors.
+
+### Cross-validation
+
+As discussed in Section \@ref(sec-2-5-Accuracy), cross-validation is a very
+useful way of determining the predictive ability of a model. In general, leave-
+one-out cross-validation for regression can be carried out using the following
+steps.
+
+Remove observation $i$ from the data set, and fit the model using the remaining
+data. Then compute the error ($e_{i}^*=y_{i}-\hat{y}_{i}$) for the omitted
+observation. (This is not the same as the residual because the $i$th
+observation was not used in estimating the value of $\hat{y}_{i}$.)
+
+Repeat step 1 for $i=1,\dots,N$.
+
+Compute the MSE from $e_{1}^*,\dots,e_{N}^*$. We shall call this the CV.
+
+For many forecasting models, this is a time-consuming procedure, but for
+regression there are very fast methods of calculating CV so it takes no longer
+than fitting one model to the full data set. The equation for computing CV is
+given in Section \@ref(sec-5-5-Matrix).
+
+Under this criterion, the best model is the one with the smallest value of CV.
+
+### Akaike {-}’s Information Criterion
+
+A closely-related method is Akaike’s Information Criterion, which we define as
+$$\text{AIC} = N\log\left(\frac{\text{SSE}}{N}\right) + 2(k+2),$$ where $N$ is
+the number of observations used for estimation and $k$ is the number of
+predictors in the model. Different computer packages use slightly different
+definitions for the AIC, although they should all lead to the same model being
+selected. The $k+2$ part of the equation occurs because there are $k+2$
+parameters in the model --- the $k$ coefficients for the predictors, the
+intercept and the variance of the residuals. The idea here is to penalize the
+fit of the model (SSE) with the number of parameters that need to be estimated.
+
+The model with the minimum value of the AIC is often the best model for
+forecasting. For large values of $N$, minimizing the AIC is equivalent to
+minimizing the CV value.
+
+### Corrected Akaike {-}’s Information Criterion
+
+For small values of $N$, the AIC tends to select too many predictors, and so a
+bias-corrected version of the AIC has been developed. $$\text{AIC}_{\text{c}} =
+\text{AIC} + \frac{2(k+2)(k+3)}{N-k-3}.$$ As with the AIC, the AIC$_\text{c}$
+should be minimized.
+
+### Schwarz Bayesian Information Criterion {-}
+
+A related measure is Schwarz’s Bayesian Information Criterion (known as SBIC,
+BIC or SC): $$\text{BIC} = N\log\left(\frac{\text{SSE}}{N}\right) +
+(k+2)\log(N).$$ As with the AIC, minimizing the BIC is intended to give the
+best model. The model chosen by BIC is either the same as that chosen by AIC,
+or one with fewer terms. This is because the BIC penalizes the number of
+parameters more heavily than the AIC. For large values of $N$, minimizing BIC
+is similar to leave-$v$-out cross-validation when $v = N[1-1/(\log(N)-1)]$.
+
+Many statisticians like to use BIC because it has the feature that if there is
+a true underlying model, then with enough data the BIC will select that model.
+However, in reality there is rarely if ever a true underlying model, and even
+if there was a true underlying model, selecting that model will not necessarily
+give the best forecasts (because the parameter estimates may not be accurate).
+
+\# To obtain all these measures in R, use CV(fit)
+
+
+
+### Best subset regression {-}
+
+Where possible, all potential regression models can be fitted (as was done in
+the above example) and the best one selected based on one of the measures
+discussed here. This is known as "best subsets" regression or "all possible
+subsets" regression.
+
+It is recommended that one of CV, AIC or AIC$_\text{c}$ be used for this
+purpose. If the value of $N$ is large enough, they will all lead to the same
+model. Most software packages will at least produce AIC, although CV and
+AIC$_\text{c}$ will be more accurate for smaller values of $N$.
+
+While $\bar{R}^2$ is very widely used, and has been around longer than the
+other measures, its tendency to select too many predictor variables makes it
+less suitable for forecasting than either CV, AIC or AIC$_\text{c}$. Also, the
+tendency of BIC to select too few variables makes it less suitable for
+forecasting than either CV, AIC or AIC$_\text{c}$.
+
+### Stepwise regression {-}
+
+If there are a large number of predictors, it is not possible to fit all
+possible models. For example, 40 predictors leads to $2^{40} >$ 1 trillion
+possible models! Consequently, a strategy is required to limit the number of
+models to be explored.
+
+An approach that works quite well is *backwards stepwise regression*:
+
+Start with the model containing all potential predictors.
+
+Try subtracting one predictor at a time. Keep the model if it improves the
+measure of predictive accuracy.
+
+Iterate until no further improvement.
+
+It is important to realise that a stepwise approach is not guaranteed to lead
+to the best possible model. But it almost always leads to a good model.
+
+If the number of potential predictors is too large, then this backwards
+stepwise regression will not work and the starting model will need to use only
+a subset of potential predictors. In this case, an extra step needs to be
+inserted in which predictors are also added one at a time, with the model being
+retained if it improves the measure of predictive accuracy.
+
+
+## Matrix formulation {#sec-matrixequations}
+
+*Warning: this is a more advanced optional section and assumes knowledge of
+matrix algebra.*
+
+The multiple regression model can be written as $$y_{i} = \beta_{0} + \beta_{1}
+x_{1,i} + \beta_{2} x_{2,i} + \cdots + \beta_{k} x_{k,i} + \varepsilon_{i}.$$
+
+This expresses the relationship between a single value of the forecast variable
+and the predictors. It can be convenient to write this in matrix form where all
+the values of the forecast variable are given in a single equation. Let 
+$\bm{y} = (y_{1},\dots,y_{N})'$, 
+$\bm{\varepsilon} = (\varepsilon_{1},\dots,\varepsilon_{N})'$, 
+$\bm{\beta} = (\beta_{0},\dots,\beta_{k})'$ and
+$$
+\bm{X} = \left[\begin{matrix}
+  1 & x_{1,1} & x_{2,1} & \dots & x_{k,1}\\ 
+  1 & x_{1,2} & x_{2,2} & \dots & x_{k,2}\\
+  \vdots& \vdots& \vdots&& \vdots\\
+  1 & x_{1,N}& x_{2,N}& \dots& x_{k,N}
+\end{matrix}\right].
+$$ 
+Then
+$$\bm{y} = \bm{X}\bm{\beta} + \bm{\varepsilon}.$$
+
+### Least squares estimation {-}
+
+Least squares estimation is obtained by minimizing the expression
+$\bm{\varepsilon}'\bm{\varepsilon} = (\bm{Y} - \bm{X}\bm{\beta})'(\bm{Y} -
+\bm{X}\bm{\beta})$. It can be shown that this is minimized when $\bm{\beta}$
+takes the value 
+$$\hat{\bm{\beta}} = (\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y}$$ 
+This is sometimes known as the "normal equation". The estimated coefficients
+require the inversion of the matrix $\bm{X}'\bm{X}$. If this matrix is
+singular, then the model cannot be estimated. This will occur, for example, if
+you fall for the "dummy variable trap" (having the same number of dummy
+variables as there are categories of a categorical predictor).
+
+The residual variance is estimated using $$\hat{\sigma}^2 =
+\frac{1}{N-k-1}(\bm{Y} - \bm{X}\hat{\bm{\beta}})'(\bm{Y} -
+\bm{X}\hat{\bm{\beta}}).$$
+
+### Fitted values and cross-validation
+
+The normal equation shows that the fitted values can be calculated using
+$$\bm{\hat{Y}} = \bm{X}\hat{\bm{\beta}} =
+\bm{X}(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y} = \bm{H}\bm{Y},$$ where $\bm{H} =
+\bm{X}(\bm{X}'\bm{X})^{-1}\bm{X}'$ is known as the "hat-matrix" because it is
+used to compute $\bm{\hat{Y}}$ ("Y-hat").
+
+If the diagonal values of $\bm{H}$ are denoted by $h_{1},\dots,h_{N}$, then the
+cross-validation statistic can be computed using $$\text{CV} =
+\frac{1}{N}\sum_{i=1}^N [e_{i}/(1-h_{i})]^2,$$ where $e_{i}$ is the residual
+obtained from fitting the model to all $N$ observations. Thus, it is not
+necessary to actually fit $N$ separate models when computing the CV statistic.
+
+### Forecasts {-}
+
+Let $\bm{X}^*$ be a row vector containing the values of the predictors for the
+forecasts (in the same format as $\bm{X}$). Then the forecast is given by
+$$\hat{y} = \bm{X}^*\hat{\bm{\beta}} =
+\bm{X}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y}$$ and its variance by $$\sigma^2
+\left[1 + \bm{X}^* (\bm{X}'\bm{X})^{-1} (\bm{X}^*)'\right].$$ Then a 95%
+prediction interval can be calculated (assuming normally distributed errors) as
+$$\hat{y} \pm 1.96 \hat{\sigma} \sqrt{1 + \bm{X}^* (\bm{X}'\bm{X})^{-1}
+(\bm{X}^*)'}.$$ This takes account of the uncertainty due to the error term
+$\varepsilon$ and the uncertainty in the coefficient estimates. However, it
+ignores any errors in $\bm{X}^*$. So if the future values of the predictors are
+uncertain, then the prediction interval calculated using this expression will
+be too narrow.
+
+## Non-linear regression {#sec-5-6-NonLinear}
+
+Although the linear relationship assumed at the beginning of this chapter is often adequate, there are cases for which a non-linear functional form is more suitable. The scatter plot of Carbon versus City in Figure \@ref(fig-4-car)  hows an example where a non-linear functional form is required.
+
+Simply transforming variables $y$ and/or $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a non-linear specification. The most commonly used transformation is the (natural) logarithmic (see Section \@ref(sec-2-4-TransAdj)). Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero.
+
+A **log-log** functional form is specified as 
+$$
+  \log y_t=\beta_0+\beta_1 \log x_t + \varepsilon_t.
+$$
+In this model, the slope $\beta_1$ can be interpreted as an elasticity: $\beta_1$ is the average percentage change in $y$ resulting from a $1\%$ change in $x$.
+
+
+The plot shows that in the original scale the slope of the fitted regression line using a log-log functional form is non-constant. The slope depends on $x$ and can be calculated for each point (see Table \@ref(tbl-4-functionalforms)). In the logarithmic scale the slope of the line which is now interpreted as an elasticity is constant. So estimating a log-log functional form produces a constant elasticity estimate in contrast to the linear model which produces a constant slope estimate.
+
+
+
+Other useful forms are the log-linear form and the linear-log form. Table \@ref(tbl-4-functionalforms) summarises these.
+
+
+
+<span>llll</span> Model & Functional form & Slope & Elasticity\ linear &
+$y=\beta_0+\beta_1 x $ & $\beta_1$ & $\beta_1y/x$\ log-log & $\log
+y=\beta_0+\beta_1 \log x$ & $\beta_1y/x$ & $\beta_1$\ linear-log &
+$y=\beta_0+\beta_1 \log x $ & $\beta_1/x$ & $\beta_1/ y$\ log-linear & $\log
+y=\beta_0+\beta_1 x $ & $\beta_1y$ & $\beta_1x$\
+
+![The four non-linear forms shown in Table \@ref(tbl-4-functionalforms), for
+$\beta_1<0$.](fig_4_nlforms)
+
+
+
+
+Sometimes the relationship between the forecast variable and a predictor is not
+linear, and then the usual multiple regression equation needs modifying. In
+Section \@ref(sec-4-7-NonLinearFF), we discussed using log transformations to
+deal with a variety of non-linear forms, and in Section
+\@ref(sec-5-2-UsefulPredictors) we showed how to include a piecewise-linear
+trend in a model; that is a nonlinear trend constructed out of linear pieces.
+Allowing other variables to enter in a nonlinear manner can be handled in
+exactly the same way.
+
+To keep things simple, suppose we have only one predictor $x$. Then the model
+we use is $$y = f(x) + e,$$ where $f$ is a possibly nonlinear function. In
+standard (linear) regression, $f(x)=\beta_{0} + \beta_{1} x$, but in nonlinear
+regression, we allow $f$ to be a nonlinear function of $x$.
+
+One of the simplest ways to do nonlinear regression is to make $f$ piecewise
+linear. That is, we introduce points where the slope of $f$ can change. These
+points are called "knots".
+
+[Car emissions continued] In Chapter \@ref(ch4), we considered an example of
+forecasting the carbon footprint of a car from its city-based fuel economy. Our
+previous analysis (Section \@ref(sec-4-7-NonLinearFF)) showed that this
+relationship was nonlinear. Close inspection of Figure \@ref(fig-4-car)
+suggests that a change in slope occurs at about 25mpg. This can be achieved
+using the following variables: $x$ (the City mpg) and $$z = (x-25)_+ =
+\left\{\begin{array}{ll} 0 & \text{if $x<25$}\\ x-25 & \text{if $x\ge
+25$}.\end{array}\right.$$ The resulting fitted values are shown as the red line
+below.
+
+![Piecewise linear trend to fuel economy data.](nlcarbon1)
+
+\@ref(fig-5-nlpulp2)
+
+Cityp \<- pmax(fuel$City-25,0) fit2 <- lm(Carbon ~ City + Cityp, data=fuel) x
+<- 15:50; z <- pmax(x-25,0) fcast2 <- forecast(fit2,
+newdata=data.frame(City=x,Cityp=z)) plot(jitter(Carbon) ~ jitter(City),
+data=fuel) lines(x, fcast2$mean,col="red")
+
+Additional bends can be included in the relationship by adding further
+variables of the form $(x-c)_+$ where $c$ is the "knot" or point at which the
+line should bend. As above, the notation $(x-c)_+$ means the value $x-c$ if it
+is positive and 0 otherwise.
+
+### Regression splines {-}
+
+Piecewise linear relationships constructed in this way are a special case of
+*regression splines*. In general, a linear regression spline is obtained using
+$$x_{1}= x \quad x_{2} = (x-c_{1})_+ \quad\dots\quad x_{k} = (x-c_{k-1})_+,$$
+where $c_{1},\dots,c_{k-1}$ are the knots (the points at which the line can
+bend). Selecting the number of knots ($k-1$) and where they should be
+positioned can be difficult and somewhat arbitrary. Automatic knot selection
+algorithms are available in some software, but are not yet widely used.
+
+A smoother result is obtained using piecewise cubics rather than piecewise
+lines. These are constrained so they are continuous (they join up) and they are
+smooth (so there are no sudden changes of direction as we see with piecewise
+linear splines). In general, a cubic regression spline is written as $$x_{1}= x
+\quad x_{2}=x^2 \quad x_3=x^3 \quad x_4 = (x-c_{1})^3_+ \quad\dots\quad x_{k} =
+(x-c_{k-3})^3_+.$$
+
+An example of a cubic regression spline fitted to the fuel economy data is
+shown below with a single knot at $c_{1}=25$.
+
+![Cubic regression spline fitted to the fuel economy data.](nlcarbon2)
+
+\@ref(fig-5-nlpulp3)
+
+fit3 \<- lm(Carbon   City + I(City^2^) + I(City^3^) + I(Cityp^3^), data=fuel)
+fcast3 \<- forecast(fit3,newdata=data.frame(City=x,Cityp=z))
+plot(jitter(Carbon)   jitter(City), data=fuel) lines(x,
+fcast3[["mean"]],col="red")
+
+This usually gives a better fit to the data, although forecasting values of
+Carbon when City is outside the range of the historical data becomes very
+unreliable.
+
+## Correlation, causation and forecasting {#sec-5-8-MultiCol}
+
+
+### Correlation is not causation {-}
+
+It is important not to confuse correlation with causation, or causation with
+forecasting. A variable $x$ may be useful for predicting a variable $y$, but
+that does not mean $x$ is causing $y$. It is possible that $x$ *is* causing
+$y$, but it may be that the relationship between them is more complicated than
+simple causality.
+
+For example, it is possible to model the number of drownings at a beach resort
+each month with the number of ice-creams sold in the same period. The model can
+give reasonable forecasts, not because ice-creams cause drownings, but because
+people eat more ice-creams on hot days when they are also more likely to go
+swimming. So the two variables (ice-cream sales and drownings) are correlated,
+but one is not causing the other. It is important to understand that
+**correlations are useful for forecasting, even when there is no causal
+relationship between the two variables**.
+
+However, often a better model is possible if a causal mechanism can be
+determined. In this example, both ice-cream sales and drownings will be
+affected by the temperature and by the numbers of people visiting the beach
+resort. Again, high temperatures do not actually *cause* people to drown, but
+they are more directly related to why people are swimming. So a better model
+for drownings will probably include temperatures and visitor numbers and
+exclude ice-cream sales.
+
+### Confounded predictors {-}
+
+A related issue involves confounding variables. Suppose we are forecasting
+monthly sales of a company for 2012, using data from 2000--2011. In January 2008
+a new competitor came into the market and started taking some market share. At
+the same time, the economy began to decline. In your forecasting model, you
+include both competitor activity (measured using advertising time on a local
+television station) and the health of the economy (measured using GDP). It will
+not be possible to separate the effects of these two predictors because they
+are correlated. We say two variables are **confounded** when their effects on
+the forecast variable cannot be separated. Any pair of correlated predictors
+will have some level of confounding, but we would not normally describe them as
+confounded unless there was a relatively high level of correlation between
+them.
+
+Confounding is not really a problem for forecasting, as we can still compute
+forecasts without needing to separate out the effects of the predictors.
+However, it becomes a problem with scenario forecasting as the scenarios should
+take account of the relationships between predictors. It is also a problem if
+some historical analysis of the contributions of various predictors is
+required.
+
+### Multicollinearity and forecasting {-}
+
+A closely related issue is **multicollinearity** which occurs when similar
+information is provided by two or more of the predictor variables in a multiple
+regression. It can occur in a number of ways.
+
+Two predictors are highly correlated with each other (that is, they have a
+correlation coefficient close to +1 or -1). In this case, knowing the value of
+one of the variables tells you a lot about the value of the other variable.
+Hence, they are providing similar information.
+
+A linear combination of predictors is highly correlated with another linear
+combination of predictors. In this case, knowing the value of the first group
+of predictors tells you a lot about the value of the second group of
+predictors. Hence, they are providing similar information.
+
+The dummy variable trap is a special case of multicollinearity. Suppose you
+have quarterly data and use four dummy variables, $D_1,D_2,D_3$ and $D_4$. Then
+$D_4=1-D_1-D_2-D_3$, so there is perfect correlation between $D_4$ and
+$D_1+D_2+D_3$.
+
+When multicollinearity occurs in a multiple regression model, there are several
+consequences that you need to be aware of.
+
+If there is perfect correlation (i.e., a correlation of +1 or -1, such as in
+the dummy variable trap), it is not possible to estimate the regression model.
+
+If there is high correlation (close to but not equal to +1 or -1), then the
+estimation of the regression coefficients is computationally difficult. In
+fact, some software (notably Microsoft Excel) may give highly inaccurate
+estimates of the coefficients. Most reputable statistical software will use
+algorithms to limit the effect of multicollinearity on the coefficient
+estimates, but you do need to be careful. The major software packages such as
+R, SPSS, SAS and Stata all use estimation algorithms to avoid the problem as
+much as possible.
+
+The uncertainty associated with individual regression coefficients will be
+large. This is because they are difficult to estimate. Consequently,
+statistical tests (e.g., t-tests) on regression coefficients are unreliable.
+(In forecasting we are rarely interested in such tests.) Also, it will not be
+possible to make accurate statements about the contribution of each separate
+predictor to the forecast.
+
+Forecasts will be unreliable if the values of the future predictors are outside
+the range of the historical values of the predictors. For example, suppose you
+have fitted a regression model with predictors $X$ and $Z$ which are highly
+correlated with each other, and suppose that the values of $X$ in the fitting
+data ranged between 0 and 100. Then forecasts based on $X>100$ or $X<0$ will be
+unreliable. It is always a little dangerous when future values of the
+predictors lie much outside the historical range, but it is especially
+problematic when multicollinearity is present.
+
+Note that if you are using good statistical software, if you are not interested
+in the specific contributions of each predictor, and if the future values of
+your predictor variables are within their historical ranges, there is nothing
+to worry about --- multicollinearity is not a problem.
+
+
+
+## Exercises
+
+
+Electricity consumption was recorded for a small town on 12 randomly chosen days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day.
+
+
+**Day & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 &
+11 & 12\ **Mwh & 16.3 & 16.8 & 15.5 & 18.2 & 15.2 & 17.5 & 19.8 & 19.0 &17.5 &
+16.0 & 19.6 & 18.0\ **temp & 29.3 & 21.7 & 23.7 & 10.4 & 29.7 & 11.9 & 9.0 &
+23.4 & 17.8 & 30.0 & 8.6 & 11.8\
+******
+
+[(a)]
+
+Plot the data and find the regression model for Mwh with temperature as an explanatory variable. Why is there a negative relationship?
+
+Produce a residual plot. Is the model adequate? Are there any outliers or influential observations?
+
+Use the model to predict the electricity consumption that you would expect for a day with maximum temperature $10^\circ$ and a day with maximum temperature $35^\circ$. Do you believe these predictions?
+
+Give prediction intervals for your forecasts.
+
+The following R code will get you started:
+
+    plot(Mwh ~ temp, data=econsumption) fit <- lm(Mwh ~ temp,
+    data=econsumption) plot(residuals(fit) ~ temp, data=econsumption)
+    forecast(fit, newdata=data.frame(temp=c(10,35)))
+
+The following table gives the winning times (in seconds) for the men’s 400 meters final in each Olympic Games from 1896 to 2012 (data set `olympic`).
+
+<span>ll|ll|ll|ll</span> 1896 & 54.2 & 1928 & 47.8 & 1964 & 45.1 & 1992 &
+43.50\ 1900 & 49.4 & 1932 & 46.2 & 1968 & 43.8 & 1996 & 43.49\ 1904 & 49.2 &
+1936 & 46.5 & 1972 & 44.66 &\ 1908 & 50.0 & 1948 & 46.2 & 1976 & 44.27 &\ 1912
+& 48.2 & 1952 & 45.9 & 1980 & 44.60 &\ 1920 & 49.6 & 1956 & 46.7 & 1984 & 44.27
+&\ 1924 & 47.6 & 1960 & 44.9 & 1988 & 43.87\
+
+[(a)]
+
+Update the data set `olympic` to include the winning times from the last few Olympics.
+
+Plot the winning time against the year. Describe the main features of the scatterplot.
+
+Fit a regression line to the data. Obviously the winning times have been decreasing, but at what *average* rate per year?
+
+Plot the residuals against the year. What does this indicate about the suitability of the fitted line?
+
+Predict the winning time for the men’s 400 meters final in the 2000, 2004, 2008 and 2012 Olympics. Give a prediction interval for each of your forecasts. What assumptions have you made in these calculations?
+
+Find out the actual winning times for these Olympics (see [www.databaseolympics.com](www.databaseolympics.com)). How good were your forecasts and prediction intervals?
+
+An elasticity coefficient is the ratio of the percentage change in the forecast variable ($y$) to the percentage change in the predictor variable ($x$). Mathematically, the elasticity is defined as $(dy/dx)\times(x/y)$. Consider the log-log model, $$\log y=\beta_0+\beta_1 \log x + \varepsilon.$$ Express $y$ as a function of $x$ and show that the coefficient $\beta_1$ is the elasticity coefficient.
+
+
+The data below (data set `fancy`) concern the monthly sales figures of a shop
+which opened in January 1987 and sells gifts, souvenirs, and novelties. The
+shop is situated on the wharf at a beach resort town in Queensland, Australia.
+The sales volume varies with the seasonal population of tourists. There is a
+large influx of visitors to the town at Christmas and for the local surfing
+festival, held every March since
+1988. Over time, the shop has expanded its premises, range of products, and
+      staff.
+
+=0.15cm
+
+<span>lrrrrrrr</span> & **1987 & **1988 & **1989 & **1990 & **1991 & **1992 &
+**1993\ **Jan & 1664.81 & 2499.81 & 4717.02 & 5921.10 & 4826.64 & 7615.03 &
+10243.24\ **Feb & 2397.53 & 5198.24 & 5702.63 & 5814.58 & 6470.23 & 9849.69 &
+11266.88\ **Mar & 2840.71 & 7225.14 & 9957.58 & 12421.25 & 9638.77 & 14558.40 &
+21826.84\ **Apr & 3547.29 & 4806.03 & 5304.78 & 6369.77 & 8821.17 & 11587.33 &
+17357.33\ **May & 3752.96 & 5900.88 & 6492.43 & 7609.12 & 8722.37 & 9332.56 &
+15997.79\ **Jun & 3714.74 & 4951.34 & 6630.80 & 7224.75 & 10209.48 & 13082.09 &
+18601.53\ **Jul & 4349.61 & 6179.12 & 7349.62 & 8121.22 & 11276.55 & 16732.78 &
+26155.15\ **Aug & 3566.34 & 4752.15 & 8176.62 & 7979.25 & 12552.22 & 19888.61 &
+28586.52\ **Sep & 5021.82 & 5496.43 & 8573.17 & 8093.06 & 11637.39 & 23933.38 &
+30505.41\ **Oct & 6423.48 & 5835.10 & 9690.50 & 8476.70 & 13606.89 & 25391.35 &
+30821.33\ **Nov & 7600.60 & 12600.08 & 15151.84 & 17914.66 & 21822.11 &
+36024.80 & 46634.38\ **Dec & 19756.21 & 28541.72 & 34061.01 & 30114.41 &
+45060.69 & 80721.71 & 104660.67\
+**************************************
+
+[(a)]
+
+Produce a time plot of the data and describe the patterns in the graph.
+Identify any unusual or unexpected fluctuations in the time series.
+
+Explain why it is necessary to take logarithms of these data before fitting a model.
+
+Use R to fit a regression model to the logarithms of these sales data with a linear trend, seasonal dummies and a "surfing festival" dummy variable.
+
+Plot the residuals against time and against the fitted values. Do these plots
+reveal any problems with the model?
+
+Do boxplots of the residuals for each month. Does this reveal any problems with
+the model?
+
+What do the values of the coefficients tell you about each variable?
+
+What does the Durbin-Watson statistic tell you about your model?
+
+Regardless of your answers to the above questions, use your regression model to
+predict the monthly sales for 1994, 1995, and 1996. Produce prediction
+intervals for each of your forecasts.
+
+Transform your predictions and intervals to obtain predictions and intervals
+for the raw data.
+
+How could you improve these predictions by modifying the model?
+
+The data below (data set `texasgas`) shows the demand for natural gas and the
+price of natural gas for 20 towns in Texas in 1969.
+
+<span>lcc</span> **<span>City</span> & **<span>Average price</span> $P$ &
+**<span>Consumption per customer</span> $C$\ & **<span>(cents per thousand
+cubic feet)</span> & **<span>(thousand cubic feet)</span>\ Amarillo & 30 & 134\
+Borger & 31 & 112\ Dalhart & 37 & 136\ Shamrock & 42 & 109\ Royalty & 43 & 105\
+Texarkana & 45 & 87\ Corpus Christi & 50 & 56\ Palestine & 54 & 43\ Marshall &
+54 & 77\ Iowa Park & 57 & 35\ Palo Pinto & 58 & 65\ Millsap & 58 & 56\ Memphis
+& 60 & 58\ Granger & 73 & 55\ Llano & 88 & 49\ Brownsville & 89 & 39\ Mercedes
+& 92 & 36\ Karnes City & 97 & 46\ Mathis & 100 & 40\ La Pryor & 102 & 42\
+**********
+
+[(a)]=0.16cm
+
+Do a scatterplot of consumption against price. The data are clearly not linear. Three possible nonlinear models for the data are given below
+\begin{align*} 
+  C_i &= \exp(a + bP_i+e_i) \\ 
+  C_i &= \left\{
+    \begin{array}{ll}
+          a_1 + b_1P_i + e_i & \mbox{when $P_i \le 60$} \\ 
+          a_2 + b_2P_i + e_i & \mbox{when $P_i > 60$;}
+    \end{array}\right.\\
+  C_i &= a + b_{1}P + b_{2}P^{2}.
+\end{align*}
+
+The second model divides the data into two sections, depending on whether the price is above or below 60 cents per 1,000 cubic feet.
+
+Can you explain why the slope of the fitted line should change with $P$?
+
+Fit the three models and find the coefficients, and residual variance in each case.
+
+For the second model, the parameters $a_1$, $a_2$, $b_1$, $b_2$ can be estimated by simply fitting a regression with four regressors but no constant: (i) a dummy taking value 1 when $P\le60$ and 0 otherwise; (ii) $\text{P1} = P$ when $P\le60$ and 0 otherwise; (iii) a dummy taking value 0 when $P\le60$ and 1 otherwise; (iv) $\text{P2}=P$ when $P>60$ and 0 otherwise.
+
+For each model, find the value of $R^2$ and AIC, and produce a residual plot. Comment on the adequacy of the three models.
+
+For prices 40, 60, 80, 100, and 120 cents per 1,000 cubic feet, compute the forecasted per capita demand using the best model of the three above.
+
+Compute 95% prediction intervals. Make a graph of these prediction intervals and discuss their interpretation.
+
+What is the correlation between $P$ and $P^{2}$? Does this suggest any general problem to be considered in dealing with polynomial regressions---especially of higher orders?
+
+## Further reading
+
+
+Regression with cross-sectional data
+
+ * Chatterjee, S. and A. S. Hadi (2012). Regression analysis by example. 5th ed. New York: John Wiley & Sons.
+ * Fox, J. and H. S. Weisberg (2010). An R Companion to Applied Regression. SAGE Publications, Inc.
+ * Harrell, Jr, F. E. (2001). Regression modelling strategies: with applications to linear models, logistic regression, and survival analysis. New York: Springer.
+ * Pardoe, I. (2006). Applied regression modeling: a business approach. Hoboken, NJ: John Wiley & Sons.
+ * Sheather, S. J. (2009). A modern approach to regression with R. New York: Springer.
+
+Regression with time series data
+
+ * Shumway, R. H. and D. S. Stoffer (2011). Time series analysis and its applications: with R examples. 3rd ed. New York: Springer.

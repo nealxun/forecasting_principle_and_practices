@@ -1,0 +1,131 @@
+## Numerical data summaries
+
+Numerical summaries of data sets are widely used to capture some essential features of the data with a few numbers. A summary number calculated from the data is called a *statistic*.
+
+###Univariate statistics {-}
+
+For a single data set, the most widely used statistics are the *average* and *median*.
+
+Suppose $T$ denotes the total number of observations and $x_t$ denotes the $t$th observation. Then the average can be written as:^[The $\sum$ indicates that the values of $x_{i}$ are to be summed from $i=1$ to $i=T$.]
+$$ 
+ \bar{x} = \frac{1}{T}\sum_{t=1}^T x_{t} = (x_{1} + x_{2} + x_3 + \cdots + x_{T})/T .
+$$ 
+The average is also called the *sample mean*.
+
+
+By way of illustration, consider the maximum temperatures at Moorabbin Airport (not far from Monash University in Melbourne, Australia) from 2001 to 2016:
+
+```{r, echo=FALSE}
+temps <- window(maxtemp, start=2001)
+temptable <- matrix(temps, nrow=2)
+pander::pander(format(temptable, digits=3))
+```
+
+In this example, $N=16$ and $x_{t}$ denotes the maximum temperature in year $t$. Then the average maximum temperature is
+\begin{align*}
+\bar{x} & = \frac{1}{16}\sum_{t=1}^{16} x_{t} \\
+        & = (x_{1} + x_{2} + x_{3} + \dots + x_{16})/16 \\
+        & = (`r temps[1]` + `r temps[2]` + `r temps[3]` + \dots + 
+        `r temps[14]` + `r temps[15]` + `r temps[16]`)/16 \\
+        & = `r sum(temps)`/16  = `r round(mean(temps),2)` \text{ degrees Celsius}.
+\end{align*}
+
+The *median*, on the other hand, is the middle observation when the data are placed in order. In this case, there are 16 observations and so the median is the average of the 8th and 9th largest observations. That is
+$$ 
+ \text{median} = (`r sort(temps)[8]` + `r sort(temps)[9]`)/2 
+               = `r median(temps)`.
+$$
+
+*Percentiles* are useful for describing the distribution of data. For example, 90% of the data are no larger than the 90th percentile. In the maximum temperature example, the 90th percentile is 
+ `r quantile(temps,0.9)`
+because 90% of the data (14 observations) are less than or equal to 
+ `r quantile(temps,0.9)`. 
+Similarly, the 75th percentile is `r quantile(temps,0.75)` and the 25th percentile is `r quantile(temps,0.25)`. The median is the 50th percentile.
+
+A useful measure of how spread out the data are is the *interquartile range* or IQR. This is simply the difference between the 75th and 25th percentiles. Thus it contains the middle 50% of the data. For the example,
+$$ 
+ \text{IQR} = (`r quantile(temps,0.75)` - 
+ `r format(quantile(temps,0.25),nsmall=2)`) = 
+ `r IQR(temps)`. 
+$$
+
+An alternative and more common measure of spread is the *standard deviation*. This is given by the formula
+$$ 
+  s = \sqrt{\frac{1}{T-1} \sum_{t=1}^T (x_{t} - \bar{x})^2}. 
+$$
+In the example, the standard deviation is
+```{r echo=FALSE}
+meantemp <- round(mean(temps),2)
+```
+$$ 
+  s = \sqrt{\frac{1}{15} \left[ 
+  (`r temps[1]`- `r meantemp`)^2 + 
+  (`r temps[2]`- `r meantemp`)^2 + 
+  \cdots + 
+  (`r temps[16]`- `r meantemp`)^2 \right]} 
+  = `r round(sd(temps),2)`
+$$
+
+```{r}
+temps <- window(maxtemp, start=2001)
+summary(temps)
+sd(temps)
+```
+
+###Bivariate statistics {-}
+
+The most commonly used bivariate statistic is the *correlation coefficient*. It measures the strength of the relationship between two variables and can be written as
+$$ 
+  r = \frac{\sum (x_{i} - \bar{x})(y_{i}-\bar{y})}{\sqrt{\sum(x_{i}-\bar{x})^2}\sqrt{\sum(y_{i}-\bar{y})^2}}, 
+$$
+where the first variable is denoted by $x$ and the second variable by $y$. The correlation coefficient only measures the strength of the *linear* relationship; it is possible for two variables to have a strong non-linear relationship but low correlation coefficient. The value of $r$ always lies between -1 and 1 with negative values indicating a negative relationship and positive values indicating a postive relationship.
+
+For example, the correlation between the Roomnights and Takings shown in Figure \@ref(fig:motel2) is 
+  `r round(cor(motel[,"Roomnights"], motel[,"Takings"]),2)`. 
+The value is positive because the Takings increases as the Roomnights increases. 
+
+```{r corplot, echo=FALSE, fig.cap="Examples of data sets with different levels of correlation."}
+library(gridExtra)
+corplot <- function(rho) {
+  require(mvtnorm, quietly=TRUE)
+  x <- as.data.frame(rmvnorm(100, sigma = matrix(c(1, rho, rho, 1), 2, 2)))
+  colnames(x) <- c("x","y")
+  ggplot(x, aes(x=x,y=y)) + geom_point() +
+    xlab("") + ylab("") + 
+    ggtitle(paste("Correlation=", format(rho,nsmall=2))) + 
+    theme(axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.text.x=element_blank(),plot.title=element_text(size=10))
+}
+p1 = corplot(-0.99)
+p2 = corplot(-0.75)
+p3 = corplot(-0.5)
+p4 = corplot(-0.25)
+p5 = corplot(0.99)
+p6 = corplot(0.75)
+p7 = corplot(0.5)
+p8 = corplot(0.25)
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,ncol=4)
+```
+
+The graphs in Figure \@ref(fig:corplot) show examples of data sets with varying levels of correlation.  Those in Figure \@ref(fig:anscombe) all have correlation coefficients of 0.82, but they have very different shaped relationships. This shows how important it is not to rely only on correlation coefficients but also to look at the plots of the data.
+
+```{r anscombe, fig.cap="Each of these plots has a correlation coefficient of 0.82. Data from Anscombe F. J. (1973) Graphs in statistical analysis. American Statistician, 27, 17–21.",echo=FALSE}
+library(gridExtra)
+p1 <- ggplot(anscombe) + geom_point(aes(x1, y1)) +
+  expand_limits(x=range(anscombe[,1:4])) +
+  expand_limits(y=range(anscombe[,5:8])) +
+  labs(title = "dataset 1", x="x", y="y")
+p2 <- ggplot(anscombe) + geom_point(aes(x2, y2)) +
+  expand_limits(x=range(anscombe[,1:4])) +
+  expand_limits(y=range(anscombe[,5:8])) +
+  labs(title = "dataset 2", x="x", y="y")
+p3 <- ggplot(anscombe) + geom_point(aes(x3, y3)) +
+  expand_limits(x=range(anscombe[,1:4])) +
+  expand_limits(y=range(anscombe[,5:8])) +
+  labs(title = "dataset 3", x="x", y="y")
+p4 <- ggplot(anscombe) + geom_point(aes(x4, y4)) +
+  expand_limits(x=range(anscombe[,1:4])) +
+  expand_limits(y=range(anscombe[,5:8])) +
+  labs(title = "dataset 4", x="x", y="y")
+grid.arrange(p1, p2, p3, p4)
+```

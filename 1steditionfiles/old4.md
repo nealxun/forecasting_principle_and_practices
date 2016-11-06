@@ -1,10 +1,6 @@
-#Simple regression {#ch4}
+#Linear regression models {#ch4}
 
-In this chapter we introduce simple linear regression. The basic concept is
-that we forecast variable $y$ assuming it has a linear relationship with
-variable $x$. The model is called “simple” regression as we only allow one
-predictor variable $x$. In Chapter \@ref(ch5) we will discuss forecasting with
-several predictor variables.
+In this chapter we discuss linear regression models. The basic concept is that we forecast variable $y$ assuming it has a linear relationship with variable $x$. The model is called “simple” regression as we only allow one predictor variable $x$. In Chapter \@ref(ch5) we will discuss forecasting with several predictor variables.
 
 The forecast variable $y$ is sometimes also called the regressand, dependent or
 explained variable. The predictor variable $x$ is sometimes also called the

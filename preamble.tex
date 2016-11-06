@@ -7,11 +7,16 @@
 
 \usepackage{multicol}
 \usepackage{rotating}
-\usepackage{amsmath,bm,url,todonotes}
+\usepackage{amsmath,url,todonotes}
 \usepackage[australian]{babel}
 
 \usepackage{mathpazo}
 
-\newcommand{\damped}{_{\text{d}}}
-\newcommand{\AICc}{\text{AIC}_{\text{C}}}
+%\newcommand{\damped}{_{\text{d}}}
+%\newcommand{\AICc}{\text{AIC}_{\text{C}}}
+\def\bm#1{\boldsymbol{#1}}
+\def\y#1#2{y_{\text{#1},#2}}
+\def\yhat#1#2{\hat{y}_{\text{#1},#2}}
+\def\ytilde#1#2{\tilde{y}_{\text{#1},#2}}
+\def\Shat#1#2#3{\hat{S}_{\text{#1},#2}^{(#3)}}
 

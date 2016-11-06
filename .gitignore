@@ -15,3 +15,6 @@ fpp.tex
 libs/*
 _bookdown_files/*
 _book/*
+bookdown/*
+test/*
+fpp.sublime*

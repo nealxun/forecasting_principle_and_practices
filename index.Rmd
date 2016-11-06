@@ -1,22 +1,10 @@
 --- 
 title: "Forecasting: Principles and Practice"
 author: "Rob J Hyndman and George Athanasopoulos"
-site: "bookdown::bookdown_site"
-knit: bookdown::render_book("index.Rmd",
-  output_format='bookdown::gitbook',
-  preview=TRUE,
-  new_session=TRUE)
-output: 
-  bookdown::gitbook:
-    split_by: section
-    download: no
-    fig_caption: yes
-    fig_height: 5.3
-    fig_width: 8.5
-  bookdown::pdf_book:
-    keep_tex: yes
+site: bookdown::bookdown_site
+output: bookdown::gitbook
 documentclass: book
-bibliography: ["FPP.bib"]
+bibliography: [FPP.bib]
 biblio-style: apalike
 link-citations: yes
 github-repo: robjhyndman/fpp2
@@ -27,13 +15,15 @@ description: "2nd edition"
 
 This textbook is intended to provide a comprehensive introduction to forecasting methods and present enough information about each method for readers to use them sensibly. We don't attempt to give a thorough discussion of the theoretical details behind each method, although the references at the end of each chapter will fill in many of those details.
 
-The book is written for three audiences: (1)&nbsp;people finding themselves doing forecasting in business when they may not have had any formal training in the area; (2)&nbsp;undergraduate students studying business; (3)&nbsp;MBA students doing a forecasting elective. We use it ourselves for a second-year subject for students undertaking a Bachelor of Commerce degree at Monash University, Australia.
+The book is written for three audiences: (1)&nbsp;people finding themselves doing forecasting in business when they may not have had any formal training in the area; (2)&nbsp;undergraduate students studying business; (3)&nbsp;MBA students doing a forecasting elective. We use it ourselves for a third-year subject for students undertaking a Bachelor of Commerce degree at Monash University, Australia.
 
-For most sections, we only assume that readers are familiar with algebra, and high school mathematics should be sufficient background. Readers who have completed an introductory course in statistics will probably want to skip some of Chapters \@ref(toolbox) and \@ref(simplereg). There are a couple of sections which also require knowledge of matrices, but these are flagged.
+For most sections, we only assume that readers are familiar with algebra, and high school mathematics should be sufficient background. Readers who have completed an introductory course in statistics will probably want to skip some of Chapters \@ref(toolbox) and \@ref(ch-regression). There are a couple of sections which also require knowledge of matrices, but these are flagged.
 
 At the end of each chapter we provide a list of "further reading". In general, these lists comprise suggested textbooks that provide a more advanced or detailed treatment of the subject. Where there is no suitable textbook, we suggest journal articles that provide more information.
 
-We use R throughout the book and we intend students to learn how to forecast with R\@. R is free and available on almost every operating system. It is a wonderful tool for all statistical analysis, not just for forecasting. See [OTexts.com/fpp/using-r](http://otexts.com/fpp/using-r) for instructions on installing and using R.
+We use R throughout the book and we intend students to learn how to forecast with R. R is free and available on almost every operating system. It is a wonderful tool for all statistical analysis, not just for forecasting. See [OTexts.com/fpp/using-r](http://otexts.com/fpp/using-r) for instructions on installing and using R.
+
+All R examples in the book assume you have loaded the `fpp2` package, available on CRAN, using `library(fpp2)`. This will automatically load several other packages including `forecast`, `ggplot2` and `magrittr`, as well as all the data used in the book. We will use the `ggplot2` package for all graphics. If you want to learn how to modify the graphs, or create your own `ggplot2` graphics that are different from the examples shown in this book, please either read the [`ggplot2` book](https://www.amazon.com/dp/0387981403?tag=otexts-20), or do the `ggplot2` course on [DataCamp](https://www.datacamp.com/courses/data-visualization-with-ggplot2-1).
 
 The book is different from other forecasting textbooks in several ways.
 
@@ -43,11 +33,15 @@ The book is different from other forecasting textbooks in several ways.
  * There are dozens of real data examples taken from our own consulting practice. We have worked with hundreds of businesses and organizations helping them with forecasting issues, and this experience has contributed directly to many of the examples given here, as well as guiding our general philosophy of forecasting.
  * We emphasise graphical methods more than most forecasters. We use graphs to explore the data, analyse the validity of the models fitted and present the forecasting results.
 
-The most important change in this section print edition of the book is that we have restricted our focus to *time series forecasting*. That is, we no longer consider the problem of cross-sectional prediction. Instead, all forecasting in this book concerns prediction of data at future times using observations collected in the past.
+###Changes in the second edition {-}
 
-In this second print edition of the book, we have simplified the chapter on exponential smoothing, and added new chapters on dynamic regression forecasting and multivariate time series. We have also added new material on handling complicated seasonality patterns and dealing with hourly, daily and weekly data, a new section on forecasting count time series, and we have added several new examples involving electricity demand, online shopping, and restaurant bookings. We have also revised all existing chapters to bring them up-to-date with the latest research, and we have also carefully gone through every chapter to improve the explanations where possible, to add newer references, and to make the R code simpler.
+With a continuously updated book, we use edition numbers of the form 2.x meaning the second major edition, and minor update x, just like with software.
 
-Helpful readers of the online version and the first print version let us know via the website of any typos or errors they had found. These were updated immediately online, and all such corrections have now made their way into this print edition as well. No doubt we have introduced some new mistakes, and we will correct them online as soon as they are spotted. Please continue to let us know about such things. We have set up a forum online to make this easier. Just go to the book website at [OTexts.org/fpp](http://OTexts.org/fpp) and click on the Forum.
+The most important change in edition 2.0 of the book is that we have restricted our focus to *time series forecasting*. That is, we no longer consider the problem of cross-sectional prediction. Instead, all forecasting in this book concerns prediction of data at future times using observations collected in the past.
+
+We have also simplified the chapter on exponential smoothing, and added new chapters on dynamic regression forecasting and multivariate time series. We have added new material on handling complicated seasonality patterns and dealing with hourly, daily and weekly data, a new section on forecasting count time series, and we have added several new examples involving electricity demand, online shopping, and restaurant bookings. We have also revised all existing chapters to bring them up-to-date with the latest research, and we have carefully gone through every chapter to improve the explanations where possible, to add newer references, to add more exercises, and to make the R code simpler.
+
+Helpful readers of the earlier versions of the book let us know of any typos or errors they had found. These were updated immediately online, and all such corrections make their way into the print versions when they are updated. No doubt we have introduced some new mistakes, and we will correct them online as soon as they are spotted. Please continue to let us know about such things. We have set up a forum online to make this easier. Just go to the book website at [OTexts.org/fpp](http://OTexts.org/fpp) and click on the Forum.
 
 
 &nbsp;
@@ -57,4 +51,4 @@ Happy forecasting!
 Rob J Hyndman<br>
 George Athanasopoulos
 
-Month?? 2016
+`r format(Sys.time(), "%B %Y")`

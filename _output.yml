@@ -4,11 +4,27 @@ bookdown::gitbook:
     toc:
       before: |
         <li><a href="./">Forecasting: Principles and Practice</a></li>
+      after: |
+        <li><a href="https://OTexts.org" target="blank">Published by OTexts with bookdown</a></li>
     edit:
       link: https://github.com/robjhyndman/fpp2/edit/master/%s
+  includes:
+      in_header: mathjax-config.html
+  keep_md: yes
+  split_by: section
+  download: no
+  toc_depth: 2
+  fig_caption: yes
+  fig_height: 5.3
+  fig_width: 8.5
 bookdown::pdf_book:
   includes:
     in_header: preamble.tex
   latex_engine: pdflatex
   citation_package: natbib
+  dev: "cairo_pdf"
+  keep_tex: yes
+  pandoc_args: --chapters
+  toc_depth: 2
+  toc_unnumbered: yes
 bookdown::epub_book: default

@@ -12,15 +12,12 @@ The varying fortunes of forecasters arise because good forecasts can seem almost
 -   *I think there is a world market for maybe five computers.*<br>
     (Chairman of IBM, 1943)
 -   *Computers in the future may weigh no more than 1.5 tons.*<br>
-    (Popular Mechanics, 1949)
 -   *There is no reason anyone would want a computer in their home.*<br>
     (President, DEC, 1977)
 
 The last of these was made only three years before IBM produced the first personal computer. Not surprisingly, you can no longer buy a DEC computer. Forecasting is obviously a difficult activity, and businesses that do it well have a big advantage over those whose forecasts fail.
 
 In this book, we will explore the most reliable methods for producing forecasts. The emphasis will be on methods that are replicable and testable, and have been shown to work.
-
-
 
 ## What can be forecast?
 
@@ -110,18 +107,20 @@ Examples of time series data include:
 
 Anything that is observed sequentially over time is a time series. In this book, we will only consider time series that are observed at regular intervals of time (e.g., hourly, daily, weekly, monthly, quarterly, annually). Irregularly spaced time series can also occur, but are beyond the scope of this book.
 
-When forecasting time series data, the aim is to estimate how the sequence of observations will continue into the future. Figure \@ref(fig:beer) shows the quarterly Australian beer production from 1992 to the third quarter of 2008.
+When forecasting time series data, the aim is to estimate how the sequence of observations will continue into the future. Figure \@ref(fig:beer) shows the quarterly Australian beer production from 1992 to the second quarter of 2010.
 
-```{r beer, fig.cap='Australian quarterly beer production: 1992Q1–2008Q3, with two years of forecasts.', echo=FALSE}
-beer2 <- window(ausbeer, start = 1992)
-autoplot(forecast(beer2), xlab = "Year", ylab = "megaliters", main = "")
+```{r beer, fig.cap='Australian quarterly beer production: 1992Q1–2010Q2, with two years of forecasts.', echo=FALSE, cache=TRUE}
+ausbeer %>% 
+  window(start = 1992) %>%
+  forecast %>% 
+  autoplot + xlab("Year") + ylab("megaliters") + ggtitle("")
 ```
 
 The blue lines show forecasts for the next two years. Notice how the forecasts have captured the seasonal pattern seen in the historical data and replicated it for the next two years. The dark shaded region shows 80% prediction intervals. That is, each future value is expected to lie in the dark shaded region with a probability of 80%. The light shaded region shows 95% prediction intervals. These prediction intervals are a very useful way of displaying the uncertainty in forecasts. In this case, the forecasts are expected to be very accurate, hence the prediction intervals are quite narrow.
 
 Time series forecasting uses only information on the variable to be forecast, and makes no attempt to discover the factors which affect its behavior. Therefore it will extrapolate trend and seasonal patterns, but it ignores all other information such as marketing initiatives, competitor activity, changes in economic conditions, and so on.
 
-Time series models used for forecasting include ARIMA models, exponential smoothing and structural models. These models are discussed in Chapters \@ref{decomposition}, \@ref(expsmooth) and \@ref(arima).
+Time series models used for forecasting include ARIMA models, exponential smoothing and structural models. These models are discussed in Chapters \@ref(ch-decomposition), \@ref(ch-expsmooth) and \@ref(ch-arima).
 
 ### Predictor variables and time series forecasting {-}
 
@@ -150,7 +149,7 @@ The model to be used in forecasting depends on the resources and data available,
 
 ### Notation {-}
 
-We will use the subscript $t$ for time. For example, $y_t$ will denote the observation at time $t$. We will use $T$ to denote the number of observations in a time series.
+We will use the subscript $t$ for time. For example, $y_t$ will denote the observation at time $t$. We will use $T$ to denote the total number of observations in a time series.
 
 ## Some case studies {#case-studies}
 
@@ -208,19 +207,46 @@ Step 4: Choosing and fitting models.
 Step 5: Using and evaluating a forecasting model.
 :   Once a model has been selected and its parameters estimated, the model is used to make forecasts. The performance of the model can only be properly evaluated after the data for the forecast period have become available. A number of methods have been developed to help in assessing the accuracy of forecasts. There are also organizational issues in using and acting on the forecasts. A brief discussion of some of these issues is in Chapter 2.
 
-## The statistical forecasting perspective
+## The statistical forecasting perspective {#sec-perspective}
 
 The thing we are trying to forecast is unknown (or we wouldn’t be forecasting it), and so we can think of it as a *random variable*. For example, the total sales for next month could take a range of possible values, and until we add up the actual sales at the end of the month we don’t know what the value will be. So, until we know the sales for next month, it is a random quantity.
 
 Because next month is relatively close, we usually have a good idea what the likely sales values could be. On the other hand, if we are forecasting the sales for the same month next year, the possible values it could take are much more variable. In most forecasting situations, the variation associated with the thing we are forecasting will shrink as the event approaches. In other words, the further ahead we forecast, the more uncertain we are.
 
+We can imagine many possible futures, each yielding a different value for the thing we wish to forecast. Plotted below in black are the total international visitors to Australia from 1980 to 2015. Also shown are ten possible futures from 2016--2025.
+
+```{r austa1, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, fig.cap="Total international visitors to Australia (1980-2015) along with ten possible futures."}
+fit <- ets(austa)
+df <- cbind(austa, simulate(fit,10))
+for(i in seq(9))
+  df <- cbind(df, simulate(fit,10))
+colnames(df) <- c("Data", paste("Future",1:10))
+autoplot(df) + 
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Total international visitors to Australia") +
+ scale_color_manual(values=c('#000000',rainbow(10)),
+                     breaks=c("Data",paste("Future",1:10)),
+                     name=" ")
+```
+
 When we obtain a forecast, we are estimating the *middle* of the range of possible values the random variable could take. Very often, a forecast is accompanied by a prediction interval giving a *range* of values the random variable could take with relatively high probability. For example, a 95% prediction interval contains a range of values which should include the actual future value with probability 95%.
 
-A forecast is always based on some observations. Suppose we denote all the information we have observed as ${\cal I}$ and we want to forecast $y_i$. We then write $y_{i} | {\cal I}$ meaning “the random variable $y_{i}$ given what we know in ${\cal I}$”. The set of values that this random variable could take, along with their relative probabilities, is known as the “probability distribution” of $y_{i} |{\cal I}$. In forecasting, we call this the “forecast distribution”.
+Instead of plotting individual possible futures as shown in Figure \@ref(fig:austa1), we normally show these prediction intervals instead. The plot below shows 80% and 95% intervals for the future Australian international visitors. The blue line is the average of the possible future values, which we call the "point forecasts".
 
-When we talk about the “forecast”, we usually mean the average value of the forecast distribution, and we put a “hat” over $y$ to show this. Thus, we write the forecast of $y_i$ as $\hat{y}_i$, meaning the average of the possible values that $y_i$ could take given everything we know. Occasionally, we will use $\hat{y}_i$ to refer to the *median* (or middle value) of the forecast distribution instead.
+```{r austa2, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, fig.cap="Total international visitors to Australia (1980-2015) along with 10-year forecasts and 80% and 95% prediction intervals."}
+autoplot(forecast(fit)) + 
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Forecasts of total international visitors to Australia")
+```
 
-With time series forecasting, it is often useful to specify exactly what information we have used in calculating the forecast. Then we will write, for example, $\hat{y}_{t|t-1}$ to mean the forecast of $y_t$ taking account of all previous observations $(y_1,\dots,y_{t-1})$. Similarly, $\hat{y}_{T+h|T}$ means the forecast of $y_{T+h}$ taking account of $y_1,\dots,y_T$ (i.e., an $h$-step forecast taking account of all observations up to time $T$).
+
+A forecast is always based on some observations. Suppose we denote all the information we have observed as ${\cal I}$ and we want to forecast $y_t$. We then write $y_{t} | {\cal I}$ meaning “the random variable $y_{t}$ given what we know in ${\cal I}$”. The set of values that this random variable could take, along with their relative probabilities, is known as the “probability distribution” of $y_{t} |{\cal I}$. In forecasting, we call this the “forecast distribution”.
+
+When we talk about the “forecast”, we usually mean the average value of the forecast distribution, and we put a “hat” over $y$ to show this. Thus, we write the forecast of $y_t$ as $\hat{y}_t$, meaning the average of the possible values that $y_t$ could take given everything we know. Occasionally, we will use $\hat{y}_t$ to refer to the *median* (or middle value) of the forecast distribution instead.
+
+It is often useful to specify exactly what information we have used in calculating the forecast. Then we will write, for example, $\hat{y}_{t|t-1}$ to mean the forecast of $y_t$ taking account of all previous observations $(y_1,\dots,y_{t-1})$. Similarly, $\hat{y}_{T+h|T}$ means the forecast of $y_{T+h}$ taking account of $y_1,\dots,y_T$ (i.e., an $h$-step forecast taking account of all observations up to time $T$).
 
 ## Exercises
 
@@ -231,6 +257,6 @@ With time series forecasting, it is often useful to specify exactly what informa
 
 ## Further reading
 
-- @Armstrong01
-- @Ord2012
+ * @Armstrong01 covers the whole field of forecasting, with each chapter written by different experts. It is highly opinionated at times (and we don't agree with everything in it), but is full of excellent general advice on tackling forecasting problems.
 
+ * @Ord2012 is a forecasting textbook covering some of the same areas as this book, but with a different emphasis and not focussed around any particular software environment. It is written by two of the most highly respected forecasters in the world, with many decades of experience between them.

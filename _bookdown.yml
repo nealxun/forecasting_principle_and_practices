@@ -1,4 +1,15 @@
 book_filename: "fpp"
 chapter_name: "Chapter "
 before_chapter_script: ["before-each-chapter.R"]
-new_session: yes
+rmd_files: ["index.Rmd" 
+ ,"01-intro.Rmd"
+ ,"02-graphics.Rmd"
+ ,"03-toolbox.Rmd"
+ ,"04-judgmental.Rmd"
+ ,"05-regression.Rmd"
+ ,"06-decomposition.Rmd"
+ ,"07-exponential-smoothing.Rmd"
+ ,"08-arima.Rmd"
+ ,"09-advanced.Rmd"
+ ,"references.Rmd"
+]

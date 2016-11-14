@@ -60,14 +60,14 @@ autoplot(usconsumption, ylab="", xlab="Year", facet=TRUE)
 Figure \@ref(fig:ConsInc) shows time series plots of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US for the period March 1970 to Dec 2010. 
 
 ```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Plot"}
-plot(consumption ~ income, data=usconsumption, ylab="")
-fit.ex3 <- lm(consumption ~ income, data=usconsumption) 
-abline(fit.ex3) 
+fit.ex3 <- tslm(consumption ~ income, data=usconsumption) 
+ggplot(as.data.frame(usconsumption), aes(x=income, y=consumption)) + geom_point() + 
+  geom_smooth(method="lm", se=FALSE)
 ```
 
 A scatter plot of consumption against income is shown in Figure \@ref(fig:ConsInc2), along with the estimated regression line
 $$
-  \hat{y}=0.52+0.32x.
+  \hat{y}=`r coef(fit.ex3)[1]` + `r coef(fit.ex3)[2]`x.
 $$
 The estimate results are given below.
 

@@ -1,0 +1,264 @@
+#Dynamic regression models
+
+The time series models in the previous two chapters allow for the inclusion of information from the past observations of a series, but not for the inclusion of other information that may be relevant. For example, the effects of holidays, competitor activity, changes in the law, the wider economy, or some other external variables may explain some of the historical variation and allow more accurate forecasts. On the other hand, the regression models in Chapter \@ref(ch5) allow for the inclusion of a lot of relevant information from predictor variables, but do not allow for the subtle time series dynamics that can be handled with ARIMA models.
+
+In this section, we consider how to extend ARIMA models to allow other information to be included in the models. We begin by simply combining regression models and ARIMA models to give regression with ARIMA errors. These are then extended into the general class of dynamic regression models. In Chapter \@ref(ch5) we considered regression models of the form
+$$
+  y_t = \beta_0 + \beta_1 x_{1,t} + \dots + \beta_k x_{k,t} + e_t,
+$$
+where $y_t$ is a linear function of the $k$ predictor variables ($x_{1,t},\dots,x_{k,t}$), and $e_t$ is usually assumed to be an uncorrelated error term (i.e., it is white noise). We considered tests such as the Durbin-Watson test for assessing whether $e_t$ was significantly correlated.
+
+In this chapter, we will allow the errors from a regression to contain autocorrelation. To emphasise this change in perspective, we will replace $e_t$ by $n_t$ in the equation. The error series $n_t$ is assumed to follow an ARIMA model. For example, if $n_t$ follows an ARIMA(1,1,1) model, we can write
+\begin{align*}
+  y_t &= \beta_0 + \beta_1 x_{1,t} + \dots + \beta_k x_{k,t} + n_t,\\
+      & (1-\phi_1B)(1-B)n_t = (1+\theta_1B)e_t,
+\end{align*}
+where $e_t$ is a white noise series.
+
+Notice that the model has two error terms here --- the error from the regression model that we denote by $n_t$ and the error from the ARIMA model that we denote by $e_t$. Only the ARIMA model errors are assumed to be white noise.
+
+## Estimation 
+
+When we estimate the parameters from the model, we need to minimise the sum of squared $e_t$ values. If, instead, we minimised the sum of squared $n_t$ values (which is what would happen if we estimated the regression model ignoring the autocorrelations in the errors), then several problems arise.
+
+  1. The estimated coefficients $\hat{\beta}_0,\dots,\hat{\beta}_k$ are no longer the best estimates as some information has been ignored in the calculation;
+
+  2. Statistical tests associated with the model (e.g., t-tests on the coefficients) are incorrect.
+
+  3. The AIC of the fitted models are not a good guide as to which is the best model for forecasting.
+
+  4. In most cases, the $p$-values associated with the coefficients will be too small, and so some predictor variables appear to be important when they are not. This is known as "spurious regression".
+
+Minimising the sum of squared $e_t$ values avoids these problems. Alternatively, maximum likelihood estimation can be used; this will give very similar estimates for the coefficients.
+
+An important consideration in estimating a regression with ARMA errors is that all variables in the model must first be stationary. So we first have to check that $y_t$ and all the predictors $(x_{1,t},\dots,x_{k,t})$ appear to be stationary. If we estimate the model while any of these are non-stationary, the estimated coefficients can be incorrect.
+
+One exception to this is the case where non-stationary variables are co-integrated. If there exists a linear combination between the non-stationary $y_t$ and predictors that is stationary, then the estimated coefficients are correct.^[Forecasting with cointegrated models is discussed in ??.]
+
+So we first difference the non-stationary variables in the model. It is often desirable to maintain the form of the relationship between $y_t$ and the predictors, and consequently it is common to difference all variables if any of them need differencing. The resulting model is then called a "model in differences" as distinct from a "model in levels" which is what is obtained when the original data are used without differencing.
+
+If all the variables in the model are stationary, then we only need to consider ARMA errors for the residuals. It is easy to see that a regression model with ARIMA errors is equivalent to a regression model in differences with ARMA errors. For example, if the above regression model with ARIMA(1,1,1) errors is differenced we obtain the model
+\begin{align*}
+  y'_t &= \beta_1 x'_{1,t} + \dots + \beta_k x'_{k,t} + n'_t,\\
+       & (1-\phi_1B)n'_t = (1+\theta_1B)e_t,
+\end{align*}
+where $y'_t=y_t-y_{t-1}$, $x'_{t,i}=x_{t,i}-x_{t-1,i}$ and $n'_t=n_t-n_{t-1}$, which is a regression model in differences with ARMA errors.
+
+## Model selection 
+
+To determine the appropriate ARIMA error structure, we first need to calculate $n_t$. But we cannot get $n_t$ without knowing the coefficients, $\beta_0,\dots,\beta_k$. To estimate these coefficients, we first need to specify the ARIMA error structure. So we are stuck in an infinite loop where each part of the model needs to be specified before we can estimate the other parts of the models.
+
+A solution is to begin with a proxy model for the ARIMA errors. A common approach with non-seasonal data is to start with an AR(2) model for the errors, or an ARIMA(2,0,0)(1,0,0)$_m$ model for seasonal data. While it is unlikely that these will be the best error models, they will allow most of the autocorrelation to be included in the model, and so the resulting $\beta$ coefficients should not be too far wrong.
+
+Once we have a proxy model for the ARIMA errors, we estimate the regression coefficients, calculate the preliminary values of $n_t$, and then select a more appropriate ARMA model for $n_t$ before re-estimating the entire model.
+
+The full modelling procedure is outlined below. We assume that you have already chosen the predictor variables (this assumption will be removed shortly). We also assume that any Box-Cox transformations have already been applied if required.
+
+  1.  Check that the forecast variable and all predictors are stationary. If not, apply differencing until all variables are stationary. Where appropriate, use the same differencing for all variables to preserve interpretability.
+  2.  Fit the regression model with AR(2) errors for non-seasonal data or ARIMA(2,0,0)(1,0,0)$_m$ errors for seasonal data.
+  3.  Calculate the errors ($n_t$) from the fitted regression model and identify an appropriate ARMA model for them.
+  4.  Re-fit the entire model using the new ARMA model for the errors.
+  5.  Check that the $e_t$ series looks like white noise.
+
+The AIC can be calculated for the final model, and this value can be used to determine the best predictors. That is, the procedure should be repeated for all subsets of predictors to be considered, and the model with the lowest AIC value selected.
+
+The procedure is illustrated in the following example.
+
+##Example: US Personal Consumption and Income 
+
+```{r usconsump, fig.cap="Percentage changes in quarterly personal consumption expenditure and personal disposable income for the USA, 1970 to 2010.", cache=TRUE}
+autoplot(usconsumption, facets=TRUE) + 
+  xlab("Year") + ylab("") +
+  ggtitle("Quarterly changes in US consumption and personal income")
+```
+
+```{r usconsump2, fig.cap="Errors ($n_t$) obtained from regression change in consumption expenditure on change in disposable income, assuming a proxy AR(2) error model.", cache=TRUE}
+fit <- Arima(usconsumption[,1], xreg=usconsumption[,2], order=c(2,0,0))
+ggtsdisplay(arima.errors(fit), main="ARIMA errors")
+```
+
+Figure \@ref(fig-9-usconsump) shows quarterly changes in personal consumption expenditure and personal disposable income from 1970 to 2010. We would like to forecast changes in expenditure based on changes in income. An increase in income does not necessarily translate into an instant increase in consumption (e.g., after the loss of a job, it may take a few months for expenses to be reduced to allow for the new circumstances). However, we will ignore this complexity in this example and try to measure the instantaneous effect of the average change of income on the average change of consumption expenditure.
+
+The data are clearly already stationary (as we are considering percentage changes rather than raw expenditure and income), so there is no need for any differencing. So we first regress consumption on income assuming AR(2) errors. The resulting $n_t$ values are shown in Figure \@ref(fig-9-usconsump2). Possible candidate ARIMA models include an MA(3) and AR(2). However, further exploration reveals that an ARIMA(1,0,2) has the lowest  value. We refit the model with ARIMA(1,0,2) errors to obtain the following results.
+
+```{r, cache=TRUE}
+(fit2 <- Arima(usconsumption[,1], xreg=usconsumption[,2], order=c(1,0,2))) 
+```
+
+A Ljung-Box test shows the residuals are uncorrelated.
+
+```{r, cache=TRUE}
+Box.test(residuals(fit2), fitdf=5, lag=10, type="Ljung") 
+```
+
+Forecasts are, of course, only possible if we have future values of changes in personal disposable income. Here we will calculate forecasts assuming that for the next 8 quarters, the percentage change in personal disposable income is equal to the mean percentage change from the last forty years.
+
+```{r usconsump3, fig.cap="Forecasts obtained from regressing the percentage change in consumption expenditure on the percentage change in disposable income, with an ARIMA(1,0,2) error model.", cache=TRUE}
+fcast <- forecast(fit2, xreg=rep(mean(usconsumption[,2]),8), h=8)
+autoplot(fcast) + xlab("Year") +
+  ylab("Percentage change") +
+  ggtitle("Forecasts from regression with ARIMA(1,0,2) errors")
+```
+
+The prediction intervals for this model are narrower than those for the model developed in Section \@ref(sec-8-usconsumption) (p. \@ref(fig-8-usconsumptionf)) because we are now able to explain some of the variation in the data using the income predictor.
+
+## Regression with ARIMA errors in R 
+
+The R function `Arima()` will fit a regression model with ARIMA errors if the argument `xreg` is used. The `order` argument specifies the order of the ARIMA error model. If differencing is specified, then the differencing is applied to all variables in the regression model before the model is estimated. For example, suppose we issue the following R command.
+
+```
+fit <- Arima(y, xreg=x, order=c(1,1,0))
+```
+
+This will fit the model $y_t' = \beta_1 x'_t + n'_t$ where $n'_t = \phi_1 n'_{t-1} + e_t$ is an AR(1) error. This is equivalent to the model
+$$
+  y_t = \beta_0 + \beta_1 x_t + n_t
+$$ 
+where $n_t$ is an ARIMA(1,1,0) error. Notice that the constant term disappears
+due to the differencing. If you want to include a constant in the differenced
+model, specify `include.drift=TRUE`.
+
+The `auto.arima()` function will also handle regression terms. For example, the following command will give the same model as that obtained in the preceding analysis.
+
+```{r, cache=TRUE}
+fit <- auto.arima(usconsumption[,1], xreg=usconsumption[,2])
+```
+
+## Forecasting 
+
+To forecast a regression model with ARIMA errors, we need to forecast the regression part of the model and the ARIMA part of the model, and combine the results. As with ordinary regression models, to obtain forecasts, we need to first forecast the predictors. When the predictors are known into the future (e.g., calendar-related variables such as time, day-of-week, etc.), this is straightforward. But when the predictors are themselves unknown, we must either model them separately, or use assumed future values for each predictor.
+
+It is important to realise that the prediction intervals from regression models (with or without ARIMA errors) do not take account of the uncertainty in the forecasts of the predictors.
+
+## Stochastic and deterministic trends 
+
+There are two different ways of modelling a linear trend. A *deterministic trend* is obtained using the regression model
+$$
+  y_t = \beta_0 + \beta_1 t + n_t,
+$$ 
+where $n_t$ is an ARMA process. A *stochastic trend* is obtained using the model
+$$
+  y_t = \beta_0 + \beta_1 t + n_t,
+$$
+where $n_t$ is an ARIMA process with $d=1$. In that case, we can difference both sides so that $y_t' = \beta_1 + n_t'$ where $n_t'$ is an ARMA process. In other words,
+$$
+  y_t = y_{t-1} + \beta_1 + n_t'.
+$$ 
+So this is very similar to a random walk with drift, but here the error term is an ARMA process rather than simply white noise.
+
+Although these models appear quite similar (they only differ in the number of differences that need to be applied to $n_t$), their forecasting characteristics are quite different.
+
+##Example: International visitors to Australia 
+
+```{r austa, fig.cap="Annual international visitors to Australia, 1980--2010.", cache=TRUE}
+autoplot(austa) + xlab("Year") +
+  ylab("millions of people") + 
+  ggtitle("Total annual international visitors to Australia")
+```
+
+Figure \@ref(fig-9-austa) shows the total number of international visitors to Australia each year from 1980 to 2010. We will fit both a deterministic and a stochastic trend model to these data.
+
+The deterministic trend model is obtained as follows:
+```{r, cache=TRUE}
+(auto.arima(austa, d=0, xreg=1:length(austa)))
+```
+
+This model can be written as
+\begin{align*}
+  y_t &= 0.42 + 0.17 t + n_t \\
+  n_t &= 1.11 n_{t-1} - 0.38 n_{t-2} + e_t\\
+  e_t &\sim \text{NID}(0,0.025).
+\end{align*}
+
+The estimated growth in visitor numbers is 0.17 million people per year.
+
+```{r austaf, fig.cap="Forecasts of annual international visitors to Australia using a deterministic trend model and a stochastic trend model.", cache=TRUE}
+fit1 <- Arima(austa, order=c(0,1,0), include.drift=TRUE) 
+fit2 <- Arima(austa, order=c(2,0,0), include.drift=TRUE) 
+autoplot(forecast(fit2)) + ylim(1,10) +
+  ggtitle("Forecasts from linear trend + AR(2) error") 
+autoplot(forecast(fit1)) + ylim(1,10)
+```
+
+Alternatively, the stochastic trend model can be estimated.
+
+```{r, cache=TRUE}
+(auto.arima(austa, d=1))
+```
+
+This model can be written as $y_t-y_{t-1} = 0.15 + e_t$, or equivalently
+\begin{align*}
+  y_t &= 0.15 t + n_t \\
+  n_t &= n_{t-1} + e_{t}\\
+  e_t &\sim \text{NID}(0,0.032).
+\end{align*}
+
+In this case, the estimated growth in visitor numbers is 0.15 million people per year.
+
+Although the growth estimates are similar, the prediction intervals are not, as shown in Figure \@ref(fig-9-austaf). In particular, stochastic trends have much wider prediction intervals because the errors are non-stationary.
+
+There is an implicit assumption with a deterministic trend that the slope of the trend is not going to change over time. On the other hand, stochastic trends can change and the estimated growth is only assumed to be the average growth over the historical period, not necessarily the rate of growth that will be observed into the future. Consequently, it is safer to forecast with stochastic trends, especially for longer forecast horizons, as the prediction intervals allow for greater uncertainty in future growth.
+
+## Lagged predictors  
+
+Sometimes, the impact of a predictor included in a regression model will not be simple and immediate. For example, an advertising campaign may impact sales for some time beyond the end of the campaign, and sales in one month will depend on advertising expenditure in each of the past few months. Similarly, a change in a company safety policy may reduce accidents immediately, but have a diminishing effect over time as employees take less care as they become familiar with the new working conditions.
+
+In these situations, we need to allow for lagged effects of the predictor. Suppose we have only one predictor in our model. Then a model that allows for lagged effects can be written as
+$$
+  y_t = \beta_0 + \gamma_0x_t + \gamma_1 x_{t-1} + \dots + \gamma_k x_{t-k} + n_t,
+$$
+where $n_t$ is an ARIMA process. The value of $k$ can be selected using the AIC along with the values of $p$ and $q$ for the ARIMA error.
+
+## Example: TV advertising and insurance quotations 
+
+```{r tvadvert, fig.cap="Number of insurance quotations provided per month and the expenditure on advertising per month.", cache=TRUE}
+autoplot(insurance, facets=TRUE) + 
+  xlab("Year") + ylab("") +
+  ggtitle("Insurance advertising and quotations")
+
+# Lagged predictors. Test 0, 1, 2 or 3 lags. 
+Advert <- cbind(insurance[,2], 
+  c(NA,insurance[1:39,2]),
+  c(NA,NA,insurance[1:38,2]), 
+  c(NA,NA,NA,insurance[1:37,2]))
+colnames(Advert) <- paste("AdLag",0:3,sep="")
+
+# Choose optimal lag length for advertising based on AIC 
+# Restrict data so models use same fitting period 
+fit1 <- auto.arima(insurance[4:40,1], xreg=Advert[4:40,1], d=0) 
+fit2 <- auto.arima(insurance[4:40,1], xreg=Advert[4:40,1:2], d=0) 
+fit3 <- auto.arima(insurance[4:40,1], xreg=Advert[4:40,1:3], d=0) 
+fit4 <- auto.arima(insurance[4:40,1], xreg=Advert[4:40,1:4], d=0)
+
+# Best model fitted to all data (based on AICc) 
+# Refit using all data
+(fit <- auto.arima(insurance[,1], xreg=Advert[,1:2], d=0))
+```
+
+A US insurance company advertises on national television in an attempt to increase the number of insurance quotations provided (and consequently the number of new policies). Figure \@ref(fig-9-tvadvert) shows the number of quotations and the expenditure on television advertising for the company each month from January 2002 to April 2005.
+
+We will consider including advertising expenditure for up to four months; that is, the model may include advertising expenditure in the current month, and the three months before that. It is important when comparing models that they are all using the same training set. So in the following code, we exclude the first three months in order to make fair comparisons. The best model is the one with the smallest  value.
+
+The chosen model includes advertising only in the current month and the previous month, and has AR(3) errors. The model can be written as
+$$ 
+  y_t = \beta_0 + \gamma_0x_t + \gamma_1 x_{t-1} + n_t,
+$$
+where $y_t$ is the number of quotations provided in month $t$, $x_t$ is the advertising expenditure in month $t$,
+$$
+  n_t = \phi_1 n_{t-1} + \phi_2 n_{t-2} + \phi_3 n_{t-3} + e_t,
+$$
+and $e_t$ is white noise.
+
+We can calculate forecasts using this model if we assume future values for the advertising variable. If we set future monthly advertising to 8 units, we get the following forecasts.
+
+```{r tvadvertf8, fig.cap="Forecasts of monthly insurance quotes assuming future advertising is 8 units in each future month.", cache=TRUE}
+fc8 <- forecast(fit, h=20,
+  xreg=cbind(rep(8,20),c(Advert[40,1],rep(8,19)))) 
+autoplot(fc8) + ylab("Quotes") +
+  ggtitle("Forecast quotes with advertising set to 8")
+```
+
+## Restaurant bookings
+
+## online shopping?
+

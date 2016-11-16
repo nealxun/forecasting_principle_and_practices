@@ -51,7 +51,7 @@ gridExtra::grid.arrange(p1,p2,p3,p4,ncol=2)
 
 ### Time series decomposition  {-}
 
-We shall think of the time series $y_{t}$ as comprising three mponents: a seasonal component, a trend-cycle component (containing both trend and cycle), and a remainder component (containing anything else in the time series). For example, if we assume an additive model,en we can write
+We shall think of the time series $y_{t}$ as comprising three components: a seasonal component, a trend-cycle component (containing both trend and cycle), and a remainder component (containing anything else in the time series). For example, if we assume an additive model,en we can write
 $$
   y_{t} = S_{t} + T_{t} + E_{t},
 $$ 
@@ -98,6 +98,8 @@ The grey bars to the right of each panel show the relative scales of the compone
 ```{r elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the STL decomposition shown in Figure \\@ref(fig:elecequip-stl).", echo=TRUE, cache=TRUE}
 ggmonthplot(fit$time.series[,"seasonal"]) + ylab("Seasonal")
 ```
+
+Even though this uses the `monthplot` function, it can be applied to any type of seasonality including quarterly data, daily data, hourly data, and so on.
 
 It can be useful to use seasonal plots and seasonal sub-series plots of the seasonal component. These help us to visualize the variation in the seasonal component over time. Figure \@ref(fig:elecequip3) shows a seasonal sub-series plot of the seasonal component from Figure \@ref(fig:elecequip-stl). In this case, there are only very small changes over time.
 
@@ -153,7 +155,7 @@ out
 In the second column of this table, a moving average of order 5 is shown, providing an estimate of the trend-cycle. The first value in this column is the average of the first five observations (1989--1993); the second value in the 5-MA column is the average of the values 1990--1994; and so on. Each value in the 5-MA column is the average of the observations in the five year period centered on the corresponding year. There are no values for the first two years or last two years because we don’t have two observations on either side. In the formula above, column
 5-MA contains the values of $\hat{T}_{t}$ with $k=2$. To see what the trend-cycle estimate looks like, we plot it along with the original data in Figure \@ref(fig:ressales2).
 
-```{r ressales2, fig.cap="Residential electricity sales (black) along with the 5-MA estimate of the trend-cycle (red).", echo=TRUE, cache=TRUE}
+```{r ressales2, fig.cap="Residential electricity sales (black) along with the 5-MA estimate of the trend-cycle (red).", echo=TRUE, cache=TRUE, warning=FALSE,message=FALSE}
 tmp <- cbind(Data=elecsales, '5-MA'=ma(elecsales,5))
 autoplot(tmp) + xlab("Year") + ylab("GWh") +
   ggtitle("Annual electricity sales: South Australia") +
@@ -165,7 +167,7 @@ Notice how the trend (in red) is smoother than the original data and captures th
 
 The order of the moving average determines the smoothness of the trend-cycle estimate. In general, a larger order means a smoother curve. Figure \@ref(fig:ressales3) shows the effect of changing the order of the moving average for the residential electricity sales data.
 
-```{r ressales3, fig.cap="Different moving averages applied to the residential electricity sales data.", echo=TRUE, cache=TRUE}
+```{r ressales3, fig.cap="Different moving averages applied to the residential electricity sales data.", echo=FALSE, cache=TRUE, warning=FALSE,message=FALSE}
 grobs <- list()
 mak <- c(3,5,7,9)
 for(m in seq(mak))
@@ -235,18 +237,18 @@ $$
 $$
 When applied to quarterly data, each quarter of the year is given equal weight as the first and last terms apply to the same quarter in consecutive years. Consequently, the seasonal variation will be averaged out and the resulting values of $\hat{T}_t$ will have little or no seasonal variation remaining. A similar effect would be obtained using a $2\times 8$-MA or a $2\times 12$-MA.
 
-In general, a $2\times m$-MA is equivalent to a weighted moving average of order $m+1$ with all observations taking weight $1/m$ except for the first and last terms which take weights $1/(2m)$. So if the seasonal period is even and of order $m$, use a $2\times m$-MA to estimate the trend-cycle. If the seasonal period is odd and of order $m$, use a $m$-MA to estimate the trend cycle. In particular, a $2\times 12$-MA can be used to estimate the trend-cycle of monthly data and a 7-MA can be used to estimate the trend-cycle of daily data.
+In general, a $2\times m$-MA is equivalent to a weighted moving average of order $m+1$ with all observations taking weight $1/m$ except for the first and last terms which take weights $1/(2m)$. So if the seasonal period is even and of order $m$, use a $2\times m$-MA to estimate the trend-cycle. If the seasonal period is odd and of order $m$, use a $m$-MA to estimate the trend cycle. For example, a $2\times 12$-MA can be used to estimate the trend-cycle of monthly data and a 7-MA can be used to estimate the trend-cycle of daily data.
 
 Other choices for the order of the MA will usually result in trend-cycle estimates being contaminated by the seasonality in the data.
 
 ###Example: Electrical equipment manufacturing {-}
 
-```{r elecequip2, fig.cap="A 2x12-MA applied to the electrical equipment orders index.", echo=TRUE, cache=TRUE}
+```{r elecequip2, fig.cap="A 2x12-MA applied to the electrical equipment orders index.", echo=TRUE, cache=TRUE, warning=FALSE}
 tmp <- cbind(Data=elecequip, '12MA'=ma(elecequip,12))
 autoplot(tmp) + xlab("Year") +
   ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") + 
-  scale_color_manual(values=c("red","grey"), breaks=c("Data","12MA"))
+  scale_color_manual(values=c("grey","red"), breaks=c("Data","12MA"))
 ```
 
 Figure \@ref(fig:elecequip2) shows a $2\times12$-MA applied to the electrical equipment orders index. Notice that the smooth line shows no seasonality; it is almost the same as the trend-cycle shown in Figure \@ref(fig:elecequip-trend) which was estimated using a much more sophisticated method than moving averages. Any other choice for the order of the moving average (except for 24, 36, etc.) would have resulted in a smooth line that shows some seasonal fluctuations.
@@ -320,6 +322,12 @@ Step 3
 Step 4
 :   The remainder component is calculated by subtracting the estimated seasonal and trend-cycle components: $\hat{E}_t = y_t - \hat{T}_t - \hat{S}_t$.
 
+```r
+# x is the time series 
+fit <- decompose(x, type="additive")
+plot(fit)
+```
+
 ### Multiplicative decomposition {-}
 
 A classical multiplicative decomposition is very similar except the subtractions are replaced by divisions.
@@ -338,7 +346,7 @@ Step 4
 
 ```r
 # x is the time series 
-fit <- decompose(x, type=“multiplicative”)
+fit <- decompose(x, type="multiplicative")
 plot(fit)
 ```
 
@@ -400,9 +408,27 @@ X-13-ARIMA also has some sophisticated methods to handle trading day variation, 
 
 A complete discussion of the method is available in @LQ01.
 
-seasonal package for R
+### The `seasonal` package for R
 
-Or ggsdc package
+The X-13-ARIMA package is implemented in the `seasonal` package for R.
+
+```{r x13arima, echo=TRUE, warning=FALSE, cache=TRUE}
+library(seasonal)
+fit <- seas(elecequip) 
+tmp <- cbind(Data=elecequip, Trend=trend(fit))
+autoplot(tmp) + xlab("Year") + ylab("New orders index") +
+  ggtitle("Electrical equipment manufacturing (Euro area)") +
+  scale_color_manual(values=c("gray","red"),
+                     breaks=c("Data","Trend"))
+```
+
+The process is entirely automatic and tends to be highly robust to outliers and level shifts in the time series. However, it only works with quarterly and monthly data. So seasonality of other kinds, such as daily data, or hourly data, or weekly data, requires an alternative approach.
+
+Add:
+
+ * seasadj()
+ * decomposition plots
+
 
 
 ## STL decomposition {#sec-6-stl}

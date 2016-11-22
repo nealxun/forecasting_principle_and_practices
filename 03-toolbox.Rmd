@@ -49,11 +49,11 @@ snaive(y, h)
 
 ###Drift method {-}
 
-A variation on the naïve method is to allow the forecasts to increase or decrease over time, where the amount of change over time (called the "drift") is set to be the average change seen in the historical data. So the forecast for time $T+h$ is given by
+A variation on the naïve method is to allow the forecasts to increase or decrease over time, where the amount of change over time (called the "drift") is set to be the average change seen in the historical data. Thus the forecast for time $T+h$ is given by
 $$ 
   \hat{y}_{T+h|T} = y_{T} + \frac{h}{T-1}\sum_{t=2}^T (y_{t}-y_{t-1}) = y_{T} + h \left( \frac{y_{T} -y_{1}}{T-1}\right). 
 $$ 
-This is equivalent to drawing a line between the first and last observation, and extrapolating it into the future.
+This is equivalent to drawing a line between the first and last observations, and extrapolating it into the future.
 
 ```r
 rwf(y, h, drift=TRUE)
@@ -93,11 +93,11 @@ autoplot(djdf) +
                      name="Forecast Method")
 ```
 
-Sometimes one of these simple methods will be the best forecasting method available. But in many cases, these methods will serve as benchmarks rather than the method of choice. That is, whatever forecasting methods we develop, they will be compared to these simple methods to ensure that the new method is better than these simple alternatives. If not, the new method is not worth considering.
+Sometimes one of these simple methods will be the best forecasting method available; but in many cases, these methods will serve as benchmarks rather than the method of choice. That is, any forecasting methods we develop will be compared to these simple methods to ensure that the new method is better than these simple alternatives. If not, the new method is not worth considering.
 
 ## Transformations and adjustments
 
-Adjusting the historical data can often lead to a simpler forecasting model. Here we deal with four kinds of adjustments: mathematical transformations, calendar adjustments, population adjustments and inflation adjustments. The purpose of all these transformations and adjustments is to simplify the patterns in the historical data by removing known sources of variation or by making the pattern more consistent across the whole data set. Simpler patterns usually lead to more accurate forecasts.
+Adjusting the historical data can often lead to a simpler forecasting model. Here, we deal with four kinds of adjustments: mathematical transformations, calendar adjustments, population adjustments and inflation adjustments. The purpose of these transformations and adjustments is to simplify the patterns in the historical data by removing known sources of variation or by making the pattern more consistent across the whole data set. Simpler patterns usually lead to more accurate forecasts.
 
 ###Mathematical transformations {-}
 
@@ -105,7 +105,7 @@ If the data show variation that increases or decreases with the level of the ser
 
 Sometimes other transformations are also used (although they are not so interpretable). For example, square roots and cube roots can be used. These are called *power transformations* because they can be written in the form $w_{t} = y_{t}^p$.
 
-A useful family of transformations that includes logarithms and power transformations is the family of "Box-Cox transformations", which depend on the parameter $\lambda$ and are defined as follows:
+A useful family of transformations, that includes both logarithms and power transformations, is the family of "Box-Cox transformations", which depend on the parameter $\lambda$ and are defined as follows:
 $$ 
   w_t  = 
     \begin{cases} 
@@ -114,7 +114,7 @@ $$
     \end{cases}
 $$
 
-The logarithm in a Box-Cox transformation is always a natural logarithm (i.e., to base $e$). So if $\lambda=0$, natural logarithms are used, but if $\lambda\ne0$, a power transformation is used followed by some simple scaling.
+The logarithm in a Box-Cox transformation is always a natural logarithm (i.e., to base $e$). So if $\lambda=0$, natural logarithms are used, but if $\lambda\ne0$, a power transformation is used, followed by some simple scaling.
 
 If $\lambda=1$, then $w_t = y_t-1$, so the transformed data is shifted downwards but there is no change in the shape of the time series. But for all other values of $\lambda$, the time series will change shape.
 
@@ -148,17 +148,17 @@ Often a small adjustment is made to the back-transformed forecasts to correct fo
 
 -   If some $y_{t}\le0$, no power transformation is possible unless all observations are adjusted by adding a constant to all values.
 -   Choose a simple value of $\lambda$. It makes explanations easier.
--   Forecasting results are relatively insensitive to the value of $\lambda$.
+-   The forecasting results are relatively insensitive to the value of $\lambda$.
 -   Often no transformation is needed.
 -   Transformations sometimes make little difference to the forecasts but have a large effect on prediction intervals.
 
 ###Calendar adjustments {-}
 
-Some variation seen in seasonal data may be due to simple calendar effects. In such cases, it is usually much easier to remove the variation before fitting a forecasting model.
+Some of the variation seen in seasonal data may be due to simple calendar effects. In such cases, it is usually much easier to remove the variation before fitting a forecasting model.
 
-For example, if you are studying monthly milk production on a farm, then there will be variation between the months simply because of the different numbers of days in each month in addition to seasonal variation across the year.
+For example, if you are studying the monthly milk production on a farm, there will be variation between the months simply because of the different numbers of days in each month, in addition to the seasonal variation across the year.
 
-```{r cowmilk, fig.cap="Monthly milk production per cow. Source: Cryer (2006).", cache=TRUE}
+```{r cowmilk, fig.cap="Monthly milk production per cow. Source: @Cryer2008.", cache=TRUE}
 monthdays <- rep(c(31,28,31,30,31,30,31,31,30,31,30,31),14)
 monthdays[26 + (4*12)*(0:2)] <- 29
 tmp <- cbind(Monthly = milk, DailyAverage=milk/monthdays)
@@ -166,19 +166,19 @@ autoplot(tmp, facet=TRUE) + xlab("Years") + ylab("Pounds") +
   ggtitle("Milk production per cow")
 ```
 
-Notice how much simpler the seasonal pattern is in the average daily production plot compared to the average monthly production plot. By looking at average daily production instead of average monthly production, we effectively remove the variation due to the different month lengths. Simpler patterns are usually easier to model and lead to more accurate forecasts.
+Notice how much simpler the seasonal pattern is in the average daily production plot compared to the average monthly production plot. By looking at the average daily production instead of the average monthly production, we effectively remove the variation due to the different month lengths. Simpler patterns are usually easier to model and lead to more accurate forecasts.
 
-A similar adjustment can be done for sales data when the number of trading days in each month will vary. In this case, the sales per trading day can be modelled instead of the total sales for each month.
+A similar adjustment can be done for sales data when the number of trading days in each month varies. In this case, the sales per trading day can be modelled instead of the total sales for each month.
 
 ###Population adjustments {-}
 
-Any data that are affected by population changes can be adjusted to give per-capita data. That is, consider the data per person (or per thousand people, or per million people) rather than the total. For example, if you are studying the number of hospital beds in a particular region over time, the results are much easier to interpret if you remove the effect of population changes by considering number of beds per thousand people. Then you can see if there have been real increases in the number of beds, or whether the increases are entirely due to population increases. It is possible for the total number of beds to increase, but the number of beds per thousand people to decrease. This occurs when the population is increasing faster than the number of hospital beds. For most data that are affected by population changes, it is best to use per-capita data rather than the totals.
+Any data that are affected by population changes can be adjusted to give per-capita data. That is, consider the data per person (or per thousand people, or per million people) rather than the total. For example, if you are studying the number of hospital beds in a particular region over time, the results are much easier to interpret if you remove the effects of population changes by considering the number of beds per thousand people. Then you can see whether there have been real increases in the number of beds, or whether the increases are due entirely to population increases. It is possible for the total number of beds to increase, but the number of beds per thousand people to decrease. This occurs when the population is increasing faster than the number of hospital beds. For most data that are affected by population changes, it is best to use per-capita data rather than the totals.
 
 ###Inflation adjustments {-}
 
-Data that are affected by the value of money are best adjusted before modelling. For example, data on the average cost of a new house will have increased over the last few decades due to inflation. A \$200,000 house this year is not the same as a \$200,000 house twenty years ago. For this reason, financial time series are usually adjusted so all values are stated in dollar values from a particular year. For example, the house price data may be stated in year 2000 dollars.
+Data which are affected by the value of money are best adjusted before modelling. For example, the average cost of a new house will have increased over the last few decades due to inflation. A \$200,000 house this year is not the same as a \$200,000 house twenty years ago. For this reason, financial time series are usually adjusted so that all values are stated in dollar values from a particular year. For example, the house price data may be stated in year 2000 dollars.
 
-To make these adjustments a price index is used. If $z_{t}$ denotes the price index and $y_{t}$ denotes the original house price in year $t$, then $x_{t} = y_{t}/z_{t} * z_{2000}$ gives the adjusted house price at year 2000 dollar values. Price indexes are often constructed by government agencies. For consumer goods, a common price index is the Consumer Price Index (or CPI).
+To make these adjustments, a price index is used. If $z_{t}$ denotes the price index and $y_{t}$ denotes the original house price in year $t$, then $x_{t} = y_{t}/z_{t} * z_{2000}$ gives the adjusted house price at year 2000 dollar values. Price indexes are often constructed by government agencies. For consumer goods, a common price index is the Consumer Price Index (or CPI).
 
 
 ## Evaluating forecast accuracy {#accuracy}
@@ -186,7 +186,7 @@ To make these adjustments a price index is used. If $z_{t}$ denotes the price in
 
 ### Fitted values {-}
 
-Each observation in a time series can be forecast using all previous observations. We call these "fitted values" and they are denoted by $\hat{y}_{t|t-1}$ meaning the forecast of $y_t$ based on observations $y_{1},\dots,y_{t-1}$ . We use these so often, we sometimes drop part of the subscript and just write $\hat{y}_t$ instead of $\hat{y}_{t|t-1}$. Fitted values always involve one-step forecasts.
+Each observation in a time series can be forecast using all previous observations. We call these "fitted values" and they are denoted by $\hat{y}_{t|t-1}$, meaning the forecast of $y_t$ based on observations $y_{1},\dots,y_{t-1}$ . We use these so often, we sometimes drop part of the subscript and just write $\hat{y}_t$ instead of $\hat{y}_{t|t-1}$. Fitted values always involve one-step forecasts.
 
 Actually, fitted values are often not true forecasts because any parameters involved in the forecasting method are estimated using all available observations in the time series, including future observations. For example, if we use the average method, the fitted values are given by
 $$
@@ -204,13 +204,13 @@ In both cases, there is a parameter to be estimated from the data. The "hat" abo
 
 ### Training and test sets {-}
 
-It is important to evaluate forecast accuracy using genuine forecasts. That is, it is invalid to look at how well a model fits the historical data; the accuracy of forecasts can only be determined by considering how well a model performs on new data that were not used when fitting the model. When choosing models, it is common to use a portion of the available data for fitting, and use the rest of the data for testing the model, as was done in the above examples. Then the test data can be used to measure how well the model is likely to forecast on new data.
+It is important to evaluate forecast accuracy using genuine forecasts. That is, it is invalid to look at how well a model fits the historical data; the accuracy of forecasts can only be determined by considering how well a model performs on new data that were not used when fitting the model. When choosing models, it is common to use a portion of the available data for fitting, and to use the rest of the data for testing the model, as was done in the examples above. Then the test data can be used to measure how well the model is likely to forecast on new data.
 
-The size of the test set is typically about 20% of the total sample, although this value depends on how long the sample is and how far ahead you want to forecast. The size of the test set should ideally be at least as large as the maximum forecast horizon required. The following points should be noted.
+The size of the test set is typically about 20% of the total sample, although this value depends on how long the sample is and how far ahead you want to forecast. The test set should ideally be at least as large as the maximum forecast horizon required. The following points should be noted.
 
--   A model which fits the data well does not necessarily forecast well.
+-   A model which fits the data well will not necessarily forecast well.
 -   A perfect fit can always be obtained by using a model with enough parameters.
--   Over-fitting a model to data is as bad as failing to identify the systematic pattern in the data.
+-   Over-fitting a model to data is just as bad as failing to identify a systematic pattern in the data.
 
 Some references describe the test set as the "hold-out set" because these data are "held out" of the data used for fitting. Other references call the training set the "in-sample data" and the test set the "out-of-sample data". We prefer to use "training set" and "test set" in this book.
 
@@ -233,22 +233,22 @@ We measure forecast accuracy by summarizing the forecast errors (on both trainin
 
 ### Scale-dependent errors {-}
 
-The forecast errors are on the same scale as the data. Accuracy measures that are based on $e_{t}$ are therefore scale-dependent and cannot be used to make comparisons between series that are on different scales.
+The forecast errors are on the same scale as the data. Accuracy measures that are based only on $e_{t}$ are therefore scale-dependent and cannot be used to make comparisons between series that involve different units.
 
 The two most commonly used scale-dependent measures are based on the absolute errors or squared errors:
 \begin{align*}
   \text{Mean absolute error: MAE} & = \text{mean}(|e_{t}|),\\
   \text{Root mean squared error: RMSE} & = \sqrt{\text{mean}(e_{t}^2)}.
 \end{align*}
-When comparing forecast methods on a single data set, the MAE is popular as it is easy to understand and compute. A forecast method that minimizes the MAE will lead to forecasts of the median, while minimizing the RMSE will lead to forecasts of the mean. Consequently, the RMSE is also widely used, despite being more difficult to interpret.
+When comparing forecast methods applied to a single time series, or to several time series with the same units, the MAE is popular as it is easy to both understand and compute. A forecast method that minimizes the MAE will lead to forecasts of the median, while minimizing the RMSE will lead to forecasts of the mean. Consequently, the RMSE is also widely used, despite being more difficult to interpret.
 
 ### Percentage errors {-}
 
-The percentage error is given by $p_{t} = 100 e_{t}/y_{t}$. Percentage errors have the advantage of being scale-independent, and so are frequently used to compare forecast performance between different data sets. The most commonly used measure is:
+The percentage error is given by $p_{t} = 100 e_{t}/y_{t}$. Percentage errors have the advantage of being unit-free, and so are frequently used to compare forecast performances between data sets. The most commonly used measure is:
 $$
   \text{Mean absolute percentage error: MAPE} = \text{mean}(|p_{t}|).
 $$
-Measures based on percentage errors have the disadvantage of being infinite or undefined if $y_{t}=0$ for any $t$ in the period of interest, and having extreme values when any $y_{t}$ is close to zero. Another problem with percentage errors that is often overlooked is that they assume the unit of measurement is a quantity. For example, a percentage error makes no sense when measuring the accuracy of temperature forecasts on the Fahrenheit or Celsius scales, because temperature is not a quantity.
+Measures based on percentage errors have the disadvantage of being infinite or undefined if $y_{t}=0$ for any $t$ in the period of interest, and having extreme values if any $y_{t}$ is close to zero. Another problem with percentage errors that is often overlooked is that they assume the unit of measurement has a meaningful zero. For example, a percentage error makes no sense when measuring the accuracy of temperature forecasts on either the Fahrenheit or Celsius scales, because temperature has an arbitrary zero point.
 
 They also have the disadvantage that they put a heavier penalty on negative errors than on positive errors. This observation led to the use of the so-called "symmetric" MAPE (sMAPE) proposed by @Armstrong85[&nbsp;p.348], which was used in the M3 forecasting competition. It is defined by
 $$ 
@@ -260,7 +260,7 @@ However, if $y_{t}$ is close to zero, $\hat{y}_{t}$ is also likely to be close t
 
 ### Scaled errors {-}
 
-Scaled errors were proposed by @HK06 as an alternative to using percentage errors when comparing forecast accuracy across series on different scales. They proposed scaling the errors based on the *training* MAE from a simple forecast method. 
+Scaled errors were proposed by @HK06 as an alternative to using percentage errors when comparing forecast accuracy across series with different units. They proposed scaling the errors based on the *training* MAE from a simple forecast method. 
 
 For a non-seasonal time series, a useful way to define a scaled error uses naïve forecasts:
 $$
@@ -279,7 +279,7 @@ The *mean absolute scaled error* is simply
 $$
   \text{MASE} = \text{mean}(|q_{j}|).
 $$
-Similarly, the *mean squared scaled error* (MSSE) can be defined where the errors (on the training data and test data) are squared instead of using absolute values.
+Similarly, the *mean squared scaled error* (MSSE) can be defined where the errors (on both the training data and test data) are squared instead of using absolute values.
 
 ###Examples {-}
 
@@ -321,7 +321,7 @@ rownames(tab) <- c("Mean method", "Naïve method", "Seasonal naïve method")
 knitr::kable(tab, digits=2)
 ```
 
-It is obvious from the graph that the seasonal naïve method is best for these data, although it can still be improved, as we will discover later. Sometimes, different accuracy measures will lead to different results as to which forecast method is best. However, in this case, all the results point to the seasonal naïve method as the best of these three methods for this data set.
+It is obvious from the graph that the seasonal naïve method is best for these data, although it can still be improved, as we will discover later. Sometimes, different accuracy measures will lead to different results as to which forecast method is best. However, in this case, all of the results point to the seasonal naïve method as the best of these three methods for this data set.
 
 To take a non-seasonal example, consider the Dow Jones Index. The following graph shows the 250 observations ending on 15 July 1994, along with forecasts of the next 42 days obtained from three different methods.
 
@@ -359,31 +359,23 @@ knitr::kable(tab, digits=2)
 
 Here, the best method is the drift method (regardless of which accuracy measure is used).
 
-###Cross-validation {-}
+###Time series cross-validation {-}
 
-A more sophisticated version of training/test sets is cross-validation. For cross-sectional data, cross-validation works as follows.
-
-1.  Select observation $i$ for the test set, and use the remaining observations in the training set. Compute the error on the test observation.
-2.  Repeat the above step for $i=1,2,\dots,N$ where $N$ is the total number of observations.
-3.  Compute the forecast accuracy measures based on the errors obtained.
-
-This is a much more efficient use of the available data, as you only omit one observation at each step. However, it can be very time consuming to implement.
-
-For time series data, the procedure is similar but the training set consists only of observations that occurred *prior* to the observation that forms the test set. Thus, no future observations can be used in constructing the forecast. However, it is not possible to get a reliable forecast based on a very small training set, so the earliest observations are not considered as test sets. Suppose $k$ observations are required to produce a reliable forecast. Then the process works as follows.
+A more sophisticated version of training/test sets is time series cross-validation. In this procedure, there are a series of test sets, each consisting of a single observation. The corresponding training set consists only of observations that occurred *prior* to the observation that forms the test set. Thus, no future observations can be used in constructing the forecast. However, it is not possible to get a reliable forecast based on a very small training set, so the earliest observations are not considered as test sets. Suppose $k$ observations are required to produce a reliable forecast. Then the process works as follows.
 
 1.  Select the observation at time $k+i$ for the test set, and use the observations at times $1,2,\dots,k+i-1$ to estimate the forecasting model. Compute the error on the forecast for time $k+i$.
 2.  Repeat the above step for $i=1,2,\dots,T-k$ where $T$ is the total number of observations.
 3.  Compute the forecast accuracy measures based on the errors obtained.
 
-This procedure is sometimes known as a "rolling forecasting origin" because the "origin" ($k+i-1$) at which the forecast is based rolls forward in time.
+This procedure is sometimes known as "evaluation on a rolling forecasting origin" because the "origin" ($k+i-1$) at which the forecast is based rolls forward in time.
 
-With time series forecasting, one-step forecasts may not be as relevant as multi-step forecasts. In this case, the cross-validation procedure based on a rolling forecasting origin can be modified to allow multi-step errors to be used. Suppose we are interested in models that produce good $h$-step-ahead forecasts.
+With time series forecasting, one-step forecasts may not be as relevant as multi-step forecasts. In this case, the cross-validation procedure based on a rolling forecasting origin can be modified to allow multi-step errors to be used. Suppose that we are interested in models that produce good $h$-step-ahead forecasts.
 
 1.  Select the observation at time $k+h+i-1$ for the test set, and use the observations at times $1,2,\dots,k+i-1$ to estimate the forecasting model. Compute the $h$-step error on the forecast for time $k+h+i-1$.
-2.  Repeat the above step for $i=1,2,\dots,T-k-h+1$ where $T$ is the total number of observations.
+2.  Repeat the above step for $i=1,2,\dots,T-k-h+1$, where $T$ is the total number of observations.
 3.  Compute the forecast accuracy measures based on the errors obtained.
 
-When $h=1$, this gives the same procedure as outlined above.
+When $h=1$, this gives the procedure outlined above.
 
 ## Residual diagnostics
 

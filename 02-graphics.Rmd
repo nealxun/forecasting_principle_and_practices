@@ -88,7 +88,13 @@ In describing these time series, we have used words such as "trend" and "seasona
 
 -   A *trend* exists when there is a long-term increase or decrease in the data. There is a trend in the antidiabetic drug sales data shown in Figure \@ref(fig:a10).
 -   A *seasonal* pattern occurs when a time series is affected by seasonal factors such as the time of the year or the day of the week. The monthly sales of antidiabetic drugs above shows seasonality which is induced partly by the change in the cost of the drugs at the end of the calendar year.
--   A *cycle* occurs when the data exhibit rises and falls that are not of a fixed period. These fluctuations are usually due to economic conditions, and are often related to the "business cycle". The economy class passenger data above showed some indications of cyclic effects.
+-   A *cycle* occurs when the data exhibit rises and falls that are not of a fixed period. These fluctuations are usually due to economic conditions, and are often related to the "business cycle". The time series in Figure \@ref(fig:hsales) shows both seasonality (the annual pattern) and cyclicity (the rises and falls lasting several years).
+
+```{r hsales, echo=TRUE, cache=TRUE, fig.cap="Monthly sales of new one-family houses sold in the USA, 1973-1995."}
+autoplot(hsales) +
+  ggtitle("Sales of new one-family houses, USA") +
+  xlab("Year") + ylab("Total sales")
+```
 
 It is important to distinguish cyclic patterns from seasonal patterns. Seasonal patterns have fixed and known lengths, while cyclic patterns have variable and unknown lengths. The average length of a cycle is usually longer than that of seasonality, and the magnitude of cyclic variation is usually more variable than that of seasonal variation. Cycles and seasonality are discussed further in Section \@ref(sec-6-1-TSpatterns).
 

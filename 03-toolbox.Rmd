@@ -637,29 +637,28 @@ That works quite well if you have no idea what sort of model to use. But by the 
     fc <- snaive(beer)
     autoplot(fc)
     res <- residuals(fc)
+    autoplot(res)
     ```
 
-    Test if the residuals are white noise.
+    Test if the residuals are white noise and normally distributed.
 
     ```r
-    ggtsdisplay(res, plot.type='scatter')
-    Box.test(res, lag=8, fitdf=0, type="Lj")
-    ```
-
-    What do you conclude?
-
-    Check if the residuals are normally distributed.
-
-    ```r
-    qplot(res)
+    checkresiduals(fc)
     ```
 
     What do you conclude?
 
 5. Repeat the exercise for the `WWWusage` and `bricksq` data. Use whichever of `naive` or `snaive` is more appropriate in each case.
 
+6. Are the following statements true or false? Explain your answer.
 
-6. For your retail time series (from Exercises \@ref(ex:graphics))?
+    a. Good forecast methods should have normally distributed residuals.
+    b. A model with small residuals will give good forecasts.
+    c. The best measure of forecast accuracy is MAPE.
+    d. If your model doesn’t forecast well, you should make it more complicated.
+    e. Always choose the model with the best forecast accuracy as measured on the test set.
+
+7. For your retail time series (from Exercises \@ref(ex:graphics))?
 
     a. Split the data into two parts using
 
@@ -683,12 +682,10 @@ That works quite well if you have no idea what sort of model to use. But by the 
     accuracy(f1,x2)
     ```
 
-    e. Compute the residuals and plot them.
+    e. Check the residuals.
 
     ```r
-    res <- residuals(f1)
-    ggtsdisplay(res)
-    qplot(res)
+    checkresiduals(f1)
     ```
 
     Do the residuals appear to be uncorrelated and normally distributed?
@@ -696,20 +693,20 @@ That works quite well if you have no idea what sort of model to use. But by the 
     e. How sensitive are the accuracy measures to the training/test split?
 
 
-7. Use the Dow Jones index (data set `dowjones`) to do the following:
+8. Use the Dow Jones index (data set `dowjones`) to do the following:
 
     a.  Produce a time plot of the series.
     b.  Produce forecasts using the drift method and plot them.
     c.  Show that the graphed forecasts are identical to extending the line drawn between the first and last observations.
     d.  Try using some of the other benchmark functions to forecast the same data set. Which do you think is best? Why?
 
-8. Consider the daily closing IBM stock prices (data set `ibmclose`).
+9. Consider the daily closing IBM stock prices (data set `ibmclose`).
 
     a. Produce some plots of the data in order to become familiar with it.
     b.  Split the data into a training set of 300 observations and a test set of 69 observations.
     c.  Try using various benchmark methods to forecast the training set and compare the results on the test set. Which method did best?
 
-9.  Consider the sales of new one-family houses in the USA, Jan 1973 -- Nov 1995 (data set `hsales`).
+10.  Consider the sales of new one-family houses in the USA, Jan 1973 -- Nov 1995 (data set `hsales`).
 
     a. Produce some plots of the data in order to become familiar with it.
     b.  Split the `hsales` data set into a training set and a test set, where the test set is the last two years of data.

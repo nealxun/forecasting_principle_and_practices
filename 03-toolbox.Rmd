@@ -2,7 +2,7 @@
 
 Before we discuss any forecasting methods, it is necessary to build a toolbox of techniques that will be useful for many different forecasting situations. Each of the tools discussed in this chapter will be used repeatedly in subsequent chapters as we develop and explore a range of forecasting methods.
 
-## Some simple forecasting methods
+## Some simple forecasting methods {#sec-2-methods}
 
 Some forecasting methods are very simple and surprisingly effective. Here are four methods that we will use as benchmarks for other forecasting methods. 
 
@@ -553,7 +553,7 @@ $$
 The value of the multiplier (1.96 or 1.28) determines the percentage of the prediction interval. The following table gives the values to be used for different percentages.
 
 
-```{r, echo=FALSE}
+```{r pcmultipliers, echo=FALSE, cache=TRUE}
 p <- c(seq(50,95,by=5),96:99)
 tab <- data.frame(Percentage=p, Multiplier=qnorm(0.5+p/200))
 knitr::kable(tab, digits=2, booktabs=TRUE,

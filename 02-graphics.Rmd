@@ -206,9 +206,30 @@ In this graph:
 
 -   $r_{4}$ is higher than for the other lags. This is due to the seasonal pattern in the data: the peaks tend to be four quarters apart and the troughs tend to be two quarters apart.
 -   $r_{2}$ is more negative than for the other lags because troughs tend to be two quarters behind peaks.
+-   The dashed blue lines indicate whether the correlations are significantly different from zero. These are explained in Section \@ref(wn).
+
+### Trend and seasonality in ACF plots {-}
 
  
-##White noise
+When data have a trend, the autocorrelations for small lags tend to be large and positive because observations nearby in time are also nearby in size. So the ACF of trended time series tend to have positive values that slowly decrease as the lags increase.
+
+When data are seasonal, the autocorrelations will be larger for the seasonal lags (at multiples of the seasonal period) than for other lags. 
+
+When data are both trended and seasonal, you see a combination of these effects, as illustrated in Figure \@ref(fig:acfelec).
+
+
+```{r aelec, echo=TRUE, cache=TRUE, fig.cap="Monthly Australian electricity demand from 1980-1995."}
+aelec <- window(elec, start=1980)
+autoplot(aelec) + xlab("Year") + ylab("GWh")
+```
+
+```{r acfelec, echo=TRUE, cache=TRUE, fig.cap="ACF of monthly Australian electricity demand."}
+ggAcf(aelec, lag=48)
+```
+
+The slow decrease in the ACF as the lags increase is due to the trend, while the "scalloped" shape is due the seasonality.
+
+##White noise {#wn}
 
 Time series that show no autocorrelation are called "white noise". Figure \@ref(fig:wnoise) gives an example of a white noise series.
 
@@ -222,7 +243,7 @@ autoplot(y, main="White noise")
 ggAcf(y)
 ```
 
-For white noise series, we expect each autocorrelation to be close to zero. Of course, they will not be exactly equal to zero as there is some random variation. For a white noise series, we expect 95% of the spikes in the ACF to lie within $\pm 2/\sqrt{T}$ where $T$ is the length of the time series. It is common to plot these bounds on a graph of the ACF (the blue dashed lines above, and also shown in the ACF plot for the beer data). If one or more large spikes are outside these bounds, or if substantially more than 5% of spikes are outside these bounds, then the series is probably not white noise.
+For white noise series, we expect each autocorrelation to be close to zero. Of course, they will not be exactly equal to zero as there is some random variation. For a white noise series, we expect 95% of the spikes in the ACF to lie within $\pm 2/\sqrt{T}$ where $T$ is the length of the time series. It is common to plot these bounds on a graph of the ACF (the blue dashed lines above). If one or more large spikes are outside these bounds, or if substantially more than 5% of spikes are outside these bounds, then the series is probably not white noise.
 
 In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r format(2/sqrt(50),digits=2)`$. All of the autocorrelation coefficients lie within these limits, confirming that the data are white noise.
   

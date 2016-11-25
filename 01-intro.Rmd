@@ -39,7 +39,7 @@ Many people wrongly assume that forecasts are not possible in a changing environ
 
 Forecasting situations vary widely in their time horizons, factors determining actual outcomes, types of data patterns, and many other aspects. Forecasting methods can be very simple such as using the most recent observation as a forecast (which is called the “naïve method”), or highly complex such as neural nets and econometric systems of simultaneous equations. Sometimes, there will be no data available at all. For example, we may wish to forecast the sales of a new product in its first year, but there are obviously no data to work with. In situations like this, we use judgmental forecasting, discussed in Chapter \@ref(judgmental). The choice of method depends on what data are available and the predictability of the quantity to be forecast.
 
-## Forecasting, planning and goals
+## Forecasting, planning and goals {#sec-1-2-ForPlanGoals}
 
 Forecasting is a common statistical task in business, where it helps to inform decisions about the scheduling of production, transportation and personnel, and provides a guide to long-term strategic planning. However, business forecasting is often done poorly, and is frequently confused with planning and goals. They are three different things.
 
@@ -188,7 +188,7 @@ In this project, we needed to develop a model for forecasting weekly air passeng
 
 Air passenger numbers are affected by school holidays, major sporting events, advertising campaigns, competition behaviour, etc. School holidays often do not coincide in different Australian cities, and sporting events sometimes move from one city to another. During the period of the historical data, there was a major pilots’ strike during which there was no traffic for several months. A new cut-price airline also launched and folded. Towards the end of the historical data, the airline had trialled a redistribution of some economy class seats tobusiness class, and some business class seats to first class. After several months, however, the seat classifications reverted to the original distribution.
 
-## The basic steps in a forecasting tassk
+## The basic steps in a forecasting task
 
 A forecasting task usually involves five basic steps.
 

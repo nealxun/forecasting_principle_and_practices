@@ -184,7 +184,7 @@ $$
 
 This is called "least squares" estimation because it gives the least value for the sum of squared errors.  Finding the best estimates of the coefficients is often called "fitting" the model to the data, or sometimes "learning" or "training" the model. The line shown in Figure \@ref(fig:ConsInc2) was obtained in this way.
 
-When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section&nbsp;\@ref(sec:matrixequations).
+When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section&nbsp;\@ref(sec-matrixequations).
 
 The estimated coefficients are used for forecasting. For each set of values for the predictors $x_1,\dots,x_k$ we can forecast a corresponding value of $y$ using 
 $$
@@ -341,7 +341,7 @@ In this case, the residuals seem to be slightly negatively skewed, although that
 
 Observations that take on extreme values compared to the majority of the data are called "outliers". Observations that have a large influence on the estimation results of a regression model are called "influential observations". Usually, influential observations are also outliers that are extreme in the $x$ direction.
 
-There are formal methods for detecting outliers and influential observations that are beyond the scope of this textbook. As we suggested at the beginning of Chapter \@ref(ch2), getting familiar with your data prior to performing any analysis is of vital importance. A scatter plot of $y$ against $x$ is always a useful starting point in regression analysis and often helps to identify unusual observations.
+There are formal methods for detecting outliers and influential observations that are beyond the scope of this textbook. As we suggested at the beginning of Chapter \@ref(graphics), getting familiar with your data prior to performing any analysis is of vital importance. A scatter plot of $y$ against $x$ is always a useful starting point in regression analysis and often helps to identify unusual observations.
 
 One source for an outlier occurring is an incorrect data entry. Simple descriptive statistics of your data can identify minima and maxima that are not sensible. If such an observation is identified, and it has been incorrectly recorded, it should be immediately removed from the sample.
 
@@ -411,22 +411,10 @@ Assuming that the regression errors are normally distributed, an approximate 95%
 $$\label{eq-4-pi}
   \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
 $$
-where $N$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is given by equation . Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28 in equation . Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab-2-pcmultipiers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation .
+where $N$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is given by equation . Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28 in equation . Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation .
 
 Equation  shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is, we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
 
-The estimated regression line in the Car data example is 
-$$ 
-  \hat{y}=12.53-0.22x. 
-$$
-For the Chevrolet Aveo (the first car in the list) $x_1$=25 mpg and $y_1=6.6$ tons of CO$_2$ per year. The model returns a fitted value of $\hat{y}_1$=7.00, i.e., $e_1=-0.4$. For a car with City driving fuel economy $x=30$ mpg, the average footprint forecasted is $\hat{y}=5.90$ tons of CO$_2$ per year. The corresponding 95% and 80% forecast intervals are [4.95, 6.84] and [5.28, 6.51] respectively (calculated using R).
-
-![Forecast with 80% and 95% forecast intervals for a car with $x=30$ mpg in
-city driving.](fig_4_car2)
-
-fitted(fit)\@ref(1) fcast \<- forecast(fit, newdata=30) plot(fcast, xlab="City
-(mpg)", ylab="Carbon footprint (tons per year)") \# The displayed graph uses
-jittering, while the code above does not.
 
 
 ### Scenario based forecasting {-}
@@ -629,7 +617,7 @@ although it does tend to err on the side of selecting too many predictors.
 
 ### Cross-validation
 
-As discussed in Section \@ref(sec-2-5-Accuracy), cross-validation is a very
+As discussed in Section \@ref(accuracy), cross-validation is a very
 useful way of determining the predictive ability of a model. In general, leave-
 one-out cross-validation for regression can be carried out using the following
 steps.

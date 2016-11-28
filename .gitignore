@@ -18,3 +18,4 @@ _book/*
 bookdown/*
 test/*
 fpp.sublime*
+Makefile

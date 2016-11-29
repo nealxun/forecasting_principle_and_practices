@@ -1,0 +1,692 @@
+#Advanced forecasting methods {#ch9}
+
+In this chapter, we briefly discuss four more advanced forecasting methods that build on the models discussed in earlier chapters.
+
+##Dynamic regression models
+
+The time series models in the previous two chapters allow for the inclusion of information from the past observations of a series, but not for the inclusion of other information that may be relevant. For example, the effects of holidays, competitor activity, changes in the law, the wider economy, or some other external variables may explain some of the historical variation and allow more accurate forecasts. On the other hand, the regression models in Chapter \@ref(ch5) allow for the inclusion of a lot of relevant information from predictor variables, but do not allow for the subtle time series dynamics that can be handled with ARIMA models.
+
+In this section, we consider how to extend ARIMA models to allow other information to be included in the models. We begin by simply combining regression models and ARIMA models to give regression with ARIMA errors. These are then extended into the general class of dynamic regression models. In Chapter \@ref(ch5) we considered regression models of the form
+$$
+  y_t = \beta_0 + \beta_1 x_{1,t} + \dots + \beta_k x_{k,t} + e_t,
+$$
+where $y_t$ is a linear function of the $k$ predictor variables ($x_{1,t},\dots,x_{k,t}$), and $e_t$ is usually assumed to be an uncorrelated error term (i.e., it is white noise). We considered tests such as the Durbin-Watson test for assessing whether $e_t$ was significantly correlated.
+
+In this chapter, we will allow the errors from a regression to contain autocorrelation. To emphasise this change in perspective, we will replace $e_t$ by $n_t$ in the equation. The error series $n_t$ is assumed to follow an ARIMA model. For example, if $n_t$ follows an ARIMA(1,1,1) model, we can write
+\begin{align*}
+  y_t &= \beta_0 + \beta_1 x_{1,t} + \dots + \beta_k x_{k,t} + n_t,\\
+      & (1-\phi_1B)(1-B)n_t = (1+\theta_1B)e_t,
+\end{align*}
+where $e_t$ is a white noise series.
+
+Notice that the model has two error terms here --- the error from the regression model that we denote by $n_t$ and the error from the ARIMA model that we denote by $e_t$. Only the ARIMA model errors are assumed to be white noise.
+
+### Estimation {-}
+
+When we estimate the parameters from the model, we need to minimise the sum of squared $e_t$ values. If, instead, we minimised the sum of squared $n_t$ values (which is what would happen if we estimated the regression model ignoring the autocorrelations in the errors), then several problems arise.
+
+  1. The estimated coefficients $\hat{\beta}_0,\dots,\hat{\beta}_k$ are no longer the best estimates as some information has been ignored in the calculation;
+
+  2. Statistical tests associated with the model (e.g., t-tests on the coefficients) are incorrect.
+
+  3. The AIC of the fitted models are not a good guide as to which is the best model for forecasting.
+
+  4. In most cases, the $p$-values associated with the coefficients will be too small, and so some predictor variables appear to be important when they are not. This is known as "spurious regression".
+
+Minimising the sum of squared $e_t$ values avoids these problems. Alternatively, maximum likelihood estimation can be used; this will give very similar estimates for the coefficients.
+
+An important consideration in estimating a regression with ARMA errors is that all variables in the model must first be stationary. So we first have to check that $y_t$ and all the predictors $(x_{1,t},\dots,x_{k,t})$ appear to be stationary. If we estimate the model while any of these are non-stationary, the estimated coefficients can be incorrect.
+
+One exception to this is the case where non-stationary variables are co-integrated. If there exists a linear combination between the non-stationary $y_t$ and predictors that is stationary, then the estimated coefficients are correct.^[Forecasting with cointegrated models is discussed in ??.]
+
+So we first difference the non-stationary variables in the model. It is often desirable to maintain the form of the relationship between $y_t$ and the predictors, and consequently it is common to difference all variables if any of them need differencing. The resulting model is then called a "model in differences" as distinct from a "model in levels" which is what is obtained when the original data are used without differencing.
+
+If all the variables in the model are stationary, then we only need to consider ARMA errors for the residuals. It is easy to see that a regression model with ARIMA errors is equivalent to a regression model in differences with ARMA errors. For example, if the above regression model with ARIMA(1,1,1) errors is differenced we obtain the model
+\begin{align*}
+  y'_t &= \beta_1 x'_{1,t} + \dots + \beta_k x'_{k,t} + n'_t,\\
+       & (1-\phi_1B)n'_t = (1+\theta_1B)e_t,
+\end{align*}
+where $y'_t=y_t-y_{t-1}$, $x'_{t,i}=x_{t,i}-x_{t-1,i}$ and $n'_t=n_t-n_{t-1}$, which is a regression model in differences with ARMA errors.
+
+### Model selection {-}
+
+To determine the appropriate ARIMA error structure, we first need to calculate $n_t$. But we cannot get $n_t$ without knowing the coefficients, $\beta_0,\dots,\beta_k$. To estimate these coefficients, we first need to specify the ARIMA error structure. So we are stuck in an infinite loop where each part of the model needs to be specified before we can estimate the other parts of the models.
+
+A solution is to begin with a proxy model for the ARIMA errors. A common approach with non-seasonal data is to start with an AR(2) model for the errors, or an ARIMA(2,0,0)(1,0,0)$_m$ model for seasonal data. While it is unlikely that these will be the best error models, they will allow most of the autocorrelation to be included in the model, and so the resulting $\beta$ coefficients should not be too far wrong.
+
+Once we have a proxy model for the ARIMA errors, we estimate the regression coefficients, calculate the preliminary values of $n_t$, and then select a more appropriate ARMA model for $n_t$ before re-estimating the entire model.
+
+The full modelling procedure is outlined below. We assume that you have already chosen the predictor variables (this assumption will be removed shortly). We also assume that any Box-Cox transformations have already been applied if required.
+
+  1.  Check that the forecast variable and all predictors are stationary. If not, apply differencing until all variables are stationary. Where appropriate, use the same differencing for all variables to preserve interpretability.
+  2.  Fit the regression model with AR(2) errors for non-seasonal data or ARIMA(2,0,0)(1,0,0)$_m$ errors for seasonal data.
+  3.  Calculate the errors ($n_t$) from the fitted regression model and identify an appropriate ARMA model for them.
+  4.  Re-fit the entire model using the new ARMA model for the errors.
+  5.  Check that the $e_t$ series looks like white noise.
+
+The AIC can be calculated for the final model, and this value can be used to determine the best predictors. That is, the procedure should be repeated for all subsets of predictors to be considered, and the model with the lowest AIC value selected.
+
+The procedure is illustrated in the following example.
+
+###Example: US Personal Consumption and Income {-}
+
+```{r usconsump, fig.cap="Percentage changes in quarterly personal consumption expenditure and personal disposable income for the USA, 1970 to 2010.", cache=TRUE}
+autoplot(usconsumption, facets=TRUE) + 
+  xlab("Year") + ylab("") +
+  ggtitle("Quarterly changes in US consumption and personal income")
+```
+
+```{r usconsump2, fig.cap="Errors ($n_t$) obtained from regression change in consumption expenditure on change in disposable income, assuming a proxy AR(2) error model.", cache=TRUE}
+fit <- Arima(usconsumption[,1], xreg=usconsumption[,2], order=c(2,0,0))
+ggtsdisplay(arima.errors(fit), main="ARIMA errors")
+```
+
+Figure \@ref(fig-9-usconsump) shows quarterly changes in personal consumption expenditure and personal disposable income from 1970 to 2010. We would like to forecast changes in expenditure based on changes in income. An increase in income does not necessarily translate into an instant increase in consumption (e.g., after the loss of a job, it may take a few months for expenses to be reduced to allow for the new circumstances). However, we will ignore this complexity in this example and try to measure the instantaneous effect of the average change of income on the average change of consumption expenditure.
+
+The data are clearly already stationary (as we are considering percentage changes rather than raw expenditure and income), so there is no need for any differencing. So we first regress consumption on income assuming AR(2) errors. The resulting $n_t$ values are shown in Figure \@ref(fig-9-usconsump2). Possible candidate ARIMA models include an MA(3) and AR(2). However, further exploration reveals that an ARIMA(1,0,2) has the lowest  value. We refit the model with ARIMA(1,0,2) errors to obtain the following results.
+
+```{r, cache=TRUE}
+(fit2 <- Arima(usconsumption[,1], xreg=usconsumption[,2], order=c(1,0,2))) 
+```
+
+A Ljung-Box test shows the residuals are uncorrelated.
+
+```{r, cache=TRUE}
+Box.test(residuals(fit2), fitdf=5, lag=10, type="Ljung") 
+```
+
+Forecasts are, of course, only possible if we have future values of changes in personal disposable income. Here we will calculate forecasts assuming that for the next 8 quarters, the percentage change in personal disposable income is equal to the mean percentage change from the last forty years.
+
+```{r usconsump3, fig.cap="Forecasts obtained from regressing the percentage change in consumption expenditure on the percentage change in disposable income, with an ARIMA(1,0,2) error model.", cache=TRUE}
+fcast <- forecast(fit2, xreg=rep(mean(usconsumption[,2]),8), h=8)
+autoplot(fcast) + xlab("Year") +
+  ylab("Percentage change") +
+  ggtitle("Forecasts from regression with ARIMA(1,0,2) errors")
+```
+
+The prediction intervals for this model are narrower than those for the model developed in Section \@ref(sec-8-usconsumption) (p. \@ref(fig-8-usconsumptionf)) because we are now able to explain some of the variation in the data using the income predictor.
+
+### Regression with ARIMA errors in R {-}
+
+The R function `Arima()` will fit a regression model with ARIMA errors if the argument `xreg` is used. The `order` argument specifies the order of the ARIMA error model. If differencing is specified, then the differencing is applied to all variables in the regression model before the model is estimated. For example, suppose we issue the following R command.
+
+```
+fit <- Arima(y, xreg=x, order=c(1,1,0))
+```
+
+This will fit the model $y_t' = \beta_1 x'_t + n'_t$ where $n'_t = \phi_1 n'_{t-1} + e_t$ is an AR(1) error. This is equivalent to the model
+$$
+  y_t = \beta_0 + \beta_1 x_t + n_t
+$$ 
+where $n_t$ is an ARIMA(1,1,0) error. Notice that the constant term disappears
+due to the differencing. If you want to include a constant in the differenced
+model, specify `include.drift=TRUE`.
+
+The `auto.arima()` function will also handle regression terms. For example, the following command will give the same model as that obtained in the preceding analysis.
+
+```{r, cache=TRUE}
+fit <- auto.arima(usconsumption[,1], xreg=usconsumption[,2])
+```
+
+### Forecasting {-}
+
+To forecast a regression model with ARIMA errors, we need to forecast the regression part of the model and the ARIMA part of the model, and combine the results. As with ordinary regression models, to obtain forecasts, we need to first forecast the predictors. When the predictors are known into the future (e.g., calendar-related variables such as time, day-of-week, etc.), this is straightforward. But when the predictors are themselves unknown, we must either model them separately, or use assumed future values for each predictor.
+
+It is important to realise that the prediction intervals from regression models (with or without ARIMA errors) do not take account of the uncertainty in the forecasts of the predictors.
+
+### Stochastic and deterministic trends {-}
+
+There are two different ways of modelling a linear trend. A *deterministic trend* is obtained using the regression model
+$$
+  y_t = \beta_0 + \beta_1 t + n_t,
+$$ 
+where $n_t$ is an ARMA process. A *stochastic trend* is obtained using the model
+$$
+  y_t = \beta_0 + \beta_1 t + n_t,
+$$
+where $n_t$ is an ARIMA process with $d=1$. In that case, we can difference both sides so that $y_t' = \beta_1 + n_t'$ where $n_t'$ is an ARMA process. In other words,
+$$
+  y_t = y_{t-1} + \beta_1 + n_t'.
+$$ 
+So this is very similar to a random walk with drift, but here the error term is an ARMA process rather than simply white noise.
+
+Although these models appear quite similar (they only differ in the number of differences that need to be applied to $n_t$), their forecasting characteristics are quite different.
+
+###Example: International visitors to Australia {-}
+
+```{r austa, fig.cap="Annual international visitors to Australia, 1980--2010.", cache=TRUE}
+autoplot(austa) + xlab("Year") +
+  ylab("millions of people") + 
+  ggtitle("Total annual international visitors to Australia")
+```
+
+Figure \@ref(fig-9-austa) shows the total number of international visitors to Australia each year from 1980 to 2010. We will fit both a deterministic and a stochastic trend model to these data.
+
+The deterministic trend model is obtained as follows:
+```{r, cache=TRUE}
+(auto.arima(austa, d=0, xreg=1:length(austa)))
+```
+
+This model can be written as
+\begin{align*}
+  y_t &= 0.42 + 0.17 t + n_t \\
+  n_t &= 1.11 n_{t-1} - 0.38 n_{t-2} + e_t\\
+  e_t &\sim \text{NID}(0,0.025).
+\end{align*}
+
+The estimated growth in visitor numbers is 0.17 million people per year.
+
+```{r austaf, fig.cap="Forecasts of annual international visitors to Australia using a deterministic trend model and a stochastic trend model.", cache=TRUE}
+fit1 <- Arima(austa, order=c(0,1,0), include.drift=TRUE) 
+fit2 <- Arima(austa, order=c(2,0,0), include.drift=TRUE) 
+autoplot(forecast(fit2)) + ylim(1,10) +
+  ggtitle("Forecasts from linear trend + AR(2) error") 
+autoplot(forecast(fit1)) + ylim(1,10)
+```
+
+Alternatively, the stochastic trend model can be estimated.
+
+```{r, cache=TRUE}
+(auto.arima(austa, d=1))
+```
+
+This model can be written as $y_t-y_{t-1} = 0.15 + e_t$, or equivalently
+\begin{align*}
+  y_t &= 0.15 t + n_t \\
+  n_t &= n_{t-1} + e_{t}\\
+  e_t &\sim \text{NID}(0,0.032).
+\end{align*}
+
+In this case, the estimated growth in visitor numbers is 0.15 million people per year.
+
+Although the growth estimates are similar, the prediction intervals are not, as shown in Figure \@ref(fig-9-austaf). In particular, stochastic trends have much wider prediction intervals because the errors are non-stationary.
+
+There is an implicit assumption with a deterministic trend that the slope of the trend is not going to change over time. On the other hand, stochastic trends can change and the estimated growth is only assumed to be the average growth over the historical period, not necessarily the rate of growth that will be observed into the future. Consequently, it is safer to forecast with stochastic trends, especially for longer forecast horizons, as the prediction intervals allow for greater uncertainty in future growth.
+
+### Lagged predictors  {-}
+
+Sometimes, the impact of a predictor included in a regression model will not be simple and immediate. For example, an advertising campaign may impact sales for some time beyond the end of the campaign, and sales in one month will depend on advertising expenditure in each of the past few months. Similarly, a change in a company safety policy may reduce accidents immediately, but have a diminishing effect over time as employees take less care as they become familiar with the new working conditions.
+
+In these situations, we need to allow for lagged effects of the predictor. Suppose we have only one predictor in our model. Then a model that allows for lagged effects can be written as
+$$
+  y_t = \beta_0 + \gamma_0x_t + \gamma_1 x_{t-1} + \dots + \gamma_k x_{t-k} + n_t,
+$$
+where $n_t$ is an ARIMA process. The value of $k$ can be selected using the AIC along with the values of $p$ and $q$ for the ARIMA error.
+
+### Example: TV advertising and insurance quotations {-}
+
+```{r tvadvert, fig.cap="Number of insurance quotations provided per month and the expenditure on advertising per month.", cache=TRUE}
+autoplot(insurance, facets=TRUE) + 
+  xlab("Year") + ylab("") +
+  ggtitle("Insurance advertising and quotations")
+
+# Lagged predictors. Test 0, 1, 2 or 3 lags. 
+Advert <- cbind(insurance[,2], 
+  c(NA,insurance[1:39,2]),
+  c(NA,NA,insurance[1:38,2]), 
+  c(NA,NA,NA,insurance[1:37,2]))
+colnames(Advert) <- paste("AdLag",0:3,sep="")
+
+# Choose optimal lag length for advertising based on AIC 
+# Restrict data so models use same fitting period 
+fit1 <- auto.arima(insurance[4:40,1], xreg=Advert[4:40,1], d=0) 
+fit2 <- auto.arima(insurance[4:40,1], xreg=Advert[4:40,1:2], d=0) 
+fit3 <- auto.arima(insurance[4:40,1], xreg=Advert[4:40,1:3], d=0) 
+fit4 <- auto.arima(insurance[4:40,1], xreg=Advert[4:40,1:4], d=0)
+
+# Best model fitted to all data (based on AICc) 
+# Refit using all data
+(fit <- auto.arima(insurance[,1], xreg=Advert[,1:2], d=0))
+```
+
+A US insurance company advertises on national television in an attempt to increase the number of insurance quotations provided (and consequently the number of new policies). Figure \@ref(fig-9-tvadvert) shows the number of quotations and the expenditure on television advertising for the company each month from January 2002 to April 2005.
+
+We will consider including advertising expenditure for up to four months; that is, the model may include advertising expenditure in the current month, and the three months before that. It is important when comparing models that they are all using the same training set. So in the following code, we exclude the first three months in order to make fair comparisons. The best model is the one with the smallest  value.
+
+The chosen model includes advertising only in the current month and the previous month, and has AR(3) errors. The model can be written as
+$$ 
+  y_t = \beta_0 + \gamma_0x_t + \gamma_1 x_{t-1} + n_t,
+$$
+where $y_t$ is the number of quotations provided in month $t$, $x_t$ is the advertising expenditure in month $t$,
+$$
+  n_t = \phi_1 n_{t-1} + \phi_2 n_{t-2} + \phi_3 n_{t-3} + e_t,
+$$
+and $e_t$ is white noise.
+
+We can calculate forecasts using this model if we assume future values for the advertising variable. If we set future monthly advertising to 8 units, we get the following forecasts.
+
+```{r tvadvertf8, fig.cap="Forecasts of monthly insurance quotes assuming future advertising is 8 units in each future month.", cache=TRUE}
+fc8 <- forecast(fit, h=20,
+  xreg=cbind(rep(8,20),c(Advert[40,1],rep(8,19)))) 
+autoplot(fc8) + ylab("Quotes") +
+  ggtitle("Forecast quotes with advertising set to 8")
+```
+
+##Vector autoregressions {#sec-9-2-VAR}
+
+One limitation with the models we have considered so far is that they impose a unidirectional relationship --- the forecast variable is influenced by the predictor variables, but not vice versa. However, there are many cases where the reverse should also be allowed for --- where all variables affect each other. Consider the series in Example \@ref(ex-9-1-USconsumption). The changes in personal consumption expenditure ($C_t$) are forecast based on the changes in personal disposable income ($I_t$). In this case a bi-directional relationship may be more suitable: an increase in $I_t$ will lead to an increase in $C_t$ and vice versa.
+
+An example of such a situation occurred in Australia during the Global Financial Crisis of 2008--2009. The Australian government issued stimulus packages that included cash payments in December 2008, just in time for Christmas spending. As a result, retailers reported strong sales and the economy was stimulated. Consequently, incomes increased.
+
+Such feedback relationships are allowed for in the vector autoregressive (VAR) framework. In this framework, all variables are treated symmetrically. They are all modelled as if they influence each other equally. In more formal terminology, all variables are now treated as "endogenous". To signify this we now change the notation and write all variables as $y$s: $y_{1,t}$ denotes the $t$th observation of variable $y_1$, $y_{2,t}$ denotes the $t$th observation of variable $y_2$, and so on.
+
+A VAR model is a generalisation of the univariate autoregressive model for forecasting a collection of variables; that is, a vector of time series.^[A more flexible generalisation would be a Vector ARMA process. However, the relative simplicity of VARs has led to their dominance in forecasting. Interested readers may refer to ??.] It comprises one equation per variable considered in the system. The right hand side of each equation includes a constant and lags of all the variables in the system. To keep it simple, we will consider a two variable VAR with one lag. We write a 2-dimensional VAR(1) as
+\begin{align*}
+\label{var1a}
+  y_{1,t} &= c_1+\phi _{11,1}y_{1,t-1}+\phi _{12,1}y_{2,t-1}+e_{1,t} \\
+  y_{2,t} &= c_2+\phi _{21,1}y_{1,t-1}+\phi _{22,1}y_{2,t-1}+e_{2,t}\label{var1b}
+\end{align*}
+where $e_{1,t}$ and $e_{2,t}$ are white noise processes that may be contemporaneously correlated. Coefficient $\phi_{ii,\ell}$ captures the influence of the $\ell$th lag of variable $y_i$ on itself, while coefficient $\phi_{ij,\ell}$ captures the influence of the $\ell$th lag of variable $y_j$ on $y_i$.
+
+If the series modelled are stationary we forecast them by directly fitting a VAR to the data (known as a "VAR in levels"). If the series are non-stationary we take differences to make them stationary and then we fit a VAR model (known as a "VAR in differences"). In both cases, the models are estimated equation by equation using the principle of least squares. For each equation, the parameters are estimated by minimising the sum of squared $e_{i,t}$ values.
+
+The other possibility which is beyond the scope of this book and therefore we do not explore here, is that series may be non-stationary but they are cointegrated, which means that there exists a linear combination of them that is stationary. In this case a VAR specification that includes an error correction mechanism (usually referred to as a vector error correction model) should be included and alternative estimation methods to least squares estimation should be used.^[Interested readers should refer to ??, and ??.]
+
+Forecasts are generated from a VAR in a recursive manner. The VAR generates forecasts for *each* variable included in the system. To illustrate the process, assume that we have fitted the 2-dimensional VAR(1) described in equations ?? -- for all observations up to time $T$. Then the one-step-ahead forecasts are generated by
+\begin{align*}
+  \hat y_{1,T+1|T} &=\hat{c}_1+\hat\phi_{11,1}y_{1,T}+\hat\phi_{12,1}y_{2,T} \\
+  \hat y_{2,T+1|T} &=\hat{c}_2+\hat\phi _{21,1}y_{1,T}+\hat\phi_{22,1}y_{2,T}.
+\end{align*}
+
+This is the same form as ?? -- except that the errors have been set to zero and parameters have been replaced with their estimates. For $h=2$, the forecasts are given by
+\begin{align*}
+  \hat y_{1,T+2|T} &=\hat{c}_1+\hat\phi_{11,1}\hat y_{1,T+1}+\hat\phi_{12,1}\hat y_{2,T+1}\\
+  \hat y_{2,T+2|T}&=\hat{c}_2+\hat\phi_{21,1}\hat y_{1,T+1}+\hat\phi_{22,1}\hat y_{2,T+1}.
+\end{align*}
+Again, this is the same form as ?? -- except that the errors have been set to zero, parameters have been replaced with their estimates, and the unknown values of $y_1$ and $y_2$ have been replaced with their forecasts. The process can be iterated in this manner for all future time periods.
+
+There are two decisions one has to make when using a VAR to forecast. They are, how many variables (denoted by $K$) and how many lags (denoted by $p$) should be included in the system. The number of coefficients to be estimated in a VAR is equal to $K+pK^2$ (or $1+pK$ per equation). For example, for a VAR with $K=5$ variables and $p=3$ lags, there are 16 coefficients per equation making for a total of 80 coefficients to be estimated. The more coefficients to be estimated the larger the estimation error entering the forecast.
+
+In practice it is usual to keep $K$ small and include only variables that are correlated to each other and therefore useful in forecasting each other. Information criteria are commonly used to select the number of lags to be included.
+
+VARs are implemented in the **vars** package in R. It contains a function `VARselect` to choose the number of lags $p$ using four different information criteria: AIC, HQ, SC and FPE. We have met the AIC before, and SC is simply another name for the BIC (SC stands for Schwarz Criterion after Gideon Schwarz who proposed it). HQ is the Hannan-Quinn criterion and FPE is the "Final Prediction Error" criterion.^[For a detailed comparison of these criteria, see Chapter 4.3 of ??.] Care should be taken using the AIC as it tends to choose large numbers of lags. Instead, for VAR models, we prefer to use the BIC.
+
+A criticism VARs face is that they are atheoretical. They are not built on some economic theory that imposes a theoretical structure to the equations. Every variable is assumed to influence every other variable in the system, which makes direct interpretation of the estimated coefficients very difficult. Despite this, VARs are useful in several contexts:
+
+  * forecasting a collection of related variables where no explicit interpretation is required;
+  * testing whether one variable is useful in forecasting another (the basis of Granger causality tests);
+  * impulse response analysis, where the response of one variable to a sudden but temporary change in another variable is analysed;
+  * forecast error variance decomposition, where the proportion of the forecast variance of one variable is attributed to the effect of other variables.
+
+###Example: A VAR model for forecasting US consumption {-}
+
+```{r}
+library(vars)
+```
+
+```{r, cache=TRUE}
+VARselect(usconsumption, lag.max=8, type="const")[["selection"]] 
+
+var <- VAR(usconsumption, p=3, type="const") 
+serial.test(var, lags.pt=10, type="PT.asymptotic") 
+
+summary(var) 
+```
+
+The R output on the following page shows the lag length selected by each of the information criteria available in the **vars** package. There is a large discrepancy between a VAR(5) selected by the AIC and a VAR(1) selected by the BIC. This is not unusual. As a result we first fit a VAR(1), selected by the BIC. In similar fashion to the univariate ARIMA methodology we test that the residuals are uncorrelated using a Portmanteau test^[The tests for serial correlation in the "vars" package are multivariate generalisations of the tests presented in Section \@ref(sec-2-residualdiagnostics).] The null hypothesis of no serial correlation in the residuals is rejected for both a VAR(1) and a VAR(2) and therefore we fit a VAR(3) as now the null is not rejected. The forecasts generated by the VAR(3) are plotted in Figure \@ref(fig-9-2-VARforecasts).
+
+
+```{r VAR3, fig.cap="Forecasts for US consumption and income generated from a VAR(3).", cache=TRUE}
+fcst <- forecast(var) 
+autoplot(fcst, xlab="Year")
+```
+
+## Neural network models {#sec-9-3-nnet}
+
+Artificial neural networks are forecasting methods that are based on simple mathematical models of the brain. They allow complex nonlinear relationships between the response variable and its predictors.
+
+### Neural network architecture {-}
+
+A neural network can be thought of as a network of "neurons" organised in layers. The predictors (or inputs) form the bottom layer, and the forecasts (or outputs) form the top layer. There may be intermediate layers containing "hidden neurons".
+
+The very simplest networks contain no hidden layers and are equivalent to linear regression. Figure \@ref(fig-10-nnet) shows the neural network version of a linear regression with four predictors. The coefficients attached to these predictors are called "weights". The forecasts are obtained by a linear combination of the inputs. The weights are selected in the neural network framework using a "learning algorithm" that minimises a "cost function" such as MSE. Of course, in this simple example, we can use linear regression which is a much more efficient method for training the model.
+
+```
+[shorten \>=1pt,-\>,draw=black!50, node distance=] =[<-,shorten \<=1pt]
+=[circle,fill=black!25,minimum size=17pt,inner sep=0pt] =[neuron,
+fill=green!50]; =[neuron, fill=red!50]; =[neuron, fill=blue!50]; = [text
+width=4em, text centered]
+
+/ in <span>1,...,4</span> (I-) at (0,-) ;
+
+\(O) ;
+
+in <span>1,...,4</span> (I-) edge (O);
+
+(input) <span>Input layer</span>; ;
+
+\@ref(fig-10-nnet)
+```
+
+Once we add an intermediate layer with hidden neurons, the neural network becomes non-linear. A simple example is shown in Figure \@ref(fig-10-nnet1).
+
+```
+[shorten \>=1pt,-\>,draw=black!50, node distance=] =[<-,shorten \<=1pt]
+=[circle,fill=black!25,minimum size=17pt,inner sep=0pt] =[neuron,
+fill=green!50]; =[neuron, fill=red!50]; =[neuron, fill=blue!50]; = [text
+width=4em, text centered]
+
+/ in <span>1,...,4</span> (I-) at (0,-) ;
+
+/ in <span>1,...,3</span> node[hidden neuron] (H-) at (,-cm) ;
+
+\(O) ;
+
+in <span>1,...,4</span> in <span>1,...,3</span> (I-) edge (H-);
+
+in <span>1,...,3</span> (H-) edge (O);
+
+(hl) <span>Hidden layer</span>; ; ;
+
+\@ref(fig-10-nnet1)
+```
+
+This is known as a *multilayer feed-forward network* where each layer of nodes receives inputs from the previous layers. The outputs of nodes in one layer are inputs to the next layer. The inputs to each node are combined using a weighted linear combination. The result is then modified by a nonlinear function before being output. For example, the inputs into hidden neuron $j$ in Figure \@ref(fig-10-nnet1) are linearly combined to give
+$$
+  z_j = b_j + \sum_{i=1}^4 w_{i,j} x_i.
+$$ 
+In the hidden layer, this is then modified using a nonlinear function such as a sigmoid,
+$$
+  s(z) = \frac{1}{1+e^{-z}},
+$$ 
+to give the input for the next layer. This tends to reduce the effect of extreme input values, thus making the network somewhat robust to outliers.
+
+The parameters $b_1,b_2,b_3$ and $w_{1,1},\dots,w_{4,3}$ are "learned" from the data. The values of the weights are often restricted to prevent them becoming too large. The parameter that restricts the weights is known as the "decay parameter" and is often set to be equal to 0.1.
+
+The weights take random values to begin with, which are then updated using the observed data. Consequently, there is an element of randomness in the predictions produced by a neural network. Therefore, the network is usually trained several times using different random starting points, and the results are averaged.
+
+The number of hidden layers, and the number of nodes in each hidden layer, must be specified in advance. We will consider how these can be chosen using cross-validation later in this chapter.
+
+###Example: Credit scoring {-}
+
+To illustrate neural network forecasting, we will use the credit scoring example that was discussed in Chapter 5. There we fitted the following linear regression model:
+$$
+  y = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{2} + \beta_3x_3 + \beta_4x_4 + e,
+$$
+where
+\begin{align*}
+  y     & =  \text{credit score},         \\
+  x_{1} & =  \text{log savings}, \\
+  x_{2} & =  \text{log income},      \\
+  x_{3} & =  \text{log time at current address},\\
+  x_4   &=  \text{log time in current job},\\
+  e     & =  \text{error}.
+\end{align*}
+
+Here "$\log$" means the transformation $\log(x+1)$. This could be represented by the network shown in Figure \@ref(fig-10-nnet) where the inputs are $x_1,\dots,x_4$ and the output is $y$. The more sophisticated neural network shown in Figure \@ref(fig-10-nnet1) could be fitted as follows.
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+library(caret, quietly=TRUE) 
+creditlog <- data.frame(score=credit[["score"]],
+  log.savings=log(credit[["savings"]]+1),
+  log.income=log(credit[["income"]]+1),
+  log.address=log(credit[["time.address"]]+1),
+  log.employed=log(credit[["time.employed"]]+1),
+  fte=credit[["fte"]],
+  single=credit[["single"]]) 
+fit <- avNNet(score ~ log.savings +
+  log.income + log.address + log.employed, 
+  data=creditlog, repeats=25, 
+  size=3, decay=0.1, linout=TRUE, trace=FALSE)
+```
+
+The `avNNet` function from the **caret** package fits a feed-forward neural network with one hidden layer. The network specified here contains three nodes (`size=3`) in the hidden layer. The decay parameter has been set to 0.1. The argument `repeats=25` indicates that 25 networks were trained and their predictions are to be averaged. The argument `linout=TRUE` indicates that the output is obtained using a linear function. In this book, we will always specify `linout=TRUE`.
+
+### Neural network autoregression {-}
+
+With time series data, lagged values of the time series can be used as inputs to a neural network. Just as we used lagged values in a linear autoregression model (Chapter 8), we can use lagged values in a neural network autoregression.
+
+In this book, we only consider feed-forward networks with one hidden layer, and use the notation NNAR($p,k$) to indicate there are $p$ lagged inputs and $k$ nodes in the hidden layer. For example, a NNAR(9,5) model is a neural network with the last nine observations $(y_{t-1},y_{t-2},\dots,y_{t-9}$) used as inputs to forecast the output $y_t$, and with five neurons in the hidden layer. A NNAR($p,0$) model is equivalent to an ARIMA($p,0,0$) model but without the restrictions on the parameters to ensure stationarity.
+
+With seasonal data, it is useful to also add the last observed values from the same season as inputs. For example, an NNAR(3,1,2)$_{12}$ model has inputs $y_{t-1}$, $y_{t-2}$, $y_{t-3}$ and $y_{t-12}$, and two neurons in the hidden layer. More generally, an NNAR($p,P,k$)$_m$ model has inputs $(y_{t-1},y_{t-2},\dots,y_{t-p},y_{t-m},y_{t-2m},y_{t-Pm})$ and $k$ neurons in the hidden layer. A NNAR($p,P,0$)$_m$ model is equivalent to an ARIMA($p,0,0$)($P$,0,0)$_m$ model but without the restrictions on the parameters to ensure stationarity.
+
+The `nnetar()` function fits an NNAR($p,P,k$)$_m$ model. If the values of $p$ and $P$ are not specified, they are automatically selected. For non-seasonal time series, the default is the optimal number of lags (according to the AIC) for a linear AR($p$) model. For seasonal time series, the default values are $P=1$ and $p$ is chosen from the optimal linear model fitted to the seasonally adjusted data. If $k$ is not specified, it is set to $k=(p+P+1)/2$ (rounded to the nearest integer).
+
+\@ref(Sunspots) The surface of the sun contains magnetic regions that appear
+as dark spots. These affect the propagation of radio waves and so
+telecommunication companies like to predict sunspot activity in order to
+plan for any future difficulties. Sunspots follow a cycle of length
+between 9 and 14 years. In Figure \@ref(fig-10-sunspot-nnetar), forecasts
+from an NNAR(9,5) are shown for the next 20 years.
+
+```{r sunspotnnetar, fig.cap="Forecasts from a neural network with nine lagged inputs and one hidden layer containing five neurons.", cache=TRUE}
+fit <- nnetar(sunspotarea) 
+autoplot(forecast(fit,h=20))
+```
+
+The forecasts actually go slightly negative, which is of course impossible. If we wanted to restrict the forecasts to remain positive, we could use a log transformation (specified by the Box-Cox parameter $\lambda=0$):
+
+```{r, cache=TRUE}
+fit <- nnetar(sunspotarea, lambda=0) 
+autoplot(forecast(fit,h=20))
+
+```
+
+##Forecasting hierarchical or grouped time series {#sec-9-4-Hierarchical}
+
+*Warning: this is a more advanced section and assumes knowledge of matrix algebra.*
+
+Time series can often be naturally disaggregated in a hierarchical structure using attributes such as geographical location, product type, etc. For example, the total number of bicycles sold by a cycling warehouse can be disaggregated into a hierarchy of bicycle types. Such a warehouse will sell road bikes, mountain bikes, children bikes or hybrids. Each of these can be disaggregated into finer categories. Children’s bikes can be divided into balance bikes for children under 4 years old, single speed bikes for children between 4 and 6 and bikes for children over the age of 6. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such disaggregation imposes a hierarchical structure. We refer to these as hierarchical time series.
+
+Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. They can be used for racing, commuting or recreational purposes. They can be single speed or have multiple gears. Frames can be carbon, aluminium or steel. Grouped time series can be thought of as hierarchical time series that do not impose a unique hierarchical structure in the sense that the order by which the series can be grouped is not unique.
+
+In this section we present alternative approaches for forecasting time series data that possess hierarchical structures. Figure \@ref(fig-9-4-hier) shows a $K=2$-level hierarchy.^[We will use this hierarchical structure in order to introduce the methods for forecasting hierarchical time series that follow.] At the top of the hierarchy, level 0, is the "Total", the most aggregate level of the data. We denote as $y_t$ the $t$th observation of the "Total" series for $t=1,\dots,T$. Below this level we denote as $\y{j}{t}$ the $t$th observation of the series which corresponds to node $j$ of the hierarchical tree. The "Total" is disaggregated into 2 series at level 1 and each of these into 3 and 2 series respectively at the bottom level of the hierarchy, level 2. The total number of series in a hierarchy is given by $n=1+n_1+\dots+n_K$ where $n_i$ is the number of series at level $i$ of the hierarchy. In this case $n=1+2+5=8$.
+
+```
+\@ref(fig-9-4-hier)
+
+=[circle,draw,inner sep=1pt] =[sibling distance=50mm,font=] =[sibling
+distance=15mm,font=]
+
+child <span>node <span>A</span> child <span>node <span>AA</span></span>
+child <span>node <span>AB</span></span> child <span>node
+<span>AC</span></span> </span> child <span>node <span>B</span> child
+<span>node <span>BA</span></span> child <span>node
+<span>BB</span></span> </span>;
+```
+
+For any time $t$, the observations of the bottom level series will aggregate to the observations of the series above. This can be effectively represented using matrix notation. We construct an $n\times n_K$ matrix referred to as the "summing" matrix $\boldsymbol{S}$ which dictates how the bottom level series are aggregated, consistent with the hierarchical structure. For the hierarchy in Figure \@ref(fig-9-4-hier) we can write
+$$
+  \begin{bmatrix}
+    y_{t} \\
+    \y{A}{t} \\
+    \y{B}{t} \\
+    \y{AA}{t} \\
+    \y{AB}{t} \\
+    \y{AC}{t} \\
+    \y{BA}{t} \\
+    \y{BB}{t}
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 \\
+    1  & 0  & 0  & 0  & 0  \\
+    0  & 1  & 0  & 0  & 0  \\
+    0  & 0  & 1  & 0  & 0  \\
+    0  & 0  & 0  & 1  & 0  \\
+    0  & 0  & 0  & 0  & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    \y{AA}{t} \\
+    \y{AB}{t} \\
+    \y{AC}{t} \\
+    \y{BA}{t} \\
+    \y{BB}{t}
+  \end{bmatrix}
+$$
+or in more compact notation 
+$$
+  \boldsymbol{y}_t=\boldsymbol{S}\boldsymbol{y}_{K,t},
+$$
+where $\boldsymbol{y}_t$ is a vector of all the observations in the hierarchy at time $t$, $\boldsymbol{S}$ is the summing matrix as defined above, and $\boldsymbol{y}_{K,t}$ is a vector of all the observation in the bottom level of the hierarchy at time $t$.
+
+We are interested in generating forecasts for each series in the hierarchy. We denote as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to observation $T$ and as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.] We refer to these as "base" forecasts. They are independent forecasts generated for each series in the hierarchy using a suitable forecasting method presented in earlier sections of this book. These base forecasts are then combined to produce final forecasts for the whole hierarchy that aggregate in a manner that is consistent with the structure of the hierarchy. We refer to these as revised forecasts and denote them as $\ytilde{j}{h}$ and $\tilde{y}_{h}$ respectively.
+
+There are a number of ways of combining the base forecasts in order to obtain revised forecasts. The following sections discuss some of the possible combining approaches.
+
+### The bottom-up approach {-}
+
+A commonly applied method for hierarchical forecasting is the bottom-up approach. This approach involves first generating base independent forecasts for each series at the bottom level of the hierarchy and then aggregating these upwards to produce revised forecasts for the whole hierarchy.
+
+For example, for the hierarchy of Figure \@ref(fig-9-4-hier) we first generate $h$-step-ahead base forecasts for the bottom level series: $\yhat{AA}{h}$, $\yhat{AB}{h}$, $\yhat{AC}{h}$, $\yhat{BA}{h}$ and $\yhat{BB}{h}$. Aggregating these up the hierarchy we get $h$-step-ahead forecasts for the rest of the series: $\ytilde{A}{h}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}$, $\ytilde{B}{h}= \yhat{BA}{h}+\yhat{BB}{h}$ and $\tilde{y}_{h}=\ytilde{A}{h}+\ytilde{B}{h}$. Note that for the bottom-up approach the revised forecasts for the bottom level series are equal to the base forecasts.
+
+Using matrix notation we can again employ the summing matrix and write
+$$
+  \tilde{\boldsymbol{y}}_{h}=\boldsymbol{S}\hat{\boldsymbol{y}}_{K,h}.
+$$ 
+The greatest advantage of this approach is that no information is lost due to aggregation. On the other hand bottom level data can be quite noisy and more challenging to model and forecast.
+
+### Top-down approaches {-}
+
+Top-down approaches involve first generating base forecasts for the "Total" series $y_t$ on the top of the hierarchy and then disaggregating these downwards. We let $p_1,\ldots,p_{n_K}$ be a set of proportions which dictate how the base forecasts of the "Total" series are to be distributed to revised forecasts for each series at the bottom level of the hierarchy. Once the bottom level forecasts have been generated we can use the summing matrix to generate forecasts for the rest of the series in the hierarchy. Note that for top-down approaches the top level revised forecasts are equal to the top level base forecasts, i.e., $\tilde{y}_{h}=\hat{y}_{h}$.
+
+The most common top-down approaches specify proportions based on the historical proportions of the data. The two most common versions follow.
+
+#### Average historical proportions {-}
+
+$$
+  p_j=\frac{1}{T}\sum_{t=1}^{T}\frac{y_{j,t}}{{y_t}}
+$$ 
+for $j=1,\dots,n_K$. Each proportion $p_j$ reflects the average of the historical proportions of the bottom level series $y_{j,t}$ over the period $t=1,\dots,T$ relative to the total aggregate $y_t$.
+
+#### Proportions of the historical averages {-}
+
+$$
+  p_j={\sum_{t=1}^{T}\frac{y_{j,t}}{T}}\Big/{\sum_{t=1}^{T}\frac{y_t}{T}}
+$$
+for $j=1,\dots,n_K$. Each proportion $p_j$ captures the average historical value of the bottom level series $y_{j,t}$ relative to the average value of the total aggregate $y_t$.
+
+The greatest attribute of such top-down approaches is their simplicity to apply. One only needs to model and generate forecasts for the most aggregated top level series. In general these approaches seem to produce quite reliable forecasts for the aggregate levels and they are very useful with low count data. On the other hand, their greatest disadvantage is the loss of information due to aggregation. With these top-down approaches, we are unable to capture and take advantage of individual series characteristics such as time dynamics, special events, etc.
+
+In the example on forecasting Australian domestic tourism demand that follows, the data are highly seasonal. The seasonal pattern of tourist arrivals may vary across series depending on the tourism destination. An area with beaches as its main tourist attractions will have a very different seasonal pattern to an area with skiing as its main tourist attraction. This will not be captured by disaggregating the total of these destinations based on historical proportions. Finally, with these methods the disaggregation of the "Total" series forecasts depends on historical and static proportions, and these proportions may be distorted by trends in the data.
+
+#### Forecasted proportions {-}
+
+An alternative approach that improves on the historical and static nature of the proportions specified above is to use forecasted proportions.
+
+To demonstrate the intuition of this method, consider a one level hierarchy. We first generate $h$-step-ahead base forecasts for all the series independently. At level 1 we calculate the proportion of each $h$-step-ahead base forecast to the aggregate of all the $h$-step-ahead base forecasts at this level. We refer to these as the forecasted proportions and we use these to disaggregate the top level forecast and generate revised forecasts for the whole of the hierarchy.
+
+For a $K$-level hierarchy this process is repeated for each node going from the top to the very bottom level. Applying this process leads to the following general rule for obtaining the forecasted proportions
+$$
+  p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}
+$$
+for $j=1,2,\dots,n_K$. These forecasted proportions disaggregate the $h$-step-ahead base forecast of the "Total" series to $h$-step-ahead revised forecasts of the bottom level series. $\hat{y}_{j,h}^{(\ell)}$ is the $h$-step-ahead base forecast of the series that corresponds to the node which is $\ell$ levels above $j$. $\hat{S}_{j,h}^{(\ell)}$ is the sum of the $h$-step-ahead base forecasts below the node that is $\ell$ levels above node $j$ and are directly connected to that node.
+
+We will use the hierarchy of Figure \@ref(fig-9-4-hier) to explain this notation and to demonstrate how this general rule is reached. Assume we have generated independent base forecasts for each series in the hierarchy. Remember that for the top level "Total" series, $\tilde{y}_{h}=\hat{y}_{h}$. Here are some example using the above notation:
+  * $\hat{y}_{\text{A},h}^{(1)}=\hat{y}_{\text{B},h}^{(1)}= \tilde{y}_{h}$
+  * $\hat{y}_{\text{BA},h}^{(1)}=\hat{y}_{\text{BB},h}^{(1)}= \hat{y}_{\text{B},h}$
+  * $\hat{y}_{\text{AA},h}^{(2)}=\hat{y}_{\text{AB},h}^{(2)}= \hat{y}_{\text{AC},h}^{(2)}=\hat{y}_{\text{BA},h}^{(2)}= \hat{y}_{\text{BB},h}^{(2)}= \tilde{y}_{h}$
+  * $\Shat{BA}{h}{1} = \Shat{BB}{h}{1}= \yhat{BA}{h}+\yhat{BB}{h}$
+  * $\Shat{BA}{h}{2} = \Shat{BB}{h}{2}= \Shat{A}{h}{1} = \Shat{B}{h}{1}= \hat{S}_{h}= \yhat{A}{h}+\yhat{B}{h}$
+
+Moving down the farthest left branch of the hierarchy the final revised forecasts are
+$$
+  \ytilde{A}{h} = \Bigg(\frac{\yhat{A}{h}}{\Shat{A}{h}{1}}\Bigg) \tilde{y}_{h} =
+  \Bigg(\frac{\yhat{AA}{h}^{(1)}}{\Shat{AA}{h}{2}}\Bigg) \tilde{y}_{h}
+$$
+and
+$$
+  \ytilde{AA}{h} = \Bigg(\frac{\yhat{AA}{h}}{\Shat{AA}{h}{1}}\Bigg) \ytilde{A}{h}
+  =\Bigg(\frac{\yhat{AA}{h}}{\Shat{AA}{h}{1}}\Bigg) \Bigg(\frac{\yhat{AA}{h}^{(1)}}{\Shat{AA}{h}{2}}\Bigg)\tilde{y}_{h}.
+$$
+Consequently,
+$$
+  p_1=\Bigg(\frac{\yhat{AA}{h}}{\Shat{AA}{h}{1}}\Bigg) \Bigg(\frac{\yhat{AA}{h}^{(1)}}{\Shat{AA}{h}{2}}\Bigg)
+$$
+The other proportions can be similarly obtained. The greatest disadvantage of the top-down forecasted proportions approach, which is a disadvantage of any top-down approach, is that they do not produce unbiased revised forecasts even if the base forecasts are unbiased.
+
+### Middle-out approach {-}
+
+The middle-out approach combines bottom-up and top-down approaches. First the "middle level" is chosen and base forecasts are generated for all the series of this level and the ones below. For the series above the middle level, revised forecasts are generated using the bottom-up approach by aggregating the "middle-level" base forecasts upwards. For the series below the "middle level", revised forecasts are generated using a top-down approach by disaggregating the "middle level" base forecasts downwards.
+
+### The optimal combination approach {-}
+
+This approach involves first generating independent base forecast for each series in the hierarchy. As these base forecasts are independently generated they will not be "aggregate consistent" (i.e., they will not add up according to the hierarchical structure). The optimal combination approach optimally combines the independent base forecasts and generates a set of revised forecasts that are as close as possible to the univariate forecasts but also aggregate consistently with the hierarchical structure.
+
+Unlike any other existing method, this approach uses all the information available within a hierarchy. It allows for correlations and interactions between series at each level of the hierarchy, it accounts for ad hoc adjustments of forecasts at any level, and, provided the base forecasts are unbiased, it produces unbiased revised forecasts.
+
+The general idea is derived from the representation of the $h$-step-ahead base forecasts for the whole of the hierarchy by the linear regression model. We write
+$$
+  \label{eqn:regression}
+  \hat{\boldsymbol{y}}_h= \boldsymbol{S}\boldsymbol{\beta}_{h}+\boldsymbol{\varepsilon}_{h}
+$$
+where $\hat{\boldsymbol{y}}_h$ is a vector of the $h$-step-ahead base forecasts for the whole hierarchy, $\boldsymbol{\beta}_{h}$ is the unknown mean of the future values of the bottom level $K$, and $\boldsymbol{\varepsilon}_{h}$ has zero mean
+$$
+  \label{eq-9-optcombination}
+  \tilde{\boldsymbol{y}}_{h}=\boldsymbol{S}(\boldsymbol{S}'\boldsymbol{S})^{-1}\boldsymbol{S}'\hat{\boldsymbol{y}}_h.
+$$
+
+Assuming that the errors approximately satisfy the hierarchical aggregation structure will be true provided that the base forecasts also approximately satisfy this aggregation structure, which should occur for any reasonable set of forecasts.
+
+### The hts package {-}
+
+Hierarchical time series forecasting is implemented in the **hts** package in R.
+
+The `hts` function creates a hierarchical time series. The required inputs are the bottom level time series obsverations, and information about the hierarchical structure. For example, the structure shown in Figure \@ref(fig-9-4-hier) is specified as follows:
+
+```
+# bts is a time series matrix containing the bottom level series 
+# The first three series belong to one group, and the last two series 
+# belong to a different group 
+y <- hts(bts, nodes=list(2, c(3,2)))
+```
+
+For a grouped but non-hierarchical time series, the `gts` function can be used. If there are more levels, the `g` argument should be a matrix where each row contains the grouping structure for each level.
+
+Forecasts are obtained, as usual, with the `forecast` function. By default it produces forecasts using the optimal combination approach with ETS models used for the base forecasts. But other models and methods can be specified via the following arguments.
+
+fmethod
+:   The forecasting model to be used for the base forecasts. Possible values are `"ets"`, `"arima"` and `"rw"`.
+
+method
+:   The method used for reconciling the base forecasts. It can take the following values:
+
+    comb
+    :   Optimal combination forecasts;
+
+    bu
+    :   Bottom-up forecasts;
+
+    mo
+    :   Middle-out forecasts where the level used is specified by the `level` argument’
+
+    tdgsa
+    :   Top-down forecasts based on the average historical proportions (Gross-Sohl method A);@GS90
+
+    tdgsf
+    :   Top-down forecasts based on the proportion of historical averages (Gross-Sohl method F);
+
+    tdfp
+    :   Top-down forecasts using forecast proportions.
+
+###Example: Australian tourism hierarchy {-}
+
+Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the three largest states of Australia, namely Victoria (VIC), New South Wales (NSW), Queensland (QLD) and other. For each of these we consider visitor nights for each respective capital city, namely, Melbourne (MEL), Sydney (SYD) and Brisbane (BGC).^[For the purpose of this example we include with Brisbane, visitor nights at the Gold Coast, a coastal city and a major tourism attraction near Brisbane.] The hierarchical structure is shown in Figure \@ref(fig-9-4-Aust). The CAP category in the bottom level includes visitor nights in all other five capital cities of the remaining states and territories.
+
+```
+\@ref(fig-9-4-Aust)
+
+=[ellipse,draw,inner sep=1pt] =[sibling distance=30mm,font=] =[sibling
+distance=15mm,font=]
+
+child <span>node <span>NSW</span> child <span>node
+<span>SYD</span></span> child <span>node <span>Other</span></span>
+</span> child <span>node <span>VIC</span> child <span>node
+<span>MEL</span></span> child <span>node <span>Other</span></span>
+</span> child <span>node <span>QLD</span> child <span>node
+<span>BGC</span></span> child <span>node <span>Other</span></span>
+</span> child <span>node <span>Other</span> child <span>node
+<span>CAP</span></span> child <span>node <span>Other</span></span>
+</span>;
+```
+
+Figure \@ref(fig-9-4-forecasts) shows all the times series in the hierarchy which span the period 1998:Q1 to 2011:Q4. The dotted lines show the revised forecasts generated by the optimal combination approach. The base forecasts for each series are generated using the ETS methodology of Chapter \@ref(ch7).
+
+```{r htstourism, fig.cap="Hierarchical time series and 8-step-ahead revised forecasts for Australian domestic tourism generated by the optimal combination approach. The base forecasts for each series were generated using the ETS methodology of Chapter ??.", fig.height=6, cache=TRUE}
+require(hts) 
+y <- hts(vn, nodes=list(4,c(2,2,2,2))) 
+allf <- forecast(y, h=8) 
+plot(allf)
+```

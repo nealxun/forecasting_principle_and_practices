@@ -82,23 +82,50 @@ autoplot(a10) +
 
 Here, there is a clear and increasing trend. There is also a strong seasonal pattern that increases in size as the level of the series increases. The sudden drop at the end of each year is caused by a government subsidisation scheme that makes it cost-effective for patients to stockpile drugs at the end of the calendar year. Any forecasts of this series would need to capture the seasonal pattern, and the fact that the trend is changing slowly.
 
-##Time series patterns
+##Time series patterns {#tspatterns}
 
 In describing these time series, we have used words such as "trend" and "seasonal" which need to be defined more carefully.
 
--   A *trend* exists when there is a long-term increase or decrease in the data. There is a trend in the antidiabetic drug sales data shown in Figure \@ref(fig:a10).
--   A *seasonal* pattern occurs when a time series is affected by seasonal factors such as the time of the year or the day of the week. The monthly sales of antidiabetic drugs above shows seasonality which is induced partly by the change in the cost of the drugs at the end of the calendar year.
--   A *cycle* occurs when the data exhibit rises and falls that are not of a fixed period. These fluctuations are usually due to economic conditions, and are often related to the "business cycle". The time series in Figure \@ref(fig:hsales) shows both seasonality (the annual pattern) and cyclicity (the rises and falls lasting several years).
+Trend
+  : A *trend* exists when there is a long-term increase or decrease in the data. It does not have to be linear. Sometimes we will refer to a trend "changing   direction" when it might go from an increasing trend to a decreasing trend. There is a trend in the antidiabetic drug sales data shown in Figure \@ref(fig:a10).
 
-```{r hsales, echo=TRUE, cache=TRUE, fig.cap="Monthly sales of new one-family houses sold in the USA, 1973-1995."}
-autoplot(hsales) +
-  ggtitle("Sales of new one-family houses, USA") +
-  xlab("Year") + ylab("Total sales")
-```
+Seasonal
+  : A *seasonal* pattern occurs when a time series is affected by seasonal factors such as the time of the year or the day of the week. Seasonality is always of a fixed and known frequency. The monthly sales of antidiabetic drugs above shows seasonality which is induced partly by the change in the cost of the drugs at the end of the calendar year.
 
-It is important to distinguish cyclic patterns from seasonal patterns. Seasonal patterns have fixed and known lengths, while cyclic patterns have variable and unknown lengths. The average length of a cycle is usually longer than that of seasonality, and the magnitude of cyclic variation is usually more variable than that of seasonal variation. Cycles and seasonality are discussed further in Section \@ref(sec-6-1-TSpatterns).
+Cyclic
+  : A *cycle* occurs when the data exhibit rises and falls that are not of a fixed frequency. These fluctuations are usually due to economic conditions, and are often related to the "business cycle".  The duration of these fluctuations is usually of at least 2 years. 
+
+Many people confuse cyclic behaviour with seasonal behaviour, but they are really quite different. If the fluctuations are not of fixed frequency then they are cyclic; if the frequency is unchanging and associated with some aspect of the calendar, then the pattern is seasonal. In general, the average length of cycles is longer than the length of a seasonal pattern, and the magnitude of cycles tends to be more variable than the magnitude of seasonal patterns. Cycles and seasonality are discussed further in Section \@ref(sec-6-1-TSpatterns).
 
 Many time series include trend, cycles and seasonality. When choosing a forecasting method, we will first need to identify the time series patterns in the data, and then choose a method that is able to capture the patterns properly.
+
+The following four examples shows different combinations of the above components.
+
+```{r 6-decomp1, echo=FALSE, cache=TRUE, fig.cap="Four examples of time series showing different patterns."}
+smallfonts <- theme(text = element_text(size = 7),
+            axis.text = element_text(size=6))
+p1 <- autoplot(hsales) + smallfonts +
+        xlab("Year") + ylab("millions") +
+        ggtitle("Sales of new one-family houses, USA") 
+p2 <- autoplot(ustreas) + smallfonts +
+        xlab("Day") + ylab("Number") +
+        ggtitle("US treasury bill contracts")
+p3 <- autoplot(qauselec) + smallfonts +
+        xlab("Year") + ylab("billion kWh") +
+        ggtitle("Australian quarterly electricity production")
+p4 <- autoplot(diff(dj)) + smallfonts +
+        xlab("Day") + ylab("Change in index") + 
+        ggtitle("Dow Jones index")
+gridExtra::grid.arrange(p1,p2,p3,p4,ncol=2)
+```
+
+  1. The monthly housing sales (top left) show strong seasonality within each year, as well as some strong cyclic behaviour with a period of about 6--10 years. There is no apparent trend in the data over this period. 
+
+  2. The US treasury bill contracts (top right) show results from the Chicago market for 100 consecutive trading days in 1981. Here there is no seasonality, but an obvious downward trend. Possibly, if we had a much longer series, we would see that this downward trend is actually part of a long cycle, but when viewed over only 100 days it appears to be a trend.
+
+  3. The Australian monthly electricity production (bottom left) shows a strong increasing trend, with strong seasonality. There is no evidence of any cyclic behaviour here.
+
+  4. The daily change in the Dow Jones index (bottom right) has no trend, seasonality or cyclic behaviour. There are random fluctuations which do not appear to be very predictable, and no strong patterns that would help with developing a forecasting model.
 
 ##Seasonal plots
 
@@ -213,7 +240,7 @@ In this graph:
  
 When data have a trend, the autocorrelations for small lags tend to be large and positive because observations nearby in time are also nearby in size. So the ACF of trended time series tend to have positive values that slowly decrease as the lags increase.
 
-When data are seasonal, the autocorrelations will be larger for the seasonal lags (at multiples of the seasonal period) than for other lags. 
+When data are seasonal, the autocorrelations will be larger for the seasonal lags (at multiples of the seasonal frequency) than for other lags. 
 
 When data are both trended and seasonal, you see a combination of these effects, as illustrated in Figure \@ref(fig:acfelec).
 

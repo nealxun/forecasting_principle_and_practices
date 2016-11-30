@@ -1,4 +1,4 @@
-#Advanced forecasting methods {#ch9}
+#Advanced forecasting methods {#ch-advanced}
 
 In this chapter, we briefly discuss four more advanced forecasting methods that build on the models discussed in earlier chapters.
 

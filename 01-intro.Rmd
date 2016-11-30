@@ -1,4 +1,4 @@
-#Getting started {#ch1}
+#Getting started {#ch-intro}
 
 Forecasting has fascinated people for thousands of years, sometimes being considered a sign of divine inspiration, and sometimes being seen as a criminal activity. The Jewish prophet Isaiah wrote in about 700 BC
 

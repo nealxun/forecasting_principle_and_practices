@@ -1,4 +1,4 @@
-#Dynamic regression models
+#Dynamic regression models {#ch-dynamic}
 
 The time series models in the previous two chapters allow for the inclusion of information from the past observations of a series, but not for the inclusion of other information that may be relevant. For example, the effects of holidays, competitor activity, changes in the law, the wider economy, or some other external variables may explain some of the historical variation and allow more accurate forecasts. On the other hand, the regression models in Chapter \@ref(ch5) allow for the inclusion of a lot of relevant information from predictor variables, but do not allow for the subtle time series dynamics that can be handled with ARIMA models.
 

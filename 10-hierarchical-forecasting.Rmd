@@ -1,4 +1,4 @@
-#Forecasting hierarchical or grouped time series {#sec-9-4-Hierarchical}
+#Forecasting hierarchical or grouped time series {#ch-hierarchical}
 
 *Warning: this is a more advanced section and assumes knowledge of matrix algebra.*
 

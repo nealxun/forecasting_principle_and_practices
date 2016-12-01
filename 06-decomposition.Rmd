@@ -1,10 +1,10 @@
 #Time series decomposition {#ch-decomposition}
 
-Time series data can exhibit a huge variety of patterns and it is helpful to try to split a time series into several components, each representing one of the underlying categories of patterns.
+Time series data can exhibit a huge variety of patterns, and it is helpful to try to split a time series into several components, each representing one of the underlying categories of patterns.
 
 In Section \@ref(tspatterns) we discussed three types of time series patterns: trend, seasonality and cycles. When we decompose a time series into components, we usually combine the trend and cycle into a single "trend-cycle" component (sometimes called the "trend" for simplicity). Thus we think of a time series as comprising three components: a trend-cycle component, a seasonal component, and a remainder component (containing anything else in the time series). 
 
-In this chapter, we consider some common  methods to extract these components from a time series. Often this is done to help understand the time series better, but it can also be used to improve forecasts.
+In this chapter, we consider some common  methods for extracting these components from a time series. Often this is done to help improve understanding of the time series, but it can also be used to improve forecasts.
 
 ## Time series components {#sec-6-1-TSpatterns}
 
@@ -17,9 +17,9 @@ $$
   y_{t} = S_{t} \times T_{t} \times R_t.
 $$
 
-The additive model is most appropriate if the magnitude of the seasonal fluctuations or the variation around the trend-cycle does not vary with the level of the time series. When the variation in the seasonal pattern, or the variation around the trend-cycle, appears to be proportional to the level of the time series, then a multiplicative model is more appropriate. With economic time series, multiplicative models are common.
+The additive model is the most appropriate if the magnitude of the seasonal fluctuations or the variation around the trend-cycle does not vary with the level of the time series. When the variation in the seasonal pattern, or the variation around the trend-cycle, appears to be proportional to the level of the time series, then a multiplicative model is more appropriate. Multiplicative models are common with economic time series.
 
-An alternative to using a multiplicative model, is to first transform the data until the variation in the series appears to be stable over time, and then use an additive model. When a log transformation has been used, this is equivalent to using a multiplicative decomposition because
+An alternative to using a multiplicative model is to first transform the data until the variation in the series appears to be stable over time, then use an additive model. When a log transformation has been used, this is equivalent to using a multiplicative decomposition because
 $$  
   y_{t} = S_{t} \times T_{t} \times R_t \quad\text{is equivalent to}\quad
   \log y_{t} = \log S_{t} + \log T_{t} + \log R_t.
@@ -28,10 +28,10 @@ $$
 
 ### Electrical equipment manufacturing {-}
 
-We will look at several methods for obtaining the components $S_{t}$, $T_{t}$ and $R_{t}$ later in this chapter. But first, it is helpful to see an example. We will decompose the new orders index for electrical equipment shown in Figure \@ref(fig:elecequip-trend). These data show the number of new orders for electrical equipment (computer, electronic and optical products) in the Euro area (16 countries). The data have been adjusted by working days and normalized so a value of 100 corresponds to 2005.
+We will look at several methods for obtaining the components $S_{t}$, $T_{t}$ and $R_{t}$ later in this chapter, but first, it is helpful to see an example. We will decompose the new orders index for electrical equipment shown in Figure \@ref(fig:elecequip-trend). These data show the numbers of new orders for electrical equipment (computer, electronic and optical products) in the Euro area (16 countries). The data have been adjusted by working days and normalized so that a value of 100 corresponds to 2005.
 
-```{r elecequip-trend,  fig.cap="Electrical equipment orders: the trend-cycle component (red) and raw data (grey).", echo=TRUE, cache=TRUE}
-fit <- stl(elecequip, s.window=5) 
+```{r elecequip-trend,  fig.cap="Electrical equipment orders: the trend-cycle component (red) and the raw data (grey).", echo=FALSE, cache=TRUE}
+fit <- stl(elecequip, s.window=7, t.window=13) 
 tmp <- cbind(Data=elecequip, Trend=trendcycle(fit))
 autoplot(tmp) + xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
@@ -41,34 +41,25 @@ autoplot(tmp) + xlab("Year") + ylab("New orders index") +
 
 Figure \@ref(fig:elecequip-trend) shows the trend-cycle component, $T_t$, in red and the original data, $y_t$, in grey. The trend-cycle shows the overall movement in the series, ignoring the seasonality and any small random fluctuations.
 
-Figure \@ref(fig:elecequip-stl) shows an additive decomposition of these data. The method used for extracting components in this example is STL which is discussed in Section \@ref(sec-6-stl).
+Figure \@ref(fig:elecequip-stl) shows an additive decomposition of these data. The method used for estimating components in this example is STL, which is discussed in Section \@ref(sec-6-stl).
 
-```{r elecequip-stl, fig.cap="The electricial equipment orders (top) and its three additive components.", fig.width=8, fig.height=7, echo=TRUE, cache=TRUE}
+```{r elecequip-stl, fig.cap="The electricial equipment orders (top) and its three additive components.", fig.width=8, fig.height=7, echo=FALSE, cache=FALSE}
 autoplot(fit)
 ```
 
-All three components are shown in the bottom three panels of Figure \@ref(fig:elecequip-stl). These three components can be added together to reconstruct the data shown in the top panel. Notice that the seasonal component changes very slowly over time, so any two consecutive years have very similar patterns, but years far apart may have different seasonal patterns. The remainder component shown in the bottom panel is what is left over when the seasonal and trend-cycle components have been subtracted from the data.
+All three components are shown in the bottom three panels of Figure \@ref(fig:elecequip-stl). These three components can be added together to reconstruct the data shown in the top panel. Notice that the seasonal component changes very slowly over time, so that any two consecutive years have very similar patterns, but years far apart may have different seasonal patterns. The remainder component shown in the bottom panel is what is left over when the seasonal and trend-cycle components have been subtracted from the data. 
 
-The components are plotted on different scales, so to compare the relative size of the components it is important to check the vertical scales. In this case, the variation in the remainder component is small compared to the variation in the data. In other words, most of the variation in the data is due to the trend-cycle and seasonal variation. 
-
-To obtain the separate components plotted in Figure \@ref{fig:classical-elecequip}, use the `seasonal` function for the seasonal component, the `trendcycle` function for trend-cycle component, and the `remainder` function for the remainder component. 
-
-For example, it can be useful to use seasonal plots and seasonal sub-series plots of the seasonal component. These help us to visualize the variation in the seasonal component over time. Figure \@ref(fig:elecequip3) shows a seasonal sub-series plot of the seasonal component from Figure \@ref(fig:elecequip-stl). In this case, there are only very small changes over time.
+The components are plotted on different scales; so to compare the relative size of the components, it is important to check the vertical scales. In this case, the variation in the remainder component is small compared to the variation in the data. In other words, most of the variation in the data is due to the trend-cycle and seasonal variation. 
 
 
-```{r elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the STL decomposition shown in Figure \\@ref(fig:elecequip-stl).", echo=TRUE, cache=TRUE}
-ggmonthplot(seasonal(fit)) + ylab("Seasonal")
-```
-
-Even though this uses the `ggmonthplot` function, it can be applied to any type of seasonality including quarterly data, daily data, hourly data, and so on.
 
 ### Seasonally adjusted data {-}
 
-If the seasonal component is removed from the original data, the resulting values are called the "seasonally adjusted" data. For an additive model, the seasonally adjusted data are given by $y_{t}-S_{t}$, and for multiplicative data, the seasonally adjusted values are obtained using $y_{t}/S_{t}$.  The `seasadj` function can be used to compute seasonally adjusted data.
+If the seasonal component is removed from the original data, the resulting values are called the "seasonally adjusted" data. For an additive model, the seasonally adjusted data are given by $y_{t}-S_{t}$, and for multiplicative data, the seasonally adjusted values are obtained using $y_{t}/S_{t}$.  
 
 Figure \@ref(fig:elecequip-sa) shows the seasonally adjusted electrical equipment orders.
 
-```{r elecequip-sa, fig.cap="Seasonally adjusted electrical equipment orders (red) and the original data (grey).", echo=TRUE, cache=TRUE}
+```{r elecequip-sa, fig.cap="Seasonally adjusted electrical equipment orders (red) and the original data (grey).", echo=FALSE, cache=TRUE}
 tmp <- cbind(Data=elecequip, 'Seasonally Adjusted'=seasadj(fit))
 autoplot(tmp) + xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
@@ -76,13 +67,13 @@ autoplot(tmp) + xlab("Year") + ylab("New orders index") +
                      breaks=c("Data","Seasonally Adjusted"))
 ```
 
-If the variation due to seasonality is not of primary interest, the seasonally adjusted series can be useful. For example, monthly unemployment data are usually seasonally adjusted to highlight variation due to the underlying state of the economy than the seasonal variation. An increase in unemployment due to school leavers seeking work is seasonal variation while an increase in unemployment due to large employers laying off workers is non-seasonal. Most people who study unemployment data are more interested in the non-seasonal variation. Consequently, employment data (and many other economic series) are usually seasonally adjusted.
+If the variation due to seasonality is not of primary interest, the seasonally adjusted series can be useful. For example, monthly unemployment data are usually seasonally adjusted in order to highlight variation due to the underlying state of the economy rather than the seasonal variation. An increase in unemployment due to school leavers seeking work is seasonal variation, while an increase in unemployment due to large employers laying off workers is non-seasonal. Most people who study unemployment data are more interested in the non-seasonal variation. Consequently, employment data (and many other economic series) are usually seasonally adjusted.
 
-Seasonally adjusted series contain the remainder component as well as the trend-cycle. Therefore they are not "smooth" and "downturns" or "upturns" can be misleading. If the purpose is to look for turning points in the series, and interpret any changes in the series, then it is better to use the trend-cycle component rather than the seasonally adjusted data.
+Seasonally adjusted series contain the remainder component as well as the trend-cycle. Therefore, they are not "smooth", and "downturns" or "upturns" can be misleading. If the purpose is to look for turning points in the series, and interpret any changes in the series, then it is better to use the trend-cycle component rather than the seasonally adjusted data.
 
 ##Moving averages
 
-The classical method of time series decomposition originated in the 1920s and was widely used until the 1950s. It still forms the basis of many time series decomposition methods, and so it is important to understand how it works. The first step in a classical decomposition is to use a moving average method to estimate the trend-cycle, so we begin by discussing moving averages.
+The classical method of time series decomposition originated in the 1920s and was widely used until the 1950s. It still forms the basis of many time series decomposition methods, so it is important to understand how it works. The first step in a classical decomposition is to use a moving average method to estimate the trend-cycle, so we begin by discussing moving averages.
 
 ### Moving average smoothing {-}
 
@@ -90,14 +81,14 @@ A moving average of order $m$ can be written as
 $$
   \hat{T}_{t} = \frac{1}{m} \sum_{j=-k}^k y_{t+j},
 $$ 
-where $m=2k+1$. That is, the estimate of the trend-cycle at time $t$ is obtained by averaging values of the time series within $k$ periods of $t$. Observations that are nearby in time are also likely to be close in value, and the average eliminates some of the randomness in the data, leaving a smooth trend-cycle component. We call this an “$m$-MA” meaning a moving average of order $m$.
+where $m=2k+1$. That is, the estimate of the trend-cycle at time $t$ is obtained by averaging values of the time series within $k$ periods of $t$. Observations that are nearby in time are also likely to be close in value, and the average eliminates some of the randomness in the data, leaving a smooth trend-cycle component. We call this an “$m$-MA”, meaning a moving average of order $m$.
 
 ```{r ressales1, fig.cap="Residential electricity sales (excluding hot water) for South Australia: 1989--2008.", echo=TRUE, cache=TRUE}
 autoplot(elecsales) + xlab("Year") + ylab("GWh") +
   ggtitle("Annual electricity sales: South Australia")
 ```
 
-For example, consider Figure \@ref(fig:ressales1) showing the volume of electricity sold to residential customers in South Australia each year from 1989 to 2008 (hot water sales have been excluded). The data are also shown in Table \@ref(tab:elecsales).
+For example, consider Figure \@ref(fig:ressales1) which shows the volume of electricity sold to residential customers in South Australia each year from 1989 to 2008 (hot water sales have been excluded). The data are also shown in Table \@ref(tab:elecsales).
 
 ```{r, echo=TRUE, cache=TRUE}
 ma5 <- ma(elecsales, 5)
@@ -113,7 +104,7 @@ out <- gsub('NA','  ', out)
 out
 ```
 
-In the second column of this table, a moving average of order 5 is shown, providing an estimate of the trend-cycle. The first value in this column is the average of the first five observations (1989--1993); the second value in the 5-MA column is the average of the values for 1990--1994; and so on. Each value in the 5-MA column is the average of the observations in the five year period centered on the corresponding year. There are no values for the first two years or last two years because we don’t have two observations on either side. In the formula above, column
+In the second column of this table, a moving average of order 5 is shown, providing an estimate of the trend-cycle. The first value in this column is the average of the first five observations (1989--1993); the second value in the 5-MA column is the average of the values for 1990--1994; and so on. Each value in the 5-MA column is the average of the observations in the five year period centered on the corresponding year. There are no values for either the first two years or the last two years, because we do not have two observations on either side. In the formula above, column
 5-MA contains the values of $\hat{T}_{t}$ with $k=2$. To see what the trend-cycle estimate looks like, we plot it along with the original data in Figure \@ref(fig:ressales2).
 
 ```{r ressales2, fig.cap="Residential electricity sales (black) along with the 5-MA estimate of the trend-cycle (red).", echo=TRUE, cache=TRUE, warning=FALSE,message=FALSE}
@@ -124,7 +115,7 @@ autoplot(tmp) + xlab("Year") + ylab("GWh") +
                      breaks=c("Data","5-MA"))
 
 ```
-Notice how the trend-cycle (in red) is smoother than the original data and captures the main movement of the time series without all the minor fluctuations. The moving average method does not allow estimates of $T_{t}$ where $t$ is close to the ends of the series; hence the red line does not extend to the edges of the graph on either side. Later we will use more sophisticated methods of trend-cycle estimation which do allow estimates near the endpoints.
+Notice that the trend-cycle (in red) is smoother than the original data and captures the main movement of the time series without all of the minor fluctuations. The moving average method does not allow estimates of $T_{t}$ when $t$ is close to the ends of the series; hence the red line does not extend to the edges of the graph on either side. Later we will use more sophisticated methods of trend-cycle estimation which do allow estimates near the endpoints.
 
 The order of the moving average determines the smoothness of the trend-cycle estimate. In general, a larger order means a smoother curve. Figure \@ref(fig:ressales3) shows the effect of changing the order of the moving average for the residential electricity sales data.
 
@@ -143,7 +134,7 @@ for(m in seq(mak))
 gridExtra::grid.arrange(grobs=grobs,ncol=2)
 ```
 
-Simple moving averages such as these are usually of odd order (e.g., 3, 5, 7, etc.) This is so they are symmetric: in a moving average of order $m=2k+1$, there are $k$ earlier observations, $k$ later observations and the middle observation that are averaged. But if $m$ was even, it would no longer be symmetric.
+Simple moving averages such as these are usually of an odd order (e.g., 3, 5, 7, etc.) This is so they are symmetric: in a moving average of order $m=2k+1$, there are $k$ earlier observations, $k$ later observations and the middle observation that are averaged. But if $m$ was even, it would no longer be symmetric.
 
 ### Moving averages of moving averages {-}
 
@@ -177,7 +168,7 @@ and
 The first value in the 2x4-MA column is the average of these two: 
 `r format(ma2x4[3],nsmall=2)`=(`r ma4[2]`+`r ma4[3]`)/2.
 
-When a 2-MA follows a moving average of even order (such as 4), it is called a “centered moving average of order 4”. This is because the results are now symmetric. To see that this is the case, we can write the $2\times4$-MA as follows:
+When a 2-MA follows a moving average of an even order (such as 4), it is called a “centered moving average of order 4”. This is because the results are now symmetric. To see that this is the case, we can write the $2\times4$-MA as follows:
 \begin{align*}
   \hat{T}_{t} &= \frac{1}{2}\Big[
     \frac{1}{4} (y_{t-2}+y_{t-1}+y_{t}+y_{t+1}) +
@@ -187,7 +178,7 @@ When a 2-MA follows a moving average of even order (such as 4), it is called a �
 \end{align*} 
 It is now a weighted average of observations, but it is symmetric.
 
-Other combinations of moving averages are also possible. For example a $3\times3$-MA is often used, and consists of a moving average of order 3 followed by another moving average of order 3. In general, an even order MA should be followed by an even order MA to make it symmetric. Similarly, an odd order MA should be followed by an odd order MA.
+Other combinations of moving averages are also possible. For example, a $3\times3$-MA is often used, and consists of a moving average of order 3 followed by another moving average of order 3. In general, an even order MA should be followed by an even order MA to make it symmetric. Similarly, an odd order MA should be followed by an odd order MA.
 
 ### Estimating the trend-cycle with seasonal data {-}
 
@@ -198,7 +189,7 @@ $$
 $$
 When applied to quarterly data, each quarter of the year is given equal weight as the first and last terms apply to the same quarter in consecutive years. Consequently, the seasonal variation will be averaged out and the resulting values of $\hat{T}_t$ will have little or no seasonal variation remaining. A similar effect would be obtained using a $2\times 8$-MA or a $2\times 12$-MA to quarterly data.
 
-In general, a $2\times m$-MA is equivalent to a weighted moving average of order $m+1$ with all observations taking weight $1/m$ except for the first and last terms which take weights $1/(2m)$. So if the seasonal period is even and of order $m$, use a $2\times m$-MA to estimate the trend-cycle. If the seasonal period is odd and of order $m$, use a $m$-MA to estimate the trend-cycle. For example, a $2\times 12$-MA can be used to estimate the trend-cycle of monthly data and a 7-MA can be used to estimate the trend-cycle of daily data with a weekly seasonality.
+In general, a $2\times m$-MA is equivalent to a weighted moving average of order $m+1$ where all observations take the weight $1/m$, except for the first and last terms which take weights $1/(2m)$. So, if the seasonal period is even and of order $m$, use a $2\times m$-MA to estimate the trend-cycle. If the seasonal period is odd and of order $m$, use a $m$-MA to estimate the trend-cycle. For example, a $2\times 12$-MA can be used to estimate the trend-cycle of monthly data and a 7-MA can be used to estimate the trend-cycle of daily data with a weekly seasonality.
 
 Other choices for the order of the MA will usually result in trend-cycle estimates being contaminated by the seasonality in the data.
 
@@ -212,7 +203,7 @@ autoplot(tmp) + xlab("Year") +
   scale_color_manual(values=c("grey","red"), breaks=c("Data","12MA"))
 ```
 
-Figure \@ref(fig:elecequip2) shows a $2\times12$-MA applied to the electrical equipment orders index. Notice that the smooth line shows no seasonality; it is almost the same as the trend-cycle shown in Figure \@ref(fig:elecequip-trend) which was estimated using a much more sophisticated method than moving averages. Any other choice for the order of the moving average (except for 24, 36, etc.) would have resulted in a smooth line that shows some seasonal fluctuations.
+Figure \@ref(fig:elecequip2) shows a $2\times12$-MA applied to the electrical equipment orders index. Notice that the smooth line shows no seasonality; it is almost the same as the trend-cycle shown in Figure \@ref(fig:elecequip-trend), which was estimated using a much more sophisticated method than moving averages. Any other choice for the order of the moving average (except for 24, 36, etc.) would have resulted in a smooth line that showed some seasonal fluctuations.
 
 
 ### Weighted moving averages {-}
@@ -222,9 +213,9 @@ $\left[\frac{1}{8},\frac{1}{4},\frac{1}{4},\frac{1}{4},\frac{1}{8}\right]$. In g
 $$
   \hat{T}_t = \sum_{j=-k}^k a_j y_{t+j},
 $$ 
-where $k=(m-1)/2$ and the weights are given by $\left[a_{-k},\dots,a_k\right]$. It is important that the weights all sum to one and that they are symmetric so that $a_j = a_{-j}$. The simple $m$-MA is a special case where all the weights are equal to $1/m$.
+where $k=(m-1)/2$, and the weights are given by $\left[a_{-k},\dots,a_k\right]$. It is important that the weights all sum to one and that they are symmetric so that $a_j = a_{-j}$. The simple $m$-MA is a special case where all of the weights are equal to $1/m$.
 
-A major advantage of weighted moving averages is that they yield a smoother estimate of the trend-cycle. Instead of observations entering and leaving the calculation at full weight, their weights are slowly increased and then slowly decreased resulting in a smoother curve.
+A major advantage of weighted moving averages is that they yield a smoother estimate of the trend-cycle. Instead of observations entering and leaving the calculation at full weight, their weights slowly increase and then slowly decrease, resulting in a smoother curve.
 
 Some specific sets of weights are widely used due to their mathematical properties. Some of these are given in Table \@ref(tab:weights).
 
@@ -265,9 +256,9 @@ out
 
 ##Classical decomposition
 
-The classical decomposition method originated in the 1920s. It is a relatively simple procedure and forms the starting point for most other methods of time series decomposition. There are two forms of classical decomposition: an additive decomposition and a multiplicative decomposition. These are described below for a time series with seasonal period $m$ (e.g., $m=4$ for quarterly data, $m=12$ for monthly data, $m=7$ for daily data with a weekly pattern).
+The classical decomposition method originated in the 1920s. It is a relatively simple procedure, and forms the starting point for most other methods of time series decomposition. There are two forms of classical decomposition: an additive decomposition and a multiplicative decomposition. These are described below for a time series with seasonal period $m$ (e.g., $m=4$ for quarterly data, $m=12$ for monthly data, $m=7$ for daily data with a weekly pattern).
 
-In classical decomposition, we assume the seasonal component is constant from year to year. For multiplicative seasonality, the $m$ values that form the seasonal component are sometimes called the “seasonal indices”.
+In classical decomposition, we assume that the seasonal component is constant from year to year. For multiplicative seasonality, the $m$ values that form the seasonal component are sometimes called the “seasonal indices”.
 
 ### Additive decomposition {-}
 
@@ -283,15 +274,10 @@ Step 3
 Step 4
 :   The remainder component is calculated by subtracting the estimated seasonal and trend-cycle components: $\hat{R}_t = y_t - \hat{T}_t - \hat{S}_t$.
 
-```r
-# x is the time series 
-fit <- decompose(x, type="additive")
-plot(fit)
-```
 
 ### Multiplicative decomposition {-}
 
-A classical multiplicative decomposition is very similar except the subtractions are replaced by divisions.
+A classical multiplicative decomposition is very similar, except that the subtractions are replaced by divisions.
 
 Step 1
 :   If $m$ is an even number, compute the trend-cycle component using a   $2\times m$-MA to obtain $\hat{T}_t$. If $m$ is an odd number, compute the trend-cycle component using an $m$-MA to obtain $\hat{T}_t$.
@@ -300,7 +286,7 @@ Step 2
 :   Calculate the detrended series: $y_t/ \hat{T}_t$.
 
 Step 3
-:   To estimate the seasonal component for each season, simply average the detrended values for that season. For example, with monthly data, the seasonal index for March is the average of all the detrended March values in the data. These seasonal indexes are then adjusted to ensure that they add to $m$. The seasonal component is obtained by stringing together all the seasonal indices for each year of data. This gives $\hat{S}_t$.
+:   To estimate the seasonal component for each season, simply average the detrended values for that season. For example, with monthly data, the seasonal index for March is the average of all the detrended March values in the data. These seasonal indexes are then adjusted to ensure that they add to $m$. The seasonal component is obtained by stringing together all of the seasonal indices for each year of data. This gives $\hat{S}_t$.
 
 Step 4
 :   The remainder component is calculated by dividing out the estimated seasonal and trend-cycle components: $\hat{R}_{t} = y_t /( \hat{T}_t  \hat{S}_t)$.
@@ -314,81 +300,44 @@ autoplot(fit) + xlab("Year") +
 
 Figure \@ref(fig:classical-elecequip) shows a classical decomposition of the electrical equipment index. Compare this decomposition with that shown in Figure \@ref(fig:elecequip-trend). 
 
+
 ### Comments on classical decomposition {-}
 
-While classical decomposition is still widely used, it is not recommended. There are now several much better methods. Some of the problems with classical decomposition are summarised below.
+While classical decomposition is still widely used, it is not recommended, as there are now several much better methods. Some of the problems with classical decomposition are summarised below.
 
-- The estimate of the trend-cycle is unavailable for the first few and last few observations. For example, if $m=12$, there is no trend-cycle estimate for the first six and last six observations. Consequently, there is also no estimate of the remainder component for the same time periods.
+- The estimate of the trend-cycle is unavailable for the first few and last few observations. For example, if $m=12$, there is no trend-cycle estimate for the first six or the last six observations. Consequently, there is also no estimate of the remainder component for the same time periods.
 
-- Classical decomposition methods assume that the seasonal component repeats from year to year. For many series, this is a reasonable assumption, but for some longer series it is not. For example, electricity demand patterns have changed over time as air conditioning has become more widespread. So in many locations, the seasonal usage pattern from several decades ago had maximum demand in winter (due to heating), while the current seasonal pattern has maximum demand in summer (due to air conditioning). The classical decomposition methods are unable to capture these seasonal changes over time.
+- Classical decomposition methods assume that the seasonal component repeats from year to year. For many series, this is a reasonable assumption, but for some longer series it is not. For example, electricity demand patterns have changed over time as air conditioning has become more widespread. Specifically, in many locations, the seasonal usage pattern from several decades ago had its maximum demand in winter (due to heating), while the current seasonal pattern has its maximum demand in summer (due to air conditioning). The classical decomposition methods are unable to capture these seasonal changes over time.
  
-- Occasionally, the value of the time series in a small number of periods may be particularly unusual. For example, monthly air passenger traffic may be affected by an industrial dispute making the traffic during the dispute very different from usual. The classical method is not robust to these kinds of unusual values.
+- Occasionally, the values of the time series in a small number of periods may be particularly unusual. For example, the monthly air passenger traffic may be affected by an industrial dispute, making the traffic during the dispute very different from usual. The classical method is not robust to these kinds of unusual values.
 
-## X-13-ARIMA decomposition
+## X-13-ARIMA-SEATS decomposition
 
-One of the most popular methods for decomposing quarterly and monthly data is X-13-ARIMA, which has its origins in methods developed by the US Bureau of the Census. It is now widely used by the Bureau and government agencies around the world. Earlier versions of the method included X-11, X-11-ARIMA, and X-12-ARIMA.
+One of the most popular methods for decomposing quarterly and monthly data is X-13-ARIMA-SEATS, which has its origins in methods developed by the US Bureau of the Census and the Bank of Spain. It is now widely used by government agencies around the world. 
 
-The X-13-ARIMA method is based on classical decomposition, but with many extra steps and features to overcome the drawbacks of classical decomposition that were discussed in the previous section. In particular, the trend-cycle estimate is available for all observations including the end points, and the seasonal component is allowed to vary slowly over time. It is also relatively robust to occasional unusual observations. X-13-ARIMA handles both additive and multiplicative decomposition, but only allows for quarterly and monthly data.
+The X-13-ARIMA-SEATS method is based on classical decomposition, but includes many extra steps and features in order to overcome the drawbacks of classical decomposition that were discussed in the previous section. In particular, trend-cycle estimates are available for all observations including the end points, and the seasonal component is allowed to vary slowly over time. It is also relatively robust to occasional unusual observations. X-13-ARIMA-SEATS also has some sophisticated methods for handling trading day variation, holiday effects and the effects of known predictors. It handles both additive and multiplicative decomposition.
 
-The “ARIMA” part of X-13-ARIMA refers to the use of an ARIMA model (see Chapter \@ref(ch-arima)) that provides forecasts of the series forward in time, as well as backwards in time. Then, when a moving average is applied to obtain an estimate of the trend-cycle, there is no loss of observations at the start and end of the series.
+The “ARIMA” part of X-13-ARIMA-SEATS refers to the use of an ARIMA model (see Chapter \@ref(ch-arima)) which provides forecasts of the series forward in time, as well as backwards in time. Then, when a moving average is applied to obtain an estimate of the trend-cycle, there is no loss of observations at the start and end of the series.
 
-The algorithm begins in a similar way to classical decomposition, and then the components are refined through several iterations. The following outline of the method describes a multiplicative decomposition applied to monthly data. Similar algorithms are used for additive decompositions and for quarterly data.
+The "SEATS" part of the name stands for "Seasonal Extraction in ARIMA Time Series".
 
-1. Compute a $2\times12$ moving average applied to the original data to obtain a rough estimate of the trend-cycle $\hat{T}_t$ for all periods.
+The details of the X-13-ARIMA-SEATS method are beyond the scope of this book. However, a complete discussion of the method is available in @Dagum2016. Here we will only demonstrate how to use the automatic procedure in R.
 
-2. Calculate ratios of the data to trend-cycle (called “centered ratios”): $y_t/\hat{T}_t$.
-
-3. Apply separate $3\times3$ MAs to each month of the centered ratios to form a rough estimate of $\hat{S}_t$.
-
-4. Divide the centered ratios by $\hat{S}_t$ to get an estimate of the remainder, $\hat{R}_{t}$.
-
-5. Reduce extreme values of $\hat{R}_{t}$ to get modified $\hat{R}_{t}$.
-
-6. Multiply modified $\hat{R}_{t}$ by $\hat{S}_t$ to get modified centered ratios.
-
-7. Repeat Step 3 to obtain revised $\hat{S}_t$.
-
-8. Divide original data by the new estimate of $\hat{S}_t$ to give the preliminary seasonally adjusted series, $y_t/\hat{S}_t$.
-
-9. The trend-cycle $\hat{T}_t$ is estimated by applying a weighted Henderson MA to the preliminary seasonally adjusted values. (The greater the randomness, the longer the length of the moving average used.) For monthly series: either a 9-, 13-, or 23-term Henderson moving average is used.
-
-10. Repeat Step 2. New ratios are obtained by dividing the original data by the new estimate of $\hat{T}_t$.
-
-11. Repeat Steps 3--6 using the new ratios and applying a $3\times5$ MA instead of a $3\times3$ MA.
-
-12. Repeat Step 7 but using a $3\times5$ MA instead of a $3\times3$ MA.
-
-13. Repeat Step 8.
-
-14. The remainder component is obtained by dividing the seasonally adjusted data from Step 13 by the trend-cycle obtained in Step 9.
-
-15. Extreme values of the remainder component are replaced as in Step 5.
-
-16. A series of modified data is obtained by multiplying the trend-cycle, seasonal component, and adjusted remainder component together.
-
-The whole process is repeated two more times using the data obtained in the Step 16 each time. On the final iteration, the $3\times5$ MA of Steps 11 and 12 is replaced by either a $3\times3$, $3\times5$, or $3\times9$ moving average, depending on the variability in the data.
-
-X-13-ARIMA also has some sophisticated methods to handle trading day variation, holiday effects and the effects of known predictors, which are not covered here.
-
-A complete discussion of the method is available in @LQ01.
 
 ### The `seasonal` package for R {-}
 
-The X-13-ARIMA method is implemented in the `seasonal` package for R.
+The X-13-ARIMA-SEATS method is implemented in the `seasonal` package for R.
 
-```{r x13arima, echo=TRUE, warning=FALSE, cache=TRUE, fig.width=8, fig.height=7, fig.cap="An X-13-ARIMA decomposition of the new orders index for electrical equipment."}
+```{r x13arima, echo=TRUE, warning=FALSE, cache=TRUE, fig.width=8, fig.height=7, fig.cap="An X-13-ARIMA-SEATS decomposition of the new orders index for electrical equipment."}
 library(seasonal)
 fit <- seas(elecequip) 
-# To be fixed ????
-#autoplot(fit) +
-#  ggtitle("X-13-ARIMA decomposition of electrical equipment index")
+autoplot(fit) +
+  ggtitle("X-13-ARIMA-SEATS decomposition of electrical equipment index")
 ```
 
 The process is entirely automatic and tends to be highly robust to outliers and level shifts in the time series. However, it only works with quarterly and monthly data. So seasonality of other kinds, such as daily data, or hourly data, or weekly data, requires an alternative approach.
 
 Compare this decomposition with the STL decomposition shown in Figure \@ref(fig:elecequip-trend) and the classical decomposition shown in Figure \@ref(fig:classical-elecequip).
-
-As before, the `seasonal` function will extract the seasonal component, the `trendcycle` function will extract the trend-cycle component, the `remainder` function will extract the remainder component, and `seasadj` will compute the seasonally adjusted time series.
 
 
 ```{r x13arima-seasadj, echo=TRUE, warning=FALSE, cache=TRUE}
@@ -401,6 +350,10 @@ autoplot(tmp) + xlab("Year") + ylab("New orders index") +
   scale_color_manual(values=c("gray","red","blue"),
                      breaks=c("Data","Seasonally Adjusted","Trend"))
 ```
+
+Given the output from the `seas` function, `seasonal()` will extract the seasonal component,  `trendcycle()` will extract the trend-cycle component, `remainder()` will extract the remainder component, and `seasadj()` will compute the seasonally adjusted time series.
+
+The `seasonal` package has many options for handling variations of X-13-ARIMA-SEATS. See [the package website](http://www.seasonal.website/seasonal.html) for a detailed introduction to the options and features available.
 
 ## STL decomposition {#sec-6-stl}
 
@@ -428,6 +381,17 @@ autoplot(fit)
 ```
 
 The two main parameters to be chosen when using STL are the trend-cycle window (`t.window`) and seasonal window (`s.window`). These control how rapidly the trend-cycle and seasonal components can change. Small values allow more rapid change. Setting the seasonal window to be infinite is equivalent to forcing the seasonal component to be periodic (i.e., identical across years).
+
+As with the other decomposition methods discussed in this book, to obtain the separate components plotted in Figure \@ref(fig:classical-elecequip), use the `seasonal()` function for the seasonal component, the `trendcycle()` function for trend-cycle component, and the `remainder()` function for the remainder component. 
+
+For example, it can be useful to use seasonal plots and seasonal sub-series plots of the seasonal component. These help us to visualize the variation in the seasonal component over time. Figure \@ref(fig:elecequip3) shows a seasonal sub-series plot of the seasonal component from Figure \@ref(fig:elecequip-stl). In this case, there are only very small changes over time.
+
+
+```{r elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the STL decomposition shown in Figure \\@ref(fig:elecequip-stl).", echo=TRUE, cache=TRUE}
+ggmonthplot(seasonal(fit)) + ylab("Seasonal")
+```
+
+Even though this uses the `ggmonthplot` function, it can be applied to any type of seasonality including quarterly data, daily data, hourly data, and so on.
 
 ## Forecasting with decomposition
 

@@ -50,7 +50,7 @@ knitr::kable(tab, digits=4,booktabs=TRUE,
 
 For any $\alpha$ between 0 and 1, the weights attached to the observations decrease exponentially as we go back in time, hence the name "exponential smoothing". If $\alpha$ is small (i.e., close to 0), more weight is given to observations from the more distant past. If $\alpha$ is large (i.e., close to 1), more weight is given to the more recent observations. At the extreme case where $\alpha=1$, $\hat{y}_{T+1|T}=y_T$ and forecasts are equal to the naïve forecasts.
 
-We present two equivalent forms of simple exponential smoothing, each of which leads to the forecast equation (\@ref{eq-7-ses}).
+We present two equivalent forms of simple exponential smoothing, each of which leads to the forecast equation (\@ref(eq-7-ses)).
 
 ### Weighted average form {-}
 

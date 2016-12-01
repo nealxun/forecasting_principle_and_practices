@@ -146,7 +146,7 @@ In this case, it is clear that there is a large jump in sales in January each ye
 An alternative plot that emphasises the seasonal patterns is where the data for each season are collected together in separate mini time plots.
 
 ```{r, fig.cap="Seasonal subseries plot of monthly antidiabetic drug sales in Australia.", cache=TRUE}
-ggmonthplot(a10) + ylab("$ million") + 
+ggsubseriesplot(a10) + ylab("$ million") + 
   ggtitle("Seasonal subseries plot: antidiabetic drug sales")
 ```
 
@@ -295,7 +295,7 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
     c. Explore your chosen retail time series using the following functions:
 
-        `autoplot`, `ggseasonplot`, `ggmonthplot`, `gglagplot`, `ggAcf`
+        `autoplot`, `ggseasonplot`, `ggsubseriesplot`, `gglagplot`, `ggAcf`
 
         Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
 

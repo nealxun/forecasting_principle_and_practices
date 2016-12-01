@@ -87,19 +87,19 @@ Here, there is a clear and increasing trend. There is also a strong seasonal pat
 In describing these time series, we have used words such as "trend" and "seasonal" which need to be defined more carefully.
 
 Trend
-  : A *trend* exists when there is a long-term increase or decrease in the data. It does not have to be linear. Sometimes we will refer to a trend "changing   direction" when it might go from an increasing trend to a decreasing trend. There is a trend in the antidiabetic drug sales data shown in Figure \@ref(fig:a10).
+  : A *trend* exists when there is a long-term increase or decrease in the data. It does not have to be linear. Sometimes we will refer to a trend as "changing direction", when it might go from an increasing trend to a decreasing trend. There is a trend in the antidiabetic drug sales data shown in Figure \@ref(fig:a10).
 
 Seasonal
   : A *seasonal* pattern occurs when a time series is affected by seasonal factors such as the time of the year or the day of the week. Seasonality is always of a fixed and known frequency. The monthly sales of antidiabetic drugs above shows seasonality which is induced partly by the change in the cost of the drugs at the end of the calendar year.
 
 Cyclic
-  : A *cycle* occurs when the data exhibit rises and falls that are not of a fixed frequency. These fluctuations are usually due to economic conditions, and are often related to the "business cycle".  The duration of these fluctuations is usually of at least 2 years. 
+  : A *cycle* occurs when the data exhibit rises and falls that are not of a fixed frequency. These fluctuations are usually due to economic conditions, and are often related to the "business cycle".  The duration of these fluctuations is usually at least 2 years. 
 
-Many people confuse cyclic behaviour with seasonal behaviour, but they are really quite different. If the fluctuations are not of fixed frequency then they are cyclic; if the frequency is unchanging and associated with some aspect of the calendar, then the pattern is seasonal. In general, the average length of cycles is longer than the length of a seasonal pattern, and the magnitude of cycles tends to be more variable than the magnitude of seasonal patterns. Cycles and seasonality are discussed further in Section \@ref(sec-6-1-TSpatterns).
+Many people confuse cyclic behaviour with seasonal behaviour, but they are really quite different. If the fluctuations are not of a fixed frequency then they are cyclic; if the frequency is unchanging and associated with some aspect of the calendar, then the pattern is seasonal. In general, the average length of cycles is longer than the length of a seasonal pattern, and the magnitudes of cycles tend to be more variable than the magnitudes of seasonal patterns. Cycles and seasonality are discussed further in Section \@ref(sec-6-1-TSpatterns).
 
 Many time series include trend, cycles and seasonality. When choosing a forecasting method, we will first need to identify the time series patterns in the data, and then choose a method that is able to capture the patterns properly.
 
-The following four examples shows different combinations of the above components.
+The following four examples show different combinations of the above components.
 
 ```{r 6-decomp1, echo=FALSE, cache=TRUE, fig.cap="Four examples of time series showing different patterns."}
 smallfonts <- theme(text = element_text(size = 7),

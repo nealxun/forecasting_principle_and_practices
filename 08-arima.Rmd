@@ -268,7 +268,7 @@ $$
 $$
 where $e_t$ is white noise. We refer to this as an **MA($q$) model**. Of course, we do not *observe* the values of $e_t$, so it is not really regression in the usual sense.
 
-Notice that each value of $y_t$ can be thought of as a weighted moving average of the past few forecast errors. However, moving average *models* should not be confused with moving average *smoothing* we discussed in Chapter \@ref(ch6). A moving average model is used for forecasting future values while moving average smoothing is used for estimating the trend-cycle of past values.
+Notice that each value of $y_t$ can be thought of as a weighted moving average of the past few forecast errors. However, moving average *models* should not be confused with moving average *smoothing* we discussed in Chapter \@ref(ch-decomposition). A moving average model is used for forecasting future values while moving average smoothing is used for estimating the trend-cycle of past values.
 
 Figure \@ref(fig-8-maq) shows some data from an MA(1) model and an MA(2) model. Changing the parameters $\theta_1,\dots,\theta_q$ results in different time series patterns. As with autoregressive models, the variance of the error term $e_t$ will only change the scale of the series, not the patterns.
 
@@ -427,7 +427,7 @@ Once the model order has been identified (i.e., the values of $p$, $d$ and $q$),
 $$
   \sum_{t=1}^Te_t^2.
 $$
-(For the regression models considered in Chapters \@ref(ch4) and \@ref(ch5), MLE gives exactly the same parameter estimates as least squares estimation.) Note that ARIMA models are much more complicated to estimate than regression models, and different software will give slightly different answers as they use different methods of estimation, or different estimation algorithms.
+(For the regression models considered in Chapter \@ref(ch-regression), MLE gives exactly the same parameter estimates as least squares estimation.) Note that ARIMA models are much more complicated to estimate than regression models, and different software will give slightly different answers as they use different methods of estimation, or different estimation algorithms.
 
 In practice, R will report the value of the *log likelihood* of the data; that is, the logarithm of the probability of the observed data coming from the estimated model. For given values of $p$, $d$ and $q$, R will try to maximize the log likelihood when finding parameter estimates.
 

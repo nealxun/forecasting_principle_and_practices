@@ -311,7 +311,7 @@ dwtest(fit, alt="two.sided")
 #to check for negative as well as positive autocorrelation
 ```
 
-Both the ACF plot and the Durbin-Watson test show that there is some autocorrelation remaining in the residuals. This means there is some information remaining in the residuals that can be exploited to obtain better forecasts. The forecasts from the current model are still unbiased, but will have larger prediction intervals than they need to. A better model in this case will be a dynamic-regression model which will be covered in Chapter \@ref(ch9).
+Both the ACF plot and the Durbin-Watson test show that there is some autocorrelation remaining in the residuals. This means there is some information remaining in the residuals that can be exploited to obtain better forecasts. The forecasts from the current model are still unbiased, but will have larger prediction intervals than they need to. A better model in this case will be a dynamic-regression model which will be covered in Chapter \@ref(ch-dynamic).
 
 A third possible test is the **Breusch-Godfrey** test designed to look for significant higher-lag autocorrelations.
 
@@ -341,7 +341,7 @@ In this case, the residuals seem to be slightly negatively skewed, although that
 
 Observations that take on extreme values compared to the majority of the data are called "outliers". Observations that have a large influence on the estimation results of a regression model are called "influential observations". Usually, influential observations are also outliers that are extreme in the $x$ direction.
 
-There are formal methods for detecting outliers and influential observations that are beyond the scope of this textbook. As we suggested at the beginning of Chapter \@ref(graphics), getting familiar with your data prior to performing any analysis is of vital importance. A scatter plot of $y$ against $x$ is always a useful starting point in regression analysis and often helps to identify unusual observations.
+There are formal methods for detecting outliers and influential observations that are beyond the scope of this textbook. As we suggested at the beginning of Chapter \@ref(ch-graphics), getting familiar with your data prior to performing any analysis is of vital importance. A scatter plot of $y$ against $x$ is always a useful starting point in regression analysis and often helps to identify unusual observations.
 
 One source for an outlier occurring is an incorrect data entry. Simple descriptive statistics of your data can identify minima and maxima that are not sensible. If such an observation is identified, and it has been incorrectly recorded, it should be immediately removed from the sample.
 
@@ -381,7 +381,7 @@ We should warn here that the evaluation of the standard error can be highly subj
 
 ### Spurious regression {-}
 
-More often than not, time series data are "non-stationary"; that is, the values of the time series do not fluctuate around a constant mean or with a constant variance. We will deal with time series stationarity in more detail in Chapter \@ref(ch8), but here we need to address the effect non-stationary data can have on regression models.
+More often than not, time series data are "non-stationary"; that is, the values of the time series do not fluctuate around a constant mean or with a constant variance. We will deal with time series stationarity in more detail in Chapter \@ref(ch-arima), but here we need to address the effect non-stationary data can have on regression models.
 
 ```{r spurious, echo=TRUE, cache=TRUE, fig.cap="Trending time series data can appear to be related, as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE,warning=FALSE}
 df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,AustralianPassengers=ausair))
@@ -393,7 +393,7 @@ ggplot(df,aes(x=GuineaRiceProduction, y=AustralianPassengers)) + geom_point()
 
 For example consider the two variables plotted in Figure \@ref(fig:spurious), which appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea. 
 
-Regressing non-stationary time series can lead to spurious regressions. High $R^2$s and high residual autocorrelation can be signs of spurious regression. We discuss the issues surrounding non-stationary data and spurious regressions in detail in Chapter \@ref(ch9).
+Regressing non-stationary time series can lead to spurious regressions. High $R^2$s and high residual autocorrelation can be signs of spurious regression. We discuss the issues surrounding non-stationary data and spurious regressions in detail in Chapter \@ref(ch-dynamic).
 
 Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
 
@@ -431,7 +431,7 @@ autoplot(fcast)
 
 Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
 
-An alternative approach is to use genuine forecasts for the predictor variable. For example, a pure time series based approach can be used to generate forecasts for the predictor variable (more on this in Chapter \@ref(ch9)) or forecasts published by some other source such as a government agency can be used.
+An alternative approach is to use genuine forecasts for the predictor variable. For example, a pure time series based approach can be used to generate forecasts for the predictor variable (more on this in Chapter \@ref(ch-dynamic)) or forecasts published by some other source such as a government agency can be used.
 
 ### Ex-ante versus ex-post forecasts {-}
 
@@ -554,7 +554,7 @@ $$\begin{aligned} x_{1} &= \text{advertising for previous month;} \\ x_{2} &=
 \text{advertising for $m$ months previously.}\end{aligned}$$
 
 It is common to require the coefficients to decrease as the lag increases. In
-Chapter \@ref(ch9) we discuss methods to allow this constraint to be
+Chapter \@ref(ch-dynamic) we discuss methods to allow this constraint to be
 implemented.
 
 ## Selecting predictors {#sec-5-3-SelectingPredictors}
@@ -847,24 +847,8 @@ One of the simplest ways to do nonlinear regression is to make $f$ piecewise
 linear. That is, we introduce points where the slope of $f$ can change. These
 points are called "knots".
 
-[Car emissions continued] In Chapter \@ref(ch4), we considered an example of
-forecasting the carbon footprint of a car from its city-based fuel economy. Our
-previous analysis (Section \@ref(sec-4-7-NonLinearFF)) showed that this
-relationship was nonlinear. Close inspection of Figure \@ref(fig-4-car)
-suggests that a change in slope occurs at about 25mpg. This can be achieved
-using the following variables: $x$ (the City mpg) and $$z = (x-25)_+ =
-\left\{\begin{array}{ll} 0 & \text{if $x<25$}\\ x-25 & \text{if $x\ge
-25$}.\end{array}\right.$$ The resulting fitted values are shown as the red line
-below.
 
-![Piecewise linear trend to fuel economy data.](nlcarbon1)
 
-\@ref(fig-5-nlpulp2)
-
-Cityp \<- pmax(fuel$City-25,0) fit2 <- lm(Carbon ~ City + Cityp, data=fuel) x
-<- 15:50; z <- pmax(x-25,0) fcast2 <- forecast(fit2,
-newdata=data.frame(City=x,Cityp=z)) plot(jitter(Carbon) ~ jitter(City),
-data=fuel) lines(x, fcast2$mean,col="red")
 
 Additional bends can be included in the relationship by adding further
 variables of the form $(x-c)_+$ where $c$ is the "knot" or point at which the

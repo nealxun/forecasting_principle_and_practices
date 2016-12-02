@@ -17,13 +17,13 @@ This textbook is intended to provide a comprehensive introduction to forecasting
 
 The book is written for three audiences: (1)&nbsp;people finding themselves doing forecasting in business when they may not have had any formal training in the area; (2)&nbsp;undergraduate students studying business; (3)&nbsp;MBA students doing a forecasting elective. We use it ourselves for a third-year subject for students undertaking a Bachelor of Commerce degree at Monash University, Australia.
 
-For most sections, we only assume that readers are familiar with algebra, and high school mathematics should be sufficient background. Readers who have completed an introductory course in statistics will probably want to skip some of Chapters \@ref(toolbox) and \@ref(ch-regression). There are a couple of sections which also require knowledge of matrices, but these are flagged.
+For most sections, we only assume that readers are familiar with introductory statistics, and with high-school algebra. There are a couple of sections that also require knowledge of matrices, but these are flagged.
 
 At the end of each chapter we provide a list of "further reading". In general, these lists comprise suggested textbooks that provide a more advanced or detailed treatment of the subject. Where there is no suitable textbook, we suggest journal articles that provide more information.
 
 We use R throughout the book and we intend students to learn how to forecast with R. R is free and available on almost every operating system. It is a wonderful tool for all statistical analysis, not just for forecasting. See [OTexts.com/fpp/using-r](http://otexts.com/fpp/using-r) for instructions on installing and using R.
 
-All R examples in the book assume you have loaded the `fpp2` package, available on CRAN, using `library(fpp2)`. This will automatically load several other packages including `forecast`, `ggplot2` and `magrittr`, as well as all the data used in the book. We will use the `ggplot2` package for all graphics. If you want to learn how to modify the graphs, or create your own `ggplot2` graphics that are different from the examples shown in this book, please either read the [`ggplot2` book](https://www.amazon.com/dp/0387981403?tag=otexts-20), or do the `ggplot2` course on [DataCamp](https://www.datacamp.com/courses/data-visualization-with-ggplot2-1).
+All R examples in the book assume you have loaded the `fpp2` package, available on CRAN, using `library(fpp2)`. This will automatically load several other packages including `forecast` and `ggplot2`, as well as all the data used in the book. We will use the `ggplot2` package for all graphics. If you want to learn how to modify the graphs, or create your own `ggplot2` graphics that are different from the examples shown in this book, please either read the [ggplot2 book](https://www.amazon.com/dp/0387981403?tag=otexts-20), or do the ggplot2 course on [DataCamp](https://www.datacamp.com/courses/data-visualization-with-ggplot2-1).
 
 The book is different from other forecasting textbooks in several ways.
 

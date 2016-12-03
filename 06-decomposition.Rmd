@@ -458,49 +458,46 @@ As well as the naïve method, several other possible forecasting methods are ava
 
 2. The `plastics` data set consists of the monthly sales (in thousands) of product A for a plastics manufacturer for five years.
 
-  (a) Plot the time series of sales of product A. Can you identify seasonal fluctuations and/or a trend-cycle?
+    (a) Plot the time series of sales of product A. Can you identify seasonal fluctuations and/or a trend-cycle?
 
-  (b) Use a classical multiplicative decomposition to calculate the trend-cycle and seasonal indices.
+    (b) Use a classical multiplicative decomposition to calculate the trend-cycle and seasonal indices.
 
-  (c) Do the results support the graphical interpretation from part (a)?
+    (c) Do the results support the graphical interpretation from part (a)?
 
-  (d) Compute and plot the seasonally adjusted data.
+    (d) Compute and plot the seasonally adjusted data.
 
-  (e) Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier?
+    (e) Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier?
 
-  (f) Does it make any difference if the outlier is near the end rather than in the middle of the time series?
+    (f) Does it make any difference if the outlier is near the end rather than in the middle of the time series?
 
-  (g) Use a random walk with drift to produce forecasts of the seasonally adjusted data.
+    (g) Return to the original data, and use a random walk with drift to produce forecasts of the seasonally adjusted data.
 
-  (h) Reseasonalize the results to give forecasts on the original scale.
+    (h) Reseasonalize the results to give forecasts on the original scale. [Hint: use the stlf function with `method="naive"`.]
 
+3. Figures \@ref(fig:labour) and \@ref(fig:labour2) shows the result of decomposing the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.
 
-3. Figure \@ref(fig:labour) shows the result of decomposing the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.
+    ```{r labour, echo=FALSE, fig.cap="Decomposition of the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.", fig.width=8, fig.height=7, cache=FALSE}
+    fit <- stl(labour, robust=TRUE, s.window=11)
+    autoplot(fit) + xlab("Year")
+    ```
 
+    ```{r labour2, echo=FALSE, fig.cap="Seasonal component from the decomposition shown in Figure ??.", cache=FALSE}
+    ggsubseriesplot(seasonal(fit))
+    ```
 
-```{r labour, echo=FALSE, fig.cap="Decomposition of the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.", fig.width=8, fig.height=7, cache=FALSE}
-fit <- stl(labour, robust=TRUE, s.window=11)
-autoplot(fit) + xlab("Year")
-```
+    a. Write about 3--5 sentences describing the results of the seasonal adjustment. Pay particular attention to the scales of the graphs in making your interpretation.
 
-```{r echo=FALSE, fig.cap="Seasonal component from the decomposition shown in Figure ??.", cache=FALSE}
-ggmonthplot(fit$time.series[,"seasonal"])
-```
-
-(a) Write about 3--5 sentences describing the results of the seasonal adjustment. Pay particular attention to the scales of the graphs in making your interpretation.
-
-(b) Is the recession of 1991/1992 visible in the estimated components?
+    b. Is the recession of 1991/1992 visible in the estimated components?
 
 
-We will use the bricksq data for this exercise.
+4. We will use the bricksq data for this exercise.
 
-Use an STL decomposition to calculate the trend-cycle and seasonal indices. (Experiment with having fixed or changing seasonality.)
-Compute and plot the seasonally adjusted data.
-Use a naïve method to produce forecasts of the seasonally adjusted data.
-Reseasonalize the results to give forecasts on the original scale.
-[Hint: use the stlf function with method="naive".]
-Do the residuals look uncorrelated?
-Repeat with a robust STL decomposition. Does it make much difference?
+    a. Use an STL decomposition to calculate the trend-cycle and seasonal indices. (Experiment with having fixed or changing seasonality.)
+    b. Compute and plot the seasonally adjusted data.
+    c. Use a naïve method to produce forecasts of the seasonally adjusted data.
+    d. Reseasonalize the results to give forecasts on the original scale. 
+    e. Do the residuals look uncorrelated?
+    f. Repeat with a robust STL decomposition. Does it make much difference?
 
 ## Further reading
 

@@ -525,6 +525,18 @@ for(j in 1:20)
 text(28,.95,"time")
 ```
 
+Time series cross validation is implemented with the `tscv` function. In the following example, we compare the residual RMSE with the RMSE obtained via time series cross-validation.
+
+```{r tscv}
+e <- tscv(dj, rwf, drift=TRUE, h=1)
+sqrt(mean(e^2, na.rm=TRUE))
+sqrt(mean(residuals(rwf(dj, drift=TRUE))^2, na.rm=TRUE))
+```
+
+As expected, the RMSE from the residuals is smaller, as the corresponding "forecasts" are based on a model fitted to the entire data set, rather than being true forecasts. 
+
+A good way to choose the best forecasting model is to find the model with the smallest RMSE computed using time series cross-validation.
+
 ## Prediction intervals
 
 As discussed in Section \@ref(sec-perspective), a prediction interval gives an interval within which we expect $y_{t}$ to lie with a specified probability. For example, assuming that the forecast errors are uncorrelated and normally distributed, a simple 95% prediction interval for the next observation in a time series is

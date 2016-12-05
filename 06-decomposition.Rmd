@@ -490,7 +490,7 @@ As well as the naïve method, several other possible forecasting methods are ava
     b. Is the recession of 1991/1992 visible in the estimated components?
 
 
-4. We will use the bricksq data for this exercise.
+4. We will use the `bricksq` data for this exercise.
 
     a. Use an STL decomposition to calculate the trend-cycle and seasonal indices. (Experiment with having fixed or changing seasonality.)
     b. Compute and plot the seasonally adjusted data.

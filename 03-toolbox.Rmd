@@ -525,10 +525,10 @@ for(j in 1:20)
 text(28,.95,"time")
 ```
 
-Time series cross validation is implemented with the `tscv` function. In the following example, we compare the residual RMSE with the RMSE obtained via time series cross-validation.
+Time series cross validation is implemented with the `tsCV` function. In the following example, we compare the residual RMSE with the RMSE obtained via time series cross-validation.
 
 ```{r tscv}
-e <- tscv(dj, rwf, drift=TRUE, h=1)
+e <- tsCV(dj, rwf, drift=TRUE, h=1)
 sqrt(mean(e^2, na.rm=TRUE))
 sqrt(mean(residuals(rwf(dj, drift=TRUE))^2, na.rm=TRUE))
 ```

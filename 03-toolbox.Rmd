@@ -67,32 +67,26 @@ Figure \@ref(fig:beerf) shows the first three methods applied to the quarterly b
 
 ```{r beerf, fig.cap="Forecasts of Australian quarterly beer production.", warning=FALSE, message=FALSE, cache=TRUE}
 beer2 <- window(ausbeer,start=1992,end=c(2007,4))
-beerdf <- cbind(Actual = beer2, 
-  Mean = meanf(beer2, h=11)$mean,
-  Naïve = naive(beer2, h=11)$mean,
-  'Seasonal naïve' = snaive(beer2, h=11)$mean)
-autoplot(beerdf) + 
+autoplot(beer2) +
+  geom_forecast(meanf(beer2, h=11), plot.conf=FALSE, series="Mean") +
+  geom_forecast(naive(beer2, h=11), plot.conf=FALSE, series="Naïve") +
+  geom_forecast(snaive(beer2, h=11), plot.conf=FALSE, series="Seasonal naïve") +
   ggtitle("Forecasts for quarterly beer production") +
-  xlab("Year") + ylab("Megalitres") +
-  scale_color_manual(values=c('#000000','#1b9e77','#d95f02','#7570b3'),
-                     breaks=c("Mean","Naïve","Seasonal naïve"),
-                     name="Forecast Method")
+  xlab("Year") + ylab("Megalitres") + 
+  guides(colour=guide_legend(title="Forecast"))
 ```
 
 In Figure \@ref(fig:djf), the non-seasonal methods were applied to a series of 250 days of the Dow Jones Index. 
 
 ```{r djf, fig.cap="Forecasts based on 250 days of the Dow Jones Index.", message=FALSE, warning=FALSE, cache=TRUE}
 dj2 <- window(dj,end=250)
-djdf <- cbind(Actual=dj2, 
-              Mean=meanf(dj2, h=42)$mean,
-              Naïve=rwf(dj2, h=42)$mean,
-              Drift=rwf(dj2, h=42, drift=TRUE)$mean)
-autoplot(djdf) +
+autoplot(dj2) + 
+  geom_forecast(meanf(dj2, h=42), plot.conf=FALSE, series="Mean") +
+  geom_forecast(rwf(dj2, h=42), plot.conf=FALSE, series="Naïve") +
+  geom_forecast(rwf(dj2, drift=TRUE, h=42), plot.conf=FALSE, series="Drift") +
   ggtitle("Dow Jones Index (daily ending 15 Jul 94)") +
   xlab("Day") + ylab("") +
-  scale_color_manual(values=c('#000000','#1b9e77','#d95f02','#7570b3'),
-                     breaks=c("Mean","Naïve","Drift"),
-                     name="Forecast Method")
+  guides(colour=guide_legend(title="Forecast"))
 ```
 
 Sometimes one of these simple methods will be the best forecasting method available; but in many cases, these methods will serve as benchmarks rather than the method of choice. That is, any forecasting methods we develop will be compared to these simple methods to ensure that the new method is better than these simple alternatives. If not, the new method is not worth considering.
@@ -401,15 +395,13 @@ beer2 <- window(ausbeer,start=1992,end=c(2007,4))
 beerfit1 <- meanf(beer2,h=10)
 beerfit2 <- rwf(beer2,h=10)
 beerfit3 <- snaive(beer2,h=10)
-tmp <- cbind(Data=window(ausbeer, start=1992),
-             Mean=beerfit1$mean, 
-             Naïve=beerfit2$mean, 
-             'Seasonal naïve'=beerfit3$mean)
-autoplot(tmp) + xlab("Year") + ylab("Megalitres") +
-  ggtitle("Forecasts for quarterly beer production") + 
-  scale_color_manual(values=c('#000000','#1b9e77','#d95f02','#7570b3'),
-                     breaks=c("Mean","Naïve","Seasonal naïve"),
-                     name="Forecast Method")
+autoplot(window(ausbeer, start=1992)) +
+  geom_forecast(beerfit1, series="Mean", plot.conf=FALSE) +
+  geom_forecast(beerfit2, series="Naïve", plot.conf=FALSE) +
+  geom_forecast(beerfit3, series="Seasonal naïve", plot.conf=FALSE) +
+  xlab("Year") + ylab("Megalitres") +
+  ggtitle("Forecasts for quarterly beer production")  + 
+  guides(colour=guide_legend(title="Forecast"))
 ```
 
 
@@ -443,13 +435,13 @@ dj2 <- window(dj, end=250)
 djfc1 <- meanf(dj2, h=42)
 djfc2 <- rwf(dj2, h=42)
 djfc3 <- rwf(dj2, drift=TRUE, h=42)
-
-tmp <- cbind(Data=dj, Mean=djfc1$mean, Naïve=djfc2$mean, Drift=djfc3$mean)
-autoplot(tmp) + xlab("Day") + ylab("") +
+autoplot(dj) +
+  geom_forecast(djfc1, plot.conf=FALSE, series="Mean") +
+  geom_forecast(djfc2, plot.conf=FALSE, series="Naïve") +
+  geom_forecast(djfc3, plot.conf=FALSE, series="Drift") +
+  xlab("Day") + ylab("") +
   ggtitle("Dow Jones Index (daily ending 15 Jul 94)") +
-  scale_color_manual(values=c('#000000','#1b9e77','#d95f02','#7570b3'),
-                     breaks=c("Mean","Naïve","Drift"),
-                     name="Forecast Method")
+  guides(colour=guide_legend(title="Forecast"))
 ```
 
 ```r
@@ -589,7 +581,14 @@ Prediction intervals are computed for you when using any of the benchmark foreca
 ```{r djforecasts, echo=TRUE, cache=TRUE}
 naive(dj2)
 ```
-    
+
+When plotted, the prediction intervals are shown as shaded region, with the strength of color indicating the probability associated with the interval. 
+
+```{r djforecasts2, echo=TRUE, cache=TRUE}
+autoplot(naive(dj2))
+```
+
+
 ## The forecast package in R
 
 This book uses the facilities in the `forecast` package in R (which is loaded automatically whenever you load the `fpp` package). This appendix briefly summarizes some of the features of the package. Please refer to the help files for individual functions to learn more, and to see some examples of their use.

@@ -132,7 +132,7 @@ gridExtra::grid.arrange(p1,p2,p3,p4,ncol=2)
 A seasonal plot is similar to a time plot except that the data are plotted against the individual "seasons" in which the data were observed. An example is given below showing the antidiabetic drug sales.
 
 
-```{r, fig.cap="Seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%", cache=TRUE}
+```{r seasonplot1, fig.cap="Seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%", cache=TRUE}
 ggseasonplot(a10, year.labels=TRUE, year.labels.left=TRUE) +
   ylab("$ million") + ggtitle("Seasonal plot: antidiabetic drug sales")
 ```
@@ -141,11 +141,18 @@ These are exactly the same data as were shown earlier, but now the data from eac
 
 In this case, it is clear that there is a large jump in sales in January each year. Actually, these are probably sales in late December as customers stockpile before the end of the calendar year, but the sales are not registered with the government until a week or two later. The graph also shows that there was an unusually small number of sales in March 2008 (most other years show an increase between February and March). The small number of sales in June 2008 is probably due to incomplete counting of sales at the time the data were collected.
 
+A useful variation on the seasonal plot uses polar coordinates, as shown below.
+
+```{r seasonplot2, fig.cap="Seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%", cache=TRUE}
+ggseasonplot(a10, polar=TRUE) +
+  ylab("$ million") + ggtitle("Seasonal plot: antidiabetic drug sales")
+```
+
 ##Seasonal subseries plots
 
 An alternative plot that emphasises the seasonal patterns is where the data for each season are collected together in separate mini time plots.
 
-```{r, fig.cap="Seasonal subseries plot of monthly antidiabetic drug sales in Australia.", cache=TRUE}
+```{r subseriesplot, fig.cap="Seasonal subseries plot of monthly antidiabetic drug sales in Australia.", cache=TRUE}
 ggsubseriesplot(a10) + ylab("$ million") + 
   ggtitle("Seasonal subseries plot: antidiabetic drug sales")
 ```
@@ -263,7 +270,7 @@ Time series that show no autocorrelation are called "white noise". Figure \@ref(
 ```{r wnoise, fig.cap="A white noise time series.", cache=TRUE}
 set.seed(30)
 y <- ts(rnorm(50))
-autoplot(y, main="White noise")
+autoplot(y) + ggtitle("White noise")
 ```
 
 ```{r wnoiseacf, fig.cap="Autocorrelation function for the white noise series.", cache=TRUE}

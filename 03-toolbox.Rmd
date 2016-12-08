@@ -66,7 +66,9 @@ rwf(y, h, drift=TRUE)
 Figure \@ref(fig:beerf) shows the first three methods applied to the quarterly beer production data. 
 
 ```{r beerf, fig.cap="Forecasts of Australian quarterly beer production.", warning=FALSE, message=FALSE, cache=TRUE}
+# Set training data from 1992-2007
 beer2 <- window(ausbeer,start=1992,end=c(2007,4))
+# Plot some forecasts
 autoplot(beer2) +
   geom_forecast(meanf(beer2, h=11), plot.conf=FALSE, series="Mean") +
   geom_forecast(naive(beer2, h=11), plot.conf=FALSE, series="Naïve") +
@@ -79,7 +81,9 @@ autoplot(beer2) +
 In Figure \@ref(fig:djf), the non-seasonal methods were applied to a series of 250 days of the Dow Jones Index. 
 
 ```{r djf, fig.cap="Forecasts based on 250 days of the Dow Jones Index.", message=FALSE, warning=FALSE, cache=TRUE}
+# Set training data to first 250 days
 dj2 <- window(dj,end=250)
+# Plot some forecasts
 autoplot(dj2) + 
   geom_forecast(meanf(dj2, h=42), plot.conf=FALSE, series="Mean") +
   geom_forecast(rwf(dj2, h=42), plot.conf=FALSE, series="Naïve") +
@@ -245,7 +249,7 @@ autoplot(res) + xlab("Day") + ylab("") +
 gghistogram(res) + ggtitle("Histogram of residuals")
 ```
 
-```{r, fig.cap="ACF of the residuals from the naïve method applied to the Dow Jones Index. The lack of correlation suggesting the forecasts are good.", cache=TRUE}
+```{r, fig.cap="ACF of the residuals from the naïve method applied to the Dow Jones Index. The lack of correlation suggesting the forecasts are good.", cache=TRUE, fig.height=3}
 ggAcf(res) + ggtitle("ACF of residuals")
 ```
 

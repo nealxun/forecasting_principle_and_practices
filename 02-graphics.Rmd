@@ -143,9 +143,9 @@ In this case, it is clear that there is a large jump in sales in January each ye
 
 A useful variation on the seasonal plot uses polar coordinates, as shown below.
 
-```{r seasonplot2, fig.cap="Seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%", cache=TRUE}
+```{r seasonplot2, fig.cap="Polar seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%", cache=TRUE}
 ggseasonplot(a10, polar=TRUE) +
-  ylab("$ million") + ggtitle("Seasonal plot: antidiabetic drug sales")
+  ylab("$ million") + ggtitle("Polar seasonal plot: antidiabetic drug sales")
 ```
 
 ##Seasonal subseries plots
@@ -232,7 +232,7 @@ knitr::kable(beeracf, booktabs=TRUE,
 
 These correspond to the nine scatterplots in the graph above. The autocorrelation coefficients are normally plotted to form the *autocorrelation function* or ACF. The plot is also known as a *correlogram*.
 
-```{r beeracf, fig.cap="Autocorrelation function of quarterly beer production.", cache=TRUE}
+```{r beeracf, fig.cap="Autocorrelation function of quarterly beer production.", cache=TRUE, fig.height=3}
 ggAcf(beer2)
 ```
 
@@ -252,12 +252,12 @@ When data are seasonal, the autocorrelations will be larger for the seasonal lag
 When data are both trended and seasonal, you see a combination of these effects, as illustrated in Figure \@ref(fig:acfelec).
 
 
-```{r aelec, echo=TRUE, cache=TRUE, fig.cap="Monthly Australian electricity demand from 1980-1995."}
+```{r aelec, echo=TRUE, cache=TRUE, fig.cap="Monthly Australian electricity demand from 1980--1995."}
 aelec <- window(elec, start=1980)
 autoplot(aelec) + xlab("Year") + ylab("GWh")
 ```
 
-```{r acfelec, echo=TRUE, cache=TRUE, fig.cap="ACF of monthly Australian electricity demand."}
+```{r acfelec, echo=TRUE, cache=TRUE, fig.cap="ACF of monthly Australian electricity demand.", fig.height=3}
 ggAcf(aelec, lag=48)
 ```
 
@@ -273,7 +273,7 @@ y <- ts(rnorm(50))
 autoplot(y) + ggtitle("White noise")
 ```
 
-```{r wnoiseacf, fig.cap="Autocorrelation function for the white noise series.", cache=TRUE}
+```{r wnoiseacf, fig.cap="Autocorrelation function for the white noise series.", cache=TRUE, fig.height=3}
 ggAcf(y)
 ```
 

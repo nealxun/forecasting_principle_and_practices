@@ -75,7 +75,7 @@ autoplot(beer2) +
   geom_forecast(snaive(beer2, h=11), PI=FALSE, series="Seasonal naïve") +
   ggtitle("Forecasts for quarterly beer production") +
   xlab("Year") + ylab("Megalitres") + 
-  guides(colour=guide_legend(title="Forecast"))
+  guides(colour=guide_legend(title="Forecast")) + fppcols()
 ```
 
 In Figure \@ref(fig:djf), the non-seasonal methods were applied to a series of 250 days of the Dow Jones Index. 
@@ -90,7 +90,8 @@ autoplot(dj2) +
   geom_forecast(rwf(dj2, drift=TRUE, h=42), PI=FALSE, series="Drift") +
   ggtitle("Dow Jones Index (daily ending 15 Jul 94)") +
   xlab("Day") + ylab("") +
-  guides(colour=guide_legend(title="Forecast"))
+  guides(colour=guide_legend(title="Forecast")) + 
+  fppcols()
 ```
 
 Sometimes one of these simple methods will be the best forecasting method available; but in many cases, these methods will serve as benchmarks rather than the method of choice. That is, any forecasting methods we develop will be compared to these simple methods to ensure that the new method is better than these simple alternatives. If not, the new method is not worth considering.
@@ -405,9 +406,8 @@ autoplot(window(ausbeer, start=1992)) +
   geom_forecast(beerfit3, series="Seasonal naïve", PI=FALSE) +
   xlab("Year") + ylab("Megalitres") +
   ggtitle("Forecasts for quarterly beer production")  + 
-  guides(colour=guide_legend(title="Forecast"))
+  guides(colour=guide_legend(title="Forecast")) + fppcols()
 ```
-
 
 Figure \@ref(fig:beeraccuracy) shows three forecast methods applied to the quarterly Australian beer production using data only to the end of 2007. The actual values for the period 2008--2010 are also shown. We compute the forecast accuracy measures for this period.
 
@@ -445,7 +445,7 @@ autoplot(dj) +
   geom_forecast(djfc3, PI=FALSE, series="Drift") +
   xlab("Day") + ylab("") +
   ggtitle("Dow Jones Index (daily ending 15 Jul 94)") +
-  guides(colour=guide_legend(title="Forecast"))
+  guides(colour=guide_legend(title="Forecast")) + fppcols()
 ```
 
 ```r

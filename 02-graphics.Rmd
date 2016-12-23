@@ -51,9 +51,9 @@ In chapter ?? we will look at handling these types of multiple seasonality, with
 
 ##Time plots
 
-For time series data, the obvious graph to start with is a time plot. That is, the observations are plotted against the time of observation, with consecutive observations joined by straight lines. The figure below shows the weekly economy passenger load on Ansett Airlines between Australia's two largest cities.
+For time series data, the obvious graph to start with is a time plot. That is, the observations are plotted against the time of observation, with consecutive observations joined by straight lines. Figure \@ref(fig:ansett) below shows the weekly economy passenger load on Ansett Airlines between Australia's two largest cities.
 
-```{r fig.cap="Weekly economy passenger load on Ansett Airlines.", cache=TRUE}
+```{r ansett, fig.cap="Weekly economy passenger load on Ansett Airlines.", cache=TRUE}
 autoplot(melsyd[,"Economy.Class"]) +
   ggtitle("Economy class passengers: Melbourne-Sydney") +
   xlab("Year") + ylab("Thousands")
@@ -230,7 +230,7 @@ knitr::kable(beeracf, booktabs=TRUE,
              format.args=list(nsmall=3))
 ```
 
-These correspond to the nine scatterplots in the graph above. The autocorrelation coefficients are normally plotted to form the *autocorrelation function* or ACF. The plot is also known as a *correlogram*.
+These correspond to the nine scatterplots in Figure \@ref(fig:beerlagplot). The autocorrelation coefficients are normally plotted to form the *autocorrelation function* or ACF. The plot is also known as a *correlogram*.
 
 ```{r beeracf, fig.cap="Autocorrelation function of quarterly beer production.", cache=TRUE, fig.height=3}
 ggAcf(beer2)

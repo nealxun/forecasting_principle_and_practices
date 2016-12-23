@@ -1,7 +1,7 @@
 book_filename: "fpp"
 chapter_name: "Chapter "
 before_chapter_script: ["before-each-chapter.R"]
-rmd_files: ["index.Rmd" 
+rmd_files: ["index.Rmd"
  ,"01-intro.Rmd"
  ,"02-graphics.Rmd"
  ,"03-toolbox.Rmd"
@@ -11,7 +11,7 @@ rmd_files: ["index.Rmd"
  ,"07-exponential-smoothing.Rmd"
  ,"08-arima.Rmd"
  ,"09-dynamic-regression.Rmd"
- ,"10-hierarchical-forecasting.Rmd"
- ,"11-advanced.Rmd"
+# ,"10-hierarchical-forecasting.Rmd"
+# ,"11-advanced.Rmd"
  ,"references.Rmd"
 ]

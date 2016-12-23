@@ -324,13 +324,13 @@ autoplot(fc) +
 The resulting forecasts look sensible with increasing trend, and relatively wide prediction intervals reflecting the variation in the historical data. The prediction intervals are calculated using the methods described in Section \@ref(sec-7-ETS).
 
 
-##Holt-Winters seasonal method {#sec-7-Taxonomy}
+##Holt-Winters' seasonal method {#sec-7-Taxonomy}
 
-@Holt57 and @Winters60 extended Holt’s method to capture seasonality. The Holt-Winters seasonal method comprises the forecast equation and three smoothing equations --- one for the level $\ell_t$, one for trend $b_t$, and one for the seasonal component denoted by $s_t$, with smoothing parameters $\alpha$, $\beta^*$ and $\gamma$. We use $m$ to denote the period of the seasonality, i.e., the number of seasons in a year. For example, for quarterly data $m=4$, and for monthly data $m=12$.
+@Holt57 and @Winters60 extended Holt’s method to capture seasonality. The Holt-Winters seasonal method comprises the forecast equation and three smoothing equations --- one for the level $\ell_t$, one for the trend $b_t$, and one for the seasonal component $s_t$, with corresponding smoothing parameters $\alpha$, $\beta^*$ and $\gamma$. We use $m$ to denote the frequency of the seasonality, i.e., the number of seasons in a year. For example, for quarterly data $m=4$, and for monthly data $m=12$.
 
-There are two variations to this method that differ in the nature of the seasonal component. The additive method is preferred when the seasonal variations are roughly constant through the series, while the multiplicative method is preferred when the seasonal variations are changing proportional to the level of the series. With the additive method, the seasonal component is expressed in absolute terms in the scale of the observed series, and in the level equation the series is seasonally adjusted by subtracting the seasonal component. Within each year the seasonal component will add up to approximately zero. With the multiplicative method, the seasonal component is expressed in relative terms (percentages) and the series is seasonally adjusted by dividing through by the seasonal component. Within each year, the seasonal component will sum up to approximately $m$.
+There are two variations to this method that differ in the nature of the seasonal component. The additive method is preferred when the seasonal variations are roughly constant through the series, while the multiplicative method is preferred when the seasonal variations are changing proportional to the level of the series. With the additive method, the seasonal component is expressed in absolute terms in the scale of the observed series, and in the level equation the series is seasonally adjusted by subtracting the seasonal component. Within each year, the seasonal component will add up to approximately zero. With the multiplicative method, the seasonal component is expressed in relative terms (percentages), and the series is seasonally adjusted by dividing through by the seasonal component. Within each year, the seasonal component will sum up to approximately $m$.
 
-### Holt-Winters additive method {-}
+### Holt-Winters' additive method {-}
 
 The component form for the additive method is:
 \begin{align*}
@@ -347,11 +347,11 @@ $$
 $$
 If we substitute $\ell_t$ from the smoothing equation for the level of the component form above, we get
 $$
- s_{t} = \gamma^*(1-\alpha) (y_{t}-\ell_{t-1}-b_{t-1})+ [1-\gamma^*(1-\alpha)]s_{t-m}
+ s_{t} = \gamma^*(1-\alpha) (y_{t}-\ell_{t-1}-b_{t-1})+ [1-\gamma^*(1-\alpha)]s_{t-m},
 $$
-which is identical to the smoothing equation for the seasonal component we specify here with $\gamma=\gamma^*(1-\alpha)$. The usual parameter restriction is $0\le\gamma^*\le1$, which translates to $0\le\gamma\le 1-\alpha$.
+which is identical to the smoothing equation for the seasonal component we specify here, with $\gamma=\gamma^*(1-\alpha)$. The usual parameter restriction is $0\le\gamma^*\le1$, which translates to $0\le\gamma\le 1-\alpha$.
 
-### Holt-Winters multiplicative method {-}
+### Holt-Winters' multiplicative method {-}
 
 The component form for the multiplicative method is:
 \begin{align*}
@@ -363,30 +363,91 @@ The component form for the multiplicative method is:
 
 ### Example: International tourist visitor nights in Australia {-}
 
-In this example we employ the Holt-Winters method with both additive and multiplicative seasonality to forecast tourists visitor nights in Australia by international arrivals. Figure \@ref(fig:7-HW) shows the data and the forecasts for the period 2016Q1--2017Q4. The data show an obvious seasonal pattern with peaks observed in the March quarter of each year as this corresponds to the Australian summer.
+In this example we employ the Holt-Winters method with both additive and multiplicative seasonality to forecast quarterly visitor nights in Australia spent by international tourists. Figure \@ref(fig:7-HW) shows the data from 2005, and the forecasts for 2016--2017. The data show an obvious seasonal pattern, with peaks observed in the March quarter of each year, corresponding to the Australian summer.
 
-```{r 7-HW, fig.cap="Forecasting international visitor nights in Australia using Holt-Winters method with both additive and multiplicative seasonality.", echo=TRUE, cache=FALSE}
+```{r 7-HW, fig.cap="Forecasting international visitor nights in Australia using the Holt-Winters method with both additive and multiplicative seasonality.", echo=TRUE, cache=FALSE}
 aust <- window(austourists,start=2005)
 fit1 <- hw(aust,seasonal="additive")
 fit2 <- hw(aust,seasonal="multiplicative")
 autoplot(aust, series="Data") +
   geom_forecast(fit1, PI=FALSE, series="HW additive forecasts") +
   geom_forecast(fit2, PI=FALSE, series="HW multiplicative forecasts") +
-  xlab("Year") +
-  ylab("International visitor night in Australia (millions)") +
+  xlab("Year") + ylab("International visitor night in Australia (millions)") +
   fppcols()
-#    scale_color_manual(name="",
-#    values=c('#000000','#1b9e77','#d95f02'),
-#    breaks=c("Data","HW additive forecasts","HW multiplicative forecasts"))
 ```
 
-The application of the method with additive and multiplicative seasonality are presented in Tables \@ref(tbl-7-HWadd) and \@ref(tbl-7-HWmulti) respectively. The results show that the method with the multiplicative seasonality fits the data best. This was expected as the time plot shows the seasonal variation in the data increases as the level of the series increases. This is also reflected in the two sets of forecasts; the forecasts generated by the method with the multiplicative seasonality portray larger and increasing seasonal variation as the level of the forecasts increases compared to the forecasts generated by the method with additive seasonality.
+```{r tab75, echo=FALSE, cache=FALSE}
+# Set up matrix
+tab <- matrix(NA_real_, ncol=6, nrow=length(aust) + 4 + 8)
+# Add historical content
+tab[,1] <- c(-3:length(aust),1:8)
+tab[4+seq_along(aust),2] <- aust
+tab[1:NROW(fit1$model$states) + 3,3:5] <- fit1$model$states[,1:3]
+tab[1:3,5] <- fit1$model$states[1,4:6]
+tab[4+seq_along(aust),6] <- fitted(fit1)
+# Add forecasts
+tab[4+length(aust)+(1:8),1] <- 1:8
+tab[4+length(aust)+(1:8),6] <- fit1$mean
+# Column names
+colnames(tab) <- c("$t$","$y_t$","$\\ell_t$","$b_t$","$s_t$",
+                   "$\\hat{y}_t$")
+# Row names
+yr <- trunc(time(aust))
+yr <- seq(min(yr)-1,max(yr)+2)
+rownames(tab) <- paste(paste(rep(yr, rep(4,length(yr)))),
+                       rep(paste("Q",1:4,sep=""),(length(aust)+3)/4))
+# Convert to characters
+ctab <- as.data.frame(tab)
+class(ctab[,1]) <- "integer"
+ctab <- format(ctab, nsmall=2,digits=1)
+# Remove missing values
+ctab <- apply(ctab, 2, function(x){j <- grep("[ ]*NA",x); x[j] <- ""; return(x)})
+# Add math notation rows
+ctab <- rbind(head(ctab,length(aust)+4),
+              c("$h$",rep("",4), "$\\hat{y}_{T+h|T}$"),
+              tail(ctab,8))
+# Output
+knitr::kable(ctab, caption="Applying Holt-Winters' method with additive seasonality for forecasting international visitor nights in Australia. Notice that the additive seasonal component sums to approximately zero. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.250$, $\\beta^*=0.0069$, $\\gamma=0.456$ and RMSE$=1.786$).")
+```
 
-The smoothing parameters and initial estimates for the components have been estimated by minimizing SSE ($\alpha=0.025$, $\beta^*=0.023$, $\gamma=0$ and SSE$=60.27$, RMSE$=1.585$).
+```{r tab76, echo=FALSE, cache=FALSE}
+# Add historical content
+tab[1:NROW(fit2$model$states) + 3,3:5] <- fit2$model$states[,1:3]
+tab[1:3,5] <- fit2$model$states[1,4:6]
+tab[4+seq_along(aust),6] <- fitted(fit2)
+# Add forecasts
+tab[4+length(aust)+(1:8),6] <- fit2$mean
+# Convert to characters
+ctab <- as.data.frame(tab)
+class(ctab[,1]) <- "integer"
+ctab <- format(ctab, nsmall=2,digits=1)
+# Remove missing values
+ctab <- apply(ctab, 2, function(x){j <- grep("[ ]*NA",x); x[j] <- ""; return(x)})
+# Add math notation rows
+ctab <- rbind(head(ctab,length(aust)+4),
+              c("$h$",rep("",4), "$\\hat{y}_{T+h|T}$"),
+              tail(ctab,8))
+# Output
+knitr::kable(ctab,digits=2, caption="Applying Holt-Winters' method with multiplicative seasonality for forecasting international visitor nights in Australia. Notice that the multiplicative seasonal component sums to approximately $m=4$. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.479$, $\\beta^*=0.055$, $\\gamma=0.0001$ and RMSE$=1.590$).")
+```
 
-The smoothing parameters and initial estimates for the components have been estimated by minimizing SSE ($\alpha=0$, $\beta^*=0$ and $\gamma=0$ and SSE$=34.6$, RMSE$=1.201$).
+```{r checkhw, echo=FALSE, cache=FALSE}
+# Check numbers in table captions above
+if(sum(abs(fit1[["model"]][["par"]][1:3] - c(0.250, 0.0069*0.250, 0.456))) > 1e-3)
+  stop("HW additive parameters are wrong")
+if(sum(abs(fit2[["model"]][["par"]][1:3] - c(0.479, 0.055*0.479, 0.0001))) > 1e-3)
+  stop("HW multiplicative parameters are wrong")
+if(abs(accuracy(fit1$model)[1,"RMSE"] - 1.786) > 1e-3)
+  stop("HW additive RMSE is wrong")
+if(abs(accuracy(fit2$model)[1,"RMSE"] - 1.590) > 1e-3)
+  stop("HW multiplicative RMSE is wrong")
+```
 
-```{r fig-7-LevelTrendSeas, fig.cap="Estimated components for Holt-Winters method with additive and multiplicative seasonal components.", echo=FALSE, cache=FALSE}
+The applications of both methods (with additive and multiplicative seasonality) are presented in Tables \@ref(tab:tab75) and \@ref(tab:tab76) respectively. Because both methods have exactly the same number of parameters to estimate, we can compare the training RMSE from both models. In this case, the method with multiplicative seasonality fits the data best.  This was to be expected, as the time plot shows that the seasonal variation in the data increases as the level of the series increases. This is also reflected in the two sets of forecasts; the forecasts generated by the method with the multiplicative seasonality display larger and increasing seasonal variation as the level of the forecasts increases compared to the forecasts generated by the method with additive seasonality.
+
+The estimated states for both models are plotted in Figure \@ref(fig:fig-7-LevelTrendSeas). The small value of $\gamma$ for the multiplicative model means that the seasonal component hardly changes over time. The small value of $\beta^*$ for the additive model means the slope component hardly changes over time (check the vertical scale).
+
+```{r fig-7-LevelTrendSeas, fig.cap="Estimated components for the Holt-Winters method with additive and multiplicative seasonal components.", echo=FALSE, cache=FALSE}
 addstates <- fit1$model$states[,1:3]
 multstates <- fit2$model$states[,1:3]
 colnames(addstates) <- colnames(multstates) <-
@@ -398,36 +459,18 @@ p2 <- autoplot(multstates, facets=TRUE) + xlab("Year") +
 gridExtra::grid.arrange(p1,p2,ncol=2)
 ```
 
-```
-fit1$model$state[,1:3]
-fitted(fit1)
-fit1[["mean"]]
-```
+### Holt-Winters' damped method {-}
 
-```{r echo=FALSE, ecache=FALSE}
-tab7.5 <- cbind(-3:44,c(rep(NA,4),aust),
-        rbind(matrix(NA,3,3),
-        as.matrix(as.data.frame(fit1$model$states[,1:3]))),
-        c(rep(NA,4),fitted(fit1)))
-tab7.5[1:3,5] <- fit1$model$states[1,4:6]
-colnames(tab7.5) <- c("$t$","$y_t$","$\\ell_t$","$b_t$","$s_t$",
-                   "$\\hat{y}_t$")
-
-knitr::kable(tab7.5,digits=2)
-```
-
-### Holt-Winters damped method {-}
-
-A method that is often the single most accurate forecasting method for seasonal data is the Holt-Winters method with a damped trend and multiplicative seasonality:
+Damping is possible with both additive and multiplicative Holt-Winters' methods. A method that often provides accurate and robust forecasts for seasonal data is the Holt-Winters method with a damped trend and multiplicative seasonality:
 
 \begin{align*}
   \hat{y}_{t+h|t} &= \left[\ell_{t} + (\phi+\phi^2 + \dots + \phi^{h})b_{t}\right]s_{t-m+h_{m}^{+}}. \\
   \ell_{t} &= \alpha(y_{t} / s_{t-m}) + (1 - \alpha)(\ell_{t-1} + \phi b_{t-1})\\
   b_{t} &= \beta^*(\ell_{t} - \ell_{t-1}) + (1 - \beta^*)\phi b_{t-1}             \\
-  s_{t} &= \gamma \frac{y_{t}}{(\ell_{t-1} + \phi b_{t-1})} + (1 - \gamma)s_{t-m}
+  s_{t} &= \gamma \frac{y_{t}}{(\ell_{t-1} + \phi b_{t-1})} + (1 - \gamma)s_{t-m}.
 \end{align*}
 
-```
+```r
 hw(x, damped=TRUE, seasonal="multiplicative")
 ```
 
@@ -458,9 +501,9 @@ Some of these methods we have already seen:
 |(N,N)      |Simple exponential smoothing       |
 |(A,N)      |Holt's linear method               |
 |(Ad,N)     |Additive damped trend method       |
-|(A,A)      |Additive Holt-Winters method       |
-|(A,M)      |Multiplicative Holt-Winters method |
-|(Ad,M)     |Holt-Winters damped method         |
+|(A,A)      |Additive Holt-Winters' method       |
+|(A,M)      |Multiplicative Holt-Winters' method |
+|(Ad,M)     |Holt-Winters' damped method         |
 
 
 \begin{table*}[!t]
@@ -853,7 +896,7 @@ b_t &=b_{t-1} + \beta(\ell_{t-1} + b_{t_1})\varepsilon_t\\
 s_t &=  s_{t-m}(1+ \gamma \varepsilon_t).
 \end{align*}
 
-The parameter estimates are $\alpha=0.4504$, $\beta=0.0004$, and $\gamma=0.0046$. The output returns the estimates for the initial states $\ell_0$, $b_0$, $s_{0}$, $s_{-1}$, $s_{-2}$ and $s_{-3}.$ The training RMSE for this model is slightly lower than the Holt-Winter methods with additive and multiplicative seasonality presented in Tables \@ref(tbl-7-HWadd) and \@ref(tbl-7-HWmulti) respectively. Figure \@ref(fig-7-MAdMstates) shows the states over time while Figure \@ref(fig-7-MAdMforecasts) shows point forecasts and prediction intervals generated from the model. The intervals are much narrower than the prediction intervals in the oil production example.
+The parameter estimates are $\alpha=0.4504$, $\beta=0.0004$, and $\gamma=0.0046$. The output returns the estimates for the initial states $\ell_0$, $b_0$, $s_{0}$, $s_{-1}$, $s_{-2}$ and $s_{-3}.$ The training RMSE for this model is slightly lower than the Holt-Winters methods with additive and multiplicative seasonality presented in Tables \@ref(tbl-7-HWadd) and \@ref(tbl-7-HWmulti) respectively. Figure \@ref(fig-7-MAdMstates) shows the states over time while Figure \@ref(fig-7-MAdMforecasts) shows point forecasts and prediction intervals generated from the model. The intervals are much narrower than the prediction intervals in the oil production example.
 
 ```{r MAMstates, fig.cap="Graphical representation of the estimated states over time.", echo=TRUE, cache=FALSE}
 autoplot(fit)

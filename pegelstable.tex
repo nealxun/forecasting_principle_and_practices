@@ -1,0 +1,62 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fullpage}
+\usepackage{kpfonts,amsmath,booktabs}
+
+\def\damped{_\text{d}}
+\pagestyle{empty}
+
+\begin{document}
+
+\def\dampfactor{\phi_h}
+\begin{small}\fontsize{7.5}{10}\rmfamily\tabcolsep=0.1cm
+\begin{tabular}{clll} \toprule
+{\bf Trend}   & \multicolumn{3}{c}{\bf Seasonal} \\
+%\cmidrule{2-4}
+& \multicolumn{1}{c}{\bf N} &
+\multicolumn{1}{c}{\bf A}
+& \multicolumn{1}{c}{\bf M}\\
+\cmidrule{2-4}
+    & $\hat{y}_{t+h|t} = \ell_t$
+    & $\hat{y}_{t+h|t} = \ell_t + s_{t-m+h_m^+}$
+    & $\hat{y}_{t+h|t}= \ell_ts_{t-m+h_m^+}$      \\[0.1cm]
+{\bf N}
+    & $\ell_t = \alpha y_t + (1-\alpha) \ell_{t-1}$
+    & $\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha) \ell_{t-1}$
+    & $\ell_t = \alpha (y_t / s_{t-m}) + (1-\alpha) \ell_{t-1}$ \\
+    &
+    & $s_t = \gamma (y_t - \ell_{t-1}) + (1-\gamma) s_{t-m}$
+    & $s_t = \gamma (y_t / \ell_{t-1}) + (1-\gamma) s_{t-m}$                \\
+\midrule
+    & $\hat{y}_{t+h|t} = \ell_t+hb_t$
+    & $\hat{y}_{t+h|t} = \ell_t +hb_t +s_{t-m+h_m^+}$
+    & $\hat{y}_{t+h|t}= (\ell_t+hb_t)s_{t-m+h_m^+}$                         \\[0.1cm]
+{\bf A}
+    & $\ell_t = \alpha y_t + (1-\alpha) (\ell_{t-1}+b_{t-1})$
+    & $\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1}+b_{t-1})$
+    & $\ell_t = \alpha (y_t / s_{t-m}) + (1-\alpha)(\ell_{t-1}+b_{t-1})$    \\
+
+    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) b_{t-1}$
+    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) b_{t-1}$
+    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) b_{t-1}$             \\
+    &
+    & $s_t = \gamma (y_t - \ell_{t-1}-b_{t-1}) + (1-\gamma)s_{t-m}$
+    & $s_t = \gamma (y_t / (\ell_{t-1}+b_{t-1})) + (1-\gamma)s_{t-m}$\\
+\midrule
+    & $\hat{y}_{t+h|t} = \ell_t+\dampfactor b_t$
+    & $\hat{y}_{t+h|t} = \ell_t+\dampfactor b_t+s_{t-m+h_m^+}$
+    & $\hat{y}_{t+h|t}= (\ell_t+\dampfactor b_t)s_{t-m+h_m^+}$ \\[0.1cm]
+{\bf A$\damped$ }
+    & $\ell_t = \alpha y_t + (1-\alpha) (\ell_{t-1}+\phi b_{t-1})$
+    & $\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha) (\ell_{t-1}+\phi b_{t-1})$
+    & $\ell_t = \alpha (y_t / s_{t-m}) + (1-\alpha) (\ell_{t-1}+\phi b_{t-1})$\\
+    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) \phi b_{t-1}$
+    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) \phi b_{t-1}$
+    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) \phi b_{t-1}$\\
+    &
+    & $s_t = \gamma (y_t - \ell_{t-1}-\phi b_{t-1}) + (1-\gamma)s_{t-m}$
+    & $s_t = \gamma (y_t / (\ell_{t-1}+\phi b_{t-1})) + (1-\gamma)s_{t-m}$\\
+\bottomrule
+\end{tabular}\vspace{0.cm}
+\end{small}
+
+\end{document}

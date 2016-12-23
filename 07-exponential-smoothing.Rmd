@@ -476,22 +476,22 @@ hw(x, damped=TRUE, seasonal="multiplicative")
 
 ##A taxonomy of exponential smoothing methods {#sec-7-6-Taxonomy}
 
-Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combination of the trend and seasonal components, fifteen exponential smoothing methods are possible, listed in Table \@ref(tbl-7-classification). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (M,N) is the method with multiplicative trend and no seasonality; and so on.
-
-```{r, include=FALSE, echo=TRUE, cache=FALSE}
+Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combinations of the trend and seasonal components, nine exponential smoothing methods are possible, listed in Table \@ref(tab:taxonomy). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (M,N) is the method with multiplicative trend and no seasonality; and so on.
 
 
-```
+Table: (\#tab:taxonomy) A two-way classification of exponential smoothing methods.
 
-Table: A two way classification of exponential smoothing methods.
-
-|                      | Seasonal|Component   |                  |
-| Trend                | N       | A          | M                |
-| Component            | (None)  | (Additive) | (Multiplicative) |
-|:---------------------|:-------:|:----------:|:----------------:|
-| N (None)             | (N,N)   | (N,A)      | (N,M)            |
-| A (Additive)         | (A,N)   | (A,A)      | (A,M)            |
-| Ad (Additive damped) | (Ad,N)  | (Ad,A)     | (Ad,M)           |
++---------------------------------+-------------------+-------------------+--------------------+
+| Trend Component                 | Seasonal          | Component         |                    |
++=================================+===================+===================+====================+
+|                                 | N (None)          | A (Additive)      | M (Multiplicative) |
++---------------------------------+-------------------+-------------------+--------------------+
+| N (None)                        | (N,N)             | (N,A)             | (N,M)              |
++---------------------------------+-------------------+-------------------+--------------------+
+| A (Additive)                    | (A,N)             | (A,A)             | (A,M)              |
++---------------------------------+-------------------+-------------------+--------------------+
+| A<sub>d</sub> (Additive damped) | (A<sub>d</sub>,N) | (A<sub>d</sub>,A) | (A<sub>d</sub>)    |
++---------------------------------+-------------------+-------------------+--------------------+
 
 
 Some of these methods we have already seen:
@@ -506,66 +506,17 @@ Some of these methods we have already seen:
 |(Ad,M)     |Holt-Winters' damped method         |
 
 
-\begin{table*}[!t]
-\def\dampfactor{\phi_h}
-\begin{small}\fontsize{7.5}{10}\rmfamily\tabcolsep=0.1cm
-\begin{tabular}{clll} \toprule
-{\bf Trend}   & \multicolumn{3}{c}{\bf Seasonal} \\
-%\cmidrule{2-4}
-& \multicolumn{1}{c}{\bf N} &
-\multicolumn{1}{c}{\bf A}
-& \multicolumn{1}{c}{\bf M}\\
-\cmidrule{2-4}
-    & $\hat{y}_{t+h|t} = \ell_t$
-    & $\hat{y}_{t+h|t} = \ell_t + s_{t-m+h_m^+}$
-    & $\hat{y}_{t+h|t}= \ell_ts_{t-m+h_m^+}$      \\[0.1cm]
-{\bf N}
-    & $\ell_t = \alpha y_t + (1-\alpha) \ell_{t-1}$
-    & $\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha) \ell_{t-1}$
-    & $\ell_t = \alpha (y_t / s_{t-m}) + (1-\alpha) \ell_{t-1}$ \\
-    &
-    & $s_t = \gamma (y_t - \ell_{t-1}) + (1-\gamma) s_{t-m}$
-    & $s_t = \gamma (y_t / \ell_{t-1}) + (1-\gamma) s_{t-m}$                \\
-\midrule
-    & $\hat{y}_{t+h|t} = \ell_t+hb_t$
-    & $\hat{y}_{t+h|t} = \ell_t +hb_t +s_{t-m+h_m^+}$
-    & $\hat{y}_{t+h|t}= (\ell_t+hb_t)s_{t-m+h_m^+}$                         \\[0.1cm]
-{\bf A}
-    & $\ell_t = \alpha y_t + (1-\alpha) (\ell_{t-1}+b_{t-1})$
-    & $\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1}+b_{t-1})$
-    & $\ell_t = \alpha (y_t / s_{t-m}) + (1-\alpha)(\ell_{t-1}+b_{t-1})$    \\
+This type of classification was first proposed by @Pegels1969, who also included a method with a multiplicative trend. It was later extended by @Gar1985 to include methods with an additive damped trend and by @Taylor2003 to include methods with a multiplicative damped trend. We do not consider the multiplicative trend methods in this book as they tend to produce poor forecasts. See @expsmooth for a more thorough discussion of all exponential smoothing methods.
 
-    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) b_{t-1}$
-    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) b_{t-1}$
-    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) b_{t-1}$             \\
-    &
-    & $s_t = \gamma (y_t - \ell_{t-1}-b_{t-1}) + (1-\gamma)s_{t-m}$
-    & $s_t = \gamma (y_t / (\ell_{t-1}+b_{t-1})) + (1-\gamma)s_{t-m}$\\
-\midrule
-    & $\hat{y}_{t+h|t} = \ell_t+\dampfactor b_t$
-    & $\hat{y}_{t+h|t} = \ell_t+\dampfactor b_t+s_{t-m+h_m^+}$
-    & $\hat{y}_{t+h|t}= (\ell_t+\dampfactor b_t)s_{t-m+h_m^+}$ \\[0.1cm]
-{\bf A$\damped$ }
-    & $\ell_t = \alpha y_t + (1-\alpha) (\ell_{t-1}+\phi b_{t-1})$
-    & $\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha) (\ell_{t-1}+\phi b_{t-1})$
-    & $\ell_t = \alpha (y_t / s_{t-m}) + (1-\alpha) (\ell_{t-1}+\phi b_{t-1})$\\
-    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) \phi b_{t-1}$
-    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) \phi b_{t-1}$
-    & $b_t = \beta^* (\ell_t-\ell_{t-1}) + (1-\beta^*) \phi b_{t-1}$\\
-    &
-    & $s_t = \gamma (y_t - \ell_{t-1}-\phi b_{t-1}) + (1-\gamma)s_{t-m}$
-    & $s_t = \gamma (y_t / (\ell_{t-1}+\phi b_{t-1})) + (1-\gamma)s_{t-m}$\\
-\bottomrule
-\end{tabular}\vspace{0.cm}
-\end{small}
+Table \@ref(tab:pegels) gives the recursive formulae for applying the nine exponential smoothing methods in Table \@ref(tab:taxonomy). Each cell includes the forecast equation for generating $h$-step-ahead forecasts, and the smoothing equations for applying the method.
 
+Table: (\#tab:pegels) Formulae for recursive calculations and point forecasts. In each case, $\ell_t$ denotes the series level at time $t$, $b_t$ denotes the slope at time $t$, $s_t$ denotes the seasonal component of the series at time $t$, and $m$ denotes the number of seasons in a year; $\alpha$, $\beta^*$, $\gamma$ and $\phi$ are smoothing parameters, $\phi_h = \phi+\phi^2+\dots+\phi^{h}$ and $h_m^+ = \lfloor(h-1) \text{ mod } m\rfloor + 1$.
 
-Table : Formulae for recursive calculations and point forecasts. In each case, $\ell_t$ denotes the series level at time $t$, $b_t$ denotes the slope at time $t$, $s_t$ denotes the seasonal component of the series at time $t$, and $m$ denotes the number of seasons in a year; $\alpha$, $\beta^*$, $\gamma$ and $\phi$ are smoothing parameters, $\phi_h = \phi+\phi^2+\dots+\phi^{h}$ and $h_m^+ = \lfloor(h-1) \text{~mod~} m\rfloor + 1$.
-
-This type of classification was proposed by Pegels (1969). It was later extended by Gardner (1985) to include methods with additive damped trend and by Taylor (2003) to include methods with multiplicative damped trend. We do not consider the multiplicative trend methods in this book as they tend to produce poor forecasts. See Hyndman et al (2008) for a
-more thorough discussion of all exponential smoothing methods.
-
-Table \@ref(tbl-7-pegels) gives the recursive formulae for applying all nine possible exponential smoothing methods. Each cell includes the forecast equation for generating $h$-step-ahead forecasts and the smoothing equations for applying the method.
+------------------------------------
+```{r, echo=FALSE, cache=FALSE}
+knitr::include_graphics("pegelstable.png")
+```
+------------------------------------
 
 ##Innovations state space models for exponential smoothing {#sec-7-ETS}
 
@@ -575,7 +526,7 @@ Each model consists of a measurement equation that describes the observed data a
 
 For each method there exist two models: one with additive errors and one with multiplicative errors. The point forecasts produced by the models are identical if they use the same smoothing parameter values. They will, however, generate different prediction intervals.
 
-To distinguish between a model with additive errors and one with multiplicative errors (and to also distinguish the models from the methods) we add a third letter to the classification of Table \@ref(tbl-7-classification). We label each state space model as ETS($\cdot,\cdot,\cdot$) for (Error, Trend, Seasonal). This label can also be thought of as ExponenTial Smoothing. Using the same notation as in Table \@ref(tbl-7-classification), the possibilities for each component are: Error $=\{$A,M$\}$, Trend $=\{$N,A,A$\}$ and Seasonal $=\{$N,A,M$\}$. Therefore, in total there exist 18 such state space models: 9 with additive errors and 9 with multiplicative errors.
+To distinguish between a model with additive errors and one with multiplicative errors (and to also distinguish the models from the methods) we add a third letter to the classification of Table \@ref(tab:taxonomy). We label each state space model as ETS($\cdot,\cdot,\cdot$) for (Error, Trend, Seasonal). This label can also be thought of as ExponenTial Smoothing. Using the same notation as in Table \@ref(tab:taxonomy), the possibilities for each component are: Error $=\{$A,M$\}$, Trend $=\{$N,A,A$\}$ and Seasonal $=\{$N,A,M$\}$. Therefore, in total there exist 18 such state space models: 9 with additive errors and 9 with multiplicative errors.
 
 ### ETS(A,N,N): simple exponential smoothing with additive errors {-}
 

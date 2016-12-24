@@ -1,0 +1,119 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fullpage}
+\usepackage{kpfonts,amsmath,booktabs}
+
+\def\damped{_\text{d}}
+\pagestyle{empty}
+
+\begin{document}
+
+\def\dampfactor{\phi_h}
+\def\damped{$_{\text{d}}$}
+
+\begin{small}\fontsize{7.9}{10}\rmfamily\tabcolsep=0.1cm
+\begin{tabular}{clll}
+\multicolumn{4}{l}{\it ADDITIVE ERROR MODELS}\\
+\toprule
+\bf Trend & \multicolumn{3}{c}{\bf Seasonal} \\
+ & \multicolumn{1}{c}{\bf N}
+ & \multicolumn{1}{c}{\bf A}
+ & \multicolumn{1}{c}{\bf M} \\
+\cmidrule{2-4}
+{\bf N}
+    & $y_{t} = \ell_{t-1}+\varepsilon_t$
+    & $y_{t} = \ell_{t-1} + s_{t-m}+\varepsilon_t$
+    & $y_{t} = \ell_{t-1} s_{t-m}+\varepsilon_t$ \\
+    & $\ell_t = \ell_{t-1} + \alpha  \varepsilon_t$
+    & $\ell_t = \ell_{t-1} + \alpha  \varepsilon_t$
+    & $\ell_t = \ell_{t-1} + \alpha  \varepsilon_t/s_{t-m}$ \\
+    &&$s_t = s_{t-m} + \gamma  \varepsilon_t$
+    & $s_t = s_{t-m} + \gamma  \varepsilon_t/\ell_{t-1}$
+\\
+\midrule
+    & $y_{t} = \ell_{t-1} + b_{t-1}+\varepsilon_t$
+    & $y_{t} = \ell_{t-1} + b_{t-1} + s_{ t-m}+\varepsilon_t$
+    & $y_{t} = (\ell_{t-1}+b_{t-1})s_{t-m}+\varepsilon_t$ \\
+{\bf A}
+    & $\ell_t = \ell_{t-1} + b_{t-1} + \alpha  \varepsilon_t$
+    & $\ell_t = \ell_{t-1} + b_{t-1} + \alpha  \varepsilon_t$
+    & $\ell_t = \ell_{t-1} + b_{t-1} + \alpha
+    \varepsilon_t/s_{t-m}$ \\
+    & $b_t = b_{t-1} + \beta  \varepsilon_t$
+    & $b_t = b_{t-1} + \beta  \varepsilon_t$
+    & $b_t = b_{t-1} + \beta  \varepsilon_t/s_{t-m}$ \\
+    &
+    & $s_t =  s_{t-m} + \gamma  \varepsilon_t$
+    & $s_t =  s_{t-m} + \gamma  \varepsilon_t/(\ell_{t-1}+b_{t-1})$
+\\
+\midrule
+    & $y_{t} =  \ell_{t-1} + \phi b_{t-1}+\varepsilon_t$
+    & $y_{t} =  \ell_{t-1} + \phi b_{t-1} + s_{t-m}+\varepsilon_t$
+    & $y_{t} = (\ell_{t-1} + \phi b_{t-1})s_{t-m}+\varepsilon_t$ \\
+{\bf A\damped }
+    & $\ell_t = \ell_{t-1} + \phi b_{t-1} + \alpha  \varepsilon_t$
+    & $\ell_t = \ell_{t-1} + \phi b_{t-1} + \alpha  \varepsilon_t$
+    & $\ell_t = \ell_{t-1} + \phi b_{t-1} + \alpha
+    \varepsilon_t/s_{t-m}$ \\
+    & $b_t = \phi b_{t-1} + \beta  \varepsilon_t$
+    & $b_t = \phi b_{t-1} + \beta  \varepsilon_t$
+    & $b_t = \phi b_{t-1} + \beta  \varepsilon_t/s_{t-m}$ \\
+    &
+    & $s_t =  s_{t-m} + \gamma  \varepsilon_t$
+    & $s_t =  s_{t-m} + \gamma  \varepsilon_t/(\ell_{t-1}+\phi
+    b_{t-1})$
+\\
+\bottomrule\\
+\multicolumn{4}{l}{\it MULTIPLICATIVE ERROR MODELS}\\
+\toprule
+\bf Trend & \multicolumn{3}{c}{\bf Seasonal} \\
+ & \multicolumn{1}{c}{\bf N}
+ & \multicolumn{1}{c}{\bf A}
+ & \multicolumn{1}{c}{\bf M} \\
+\cmidrule{2-4}
+{\bf N}
+    & $y_{t} = \ell_{t-1}(1 + \varepsilon_t)$
+    & $y_{t} = (\ell_{t-1} + s_{t-m})(1 + \varepsilon_t)$
+    & $y_{t} = \ell_{t-1} s_{t-m}(1 + \varepsilon_t)$ \\
+    & $\ell_t = \ell_{t-1}(1 + \alpha \varepsilon_t)$
+    & $\ell_t = \ell_{t-1} + \alpha(\ell_{t-1} + s_{t-m})
+    \varepsilon_t$
+    & $\ell_t = \ell_{t-1}(1 + \alpha \varepsilon_t)$ \\
+    &&$s_t = s_{t-m} + \gamma  (\ell_{t-1} + s_{t-m})\varepsilon_t$
+    & $s_t = s_{t-m}(1 + \gamma  \varepsilon_t)$
+\\
+\midrule
+    & $y_{t} = (\ell_{t-1} + b_{t-1})(1 + \varepsilon_t)$
+    & $y_{t} = (\ell_{t-1} + b_{t-1} + s_{ t-m})(1 + \varepsilon_t)$
+    & $y_{t} = (\ell_{t-1}+b_{t-1})s_{t-m}(1 + \varepsilon_t)$ \\
+{\bf A}
+    & $\ell_t = (\ell_{t-1} + b_{t-1})(1 + \alpha  \varepsilon_t)$
+    & $\ell_t = \ell_{t-1} + b_{t-1} + \alpha (\ell_{t-1} + b_{t-1}+ s_{ t-m}) \varepsilon_t$
+    & $\ell_t = (\ell_{t-1} + b_{t-1})(1 + \alpha\varepsilon_t)$ \\
+    & $b_t = b_{t-1} + \beta (\ell_{t-1} + b_{t-1}) \varepsilon_t$
+    & $b_t = b_{t-1} + \beta (\ell_{t-1} + b_{t-1} + s_{ t-m})\varepsilon_t$
+    & $b_t = b_{t-1} + \beta (\ell_{t-1}+b_{t-1})\varepsilon_t$ \\
+    &
+    & $s_t =  s_{t-m} + \gamma (\ell_{t-1} + b_{t-1} + s_{ t-m})\varepsilon_t$
+    & $s_t =  s_{t-m}(1 + \gamma \varepsilon_t)$
+\\
+\midrule
+    & $y_{t} =  (\ell_{t-1} + \phi b_{t-1})(1 + \varepsilon_t)$
+    & $y_{t} =  (\ell_{t-1} + \phi b_{t-1} + s_{t-m})(1 + \varepsilon_t)$
+    & $y_{t} = (\ell_{t-1} + \phi b_{t-1})s_{t-m}(1 + \varepsilon_t)$ \\
+{\bf A\damped }
+    & $\ell_t = (\ell_{t-1} + \phi b_{t-1})(1 + \alpha \varepsilon_t)$
+    & $\ell_t = \ell_{t-1} + \phi b_{t-1} + \alpha (\ell_{t-1}+ \phi b_{t-1} + s_{t-m}) \varepsilon_t$
+    & $\ell_t = (\ell_{t-1} + \phi b_{t-1})(1 + \alpha \varepsilon_t)$ \\
+    & $b_t = \phi b_{t-1} + \beta(\ell_{t-1} + \phi b_{t-1})\varepsilon_t$
+    & $b_t = \phi b_{t-1} + \beta  (\ell_{t-1} + \phi b_{t-1} +s_{t-m})\varepsilon_t$
+    & $b_t = \phi b_{t-1} + \beta (\ell_{t-1} + \phi b_{t-1})\varepsilon_t$ \\
+    &
+    & $s_t =  s_{t-m} + \gamma (\ell_{t-1} + \phi b_{t-1} + s_{t-m})\varepsilon_t$
+    & $s_t =  s_{t-m}(1+ \gamma \varepsilon_t)$
+\\
+\bottomrule
+\end{tabular}\vspace{0.5cm}
+\end{small}
+
+
+\end{document}

@@ -184,7 +184,7 @@ autoplot(fc) +
 
 The forecasts for the period 2014--2018 are plotted in Figure \@ref(fig:ses). Also plotted are one-step-ahead fitted values alongside the data over the period 1996--2013. The large value of $\alpha$ in this example is reflected in the large adjustment that takes place in the estimated level $\ell_t$ at each time. A smaller value of $\alpha$ would lead to smaller changes over time, and so the series of fitted values would be smoother.
 
-The prediction intervals shown here are calculated using the methods described in Section \@ref(sec-7-ETS). They show that there is considerable uncertainty in the future values of oil production over the five-year forecast period.
+The prediction intervals shown here are calculated using the methods described in Section \@ref(sec-7-ETS). The prediction intervals show that there is considerable uncertainty in the future values of oil production over the five-year forecast period. So interpreting the point forecasts without accounting for the large uncertainty can be very misleading.
 
 ## Trend methods
 
@@ -646,7 +646,9 @@ Models with multiplicative errors are useful when the data are strictly positive
 
 ### The `ets()` function in R {-}
 
-The models can be estimated in R using the `ets()` function in the forecast package. The R code below shows all the possible arguments this function takes, and their default values. If only the time series is specified, and all other arguments are left at their default values, then an appropriate model will be selected automatically. We explain the most important arguments below. See the help file for a more complete description.
+The models can be estimated in R using the `ets()` function in the forecast package.  Unlike the `ses`, `holt` and `hw` functions, the `ets` function does not produce forecasts. Rather, it estimates the model parameters and returns information about the fitted model.
+
+The R code below shows all the possible arguments this function takes, and their default values. If only the time series is specified, and all other arguments are left at their default values, then an appropriate model will be selected automatically. We explain the most important arguments below. See the help file for a more complete description.
 
 ```r
 ets(y, model="ZZZ", damped=NULL, alpha=NULL, beta=NULL, gamma=NULL,
@@ -702,12 +704,14 @@ Therefore, $\hat{y}_{T+2|T}= \ell_{T}+2b_{T},$ and so on. These forecasts are id
 
 A big advantage of the models is that prediction intervals can also be generated --- something that cannot be done using the methods. The prediction intervals will differ between models with additive and multiplicative methods.
 
-For some models, there are exact formulae that enable prediction intervals to be calculated. A more general approach that works for all models is to simulate future sample paths, conditional on the last estimate of the states, and to obtain prediction intervals from the percentiles of these simulated future paths. These options are available in R using the `forecast` function in the forecast package. The R code below shows the all the possible arguments this function takes when applied to an ETS model. We explain each the arguments in what follows.
+For some models, there are exact formulae that enable prediction intervals to be calculated (see @expsmooth for the formulas). A more general approach that works for all models is to simulate future sample paths, conditional on the last estimate of the states, and to obtain prediction intervals from the percentiles of these simulated future paths.
 
-```
-forecast(object, h=ifelse(object[["m"]]\>1, 2\*object[["m"]], 10),
+To obtain forecasts from an ETS model, we use the `forecast` function. The R code below shows the all the possible arguments this function takes when applied to an ETS model. We explain each the arguments in what follows.
+
+```r
+forecast(object, h=ifelse(object$m>1, 2*object$m, 10),
 level=c(80,95), fan=FALSE, simulate=FALSE, bootstrap=FALSE, npaths=5000,
-PI=TRUE, lambda=object[["lambda"]], ...)
+PI=TRUE, lambda=object$lambda, biasadj=NULL, ...)
 ```
 
 object
@@ -732,21 +736,13 @@ npaths
 :   The number of sample paths used in computing simulated prediction intervals.
 
 PI
-:   If `PI=TRUE`, then prediction intervals are produced; otherwise only point forecasts are calculated. If `PI=FALSE`, then `level`, `fan`, `simulate`, `bootstrap` and `npaths` are all ignored.
+:   If `PI=TRUE`, then prediction intervals are produced; otherwise only point forecasts are calculated.
 
 lambda
 :   The Box-Cox transformation parameter. This is ignored if `lambda=NULL`. Otherwise, forecasts are back-transformed via an inverse Box-Cox transformation.
 
-### Example: Oil production example (revisited) {-}
-
-Figure \@ref(fig-7-Oil) shows the point forecasts and prediction intervals from an estimated ETS(A,N,N) model. The estimates for the smoothing parameter $\alpha$ and the initial level $\ell_0$ are 0.89 and 447.49 respectively, identical to the estimates for the simple exponential smoothing method estimated earlier (see beginning of Example \@ref(ex:7-SES)). The plot shows the importance of generating prediction intervals. The intervals here are relatively wide, so interpreting the point forecasts without accounting for the large uncertainty can be very misleading.
-
-```{r, 7-oil-b, fig.cap="Point forecasts and 80% and 95% prediction intervals from model ETS(A,N,N).", echo=TRUE, cache=FALSE}
-oildata <- window(oil,start=1996)
-fit <- ets(oildata, model="ANN")
-autoplot(forecast(fit, h=3)) + xlab("Year") + ylab("Oil (millions of tonnes)")
-fit[["par"]]
-```
+biasadj
+:   If `lambda` is not `NULL`, the backtransformed forecasts (and prediction intervals) are bias-adjusted.
 
 ### Example: International tourist visitor nights in Australia {-}
 
@@ -767,7 +763,9 @@ b_t &=b_{t-1} + \beta(\ell_{t-1} + b_{t_1})\varepsilon_t\\
 s_t &=  s_{t-m}(1+ \gamma \varepsilon_t).
 \end{align*}
 
-The parameter estimates are $\alpha=0.4504$, $\beta=0.0004$, and $\gamma=0.0046$. The output returns the estimates for the initial states $\ell_0$, $b_0$, $s_{0}$, $s_{-1}$, $s_{-2}$ and $s_{-3}.$ The training RMSE for this model is slightly lower than the Holt-Winters methods with additive and multiplicative seasonality presented in Tables \@ref(tbl-7-HWadd) and \@ref(tbl-7-HWmulti) respectively. Figure \@ref(fig-7-MAdMstates) shows the states over time while Figure \@ref(fig-7-MAdMforecasts) shows point forecasts and prediction intervals generated from the model. The intervals are much narrower than the prediction intervals in the oil production example.
+The parameter estimates are $\alpha=`r format(fit$par[1],nsmall=4,digits=4)`$, $\beta=`r format(fit$par[2],nsmall=4,digits=4, scientific=FALSE)`$, and $\gamma=`r format(fit$par[3],digits=4,nsmall=4, scientific=FALSE)`$. The output also returns the estimates for the initial states $\ell_0$, $b_0$, $s_{0}$, $s_{-1}$, $s_{-2}$ and $s_{-3}.$ The training RMSE for this model is slightly lower than the Holt-Winters methods with additive and multiplicative seasonality presented in Tables \@ref(tbl-7-HWadd) and \@ref(tbl-7-HWmulti) respectively. Although this model gives equivalent point forecasts to a multiplicative Holt-Winters' method, the parameters have been estimated differently. With the `ets()` function, the default estimation method is maximum likelihood rather than minimum sum of squares.
+
+Figure \@ref(fig:MAMstates) shows the states over time while Figure \@ref(fig:MAMforecasts) shows point forecasts and prediction intervals generated from the model. The small values of $\beta$ and $\gamma$ mean that the slope and seasonal components change very little over time. The narrow prediction intervals indicate that the series is relatively easy to forecast due to the strong trend and seasonality.
 
 ```{r MAMstates, fig.cap="Graphical representation of the estimated states over time.", echo=TRUE, cache=FALSE}
 autoplot(fit)

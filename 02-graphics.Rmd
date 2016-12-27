@@ -312,8 +312,10 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
     Use the help files to find out what the series are.
 
+3. The `arrivals` data set comprises quarterly international arrivals (in thousands) to Australia from Japan, New Zealand, UK and the US. Use `autoplot` and `ggseasonplot` and compare the differences between the arrivals from these four countries. Can  you identify any unusual observations? 
 
-3. The following time plots and ACF plots correspond to four different time series. Your task is to match each  time plot in the first row with one of the ACF plots in the second row.
+
+4. The following time plots and ACF plots correspond to four different time series. Your task is to match each  time plot in the first row with one of the ACF plots in the second row.
 
     ```{r acfguess, fig.height=6, fig.width=12, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
     tp1 <- autoplot(cowtemp) + xlab("") + ylab("chirps per minute") +

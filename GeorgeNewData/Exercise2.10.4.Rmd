@@ -1,0 +1,36 @@
+## Exercises {#ex:graphics}
+
+[//]: I am guessing this can be the second exercise - I have just labelled it as 2.10.4 only for the moment. Maybe we can add the data as ts() object in FPP2
+
+The csv file Exercise2.10.4.csv contains quartely international arrivals from four source countries to Australia: Japan, New Zealand, UK and the US. Use `autoplot`, `ggseasonplot`, `ggsubseriesplot` and compare the differences between the arrivals from these four countries. Can  you identify any unusual observations? 
+
+
+```{r, echo=FALSE, cache=TRUE}
+setwd("C:/George/FPP2/GeorgeNewData")
+
+data <- read.csv("Exercise2.10.4.csv")
+data$X=seq(as.Date("1981-01-31"), by = "quarter", length = nrow(data))
+df.data <- melt(data,id="X")
+
+ggplot(df.data) + geom_line(aes(x=X, y=value, color=variable))+
+  facet_wrap( ~ variable, scales="free",ncol=2) +
+  xlab("Year") + ylab("") + theme(legend.position="none")+
+  geom_vline(xintercept = 20)
+
+y <- ts(data[,-1], frequency=4, start=c(1981,1))
+
+autoplot(y, facet=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Total quarterly arrivals to Australia")
+
+# I could not work out how to do multiple seas or subser plots
+  ggseasonplot(y[,1], year.labels=TRUE, year.labels.left=TRUE)+ ylab("")+ggtitle("Japan")
+  ggseasonplot(y[,2], year.labels=TRUE, year.labels.left=TRUE)+ ylab("")+ggtitle("New Zealand")
+  ggseasonplot(y[,3], year.labels=TRUE, year.labels.left=TRUE)+ ylab("")+ggtitle("UK")
+  ggseasonplot(y[,4], year.labels=TRUE, year.labels.left=TRUE)+ ylab("")+ggtitle("US")
+  
+  ggsubseriesplot(y[,1], year.labels=TRUE, year.labels.left=TRUE)+ ylab("")+ggtitle("Japan")
+  ggsubseriesplot(y[,2], year.labels=TRUE, year.labels.left=TRUE)+ ylab("")+ggtitle("New Zealand")
+  ggsubseriesplot(y[,3], year.labels=TRUE, year.labels.left=TRUE)+ ylab("")+ggtitle("UK")
+  ggsubseriesplot(y[,4], year.labels=TRUE, year.labels.left=TRUE)+ ylab("")+ggtitle("US")
+```

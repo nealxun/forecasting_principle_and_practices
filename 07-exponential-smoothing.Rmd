@@ -782,76 +782,71 @@ autoplot(forecast(fit,h=8)) +
 hardcover books at the same store. The task is to forecast the next four
 days’ sales for paperback and hardcover books (data set `books`).
 
- a. Plot the series and discuss the main features of the data.
+    a. Plot the series and discuss the main features of the data.
 
- b. Use simple exponential smoothing with the `ses` function (setting `initial="simple"`) and explore different values of $\alpha$ for the `paperback` series. Record the within-sample SSE for the one-step forecasts. Plot SSE against $\alpha$ and find which value of $\alpha$ works best. What is the effect of $\alpha$ on the forecasts?
+    b. Use the `ses` function to forecast each series, and plot the forecasts.
 
- c. Now let `ses` select the optimal value of $\alpha$. Use this value to generate forecasts for the next four days. Compare your results with (\@ref(1b)).
+    c. Compute the RMSE values for the training data in each case.
 
- d. Repeat but with `initial="optimal"`. How much difference does an optimal initial level make?
-
-Repeat steps (b)--(d) with the `hardcover` series.
 
 2.
-  a. Apply Holt’s linear method to the `paperback` and `hardback` series and compute four-day forecasts in each case.
+    a. Apply Holt’s linear method to the `paperback` and `hardback` series and compute four-day forecasts in each case.
 
-  b. Compare the SSE measures of Holt’s method for the two series to those of simple exponential smoothing in the previous question. Discuss the merits of the two forecasting methods for these data sets.
+    b. Compare the RMSE measures of Holt’s method for the two series to those of simple exponential smoothing in the previous question. (Remember that Holt's method is using one more parameter than SES.) Discuss the merits of the two forecasting methods for these data sets.
 
-  c. Compare the forecasts for the two series using both methods. Which do you think is best?
+    c. Compare the forecasts for the two series using both methods. Which do you think is best?
 
-  d. Calculate a 95% prediction interval for the first forecast for each series using both methods, assuming normal errors. Compare your forecasts with those produced by R.
+    d. Calculate a 95% prediction interval for the first forecast for each series, using the RMSE values and assuming normal errors. Compare your intervals with those produced by R.
 
-3. For this exercise, use the price of a dozen eggs in the United States from 1900--1993 (data set `eggs`). Experiment with the various options in the `holt()` function to see how much the forecasts change with damped or exponential trend. Also try changing the parameter values for $\alpha$ and $\beta$ to see how they affect the forecasts. Try to develop an intuition of what each parameter and argument is doing to the forecasts.
+3. For this exercise, use the price of a dozen eggs in the United States from 1900--1993 (data set `eggs`). Experiment with the various options in the `holt()` function to see how much the forecasts change with damped trend, or with a Box-Cox transformation. Try to develop an intuition of what each argument is doing to the forecasts.
 
-[Hint: use `h=100` when calling `holt()` so you can clearly see the differences between the various options when plotting the forecasts.]
+    [Hint: use `h=100` when calling `holt()` so you can clearly see the differences between the various options when plotting the forecasts.]
 
-Which model gives the best RMSE?
+    Which model gives the best RMSE?
 
 4. For this exercise, use the quarterly UK passenger vehicle production data from 1977:1--2005:1 (data set `ukcars`).
 
- a. Plot the data and describe the main features of the series.
+    a. Plot the data and describe the main features of the series.
 
- b. Decompose the series using STL and obtain the seasonally adjusted data.
+    b. Decompose the series using STL and obtain the seasonally adjusted data.
 
- c. Forecast the next two years of the series using an additive damped trend method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of the one-step forecasts from your method.
+    c. Forecast the next two years of the series using an additive damped trend method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of the one-step forecasts from your method.
 
- d. Forecast the next two years of the series using Holt’s linear method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of of the one-step forecasts from your method.
+    d. Forecast the next two years of the series using Holt’s linear method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of of the one-step forecasts from your method.
 
- e. Now use `ets()` to choose a seasonal model for the data.
+    e. Now use `ets()` to choose a seasonal model for the data.
 
- f. Compare the RMSE of the fitted model with the RMSE of the model you obtained using an STL decomposition with Holt’s method. Which gives the better in-sample fits?
+    f. Compare the RMSE of the fitted model with the RMSE of the model you obtained using an STL decomposition with Holt’s method. Which gives the better in-sample fits?
 
- g. Compare the forecasts from the two approaches? Which seems most reasonable?
+    g. Compare the forecasts from the two approaches? Which seems most reasonable?
 
 
 5. For this exercise, use the monthly Australian short-term overseas visitors data, May 1985--April 2005. (Data set: `visitors`.)
 
- a. Make a time plot of your data and describe the main features of the series.
+    a. Make a time plot of your data and describe the main features of the series.
 
- b. Forecast the next two years using Holt-Winters’ multiplicative method.
+    b. Forecast the next two years using Holt-Winters’ multiplicative method.
 
- c. Why is multiplicative seasonality necessary here?
+    c. Why is multiplicative seasonality necessary here?
 
- d. Experiment with making the trend exponential and/or damped.
+    d. Experiment with making the trend exponential and/or damped.
 
- e. Compare the RMSE of the one-step forecasts from the various methods. Which do you prefer?
+    e. Compare the RMSE of the one-step forecasts from the various methods. Which do you prefer?
 
- g. Now fit each of the following models to the same data:
+    g. Now fit each of the following models to the same data:
 
-   i) a multiplicative Holt-Winters’ method;
+        i) a multiplicative Holt-Winters’ method;
 
-   ii) an ETS model;
+        ii) an ETS model;
 
-   iii) an additive ETS model applied to a Box-Cox transformed series;
+        iii) an additive ETS model applied to a Box-Cox transformed series;
 
-   iv) a seasonal naive method applied to the Box-Cox transformed series;
+        iv) a seasonal naive method applied to the Box-Cox transformed series;
 
-   v) an STL decomposition applied to the Box-Cox transformed data followed by an ETS model applied to the seasonally adjusted (transformed) data.
+        v) an STL decomposition applied to the Box-Cox transformed data followed by an ETS model applied to the seasonally adjusted (transformed) data.
 
-   vi) For each model, look at the residual diagnostics and compare the forecasts for the next two years. Which do you prefer?
+        vi) For each model, look at the residual diagnostics and compare the forecasts for the next two years. Which do you prefer?
 
 ## Further reading
 
-- @Gar1985
-- @Gar2006
-- @expsmooth08
+Two articles by Ev Gardner [@Gar1985;@Gar2006] provide a great overview of the history of exponential smoothing, and its many variations. A full book treatment of the subject providing the mathematical details is given by @expsmooth08.

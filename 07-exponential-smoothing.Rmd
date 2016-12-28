@@ -85,7 +85,7 @@ An alternative representation is the component form. For simple exponential smoo
   \text{Forecast equation}  && \hat{y}_{t+1|t} & = \ell_{t}\\
   \text{Smoothing equation} && \ell_{t}        & = \alpha y_{t} + (1 - \alpha)\ell_{t-1},
 \end{align*}
-where $\ell_{t}$ is the level (or the smoothed value) of the series at time $t$. The forecast equation shows that the forecasted value at time $t+1$ is the estimated level at time $t$. The smoothing equation for the level (usually referred to as the level equation) gives the estimated level of the series at each period $t$.
+where $\ell_{t}$ is the level (or the smoothed value) of the series at time $t$. The forecast equation shows that the forecast value at time $t+1$ is the estimated level at time $t$. The smoothing equation for the level (usually referred to as the level equation) gives the estimated level of the series at each period $t$.
 
 Applying the forecast equation for time $T$ gives $\hat{y}_{T+1|T} = \ell_{T}$, the most recent estimated level.
 
@@ -112,7 +112,7 @@ In Section \@ref(sec-4-2-LSprinciple), we estimated the coefficients of a regres
  \text{SSE}=\sum_{t=1}^T(y_t - \hat{y}_{t|t-1})^2=\sum_{t=1}^Te_t^2. (\#eq:7-SSE)
 \end{equation}
 
-Unlike the regression case (where we have formulae which return the values of the regression coefficients that minimize the SSE), this involves a non-linear minimization problem, and we need to use an optimization tool to solve it.
+Unlike the regression case (where we have formulas which return the values of the regression coefficients that minimize the SSE), this involves a non-linear minimization problem, and we need to use an optimization tool to solve it.
 
 ### Example: Oil production {-}
 

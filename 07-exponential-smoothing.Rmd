@@ -476,7 +476,7 @@ hw(x, damped=TRUE, seasonal="multiplicative")
 
 ##A taxonomy of exponential smoothing methods {#sec-7-6-Taxonomy}
 
-Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combinations of the trend and seasonal components, nine exponential smoothing methods are possible, listed in Table \@ref(tab:taxonomy). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (M,N) is the method with multiplicative trend and no seasonality; and so on.
+Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combinations of the trend and seasonal components, nine exponential smoothing methods are possible, listed in Table \@ref(tab:taxonomy). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (A$\damped$,N) is the method with damped trend and no seasonality; and so on.
 
 
 Table: (\#tab:taxonomy) A two-way classification of exponential smoothing methods.
@@ -520,13 +520,13 @@ knitr::include_graphics("pegelstable.png")
 
 ##Innovations state space models for exponential smoothing {#sec-7-ETS}
 
-In the rest of this chapter, we study statistical models that underlie the exponential smoothing methods we have considered so far. The exponential smoothing methods presented in Table \@ref(tab:pegels) are algorithms which generate point forecasts. The statistical models in this section generate the same point forecasts, but can also generate prediction (or forecast) intervals. A statistical model is a stochastic (or random) data generating process that can produce an entire forecast distribution. The general statistical framework we will introduce also provides a platform for using the model selection criteria introduced in Chapter \@ref(ch-regression), thus allowing the choice of model to be made in an objective manner.
+In the rest of this chapter, we study the statistical models that underlie the exponential smoothing methods we have considered so far. The exponential smoothing methods presented in Table \@ref(tab:pegels) are algorithms which generate point forecasts. The statistical models in this section generate the same point forecasts, but can also generate prediction (or forecast) intervals. A statistical model is a stochastic (or random) data generating process that can produce an entire forecast distribution. The general statistical framework we will introduce also provides a way of using the model selection criteria introduced in Chapter \@ref(ch-regression), thus allowing the choice of model to be made in an objective manner.
 
-Each model consists of a measurement equation that describes the observed data and some transition equations that describe how the unobserved components or states (level, trend, seasonal) change over time. Hence these are referred to as "state space models".
+Each model consists of a measurement equation that describes the observed data, and some transition equations that describe how the unobserved components or states (level, trend, seasonal) change over time. Hence, these are referred to as "state space models".
 
 For each method there exist two models: one with additive errors and one with multiplicative errors. The point forecasts produced by the models are identical if they use the same smoothing parameter values. They will, however, generate different prediction intervals.
 
-To distinguish between a model with additive errors and one with multiplicative errors (and to also distinguish the models from the methods) we add a third letter to the classification of Table \@ref(tab:taxonomy). We label each state space model as ETS($\cdot,\cdot,\cdot$) for (Error, Trend, Seasonal). This label can also be thought of as ExponenTial Smoothing. Using the same notation as in Table \@ref(tab:taxonomy), the possibilities for each component are: Error $=\{$A,M$\}$, Trend $=\{$N,A,A_{\text{d}}$\}$ and Seasonal $=\{$N,A,M$\}$. Therefore, in total there exist 18 such state space models: 9 with additive errors and 9 with multiplicative errors.
+To distinguish between a model with additive errors and one with multiplicative errors (and also to distinguish the models from the methods), we add a third letter to the classification of Table \@ref(tab:taxonomy). We label each state space model as ETS($\cdot,\cdot,\cdot$) for (Error, Trend, Seasonal). This label can also be thought of as ExponenTial Smoothing. Using the same notation as in Table \@ref(tab:taxonomy), the possibilities for each component are: Error $=\{$A,M$\}$, Trend $=\{$N,A,A_{\text{d}}$\}$ and Seasonal $=\{$N,A,M$\}$.
 
 ### ETS(A,N,N): simple exponential smoothing with additive errors {-}
 
@@ -547,18 +547,18 @@ The training data errors lead to the adjustment of the estimated level throughou
 
 We can also write $y_t = \ell_{t-1} + e_t$, so that each observation is equal to the previous level plus an error. To make this into an innovations state space model, all we need to do is specify the probability distribution for $e_t$. For a model with additive errors, we assume that one-step forecast errors $e_t$ are normally distributed white noise with mean 0 and variance $\sigma^2$. A short-hand notation for this is $e_t = \varepsilon_t\sim\text{NID}(0,\sigma^2)$; NID stands for "normally and independently distributed".
 
-Then the equations of the model can be written
+Then the equations of the model can be written as
 \begin{align}
   y_t &= \ell_{t-1} + \varepsilon_t (\#eq:ann-1a)\\
   \ell_t&=\ell_{t-1}+\alpha \varepsilon_t. (\#eq:ann-2a)
 \end{align}
 We refer to \@ref(eq:ann-1a) as the *measurement* (or observation) equation and (\#eq:ann-2a) as the *state* (or transition) equation. These two equations, together with the statistical distribution of the errors, form a fully specified statistical model. Specifically, these constitute an innovations state space model underlying simple exponential smoothing.
 
-The term "innovations" comes from the fact that all equations in this type of specification use the same random error process, $\varepsilon_t$. For the same reason this formulation is also referred to as a "single source of error" model in contrast to alternative multiple source of error formulations, which we do not present here.
+The term "innovations" comes from the fact that all equations in this type of specification use the same random error process, $\varepsilon_t$. For the same reason, this formulation is also referred to as a "single source of error" model, in contrast to alternative multiple source of error formulation swhich we do not present here.
 
-The measurement equation shows the relationship between the observations and the unobserved states. In this case observation $y_t$ is a linear function of the level $\ell_{t-1}$, the predictable part of $y_t$, and the random error $\varepsilon_t$, the unpredictable part of $y_t$. For other innovations state space models, this relationship may be nonlinear.
+The measurement equation shows the relationship between the observations and the unobserved states. In this case, observation $y_t$ is a linear function of the level $\ell_{t-1}$, the predictable part of $y_t$, and the random error $\varepsilon_t$, the unpredictable part of $y_t$. For other innovations state space models, this relationship may be nonlinear.
 
-The transition equation shows the evolution of the state through time. The influence of the smoothing parameter $\alpha$ is the same as for the methods discussed earlier. For example $\alpha$ governs the degree of change in successive levels. The higher the value of $\alpha$, the more rapid the changes in the level; the lower the value of $\alpha$, the smoother the changes. At the lowest extreme, where $\alpha=0$, the level of the series does not change over time. At the other extreme, where $\alpha=1$, the model reduces to a random walk model, $y_t=y_{t-1}+\varepsilon_t$.
+The transition equation shows the evolution of the state through time. The influence of the smoothing parameter $\alpha$ is the same as for the methods discussed earlier. For example, $\alpha$ governs the degree of change in successive levels. The higher the value of $\alpha$, the more rapid the changes in the level; the lower the value of $\alpha$, the smoother the changes. At the lowest extreme, where $\alpha=0$, the level of the series does not change over time. At the other extreme, where $\alpha=1$, the model reduces to a random walk model, $y_t=y_{t-1}+\varepsilon_t$.
 
 ### ETS(M,N,N): simple exponential smoothing with multiplicative errors {-}
 
@@ -576,14 +576,13 @@ Then we can write the multiplicative form of the state space model as
 
 ### ETS(A,A,N): Holt’s linear method with additive errors {-}
 
-For this model, we assume that one-step forecast errors are given by $\varepsilon_t=y_t-\ell_{t-1}-b_{t-1} \sim \text{NID}(0,\sigma^2)$. Substituting this into the error correction equations for Holt’s linear method we obtain
+For this model, we assume that the one-step forecast errors are given by $\varepsilon_t=y_t-\ell_{t-1}-b_{t-1} \sim \text{NID}(0,\sigma^2)$. Substituting this into the error correction equations for Holt’s linear method we obtain
 \begin{align*}
 y_t&=\ell_{t-1}+b_{t-1}+\varepsilon_t\\
 \ell_t&=\ell_{t-1}+b_{t-1}+\alpha \varepsilon_t\\
 b_t&=b_{t-1}+\beta \varepsilon_t,
 \end{align*}
-
-where for simplicity we have set $\beta=\alpha \beta^*$.
+where, for simplicity, we have set $\beta=\alpha \beta^*$.
 
 ### ETS(M,A,N): Holt’s linear method with multiplicative errors {-}
 
@@ -591,7 +590,7 @@ Specifying one-step forecast errors as relative errors such that
 $$
   \varepsilon_t=\frac{y_t-(\ell_{t-1}+b_{t-1})}{(\ell_{t-1}+b_{t-1})}
 $$
-and following a similar approach as above, the innovations state space model underlying Holt’s linear method with multiplicative errors is specified as
+and following an approach similar to that used above, the innovations state space model underlying Holt’s linear method with multiplicative errors is specified as
 \begin{align*}
 y_t&=(\ell_{t-1}+b_{t-1})(1+\varepsilon_t)\\
 \ell_t&=(\ell_{t-1}+b_{t-1})(1+\alpha \varepsilon_t)\\
@@ -615,11 +614,11 @@ knitr::include_graphics("statespacemodels.png")
 
 ### Estimating ETS models {-}
 
-An alternative to estimating the parameters by minimizing the sum of squared errors, is to maximize the "likelihood". The likelihood is the probability of the data arising from the specified model. So a large likelihood is associated with a good model. For an additive error model, maximizing the likelihood gives the same results as minimizing the sum of squared errors. However, different results will be obtained for multiplicative error models. In this section, we will estimate the smoothing parameters $\alpha$, $\beta$, $\gamma$ and $\phi$, and the initial states $\ell_0$, $b_0$, $s_0,s_{-1},\dots,s_{-m+1}$, by maximizing the likelihood.
+An alternative to estimating the parameters by minimizing the sum of squared errors is to maximize the "likelihood". The likelihood is the probability of the data arising from the specified model. Thus, a large likelihood is associated with a good model. For an additive error model, maximizing the likelihood gives the same results as minimizing the sum of squared errors. However, different results will be obtained for multiplicative error models. In this section, we will estimate the smoothing parameters $\alpha$, $\beta$, $\gamma$ and $\phi$, and the initial states $\ell_0$, $b_0$, $s_0,s_{-1},\dots,s_{-m+1}$, by maximizing the likelihood.
 
-The possible values that the smoothing parameters can take is restricted. Traditionally the parameters have been constrained to lie between 0 and 1 so that the equations can be interpreted as weighted averages. That is, $0< \alpha,\beta^*,\gamma^*,\phi<1$. For the state space models, we have set $\beta=\alpha\beta^*$ and $\gamma=(1-\alpha)\gamma^*$. Therefore the traditional restrictions translate to $0< \alpha <1$,  $0 < \beta < \alpha$  and $0< \gamma < 1-\alpha$. In practice, the damping parameter $\phi$ is usually constrained further to prevent numerical difficulties in estimating the model. A common constraint is to set $0.8<\phi<0.98$.
+The possible values that the smoothing parameters can take are restricted. Traditionally, the parameters have been constrained to lie between 0 and 1 so that the equations can be interpreted as weighted averages. That is, $0< \alpha,\beta^*,\gamma^*,\phi<1$. For the state space models, we have set $\beta=\alpha\beta^*$ and $\gamma=(1-\alpha)\gamma^*$. Therefore, the traditional restrictions translate to $0< \alpha <1$,  $0 < \beta < \alpha$  and $0< \gamma < 1-\alpha$. In practice, the damping parameter $\phi$ is usually constrained further to prevent numerical difficulties in estimating the model. A common constraint is to set $0.8<\phi<0.98$.
 
-Another way to view the parameters is through a consideration of the mathematical properties of the state space models. Then the parameters are constrained to prevent observations in the distant past having a continuing effect on current forecasts. This leads to some *admissibility* constraints on the parameters which are usually (but not always) less restrictive than the usual region. For example for the ETS(A,N,N) model, the usual parameter region is $0< \alpha <1$ but the admissible region is $0< \alpha <2$. For the ETS(A,A,N) model, the usual parameter region is $0<\alpha<1$ and $0<\beta<\alpha$ but the admissible region is $0<\alpha<2$ and $0<\beta<4-2\alpha$.
+Another way to view the parameters is through a consideration of the mathematical properties of the state space models. The parameters are constrained in order to prevent observations in the distant past having a continuing effect on current forecasts. This leads to some *admissibility* constraints on the parameters, which are usually (but not always) less restrictive than the usual region. For example, for the ETS(A,N,N) model, the usual parameter region is $0< \alpha <1$ but the admissible region is $0< \alpha <2$. For the ETS(A,A,N) model, the usual parameter region is $0<\alpha<1$ and $0<\beta<\alpha$ but the admissible region is $0<\alpha<2$ and $0<\beta<4-2\alpha$.
 
 ### Model selection {-}
 
@@ -642,13 +641,13 @@ $$
 
 Three of the combinations of (Error, Trend, Seasonal) can lead to numerical difficulties. Specifically, the models that can cause such instabilities are ETS(A,N,M), ETS(A,A,M), and ETS(A,A,M). We normally do not consider these particular combinations when selecting a model.
 
-Models with multiplicative errors are useful when the data are strictly positive, but are not numerically stable when the data contain zeros or negative values. Therefore multiplicative errors models will not be considered if the time series is not strictly positive. In that case only the six fully additive models will be applied.
+Models with multiplicative errors are useful when the data are strictly positive, but are not numerically stable when the data contain zeros or negative values. Therefore, multiplicative error models will not be considered if the time series is not strictly positive. In that case, only the six fully additive models will be applied.
 
 ### The `ets()` function in R {-}
 
 The models can be estimated in R using the `ets()` function in the forecast package.  Unlike the `ses`, `holt` and `hw` functions, the `ets` function does not produce forecasts. Rather, it estimates the model parameters and returns information about the fitted model.
 
-The R code below shows all the possible arguments this function takes, and their default values. If only the time series is specified, and all other arguments are left at their default values, then an appropriate model will be selected automatically. We explain the most important arguments below. See the help file for a more complete description.
+The R code below shows the most important arguments that this function can take, and their default values. If only the time series is specified, and all other arguments are left at their default values, then an appropriate model will be selected automatically. We explain the arguments below. See the help file for a more complete description.
 
 ```r
 ets(y, model="ZZZ", damped=NULL, alpha=NULL, beta=NULL, gamma=NULL,
@@ -661,10 +660,10 @@ y
 :   The time series to be forecast.
 
 model
-:   A three-letter code indicating the model to be estimated using the ETS classification and notation. The possible inputs are "N" for none, "A" for additive, "M" for multiplicative, or "Z" for automatic selection. If any of the inputs is left as "Z" then this component is selected according to the information criterion chosen. The default value of `ZZZ` ensures that all components are selected using the information criterion.
+:   A three-letter code indicating the model to be estimated using the ETS classification and notation. The possible inputs are "N" for none, "A" for additive, "M" for multiplicative, or "Z" for automatic selection. If any of the inputs is left as "Z", then this component is selected according to the information criterion chosen. The default value of `ZZZ` ensures that all components are selected using the information criterion.
 
 damped
-:   If `damped=TRUE`, then a damped trend will be used (either A or M). If `damped=FALSE`, then a non-damped trend will used. If `damped=NULL` (the default), then either a damped or a non-damped trend will be selected according to the information criterion chosen.
+:   If `damped=TRUE`, then a damped trend will be used (either A or M). If `damped=FALSE`, then a non-damped trend will used. If `damped=NULL` (the default), then either a damped or a non-damped trend will be selected, depending on which model has the smallest value for the information criterion.
 
 alpha, beta, gamma, phi
 :   The values of the smoothing parameters can be specified using these arguments. If they are set to `NULL` (the default setting for each of them), the parameters are estimated.
@@ -676,7 +675,7 @@ biasadj
 :   If `TRUE` and `lambda` is not `NULL`, then the back-transformed fitted values and forecasts will be bias-adjusted.
 
 additive.only
-:   Only models with additive components will be considered if `additive.only=TRUE`. Otherwise all models will be considered.
+:   Only models with additive components will be considered if `additive.only=TRUE`. Otherwise, all models will be considered.
 
 ic
 :   The information criterion to be used in selecting models, set by default to `aicc`.
@@ -700,13 +699,13 @@ y_{T+2} &= (\ell_{T+1} + b_{T+1})(1 + \varepsilon_{T+1})\\
             \right]
    ( 1 + \varepsilon_{T+1}).
 \end{align*}
-Therefore, $\hat{y}_{T+2|T}= \ell_{T}+2b_{T},$ and so on. These forecasts are identical to the forecasts from Holt’s linear method and also those from model ETS(A,A,N). So the point forecasts obtained from the method and from the two models that underlie the method are identical (assuming the same parameter values are used).
+Therefore, $\hat{y}_{T+2|T}= \ell_{T}+2b_{T},$ and so on. These forecasts are identical to the forecasts from Holt’s linear method, and also to those from model ETS(A,A,N). Thus, the point forecasts obtained from the method and from the two models that underlie the method are identical (assuming that the same parameter values are used).
 
 A big advantage of the models is that prediction intervals can also be generated --- something that cannot be done using the methods. The prediction intervals will differ between models with additive and multiplicative methods.
 
 For some models, there are exact formulae that enable prediction intervals to be calculated (see @expsmooth for the formulas). A more general approach that works for all models is to simulate future sample paths, conditional on the last estimate of the states, and to obtain prediction intervals from the percentiles of these simulated future paths.
 
-To obtain forecasts from an ETS model, we use the `forecast` function. The R code below shows the all the possible arguments this function takes when applied to an ETS model. We explain each the arguments in what follows.
+To obtain forecasts from an ETS model, we use the `forecast` function. The R code below shows the possible arguments that this function takes when applied to an ETS model. We explain each of the arguments in what follows.
 
 ```r
 forecast(object, h=ifelse(object$m>1, 2*object$m, 10),
@@ -739,18 +738,18 @@ PI
 :   If `PI=TRUE`, then prediction intervals are produced; otherwise only point forecasts are calculated.
 
 lambda
-:   The Box-Cox transformation parameter. This is ignored if `lambda=NULL`. Otherwise, forecasts are back-transformed via an inverse Box-Cox transformation.
+:   The Box-Cox transformation parameter. This is ignored if `lambda=NULL`. Otherwise, the forecasts are back-transformed via an inverse Box-Cox transformation.
 
 biasadj
 :   If `lambda` is not `NULL`, the backtransformed forecasts (and prediction intervals) are bias-adjusted.
 
 ### Example: International tourist visitor nights in Australia {-}
 
-We now employ the ETS statistical framework to forecast tourists visitor nights in Australia by international arrivals over the period 2011--2012. We let the `ets()` function select the model by minimizing the AICc.
+We now employ the ETS statistical framework to forecast tourist visitor nights in Australia by international arrivals over the period 2016--2019. We let the `ets()` function select the model by minimizing the AICc.
 
 ```{r, echo=TRUE, cache=FALSE}
-vndata <- window(austourists, start=2005)
-fit <- ets(vndata)
+aust <- window(austourists, start=2005)
+fit <- ets(aust)
 summary(fit)
 ```
 
@@ -763,15 +762,15 @@ b_t &=b_{t-1} + \beta(\ell_{t-1} + b_{t_1})\varepsilon_t\\
 s_t &=  s_{t-m}(1+ \gamma \varepsilon_t).
 \end{align*}
 
-The parameter estimates are $\alpha=`r format(fit$par[1],nsmall=4,digits=4)`$, $\beta=`r format(fit$par[2],nsmall=4,digits=4, scientific=FALSE)`$, and $\gamma=`r format(fit$par[3],digits=4,nsmall=4, scientific=FALSE)`$. The output also returns the estimates for the initial states $\ell_0$, $b_0$, $s_{0}$, $s_{-1}$, $s_{-2}$ and $s_{-3}.$ The training RMSE for this model is slightly lower than the Holt-Winters methods with additive and multiplicative seasonality presented in Tables \@ref(tbl-7-HWadd) and \@ref(tbl-7-HWmulti) respectively. Although this model gives equivalent point forecasts to a multiplicative Holt-Winters' method, the parameters have been estimated differently. With the `ets()` function, the default estimation method is maximum likelihood rather than minimum sum of squares.
+The parameter estimates are $\alpha=`r format(fit$par[1],nsmall=4,digits=4)`$, $\beta=`r format(fit$par[2],nsmall=4,digits=4, scientific=FALSE)`$, and $\gamma=`r format(fit$par[3],digits=4,nsmall=4, scientific=FALSE)`$. The output also returns the estimates for the initial states $\ell_0$, $b_0$, $s_{0}$, $s_{-1}$, $s_{-2}$ and $s_{-3}.$ Compare these with the values obtained for the Holt-Winters method with multiplicative seasonality presented in Table \@ref(tab:tab76). Although this model gives equivalent point forecasts to a multiplicative Holt-Winters' method, the parameters have been estimated differently. With the `ets()` function, the default estimation method is maximum likelihood rather than minimum sum of squares.
 
-Figure \@ref(fig:MAMstates) shows the states over time while Figure \@ref(fig:MAMforecasts) shows point forecasts and prediction intervals generated from the model. The small values of $\beta$ and $\gamma$ mean that the slope and seasonal components change very little over time. The narrow prediction intervals indicate that the series is relatively easy to forecast due to the strong trend and seasonality.
+Figure \@ref(fig:MAMstates) shows the states over time, while Figure \@ref(fig:MAMforecasts) shows point forecasts and prediction intervals generated from the model. The small values of $\beta$ and $\gamma$ mean that the slope and seasonal components change very little over time. The narrow prediction intervals indicate that the series is relatively easy to forecast due to the strong trend and seasonality.
 
 ```{r MAMstates, fig.cap="Graphical representation of the estimated states over time.", echo=TRUE, cache=FALSE}
 autoplot(fit)
 ```
 
-```{r MAMforecasts, fig.cap="Forecasting international visitor nights in Australia from an ETS(M,A,M) model.", echo=TRUE, cache=FALSE}
+```{r MAMforecasts, fig.cap="Forecasting international visitor nights in Australia using an ETS(M,A,M) model.", echo=TRUE, cache=FALSE}
 autoplot(forecast(fit,h=8)) +
   ylab("International visitor night in Australia (millions)")
 ```

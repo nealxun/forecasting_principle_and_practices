@@ -26,7 +26,7 @@ pl[[9]] <- autoplot(elec, main = "(i)", xlab = "Year")
 gridExtra::marrangeGrob(pl, nrow=3, ncol=3, top="")
 ```
 
-Consider the nine series plotted in Figure \@ref(fig-8-stationary). Which of these do you think are stationary?
+Consider the nine series plotted in Figure \@ref(fig:stationary). Which of these do you think are stationary?
 
 Obvious seasonality rules out series (d), (h) and (i). Trend rules out series (a), (c), (e), (f) and (i). Increasing variance also rules out (i). That leaves only (b) and (g) as stationary series.
 
@@ -34,7 +34,7 @@ At first glance, the strong cycles in series (g) might appear to make it non-sta
 
 ### Differencing  {-}
 
-In Figure \@ref(fig-8-stationary), notice how the Dow Jones index data was non-stationary in panel (a), but the daily changes were stationary in panel (b). This shows one way to make a time series stationary --- compute the differences between consecutive observations. This is known as **differencing**.
+In Figure \@ref(fig:stationary), notice how the Dow Jones index data was non-stationary in panel (a), but the daily changes were stationary in panel (b). This shows one way to make a time series stationary --- compute the differences between consecutive observations. This is known as **differencing**.
 
 Transformations such as logarithms can help to stabilize the variance of a time series. Differencing can help stabilize the mean of a time series by removing changes in the level of a time series, and so eliminating (or reducing) trend and seasonality.
 
@@ -90,7 +90,7 @@ In this case, $y_t''$ will have $T-2$ values. Then we would model the "change in
 A seasonal difference is the difference between an observation and the corresponding observation from the previous year. So
 $$
   y’_t = y_t - y_{t-m}
-$$ 
+$$
 These are also called "lag-$m$ differences" as we subtract the observation after a lag of $m$ periods.
 
 If seasonally differenced data appear to be white noise, then an appropriate model for the original data is
@@ -99,40 +99,41 @@ $$
 $$
 Forecasts from this model are equal to the last observation from the relevant season. That is, this model gives seasonal naïve forecasts.
 
-```{r a10diff, fig.cap="Logs and seasonal differences of the A10 (antidiabetic) sales data. The logarithms stabilize the variance, while the seasonal differences remove the seasonality and trend.", echo=FALSE, fig.height=6, cache=TRUE}
-p1 <- autoplot(a10) + xlab("Year") + 
-  ylab("Sales ($million)") +
-  ggtitle("Antidiabetic drug sales") 
-p2 <- autoplot(log(a10)) + xlab("Year") +
-  ylab("") + ggtitle("Monthly log sales")
-p3 <- autoplot(diff(log(a10),12)) + xlab("Year") +
-  ylab("") + ggtitle("Annual change in monthly log sales")
-gridExtra::grid.arrange(p1,p2,p3,ncol=1)
+```{r a10diff, fig.cap="Logs and seasonal differences of the A10 (antidiabetic) sales data. The logarithms stabilize the variance, while the seasonal differences remove the seasonality and trend.", fig.height=6, cache=TRUE}
+tmp <- cbind(
+  "Sales ($million)" = a10,
+  "Monthly log sales" = log(a10),
+  "Annual change in log sales" = diff(log(a10),12))
+autoplot(tmp, facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Antidiabetic drug sales")
 ```
 
-Figure \@ref(fig-8-a10diff) shows the seasonal differences of the logarithm of the monthly scripts for A10 (antidiabetic) drugs sold in Australia. The transformation and differencing has made the series look relatively stationary.
+Figure \@ref(fig:a10diff) shows the seasonal differences of the logarithm of the monthly scripts for A10 (antidiabetic) drugs sold in Australia. The transformation and differencing has made the series look relatively stationary.
 
 To distinguish seasonal differences from ordinary differences, we sometimes refer to ordinary differences as "first differences" meaning differences at lag 1.
 
 Sometimes it is necessary to do both a seasonal difference and a first difference to obtain stationary data, as shown in Figure \@ref(fig-8-diffusnetelec). Here, the data are first transformed using logarithms (second panel). Then seasonal differenced are calculated (third panel). The data still seem a little non-stationary, and so a further lot of first differences are computed (bottom panel).
 
-```{r usmelec, echo=FALSE, fig.height=6, cache=TRUE}
-tmp <- cbind(usmelec, log(usmelec))
-tmp <- cbind(tmp, diff(tmp[, 2], 12))
-tmp <- cbind(tmp, diff(tmp[, 3], 1))
-colnames(tmp) <- c("Billion kWh", "Logs", "Seasonally\n differenced logs", "Doubly\n differenced logs")
-autoplot(tmp, facets=TRUE) + xlab("Year") + ylab("") + 
+```{r usmelec, fig.height=6, cache=TRUE}
+tmp <- cbind(
+  "Billion kWh" = usmelec,
+  "Logs" = log(usmelec),
+  "Seasonally\n differenced logs" = diff(log(usmelec),12),
+  "Doubly\n differenced logs" = diff(diff(log(usmelec),12),1))
+autoplot(tmp, facets=TRUE) +
+  xlab("Year") + ylab("") +
   ggtitle("Monthly US net electricity generation")
 ```
 
-There is a degree of subjectivity in selecting what differences to apply. The seasonally differenced data in Figure \@ref(fig-8-a10diff) do not show substantially different behaviour from the seasonally differenced data in Figure \@ref(fig-8-diffusnetelec). In the latter case, we may have decided to stop with the seasonally differenced data, and not done an extra round of differencing. In the former case, we may have decided the data were not sufficiently stationary and taken an extra round of differencing. Some formal tests for differencing will be discussed later, but there are always some choices to be made in the modeling process, and different analysts may make different choices.
+There is a degree of subjectivity in selecting which differences to apply. The seasonally differenced data in Figure \@ref(fig:a10diff) do not show substantially different behaviour from the seasonally differenced data in Figure \@ref(fig:usmelec). In the latter case, we may have decided to stop with the seasonally differenced data, and have not done an extra round of differencing. In the former case, we have decided the data were not sufficiently stationary and taken an extra round of differencing. Some formal tests for differencing will be discussed later, but there are always some choices to be made in the modeling process, and different analysts may make different choices.
 
 If $y'_t = y_t - y_{t-m}$ denotes a seasonally differenced series, then the twice-differenced series is
 
 \begin{align*}
 y''_t &= y'_t - y'_{t-1} \\
       &= (y_t - y_{t-m}) - (y_{t-1} - y_{t-m-1}) \\
-      &= y_t -y_{t-1} - y_{t-m} + y_{t-m-1}\: 
+      &= y_t -y_{t-1} - y_{t-m} + y_{t-m-1}\:
 \end{align*}
 
 When both seasonal and first differences are applied, it makes no difference which is done first---the result will be the same. However, if the data have a strong seasonal pattern, we recommend that seasonal differencing be done first because sometimes the resulting series will be stationary and there will be no need for a further first difference. If first differencing is done first, there will still be seasonality present.
@@ -145,13 +146,15 @@ One way to determine more objectively if differencing is required is to use a *u
 
 A number of unit root tests are available, and they are based on different assumptions and may lead to conflicting answers.
 
+#### ADF test {-}
+
 One of the most popular tests is the *Augmented Dickey-Fuller (ADF) test*. For this test, the following regression model is estimated:
 $$
   y'_t = \phi y_{t-1} + \beta_1 y'_{t-1} + \beta_2 y'_{t-2} + \cdots + \beta_k y'_{t-k},
 $$
 where $y'_t$ denotes the first-differenced series, $y'_t=y_t-y_{t-1}$ and $k$ is the number of lags to include in the regression (often set to be about 3). If the original series, $y_t$, needs differencing, then the coefficient $\hat\phi$ should be approximately zero. If $y_t$ is already stationary, then $\hat{\phi}<0$. The usual hypothesis tests for regression coefficients do not work when the data are non-stationary, but the test can be carried out using the following R command.
 
-```
+```r
 adf.test(x, alternative = "stationary")
 ```
 
@@ -159,9 +162,11 @@ In R, the default value of $k$ is set to $\lfloor(T - 1)^{1/3}\rfloor$ where $T$
 
 The null-hypothesis for an ADF test is that the data are non-stationary. So large p-values are indicative of non-stationarity, and small p-values suggest stationarity. Using the usual 5% threshold, differencing is required if the p-value is greater than 0.05.
 
+#### KPSS test {-}
+
 Another popular unit root test is the *Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test*. This reverses the hypotheses, so the null-hypothesis is that the data are stationary. In this case, small p-values (e.g., less than 0.05) suggest that differencing is required.
 
-```
+```r
 kpss.test(x)
 ```
 
@@ -171,15 +176,15 @@ More complicated tests are required for seasonal differencing and are beyond the
 
 The following code can be used to find how to make a seasonal series stationary. The resulting series stored as `xstar` has been differenced appropriately.
 
-```
-ns <- nsdiffs(x) 
-if(ns > 0) 
-  xstar <- diff(x,lag=frequency(x),differences=ns) 
-else 
+```r
+ns <- nsdiffs(x)
+if(ns > 0)
+  xstar <- diff(x,lag=frequency(x), differences=ns)
+else
   xstar <- x
-nd <- ndiffs(xstar) 
-if(nd > 0) 
-  xstar <- diff(xstar,differences=nd)
+nd <- ndiffs(xstar)
+if(nd > 0)
+  xstar <- diff(xstar, differences=nd)
 ```
 
 ##Backshift notation
@@ -187,7 +192,7 @@ if(nd > 0)
 The backward shift operator $B$ is a useful notational device when working with time series lags:
 $$
   B y_{t} = y_{t - 1} \: .
-$$ 
+$$
 (Some references use $L$ for "lag" instead of $B$ for "backshift".) In other words, $B$, operating on $y_{t}$, has the effect of **shifting the data back one period**. Two applications of $B$ to $y_{t}$ **shifts the data back two periods**:
 $$
   B(By_{t}) = B^{2}y_{t} = y_{t-2}\: .
@@ -223,7 +228,7 @@ In a multiple regression model, we forecast the variable of interest using a lin
 Thus an autoregressive model of order $p$ can be written as
 $$
   y_{t} = c + \phi_{1}y_{t-1} + \phi_{2}y_{t-2} + \dots + \phi_{p}y_{t-p} + e_{t},
-$$ 
+$$
 where $e_t$ is white noise. This is like a multiple regression but with *lagged values* of $y_t$ as predictors. We refer to this as an **AR($p$) model**.
 
 Autoregressive models are remarkably flexible at handling a wide range of different time series patterns. The two series in Figure \@ref(fig-8-arp) show series from an AR(1) model and an AR(2) model. Changing the parameters $\phi_1,\dots,\phi_p$ results in different time series patterns. The variance of the error term $e_t$ will only change the scale of the series, not the patterns.
@@ -247,7 +252,7 @@ For an AR(1) model:
 We normally restrict autoregressive models to stationary data, and then some constraints on the values of the parameters are required.
 
 -   For an AR(1) model:   $-1 < \phi_1 < 1$.
--   For an AR(2) model:   $-1 < \phi_2 < 1$,   $\phi_1+\phi_2 < 1$,  
+-   For an AR(2) model:   $-1 < \phi_2 < 1$,   $\phi_1+\phi_2 < 1$,
 
 When $p\ge3$ the restrictions are much more complicated. R takes care of these restrictions when estimating a model.
 
@@ -300,8 +305,8 @@ More complicated conditions hold for $q\ge3$. Again, R will take care of these c
 
 ##Non-seasonal ARIMA models
 
-If we combine differencing with autoregression and a moving average model, we obtain a non-seasonal ARIMA model. ARIMA is an acronym for AutoRegressive Integrated Moving Average model ("integration" in this context is the reverse of differencing). The full model can be written as 
-$$\label{eq-8-arima} 
+If we combine differencing with autoregression and a moving average model, we obtain a non-seasonal ARIMA model. ARIMA is an acronym for AutoRegressive Integrated Moving Average model ("integration" in this context is the reverse of differencing). The full model can be written as
+$$\label{eq-8-arima}
   y'_{t} = c + \phi_{1}y'_{t-1} + \cdots + \phi_{p}y'_{t-p}
      + \theta_{1}e_{t-1} + \cdots + \theta_{q}e_{t-q} + e_{t},
 $$
@@ -329,7 +334,7 @@ Selecting appropriate values for $p$, $d$ and $q$ can be difficult. The `auto.ar
 Many of the models we have already discussed are special cases of the ARIMA model as shown in the following table.
 
 :----------------------:--------------------------
-White noise            | ARIMA(0,0,0) 
+White noise            | ARIMA(0,0,0)
 Random walk            | ARIMA(0,1,0) with no constant
 Random walk with drift | ARIMA(0,1,0) with a constant
 Autoregression         | ARIMA($p$,0,0)
@@ -521,7 +526,7 @@ The process is summarized in Figure \@ref(fig-8-diagram).
 We will apply this procedure to the seasonally adjusted electrical equipment orders data shown in Figure \@ref(fig-8-ee1).
 
 ```{r ee1, fig.cap="Seasonally adjusted electrical equipment orders index in the Euro area.", cache=TRUE}
-eeadj <- seasadj(stl(elecequip, s.window="periodic")) 
+eeadj <- seasadj(stl(elecequip, s.window="periodic"))
 autoplot(eeadj)
 ```
 
@@ -540,14 +545,14 @@ ggtsdisplay(diff(eeadj), main="")
 5.  We fit an ARIMA(3,1,0) model along with variations including ARIMA(4,1,0), ARIMA(2,1,0), ARIMA(3,1,1), etc. Of these, the ARIMA(3,1,1) has a slightly smaller  value.
 
 ```{r eeadj1, cache=TRUE}
-fit <- Arima(eeadj, order=c(3,1,1)) 
-summary(fit) 
+fit <- Arima(eeadj, order=c(3,1,1))
+summary(fit)
 ```
 
 6.  The ACF plot of the residuals from the ARIMA(3,1,1) model shows all correlations within the threshold limits indicating that the residuals are behaving like white noise. A portmanteau test returns a large p-value, also suggesting the residuals are white noise.
 
 ```{r eeadj2, cache=TRUE}
-ggAcf(residuals(fit)) 
+ggAcf(residuals(fit))
 Box.test(residuals(fit), lag=24, fitdf=4, type="Ljung")
 ```
 
@@ -644,7 +649,7 @@ Multi-step forecast intervals for ARIMA(0,0,$q$) models are relatively
 easy to calculate. We can write the model as
 $$
   y_t = e_t + \sum_{i=1}^q \theta_i e_{t-i}.
-$$ 
+$$
 Then the estimated forecast variance can be written as
 $$
   v_{T+h|T} = \hat{\sigma}^2 \left[ 1 + \sum_{i=1}^{h-1} \hat{\theta}_i^2\right], \qquad\text{for $h=2,3,\dots$,}
@@ -727,9 +732,9 @@ ggtsdisplay(residuals(fit))
 Both the ACF and PACF show significant spikes at lag 2, and almost significant spikes at lag 3, indicating some additional non-seasonal terms need to be included in the model. The  of the ARIMA(0,1,2)(0,1,1)$_4$ model is 74.36, while that for the ARIMA(0,1,3)(0,1,1)$_4$ model is 68.53. We tried other models with AR terms as well, but none that gave a smaller  value. Consequently, we choose the ARIMA(0,1,3)(0,1,1)$_4$ model. Its residuals are plotted in Figure \@ref(fig-8-euretail5). All the spikes are now within the significance limits, and so the residuals appear to be white noise. A Ljung-Box test also shows that the residuals have no remaining autocorrelations.
 
 ```{r euretail5, fig.cap="Residuals from the fitted ARIMA(0,1,3)(0,1,1)$_4$ model for the European retail trade index data.", cache=TRUE}
-fit3 <- Arima(euretail, order=c(0,1,3), seasonal=c(0,1,1)) 
-res <- residuals(fit3) 
-ggtsdisplay(res) 
+fit3 <- Arima(euretail, order=c(0,1,3), seasonal=c(0,1,1))
+res <- residuals(fit3)
+ggtsdisplay(res)
 Box.test(res, lag=16, fitdf=4, type="Ljung")
 ```
 
@@ -798,7 +803,7 @@ Of these models, the best is the ARIMA(3,0,1)(0,1,2)$_{12}$ model (i.e., it has 
 The residuals from this model are shown in Figure \@ref(fig-8-h02res). There are significant spikes in both the ACF and PACF, and the model fails a Ljung-Box test. The model can still be used for forecasting, but the prediction intervals may not be accurate due to the correlated residuals.
 
 ```{r h02res, fig.cap="Residuals from the ARIMA(3,0,1)(0,1,2)$_{12}$ model applied to the H02 monthly script sales data.", cache=TRUE}
-ggtsdisplay(residuals(fit)) 
+ggtsdisplay(residuals(fit))
 Box.test(residuals(fit), lag=36, fitdf=6, type="Ljung")
 ```
 
@@ -807,9 +812,9 @@ Next we will try using the automatic ARIMA algorithm. Running `auto.arima()` wit
 Finally, we tried running `auto.arima()` with differencing specified to be $d=0$ and $D=1$, and allowing larger models than usual. This led to an ARIMA(4,0,3)(0,1,1)$_{12}$ model, which did pass all the tests.
 
 ```{r h02arima2, cache=TRUE}
-fit <- auto.arima(h02, lambda=0, d=0, D=1, max.order=9, 
-  stepwise=FALSE, approximation=FALSE) 
-ggtsdisplay(residuals(fit)) 
+fit <- auto.arima(h02, lambda=0, d=0, D=1, max.order=9,
+  stepwise=FALSE, approximation=FALSE)
+ggtsdisplay(residuals(fit))
 Box.test(residuals(fit), lag=36, fitdf=8, type="Ljung")
 ```
 
@@ -843,7 +848,7 @@ rmse <- numeric(NROW(models))
 modelname <- character(NROW(models))
 for(i in seq(length(rmse)))
 {
-  fit <- Arima(train, order=models[i,1:3], 
+  fit <- Arima(train, order=models[i,1:3],
           seasonal=models[i,4:6], lambda=0)
   fc <- forecast(fit,h=h)
   rmse[i] <- accuracy(fc, test)[2,"RMSE"]
@@ -863,7 +868,7 @@ Forecasts from the ARIMA(3,0,1)(0,1,2)$_{12}$ model (which has the lowest RMSE v
 
 ```{r h02f, fig.cap="Forecasts from the ARIMA(3,0,1)(0,1,2)$_{12}$ model applied to the H02 monthly script sales data.", cache=TRUE}
 fit <- Arima(h02, order=c(3,0,1), seasonal=c(0,1,2), lambda=0)
-autoplot(forecast(fit)) + 
+autoplot(forecast(fit)) +
   ylab("H02 sales (million scripts)") + xlab("Year")
 ```
 
@@ -930,9 +935,9 @@ gridExtra::grid.arrange(p1,p2,p3,nrow=1)
 (a) Use the following R code to generate data from an AR(1) model with $\phi_{1} = 0.6$ and $\sigma^2=1$. The process starts with $y_1=0$.
 
 ```
-    y <- ts(numeric(100)) 
-    e <- rnorm(100) 
-    for(i in 2:100) 
+    y <- ts(numeric(100))
+    e <- rnorm(100)
+    for(i in 2:100)
        y[i] <- 0.6*y[i-1] + e[i]
 ```
 

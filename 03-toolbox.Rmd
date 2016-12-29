@@ -96,7 +96,7 @@ autoplot(dj2) +
 
 Sometimes one of these simple methods will be the best forecasting method available; but in many cases, these methods will serve as benchmarks rather than the method of choice. That is, any forecasting methods we develop will be compared to these simple methods to ensure that the new method is better than these simple alternatives. If not, the new method is not worth considering.
 
-## Transformations and adjustments
+## Transformations and adjustments {#sec-transformations}
 
 Adjusting the historical data can often lead to a simpler forecasting model. Here, we deal with four kinds of adjustments: mathematical transformations, calendar adjustments, population adjustments and inflation adjustments. The purpose of these transformations and adjustments is to simplify the patterns in the historical data by removing known sources of variation or by making the pattern more consistent across the whole data set. Simpler patterns usually lead to more accurate forecasts.
 

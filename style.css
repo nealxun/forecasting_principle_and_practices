@@ -49,7 +49,6 @@ dd {
   cellpadding="0";
   cellspacing="0";
   text-shadow: none;
-  text-align: right;
 }
 
 .book .book-body .page-wrapper .page-inner section.normal th {
@@ -64,7 +63,7 @@ dd {
   padding:  7px 20px 1px 20px;
   color: #333333;
   -moz-border-radius: 5px;
-  -webkit-border-radius: 5px; 
+  -webkit-border-radius: 5px;
 }
 
 .book .book-body .page-wrapper .page-inner section.normal pre {

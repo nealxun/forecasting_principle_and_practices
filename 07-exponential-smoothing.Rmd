@@ -10,7 +10,7 @@ In the second part of the chapter (Section \@ref(sec-7-ETS)) we present the stat
 
 The simplest of the exponentially smoothing methods is naturally called "simple exponential smoothing" (SES)^[In some books it is called ``single exponential smoothing'']. This method is suitable for forecasting data with no clear trend or seasonal pattern. For example, the data in Figure \@ref(fig:7-oil) do not display any clear trending behaviour or any seasonality. (There is a rise in the last few years, which might suggest a trend. We will consider whether a trended method would be better for this series later in this chapter.) We have already considered the naïve and the average as possible methods for forecasting such data (Section \@ref(sec-2-methods)).
 
-```{r 7-oil, fig.cap="Oil production in Saudi Arabia from 1980 to 2013.", echo=TRUE, cache=FALSE}
+```{r 7-oil, fig.cap="Oil production in Saudi Arabia from 1980 to 2013.", echo=TRUE, cache=TRUE}
 oildata <- window(oil, start=1996)
 autoplot(oildata) +
   ylab("Oil (millions of tonnes)") + xlab("Year")
@@ -36,7 +36,7 @@ where $0 \le \alpha \le 1$ is the smoothing parameter. The one-step-ahead foreca
 
 Table \@ref(tab:alpha) shows the weights attached to observations for four different values of $\alpha$ when forecasting using simple exponential smoothing. Note that the sum of the weights even for a small value of $\alpha$ will be approximately one for any reasonable sample size.
 
-```{r alpha, echo=FALSE, cache=FALSE}
+```{r alpha, echo=FALSE, cache=TRUE}
 tab <- as.data.frame(matrix(NA,nrow=6,ncol=4))
 rownames(tab) <- c("$y_{T}$", paste("$y_{T-",1:5,"}$",sep=''))
 alpha <- c(0.2,0.4,0.6,0.8)
@@ -85,7 +85,7 @@ An alternative representation is the component form. For simple exponential smoo
   \text{Forecast equation}  && \hat{y}_{t+1|t} & = \ell_{t}\\
   \text{Smoothing equation} && \ell_{t}        & = \alpha y_{t} + (1 - \alpha)\ell_{t-1},
 \end{align*}
-where $\ell_{t}$ is the level (or the smoothed value) of the series at time $t$. The forecast equation shows that the forecasted value at time $t+1$ is the estimated level at time $t$. The smoothing equation for the level (usually referred to as the level equation) gives the estimated level of the series at each period $t$.
+where $\ell_{t}$ is the level (or the smoothed value) of the series at time $t$. The forecast equation shows that the forecast value at time $t+1$ is the estimated level at time $t$. The smoothing equation for the level (usually referred to as the level equation) gives the estimated level of the series at each period $t$.
 
 Applying the forecast equation for time $T$ gives $\hat{y}_{T+1|T} = \ell_{T}$, the most recent estimated level.
 
@@ -112,14 +112,14 @@ In Section \@ref(sec-4-2-LSprinciple), we estimated the coefficients of a regres
  \text{SSE}=\sum_{t=1}^T(y_t - \hat{y}_{t|t-1})^2=\sum_{t=1}^Te_t^2. (\#eq:7-SSE)
 \end{equation}
 
-Unlike the regression case (where we have formulae which return the values of the regression coefficients that minimize the SSE), this involves a non-linear minimization problem, and we need to use an optimization tool to solve it.
+Unlike the regression case (where we have formulas which return the values of the regression coefficients that minimize the SSE), this involves a non-linear minimization problem, and we need to use an optimization tool to solve it.
 
 ### Example: Oil production {-}
 
 
 In this example, simple exponential smoothing is applied to forecast oil production in Saudi Arabia.
 
-```{r sesfit, echo=TRUE, cache=FALSE}
+```{r sesfit, echo=TRUE, cache=TRUE}
 oildata <- window(oil, start=1996)
 # Estimate parameters
 fc <- ses(oildata, h=5)
@@ -127,7 +127,7 @@ fc <- ses(oildata, h=5)
 round(accuracy(fc),2)
 ```
 
-```{r, echo=FALSE, cache=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 #tmp <- accuracy(fc)
 #print(round(c(tmp[,c("MAE","RMSE","MAPE")],SSE=sum(residuals(fc)^2)),1))
 alpha <- fc$model$par[1]
@@ -140,7 +140,7 @@ $\ell_0=`r format(l0,digits=1,nsmall=1)`$, obtained by minimizing SSE (equivalen
 In Table \@ref(tab:oilses) we demonstrate the calculation using these parameters. The second last column shows the estimated level for times $t=0$ to $t=12$; the last few rows of the last column show the forecasts for $h=1,2,3$.
 
 
-```{r oilses, echo=FALSE, cache=FALSE}
+```{r oilses, echo=FALSE, cache=TRUE}
 # Data set for table
 x <- oildata
 # Generate forecasts
@@ -176,7 +176,7 @@ knitr::kable(tab, caption="Forecasting the total oil production in millions of t
 The black line in Figure \@ref(fig:ses) is a plot of the data, which shows a changing level over time.
 
 
-```{r ses, fig.cap="Simple exponential smoothing applied to oil production in Saudi Arabia (1996--2013).", echo=TRUE, cache=FALSE}
+```{r ses, fig.cap="Simple exponential smoothing applied to oil production in Saudi Arabia (1996--2013).", echo=TRUE, cache=TRUE}
 autoplot(fc) +
   autolayer(fitted(fc), series="Fitted") +
   ylab("Oil (millions of tonnes)") + xlab("Year")
@@ -204,7 +204,7 @@ The forecast function is no longer flat but trending. The $h$-step-ahead forecas
 
 ### Example: Air Passengers {-}
 
-```{r airholt0, echo=TRUE, cache=FALSE, fig.cap="Total annual passengers of air carriers registered in Australia. 1990-2014."}
+```{r airholt0, echo=TRUE, cache=TRUE, fig.cap="Total annual passengers of air carriers registered in Australia. 1990-2014."}
 air <- window(ausair, start=1990)
 autoplot(air) +
  ggtitle("Air passengers in Australia") +
@@ -213,11 +213,11 @@ autoplot(air) +
 
 Figure \@ref(fig:airholt0) shows annual passenger numbers for Australian airlines. In Table \@ref(tab:airholt) we demonstrate the application of Holt’s method to these data. The smoothing parameters, $\alpha$ and $\beta$, and the initial values $\ell_0$ and $b_0$ are estimated by minimizing the SSE for the one-step training errors as in Section \@ref(sec-7-1-SES).
 
-```{r airholt1, echo=TRUE, cache=FALSE}
+```{r airholt1, echo=TRUE, cache=TRUE}
 fc <- holt(air, h=5)
 ```
 
-```{r airholt, echo=FALSE, cache=FALSE}
+```{r airholt, echo=FALSE, cache=TRUE}
 # Now set up table
 tmp <- cbind(air, fc$model$state, fitted(fc))
 tsp(tmp) <- NULL
@@ -241,7 +241,7 @@ knitr::kable(tmp, booktabs=TRUE,
              caption="Applying Holt's linear method with $\\alpha=0.8317$ and $\\beta^*=0.0001$ to Australian air passenger data (millions of passengers).")
 ```
 
-```{r checkholt, echo=FALSE, cache=FALSE}
+```{r checkholt, echo=FALSE, cache=TRUE}
 if(sum(abs(fc$model$par[1:2] - c(0.8317,0.0001))) > 1e-4)
   stop("Parameter error")
 ```
@@ -266,7 +266,7 @@ In practice, $\phi$ is rarely less than 0.8 as the damping has a very strong eff
 
 Figure \@ref(fig:dampedtrend) shows the forecasts for years 2014--2018 generated from Holt’s linear trend method and the damped trend method.
 
-```{r dampedtrend, fig.cap="Forecasting Air Passengers in Australia (millions of passengers). For the damped trend method, $\\phi=0.90$.", echo=TRUE, cache=FALSE}
+```{r dampedtrend, fig.cap="Forecasting Air Passengers in Australia (millions of passengers). For the damped trend method, $\\phi=0.90$.", echo=TRUE, cache=TRUE}
 fc <- holt(air, h=15)
 fc2 <- holt(air, damped=TRUE, phi = 0.9, h=15)
 autoplot(air, series="Data") +
@@ -283,14 +283,14 @@ We have set the damping parameter to a relatively low number $(\phi=0.90)$ to ex
 
 In this example, we compare the forecasting performance of the three exponential smoothing methods that we have considered so far in forecasting the sheep livestock population in Asia. The data spans the period 1970--2007 and is shown in Figure \@ref(fig:sheep).
 
-```{r sheep, fig.cap="Annual sheep livestock numbers in Asia (in million head)", echo=TRUE, cache=FALSE}
+```{r sheep, fig.cap="Annual sheep livestock numbers in Asia (in million head)", echo=TRUE, cache=TRUE}
 autoplot(livestock) +
   xlab("Year") + ylab("Livestock, sheep in Asia (millions)")
 ```
 
 We will use time series cross-validation to compare the one-step forecast accuracy of the three methods.
 
-```{r expsmoothcv, echo=TRUE, cache=FALSE}
+```{r expsmoothcv, echo=TRUE, cache=TRUE}
 e1 <- tsCV(livestock, ses, h=1)
 e2 <- tsCV(livestock, holt, h=1)
 e3 <- tsCV(livestock, holt, damped=TRUE, h=1)
@@ -307,7 +307,7 @@ mean(abs(e3), na.rm=TRUE)
 Based on MSE, Holt's method is best. But based on MAE, simple exponential smoothing is best. Conflicts such as this are common in forecasting comparisons. As forecasting tasks can vary by many dimensions (length of forecast horizon, size of test set, forecast error measures, frequency of data, etc.), it is unlikely that one method will be better than all others for all forecasting scenarios. What we require from a forecasting method are consistently sensible forecasts, and these should be frequently evaluated against the task at hand. In this case, the data are clearly trended, so we will prefer Holt's method, and apply it to the whole data set to get forecasts for future years.
 
 
-```{r, echo=TRUE, cache=FALSE}
+```{r, echo=TRUE, cache=TRUE}
 fc <- holt(livestock)
 # Estimated parameters:
 fc[["model"]]
@@ -315,7 +315,7 @@ fc[["model"]]
 
 The smoothing parameter for the slope parameter is estimated to be essentially zero, indicating that the trend is not changing over time.  The value of $\alpha$ is very close to one, showing that the level reacts strongly to each new observation.
 
-```{r fig-7-comp, fig.cap="Forecasting livestock, sheep in Asia: comparing forecasting performance of non-seasonal method.", echo=TRUE, cache=FALSE}
+```{r fig-7-comp, fig.cap="Forecasting livestock, sheep in Asia: comparing forecasting performance of non-seasonal method.", echo=TRUE, cache=TRUE}
 autoplot(fc) +
   xlab("Year") + ylab("Livestock, sheep in Asia (millions)") +
   fppcols()
@@ -365,7 +365,7 @@ The component form for the multiplicative method is:
 
 In this example we employ the Holt-Winters method with both additive and multiplicative seasonality to forecast quarterly visitor nights in Australia spent by international tourists. Figure \@ref(fig:7-HW) shows the data from 2005, and the forecasts for 2016--2017. The data show an obvious seasonal pattern, with peaks observed in the March quarter of each year, corresponding to the Australian summer.
 
-```{r 7-HW, fig.cap="Forecasting international visitor nights in Australia using the Holt-Winters method with both additive and multiplicative seasonality.", echo=TRUE, cache=FALSE}
+```{r 7-HW, fig.cap="Forecasting international visitor nights in Australia using the Holt-Winters method with both additive and multiplicative seasonality.", echo=TRUE, cache=TRUE}
 aust <- window(austourists,start=2005)
 fit1 <- hw(aust,seasonal="additive")
 fit2 <- hw(aust,seasonal="multiplicative")
@@ -376,7 +376,7 @@ autoplot(aust, series="Data") +
   fppcols()
 ```
 
-```{r tab75, echo=FALSE, cache=FALSE}
+```{r tab75, echo=FALSE, cache=TRUE}
 # Set up matrix
 tab <- matrix(NA_real_, ncol=6, nrow=length(aust) + 4 + 8)
 # Add historical content
@@ -410,7 +410,7 @@ ctab <- rbind(head(ctab,length(aust)+4),
 knitr::kable(ctab, caption="Applying Holt-Winters' method with additive seasonality for forecasting international visitor nights in Australia. Notice that the additive seasonal component sums to approximately zero. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.250$, $\\beta^*=0.0069$, $\\gamma=0.456$ and RMSE$=1.786$).")
 ```
 
-```{r tab76, echo=FALSE, cache=FALSE}
+```{r tab76, echo=FALSE, cache=TRUE}
 # Add historical content
 tab[1:NROW(fit2$model$states) + 3,3:5] <- fit2$model$states[,1:3]
 tab[1:3,5] <- fit2$model$states[1,4:6]
@@ -431,7 +431,7 @@ ctab <- rbind(head(ctab,length(aust)+4),
 knitr::kable(ctab,digits=2, caption="Applying Holt-Winters' method with multiplicative seasonality for forecasting international visitor nights in Australia. Notice that the multiplicative seasonal component sums to approximately $m=4$. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.479$, $\\beta^*=0.055$, $\\gamma=0.0001$ and RMSE$=1.590$).")
 ```
 
-```{r checkhw, echo=FALSE, cache=FALSE}
+```{r checkhw, echo=FALSE, cache=TRUE}
 # Check numbers in table captions above
 if(sum(abs(fit1[["model"]][["par"]][1:3] - c(0.250, 0.0069*0.250, 0.456))) > 1e-3)
   stop("HW additive parameters are wrong")
@@ -447,7 +447,7 @@ The applications of both methods (with additive and multiplicative seasonality) 
 
 The estimated states for both models are plotted in Figure \@ref(fig:fig-7-LevelTrendSeas). The small value of $\gamma$ for the multiplicative model means that the seasonal component hardly changes over time. The small value of $\beta^*$ for the additive model means the slope component hardly changes over time (check the vertical scale).
 
-```{r fig-7-LevelTrendSeas, fig.cap="Estimated components for the Holt-Winters method with additive and multiplicative seasonal components.", echo=FALSE, cache=FALSE}
+```{r fig-7-LevelTrendSeas, fig.cap="Estimated components for the Holt-Winters method with additive and multiplicative seasonal components.", echo=FALSE, cache=TRUE}
 addstates <- fit1$model$states[,1:3]
 multstates <- fit2$model$states[,1:3]
 colnames(addstates) <- colnames(multstates) <-
@@ -476,7 +476,7 @@ hw(x, damped=TRUE, seasonal="multiplicative")
 
 ##A taxonomy of exponential smoothing methods {#sec-7-6-Taxonomy}
 
-Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combinations of the trend and seasonal components, nine exponential smoothing methods are possible, listed in Table \@ref(tab:taxonomy). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (M,N) is the method with multiplicative trend and no seasonality; and so on.
+Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combinations of the trend and seasonal components, nine exponential smoothing methods are possible, listed in Table \@ref(tab:taxonomy). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (A$\damped$,N) is the method with damped trend and no seasonality; and so on.
 
 
 Table: (\#tab:taxonomy) A two-way classification of exponential smoothing methods.
@@ -513,20 +513,20 @@ Table \@ref(tab:pegels) gives the recursive formulae for applying the nine expon
 Table: (\#tab:pegels) Formulae for recursive calculations and point forecasts. In each case, $\ell_t$ denotes the series level at time $t$, $b_t$ denotes the slope at time $t$, $s_t$ denotes the seasonal component of the series at time $t$, and $m$ denotes the number of seasons in a year; $\alpha$, $\beta^*$, $\gamma$ and $\phi$ are smoothing parameters, $\phi_h = \phi+\phi^2+\dots+\phi^{h}$ and $h_m^+ = \lfloor(h-1) \text{ mod } m\rfloor + 1$.
 
 ------------------------------------
-```{r, echo=FALSE, cache=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 knitr::include_graphics("pegelstable.png")
 ```
 ------------------------------------
 
 ##Innovations state space models for exponential smoothing {#sec-7-ETS}
 
-In the rest of this chapter, we study statistical models that underlie the exponential smoothing methods we have considered so far. The exponential smoothing methods presented in Table \@ref(tab:pegels) are algorithms which generate point forecasts. The statistical models in this section generate the same point forecasts, but can also generate prediction (or forecast) intervals. A statistical model is a stochastic (or random) data generating process that can produce an entire forecast distribution. The general statistical framework we will introduce also provides a platform for using the model selection criteria introduced in Chapter \@ref(ch-regression), thus allowing the choice of model to be made in an objective manner.
+In the rest of this chapter, we study the statistical models that underlie the exponential smoothing methods we have considered so far. The exponential smoothing methods presented in Table \@ref(tab:pegels) are algorithms which generate point forecasts. The statistical models in this section generate the same point forecasts, but can also generate prediction (or forecast) intervals. A statistical model is a stochastic (or random) data generating process that can produce an entire forecast distribution. The general statistical framework we will introduce also provides a way of using the model selection criteria introduced in Chapter \@ref(ch-regression), thus allowing the choice of model to be made in an objective manner.
 
-Each model consists of a measurement equation that describes the observed data and some transition equations that describe how the unobserved components or states (level, trend, seasonal) change over time. Hence these are referred to as "state space models".
+Each model consists of a measurement equation that describes the observed data, and some transition equations that describe how the unobserved components or states (level, trend, seasonal) change over time. Hence, these are referred to as "state space models".
 
 For each method there exist two models: one with additive errors and one with multiplicative errors. The point forecasts produced by the models are identical if they use the same smoothing parameter values. They will, however, generate different prediction intervals.
 
-To distinguish between a model with additive errors and one with multiplicative errors (and to also distinguish the models from the methods) we add a third letter to the classification of Table \@ref(tab:taxonomy). We label each state space model as ETS($\cdot,\cdot,\cdot$) for (Error, Trend, Seasonal). This label can also be thought of as ExponenTial Smoothing. Using the same notation as in Table \@ref(tab:taxonomy), the possibilities for each component are: Error $=\{$A,M$\}$, Trend $=\{$N,A,A_{\text{d}}$\}$ and Seasonal $=\{$N,A,M$\}$. Therefore, in total there exist 18 such state space models: 9 with additive errors and 9 with multiplicative errors.
+To distinguish between a model with additive errors and one with multiplicative errors (and also to distinguish the models from the methods), we add a third letter to the classification of Table \@ref(tab:taxonomy). We label each state space model as ETS($\cdot,\cdot,\cdot$) for (Error, Trend, Seasonal). This label can also be thought of as ExponenTial Smoothing. Using the same notation as in Table \@ref(tab:taxonomy), the possibilities for each component are: Error $=\{$A,M$\}$, Trend $=\{$N,A,A_{\text{d}}$\}$ and Seasonal $=\{$N,A,M$\}$.
 
 ### ETS(A,N,N): simple exponential smoothing with additive errors {-}
 
@@ -547,18 +547,18 @@ The training data errors lead to the adjustment of the estimated level throughou
 
 We can also write $y_t = \ell_{t-1} + e_t$, so that each observation is equal to the previous level plus an error. To make this into an innovations state space model, all we need to do is specify the probability distribution for $e_t$. For a model with additive errors, we assume that one-step forecast errors $e_t$ are normally distributed white noise with mean 0 and variance $\sigma^2$. A short-hand notation for this is $e_t = \varepsilon_t\sim\text{NID}(0,\sigma^2)$; NID stands for "normally and independently distributed".
 
-Then the equations of the model can be written
+Then the equations of the model can be written as
 \begin{align}
   y_t &= \ell_{t-1} + \varepsilon_t (\#eq:ann-1a)\\
   \ell_t&=\ell_{t-1}+\alpha \varepsilon_t. (\#eq:ann-2a)
 \end{align}
 We refer to \@ref(eq:ann-1a) as the *measurement* (or observation) equation and (\#eq:ann-2a) as the *state* (or transition) equation. These two equations, together with the statistical distribution of the errors, form a fully specified statistical model. Specifically, these constitute an innovations state space model underlying simple exponential smoothing.
 
-The term "innovations" comes from the fact that all equations in this type of specification use the same random error process, $\varepsilon_t$. For the same reason this formulation is also referred to as a "single source of error" model in contrast to alternative multiple source of error formulations, which we do not present here.
+The term "innovations" comes from the fact that all equations in this type of specification use the same random error process, $\varepsilon_t$. For the same reason, this formulation is also referred to as a "single source of error" model, in contrast to alternative multiple source of error formulation swhich we do not present here.
 
-The measurement equation shows the relationship between the observations and the unobserved states. In this case observation $y_t$ is a linear function of the level $\ell_{t-1}$, the predictable part of $y_t$, and the random error $\varepsilon_t$, the unpredictable part of $y_t$. For other innovations state space models, this relationship may be nonlinear.
+The measurement equation shows the relationship between the observations and the unobserved states. In this case, observation $y_t$ is a linear function of the level $\ell_{t-1}$, the predictable part of $y_t$, and the random error $\varepsilon_t$, the unpredictable part of $y_t$. For other innovations state space models, this relationship may be nonlinear.
 
-The transition equation shows the evolution of the state through time. The influence of the smoothing parameter $\alpha$ is the same as for the methods discussed earlier. For example $\alpha$ governs the degree of change in successive levels. The higher the value of $\alpha$, the more rapid the changes in the level; the lower the value of $\alpha$, the smoother the changes. At the lowest extreme, where $\alpha=0$, the level of the series does not change over time. At the other extreme, where $\alpha=1$, the model reduces to a random walk model, $y_t=y_{t-1}+\varepsilon_t$.
+The transition equation shows the evolution of the state through time. The influence of the smoothing parameter $\alpha$ is the same as for the methods discussed earlier. For example, $\alpha$ governs the degree of change in successive levels. The higher the value of $\alpha$, the more rapid the changes in the level; the lower the value of $\alpha$, the smoother the changes. At the lowest extreme, where $\alpha=0$, the level of the series does not change over time. At the other extreme, where $\alpha=1$, the model reduces to a random walk model, $y_t=y_{t-1}+\varepsilon_t$.
 
 ### ETS(M,N,N): simple exponential smoothing with multiplicative errors {-}
 
@@ -576,14 +576,13 @@ Then we can write the multiplicative form of the state space model as
 
 ### ETS(A,A,N): Holt’s linear method with additive errors {-}
 
-For this model, we assume that one-step forecast errors are given by $\varepsilon_t=y_t-\ell_{t-1}-b_{t-1} \sim \text{NID}(0,\sigma^2)$. Substituting this into the error correction equations for Holt’s linear method we obtain
+For this model, we assume that the one-step forecast errors are given by $\varepsilon_t=y_t-\ell_{t-1}-b_{t-1} \sim \text{NID}(0,\sigma^2)$. Substituting this into the error correction equations for Holt’s linear method we obtain
 \begin{align*}
 y_t&=\ell_{t-1}+b_{t-1}+\varepsilon_t\\
 \ell_t&=\ell_{t-1}+b_{t-1}+\alpha \varepsilon_t\\
 b_t&=b_{t-1}+\beta \varepsilon_t,
 \end{align*}
-
-where for simplicity we have set $\beta=\alpha \beta^*$.
+where, for simplicity, we have set $\beta=\alpha \beta^*$.
 
 ### ETS(M,A,N): Holt’s linear method with multiplicative errors {-}
 
@@ -591,7 +590,7 @@ Specifying one-step forecast errors as relative errors such that
 $$
   \varepsilon_t=\frac{y_t-(\ell_{t-1}+b_{t-1})}{(\ell_{t-1}+b_{t-1})}
 $$
-and following a similar approach as above, the innovations state space model underlying Holt’s linear method with multiplicative errors is specified as
+and following an approach similar to that used above, the innovations state space model underlying Holt’s linear method with multiplicative errors is specified as
 \begin{align*}
 y_t&=(\ell_{t-1}+b_{t-1})(1+\varepsilon_t)\\
 \ell_t&=(\ell_{t-1}+b_{t-1})(1+\alpha \varepsilon_t)\\
@@ -607,7 +606,7 @@ In a similar fashion, we can write an innovations state space model for each of 
 Table: (\#tab:ssm) State space equations for each of the models in the ETS framework.
 
 ------------------------------------
-```{r ssm, echo=FALSE, cache=FALSE}
+```{r ssm, echo=FALSE, cache=TRUE}
 knitr::include_graphics("statespacemodels.png")
 ```
 ------------------------------------
@@ -615,11 +614,11 @@ knitr::include_graphics("statespacemodels.png")
 
 ### Estimating ETS models {-}
 
-An alternative to estimating the parameters by minimizing the sum of squared errors, is to maximize the "likelihood". The likelihood is the probability of the data arising from the specified model. So a large likelihood is associated with a good model. For an additive error model, maximizing the likelihood gives the same results as minimizing the sum of squared errors. However, different results will be obtained for multiplicative error models. In this section, we will estimate the smoothing parameters $\alpha$, $\beta$, $\gamma$ and $\phi$, and the initial states $\ell_0$, $b_0$, $s_0,s_{-1},\dots,s_{-m+1}$, by maximizing the likelihood.
+An alternative to estimating the parameters by minimizing the sum of squared errors is to maximize the "likelihood". The likelihood is the probability of the data arising from the specified model. Thus, a large likelihood is associated with a good model. For an additive error model, maximizing the likelihood gives the same results as minimizing the sum of squared errors. However, different results will be obtained for multiplicative error models. In this section, we will estimate the smoothing parameters $\alpha$, $\beta$, $\gamma$ and $\phi$, and the initial states $\ell_0$, $b_0$, $s_0,s_{-1},\dots,s_{-m+1}$, by maximizing the likelihood.
 
-The possible values that the smoothing parameters can take is restricted. Traditionally the parameters have been constrained to lie between 0 and 1 so that the equations can be interpreted as weighted averages. That is, $0< \alpha,\beta^*,\gamma^*,\phi<1$. For the state space models, we have set $\beta=\alpha\beta^*$ and $\gamma=(1-\alpha)\gamma^*$. Therefore the traditional restrictions translate to $0< \alpha <1$,  $0 < \beta < \alpha$  and $0< \gamma < 1-\alpha$. In practice, the damping parameter $\phi$ is usually constrained further to prevent numerical difficulties in estimating the model. A common constraint is to set $0.8<\phi<0.98$.
+The possible values that the smoothing parameters can take are restricted. Traditionally, the parameters have been constrained to lie between 0 and 1 so that the equations can be interpreted as weighted averages. That is, $0< \alpha,\beta^*,\gamma^*,\phi<1$. For the state space models, we have set $\beta=\alpha\beta^*$ and $\gamma=(1-\alpha)\gamma^*$. Therefore, the traditional restrictions translate to $0< \alpha <1$,  $0 < \beta < \alpha$  and $0< \gamma < 1-\alpha$. In practice, the damping parameter $\phi$ is usually constrained further to prevent numerical difficulties in estimating the model. A common constraint is to set $0.8<\phi<0.98$.
 
-Another way to view the parameters is through a consideration of the mathematical properties of the state space models. Then the parameters are constrained to prevent observations in the distant past having a continuing effect on current forecasts. This leads to some *admissibility* constraints on the parameters which are usually (but not always) less restrictive than the usual region. For example for the ETS(A,N,N) model, the usual parameter region is $0< \alpha <1$ but the admissible region is $0< \alpha <2$. For the ETS(A,A,N) model, the usual parameter region is $0<\alpha<1$ and $0<\beta<\alpha$ but the admissible region is $0<\alpha<2$ and $0<\beta<4-2\alpha$.
+Another way to view the parameters is through a consideration of the mathematical properties of the state space models. The parameters are constrained in order to prevent observations in the distant past having a continuing effect on current forecasts. This leads to some *admissibility* constraints on the parameters, which are usually (but not always) less restrictive than the usual region. For example, for the ETS(A,N,N) model, the usual parameter region is $0< \alpha <1$ but the admissible region is $0< \alpha <2$. For the ETS(A,A,N) model, the usual parameter region is $0<\alpha<1$ and $0<\beta<\alpha$ but the admissible region is $0<\alpha<2$ and $0<\beta<4-2\alpha$.
 
 ### Model selection {-}
 
@@ -642,13 +641,13 @@ $$
 
 Three of the combinations of (Error, Trend, Seasonal) can lead to numerical difficulties. Specifically, the models that can cause such instabilities are ETS(A,N,M), ETS(A,A,M), and ETS(A,A,M). We normally do not consider these particular combinations when selecting a model.
 
-Models with multiplicative errors are useful when the data are strictly positive, but are not numerically stable when the data contain zeros or negative values. Therefore multiplicative errors models will not be considered if the time series is not strictly positive. In that case only the six fully additive models will be applied.
+Models with multiplicative errors are useful when the data are strictly positive, but are not numerically stable when the data contain zeros or negative values. Therefore, multiplicative error models will not be considered if the time series is not strictly positive. In that case, only the six fully additive models will be applied.
 
 ### The `ets()` function in R {-}
 
 The models can be estimated in R using the `ets()` function in the forecast package.  Unlike the `ses`, `holt` and `hw` functions, the `ets` function does not produce forecasts. Rather, it estimates the model parameters and returns information about the fitted model.
 
-The R code below shows all the possible arguments this function takes, and their default values. If only the time series is specified, and all other arguments are left at their default values, then an appropriate model will be selected automatically. We explain the most important arguments below. See the help file for a more complete description.
+The R code below shows the most important arguments that this function can take, and their default values. If only the time series is specified, and all other arguments are left at their default values, then an appropriate model will be selected automatically. We explain the arguments below. See the help file for a more complete description.
 
 ```r
 ets(y, model="ZZZ", damped=NULL, alpha=NULL, beta=NULL, gamma=NULL,
@@ -661,10 +660,10 @@ y
 :   The time series to be forecast.
 
 model
-:   A three-letter code indicating the model to be estimated using the ETS classification and notation. The possible inputs are "N" for none, "A" for additive, "M" for multiplicative, or "Z" for automatic selection. If any of the inputs is left as "Z" then this component is selected according to the information criterion chosen. The default value of `ZZZ` ensures that all components are selected using the information criterion.
+:   A three-letter code indicating the model to be estimated using the ETS classification and notation. The possible inputs are "N" for none, "A" for additive, "M" for multiplicative, or "Z" for automatic selection. If any of the inputs is left as "Z", then this component is selected according to the information criterion chosen. The default value of `ZZZ` ensures that all components are selected using the information criterion.
 
 damped
-:   If `damped=TRUE`, then a damped trend will be used (either A or M). If `damped=FALSE`, then a non-damped trend will used. If `damped=NULL` (the default), then either a damped or a non-damped trend will be selected according to the information criterion chosen.
+:   If `damped=TRUE`, then a damped trend will be used (either A or M). If `damped=FALSE`, then a non-damped trend will used. If `damped=NULL` (the default), then either a damped or a non-damped trend will be selected, depending on which model has the smallest value for the information criterion.
 
 alpha, beta, gamma, phi
 :   The values of the smoothing parameters can be specified using these arguments. If they are set to `NULL` (the default setting for each of them), the parameters are estimated.
@@ -676,7 +675,7 @@ biasadj
 :   If `TRUE` and `lambda` is not `NULL`, then the back-transformed fitted values and forecasts will be bias-adjusted.
 
 additive.only
-:   Only models with additive components will be considered if `additive.only=TRUE`. Otherwise all models will be considered.
+:   Only models with additive components will be considered if `additive.only=TRUE`. Otherwise, all models will be considered.
 
 ic
 :   The information criterion to be used in selecting models, set by default to `aicc`.
@@ -700,13 +699,13 @@ y_{T+2} &= (\ell_{T+1} + b_{T+1})(1 + \varepsilon_{T+1})\\
             \right]
    ( 1 + \varepsilon_{T+1}).
 \end{align*}
-Therefore, $\hat{y}_{T+2|T}= \ell_{T}+2b_{T},$ and so on. These forecasts are identical to the forecasts from Holt’s linear method and also those from model ETS(A,A,N). So the point forecasts obtained from the method and from the two models that underlie the method are identical (assuming the same parameter values are used).
+Therefore, $\hat{y}_{T+2|T}= \ell_{T}+2b_{T},$ and so on. These forecasts are identical to the forecasts from Holt’s linear method, and also to those from model ETS(A,A,N). Thus, the point forecasts obtained from the method and from the two models that underlie the method are identical (assuming that the same parameter values are used).
 
 A big advantage of the models is that prediction intervals can also be generated --- something that cannot be done using the methods. The prediction intervals will differ between models with additive and multiplicative methods.
 
 For some models, there are exact formulae that enable prediction intervals to be calculated (see @expsmooth for the formulas). A more general approach that works for all models is to simulate future sample paths, conditional on the last estimate of the states, and to obtain prediction intervals from the percentiles of these simulated future paths.
 
-To obtain forecasts from an ETS model, we use the `forecast` function. The R code below shows the all the possible arguments this function takes when applied to an ETS model. We explain each the arguments in what follows.
+To obtain forecasts from an ETS model, we use the `forecast` function. The R code below shows the possible arguments that this function takes when applied to an ETS model. We explain each of the arguments in what follows.
 
 ```r
 forecast(object, h=ifelse(object$m>1, 2*object$m, 10),
@@ -739,18 +738,18 @@ PI
 :   If `PI=TRUE`, then prediction intervals are produced; otherwise only point forecasts are calculated.
 
 lambda
-:   The Box-Cox transformation parameter. This is ignored if `lambda=NULL`. Otherwise, forecasts are back-transformed via an inverse Box-Cox transformation.
+:   The Box-Cox transformation parameter. This is ignored if `lambda=NULL`. Otherwise, the forecasts are back-transformed via an inverse Box-Cox transformation.
 
 biasadj
 :   If `lambda` is not `NULL`, the backtransformed forecasts (and prediction intervals) are bias-adjusted.
 
 ### Example: International tourist visitor nights in Australia {-}
 
-We now employ the ETS statistical framework to forecast tourists visitor nights in Australia by international arrivals over the period 2011--2012. We let the `ets()` function select the model by minimizing the AICc.
+We now employ the ETS statistical framework to forecast tourist visitor nights in Australia by international arrivals over the period 2016--2019. We let the `ets()` function select the model by minimizing the AICc.
 
-```{r, echo=TRUE, cache=FALSE}
-vndata <- window(austourists, start=2005)
-fit <- ets(vndata)
+```{r, echo=TRUE, cache=TRUE}
+aust <- window(austourists, start=2005)
+fit <- ets(aust)
 summary(fit)
 ```
 
@@ -763,15 +762,15 @@ b_t &=b_{t-1} + \beta(\ell_{t-1} + b_{t_1})\varepsilon_t\\
 s_t &=  s_{t-m}(1+ \gamma \varepsilon_t).
 \end{align*}
 
-The parameter estimates are $\alpha=`r format(fit$par[1],nsmall=4,digits=4)`$, $\beta=`r format(fit$par[2],nsmall=4,digits=4, scientific=FALSE)`$, and $\gamma=`r format(fit$par[3],digits=4,nsmall=4, scientific=FALSE)`$. The output also returns the estimates for the initial states $\ell_0$, $b_0$, $s_{0}$, $s_{-1}$, $s_{-2}$ and $s_{-3}.$ The training RMSE for this model is slightly lower than the Holt-Winters methods with additive and multiplicative seasonality presented in Tables \@ref(tbl-7-HWadd) and \@ref(tbl-7-HWmulti) respectively. Although this model gives equivalent point forecasts to a multiplicative Holt-Winters' method, the parameters have been estimated differently. With the `ets()` function, the default estimation method is maximum likelihood rather than minimum sum of squares.
+The parameter estimates are $\alpha=`r format(fit$par[1],nsmall=4,digits=4)`$, $\beta=`r format(fit$par[2],nsmall=4,digits=4, scientific=FALSE)`$, and $\gamma=`r format(fit$par[3],digits=4,nsmall=4, scientific=FALSE)`$. The output also returns the estimates for the initial states $\ell_0$, $b_0$, $s_{0}$, $s_{-1}$, $s_{-2}$ and $s_{-3}.$ Compare these with the values obtained for the Holt-Winters method with multiplicative seasonality presented in Table \@ref(tab:tab76). Although this model gives equivalent point forecasts to a multiplicative Holt-Winters' method, the parameters have been estimated differently. With the `ets()` function, the default estimation method is maximum likelihood rather than minimum sum of squares.
 
-Figure \@ref(fig:MAMstates) shows the states over time while Figure \@ref(fig:MAMforecasts) shows point forecasts and prediction intervals generated from the model. The small values of $\beta$ and $\gamma$ mean that the slope and seasonal components change very little over time. The narrow prediction intervals indicate that the series is relatively easy to forecast due to the strong trend and seasonality.
+Figure \@ref(fig:MAMstates) shows the states over time, while Figure \@ref(fig:MAMforecasts) shows point forecasts and prediction intervals generated from the model. The small values of $\beta$ and $\gamma$ mean that the slope and seasonal components change very little over time. The narrow prediction intervals indicate that the series is relatively easy to forecast due to the strong trend and seasonality.
 
-```{r MAMstates, fig.cap="Graphical representation of the estimated states over time.", echo=TRUE, cache=FALSE}
+```{r MAMstates, fig.cap="Graphical representation of the estimated states over time.", echo=TRUE, cache=TRUE}
 autoplot(fit)
 ```
 
-```{r MAMforecasts, fig.cap="Forecasting international visitor nights in Australia from an ETS(M,A,M) model.", echo=TRUE, cache=FALSE}
+```{r MAMforecasts, fig.cap="Forecasting international visitor nights in Australia using an ETS(M,A,M) model.", echo=TRUE, cache=TRUE}
 autoplot(forecast(fit,h=8)) +
   ylab("International visitor night in Australia (millions)")
 ```
@@ -782,76 +781,71 @@ autoplot(forecast(fit,h=8)) +
 hardcover books at the same store. The task is to forecast the next four
 days’ sales for paperback and hardcover books (data set `books`).
 
- a. Plot the series and discuss the main features of the data.
+    a. Plot the series and discuss the main features of the data.
 
- b. Use simple exponential smoothing with the `ses` function (setting `initial="simple"`) and explore different values of $\alpha$ for the `paperback` series. Record the within-sample SSE for the one-step forecasts. Plot SSE against $\alpha$ and find which value of $\alpha$ works best. What is the effect of $\alpha$ on the forecasts?
+    b. Use the `ses` function to forecast each series, and plot the forecasts.
 
- c. Now let `ses` select the optimal value of $\alpha$. Use this value to generate forecasts for the next four days. Compare your results with (\@ref(1b)).
+    c. Compute the RMSE values for the training data in each case.
 
- d. Repeat but with `initial="optimal"`. How much difference does an optimal initial level make?
-
-Repeat steps (b)--(d) with the `hardcover` series.
 
 2.
-  a. Apply Holt’s linear method to the `paperback` and `hardback` series and compute four-day forecasts in each case.
+    a. Apply Holt’s linear method to the `paperback` and `hardback` series and compute four-day forecasts in each case.
 
-  b. Compare the SSE measures of Holt’s method for the two series to those of simple exponential smoothing in the previous question. Discuss the merits of the two forecasting methods for these data sets.
+    b. Compare the RMSE measures of Holt’s method for the two series to those of simple exponential smoothing in the previous question. (Remember that Holt's method is using one more parameter than SES.) Discuss the merits of the two forecasting methods for these data sets.
 
-  c. Compare the forecasts for the two series using both methods. Which do you think is best?
+    c. Compare the forecasts for the two series using both methods. Which do you think is best?
 
-  d. Calculate a 95% prediction interval for the first forecast for each series using both methods, assuming normal errors. Compare your forecasts with those produced by R.
+    d. Calculate a 95% prediction interval for the first forecast for each series, using the RMSE values and assuming normal errors. Compare your intervals with those produced by R.
 
-3. For this exercise, use the price of a dozen eggs in the United States from 1900--1993 (data set `eggs`). Experiment with the various options in the `holt()` function to see how much the forecasts change with damped or exponential trend. Also try changing the parameter values for $\alpha$ and $\beta$ to see how they affect the forecasts. Try to develop an intuition of what each parameter and argument is doing to the forecasts.
+3. For this exercise, use the price of a dozen eggs in the United States from 1900--1993 (data set `eggs`). Experiment with the various options in the `holt()` function to see how much the forecasts change with damped trend, or with a Box-Cox transformation. Try to develop an intuition of what each argument is doing to the forecasts.
 
-[Hint: use `h=100` when calling `holt()` so you can clearly see the differences between the various options when plotting the forecasts.]
+    [Hint: use `h=100` when calling `holt()` so you can clearly see the differences between the various options when plotting the forecasts.]
 
-Which model gives the best RMSE?
+    Which model gives the best RMSE?
 
 4. For this exercise, use the quarterly UK passenger vehicle production data from 1977:1--2005:1 (data set `ukcars`).
 
- a. Plot the data and describe the main features of the series.
+    a. Plot the data and describe the main features of the series.
 
- b. Decompose the series using STL and obtain the seasonally adjusted data.
+    b. Decompose the series using STL and obtain the seasonally adjusted data.
 
- c. Forecast the next two years of the series using an additive damped trend method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of the one-step forecasts from your method.
+    c. Forecast the next two years of the series using an additive damped trend method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of the one-step forecasts from your method.
 
- d. Forecast the next two years of the series using Holt’s linear method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of of the one-step forecasts from your method.
+    d. Forecast the next two years of the series using Holt’s linear method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of of the one-step forecasts from your method.
 
- e. Now use `ets()` to choose a seasonal model for the data.
+    e. Now use `ets()` to choose a seasonal model for the data.
 
- f. Compare the RMSE of the fitted model with the RMSE of the model you obtained using an STL decomposition with Holt’s method. Which gives the better in-sample fits?
+    f. Compare the RMSE of the fitted model with the RMSE of the model you obtained using an STL decomposition with Holt’s method. Which gives the better in-sample fits?
 
- g. Compare the forecasts from the two approaches? Which seems most reasonable?
+    g. Compare the forecasts from the two approaches? Which seems most reasonable?
 
 
 5. For this exercise, use the monthly Australian short-term overseas visitors data, May 1985--April 2005. (Data set: `visitors`.)
 
- a. Make a time plot of your data and describe the main features of the series.
+    a. Make a time plot of your data and describe the main features of the series.
 
- b. Forecast the next two years using Holt-Winters’ multiplicative method.
+    b. Forecast the next two years using Holt-Winters’ multiplicative method.
 
- c. Why is multiplicative seasonality necessary here?
+    c. Why is multiplicative seasonality necessary here?
 
- d. Experiment with making the trend exponential and/or damped.
+    d. Experiment with making the trend exponential and/or damped.
 
- e. Compare the RMSE of the one-step forecasts from the various methods. Which do you prefer?
+    e. Compare the RMSE of the one-step forecasts from the various methods. Which do you prefer?
 
- g. Now fit each of the following models to the same data:
+    g. Now fit each of the following models to the same data:
 
-   i) a multiplicative Holt-Winters’ method;
+        i) a multiplicative Holt-Winters’ method;
 
-   ii) an ETS model;
+        ii) an ETS model;
 
-   iii) an additive ETS model applied to a Box-Cox transformed series;
+        iii) an additive ETS model applied to a Box-Cox transformed series;
 
-   iv) a seasonal naive method applied to the Box-Cox transformed series;
+        iv) a seasonal naive method applied to the Box-Cox transformed series;
 
-   v) an STL decomposition applied to the Box-Cox transformed data followed by an ETS model applied to the seasonally adjusted (transformed) data.
+        v) an STL decomposition applied to the Box-Cox transformed data followed by an ETS model applied to the seasonally adjusted (transformed) data.
 
-   vi) For each model, look at the residual diagnostics and compare the forecasts for the next two years. Which do you prefer?
+        vi) For each model, look at the residual diagnostics and compare the forecasts for the next two years. Which do you prefer?
 
 ## Further reading
 
-- @Gar1985
-- @Gar2006
-- @expsmooth08
+Two articles by Ev Gardner [@Gar1985;@Gar2006] provide a great overview of the history of exponential smoothing, and its many variations. A full book treatment of the subject providing the mathematical details is given by @expsmooth08.

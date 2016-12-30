@@ -182,7 +182,7 @@ Data which are affected by the value of money are best adjusted before modelling
 To make these adjustments, a price index is used. If $z_{t}$ denotes the price index and $y_{t}$ denotes the original house price in year $t$, then $x_{t} = y_{t}/z_{t} * z_{2000}$ gives the adjusted house price at year 2000 dollar values. Price indexes are often constructed by government agencies. For consumer goods, a common price index is the Consumer Price Index (or CPI).
 
 
-## Residual diagnostics
+## Residual diagnostics {#toolbox-resids}
 
 ### Fitted values {-}
 

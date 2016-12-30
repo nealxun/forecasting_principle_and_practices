@@ -6,16 +6,16 @@ For example, we might wish to  forecast monthly sales ($y$) with total advertisi
 
 The forecast variable ($y$) is sometimes also called the regressand, dependent or explained variable. The predictor variables ($x$) are sometimes also called the regressors, independent or explanatory variables. In this book we will always refer to them as the "forecast variable" and "predictor variables".
 
-## The linear model {#sec-4-1-Intro}
+## The linear model {#Regr-Intro}
 
 ### Simple linear regression {-}
 
-In the simplest case there is only one predictor variable, and it is related to the forecast variable by the simple linear model: 
+In the simplest case there is only one predictor variable, and it is related to the forecast variable by the simple linear model 
 $$
-  y = \beta_0 + \beta_1 x + \varepsilon.
+  y_t = \beta_0 + \beta_1 x_t + \varepsilon_t.
 $$
 
-An example of data from such a model is shown in Figure \@ref(fig:SLRpop1). The parameters $\beta_0$ and $\beta_1$ denote the intercept and the slope of the line respectively. The intercept $\beta_0$ represents the predicted value of $y$ when $x=0$. The slope $\beta_1$ represents the predicted increase in $y$ resulting from a one unit increase in $x$.
+An example of data from such a model is shown in Figure \@ref(fig:SLRpop1). The parameters $\beta_0$ and $\beta_1$ denote the intercept and the slope of the line respectively. The intercept $\beta_0$ represents the predicted value of $y$ when $x=0$. The slope $\beta_1$ represents the average predicted change in $y$ resulting from a one unit change in $x$.
 
 ```{r SLRpop1, fig.cap="An example of data from a linear regression model.", echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
 set.seed(2)
@@ -27,7 +27,7 @@ ggplot(df, aes(x, y)) +
   geom_abline(slope=10,intercept=3, col="#990000",
               size=0.3) +
   geom_label(x=.3,y=40,parse=TRUE, col="#990000",
-             label="y == beta[0] + beta[1] * x") +
+             label=" beta[0] + beta[1] * x") +
   geom_segment(x=.3, y=36, xend=0, yend=4, 
         arrow=arrow(length = unit(0.02, "npc")),
         size=0.2, col='#990000') +
@@ -51,69 +51,83 @@ Notice that the observations do not lie on the straight line but are scattered a
 
 
 
-### US consumption expenditure {-}
+#### Example: US consumption expenditure {-}
+
+Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US for the period March 1970 to Dec 2016.
   
-```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure for the US."}
-autoplot(usconsumption, ylab="", xlab="Year", facet=TRUE) 
+```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US."}
+autoplot(usconsumption, ylab="% change", xlab="Year")+
+guides(colour=guide_legend(title=" "))
 ```
 
-Figure \@ref(fig:ConsInc) shows time series plots of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US for the period March 1970 to Dec 2010. 
-
-```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Plot"}
-fit.ex3 <- tslm(consumption ~ income, data=usconsumption) 
-ggplot(as.data.frame(usconsumption), aes(x=income, y=consumption)) + geom_point() + 
-  geom_smooth(method="lm", se=FALSE)
+```{r, cache=TRUE, include=FALSE}
+fit.cons <- tslm(consumption ~ income, data=usconsumption) 
 ```
 
-A scatter plot of consumption against income is shown in Figure \@ref(fig:ConsInc2), along with the estimated regression line
+A scatter plot of consumption against income is shown in Figure \@ref(fig:ConsInc2) along with the estimated regression line
 $$
-  \hat{y}=`r coef(fit.ex3)[1]` + `r coef(fit.ex3)[2]`x.
+  \hat{y}_t=`r coef(fit.cons)[1]` + `r coef(fit.cons)[2]`x_t.
 $$
-The estimate results are given below.
+We will show how this line is estimated in Section \@ref(regr-LSprinciple). The fitted line is positively sloped showing a positive relationship between income and consumption. 
+
+The interpretation of the intercept requires that a value of $x=0$ makes sense. In this case when $x=0$ (when there is no change in personal disposable income since the last quarter) the predicted value of $y$ corresponding to $x=0$ is `r round(coef(fit.cons)[1], 2)` (there is a predicted increase in personal consumption expenditure of `r round(coef(fit.cons)[1], 2)`%). Even when $x=0$ does not make sense, the intercept is an important part of the model. Without it, the slope coefficient can be distorted unnecessarily. The intercept should always be included unless the requirement is to force the regression line through the origin.
+
+The slope coefficient shows that a one unit increase in $x$ (a 1% increase in personal disposable income) results on average in `r round(coef(fit.cons)[2], 2)` units increase in $y$ (an average `r round(coef(fit.cons)[2], 2)`% increase in personal consumption expenditure). Alternatively the estimated equation shows that a value of 1 for $x$ (the percentage increase in personal disposable income) will result in a forecast value of `r round(coef(fit.cons)[1], 2)` + `r  round(coef(fit.cons)[2], 2)`$\times1$ = 0.83 for $y$ (the percentage increase in personal consumption expenditure).
+
+
+```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
+ggplot(as.data.frame(usconsumption), aes(x=income, y=consumption)) +
+  ylab("% change in consumption")+xlab("% change in income")+
+  geom_point() + geom_smooth(method="lm", se=FALSE)
+```
+
+The estimation results are shown below.
 
 ```{r ConsInc3, echo=TRUE, cache=TRUE}
-summary(fit.ex3)
+summary(fit.cons)
 ```
 
-(We will show how this line can be estimated in Section \@ref().
 
-This equation shows that a value of 1 for $x$ (the percentage increase in personal disposable income) will result in a forecast value of $0.52+0.32\times1 = 0.84$ for $y$ (the percentage increase in personal consumption expenditure). When $x$ is zero (there is no change in personal disposal income since the last quarter), $y$ takes the value $0.52$ --- there is an increase in consumption of 0.52%.
-
-In general, the slope coefficient can be interpreted as the effect on $y$ of an increase of 1 in $x$ . 
-
-The interpretation of the intercept requires that a value of $x=0$ makes sense. When $x=0$ makes sense, the intercept $\hat{\beta}_0$ is the predicted value of $y$ corresponding to $x=0$. Even when $x=0$ does not make sense, the intercept is an important part of the model. Without it, the slope coefficient can be distorted unnecessarily.
 
 ### Multiple linear regression {-}
 
 When there are two or more predictor variables, the model is called a "multiple regression model". The general form of a multiple regression model is
 \begin{equation}
-  y = \beta_{0} + \beta_{1} x_{1} + \beta_{2} x_{2} + \cdots + \beta_{k} x_{k} + \varepsilon,
+  y_t = \beta_{0} + \beta_{1} x_{1,t} + \beta_{2} x_{2,t} + \cdots + \beta_{k} x_{k,t} + \varepsilon_t,
   (\#eq:lm)
 \end{equation}
 where $y$ is the variable to be forecast and $x_{1},\dots,x_{k}$ are the $k$ predictor variables. Each of the predictor variables must be numerical. The coefficients $\beta_{1},\dots,\beta_{k}$ measure the effect of each predictor after taking account of the effect of all other predictors in the model. Thus, the coefficients measure the *marginal effects* of the predictor variables.
 
+#### Example: multiple linear regression {-}
+
 ### Assumptions {-}
 
-When we use a linear regression model, we are implicitly making some assumptions about the variables in equation \@ref(eq:lm).
+When we use a linear regression model, we are implicitly making some assumptions about the variables in Equation \@ref(eq:lm).
 
 First, we assume that the model is a reasonable approximation to reality; that is, that the relationship between the forecast variable and the predictor variables satisfies this linear equation.
 
-Second, we make these assumptions about the errors $(\varepsilon_{1},\dots,\varepsilon_{T})$:
+Second, we make the following assumptions about the errors $(\varepsilon_{1},\dots,\varepsilon_{T})$:
 
   * they have mean zero; otherwise the forecasts will be systematically biased.
   * they are not autocorrelated; otherwise the forecasts will be inefficient as there is more information to be exploited in the data.
   * they are unrelated to the predictor variables; otherwise there would be more information that should be included in the systematic part of the model.
 
-It is also useful to have the errors normally distributed with constant variance in order to easily produce prediction intervals. 
+It is also useful to have the errors normally distributed with constant variance in order to easily produce prediction intervals.
 
-## Some useful predictors {#sec-5-2-UsefulPredictors}
+Another important assumption in the linear regression model is that each $x$ is not a random variable. If we were performing a controlled experiment in a laboratory, we could control the values of each $x$ (so they would not be random) and observe the resulting values of $y$. With observational data (including most data in business and economics) it is not possible to control the value of $x$, and hence we make this an assumption.
+
+## Some useful predictors {#Regr-UsefulPredictors}
 
 There are several very useful predictors that occur frequently when using regression for time series data.
 
 ### Trend {-}
 
-A linear trend can be included by using the predictor $x_{1,t}=t$.
-A quadratic or higher order trend is obtained by specifying 
+It is very common for time series data to be trending. A linear trend can be modelled by simply using $x_{1,t}=t$ as a predictor,
+
+$$
+  y_{t}= \beta_0+\beta_1t+\varepsilon_t,
+$$
+where $t=1,\ldots,T$. Quadratic or higher order trends can also be obtained by specifying 
 \[
   x_{1,t} =t,\quad x_{2,t}=t^2,\quad \dots
 \]
@@ -139,14 +153,13 @@ So far, we have assumed that each predictor takes numerical values. But what abo
 
 This situation can still be handled within the framework of multiple regression models by creating a "dummy variable" taking value 1 corresponding to "yes" and 0 corresponding to "no". A dummy variable is also known as an "indicator variable".
 
-If there is an outlier in the data, rather than omit it, you can use a dummy variable to remove its effect. In this case, the dummy variable takes value one for that observation and zero everywhere else.
+A dummy variable can also be used to account for an outlier in the data. Rather than omit the outlier, a dummy variable removes its effect. In this case, the dummy variable takes value 1 for that observation and 1 everywhere else. An example is the case where a special event has occured. For example when forecasting tourist arrivals to Sydney Australia we will need to account for the effect of the Sydney summer Olympics in 2000.
 
 If there are more than two categories, then the variable can be coded using several dummy variables (one fewer than the total number of categories).
 
-
 ### Seasonal dummy variables {-}
 
-For example, suppose we are forecasting daily electricity demand and we want toaccount for the day of the week as a predictor. Then the following dummy variables can be created.
+For example, suppose we are forecasting daily electricity demand and we want to account for the day of the week as a predictor. Then the following dummy variables can be created.
 
 ```{r dowdummy, echo=FALSE, cache=TRUE}
 df <- matrix("0", nrow=13, ncol=6)
@@ -159,20 +172,51 @@ rownames(df)[13] <- "&#8942;"
 knitr::kable(df)
 ```
 
-Notice that only six dummy variables are needed to code seven categories. That is because the seventh category (in this case Sunday) is specified when the dummy variables are all set to zero.
+Notice that only six dummy variables are needed to code seven categories. That is because the seventh category (in this case Sunday) is specified when all dummy variables are all set to zero and is captured by the intercept.
 
-Many beginners will try to add a seventh dummy variable for the seventh category. This is known as the "dummy variable trap" because it will cause the regression to fail. There will be too many parameters to estimate. The general rule is to use one fewer dummy variables than categories. So for quarterly data, use three dummy variables; for monthly data, use 11 dummy variables; and for daily data, use six dummy variables.
+Many beginners will try to add a seventh dummy variable for the seventh category. This is known as the "dummy variable trap" because it will cause the regression to fail. There will be one too many parameters to estimate when an intercept is also included. The general rule is to use one fewer dummy variables than categories. So for quarterly data, use three dummy variables; for monthly data, use 11 dummy variables; and for daily data, use six dummy variables.
 
-The interpretation of each of the coefficients associated with the dummy variables is that it is *a measure of the effect of that category relative to the omitted category*. In the above example, the coefficient associated with Monday will measure the effect of Monday compared to Sunday on the forecast variable.
+The interpretation of each of the coefficients associated with the dummy variables is that it is *a measure of the effect of that category relative to the omitted category*. In the above example, the coefficient of $x_{1,t}$ associated with Monday will measure the effect of Monday compared to Sunday on the forecast variable. An example of interpreting estimated dummy variable coefficients capturing the quarterly seasonality of Australian beer production follows in Section \@ref(sec-5-3-LSprinciple). 
+
+### Intervention variables {-}
+
+It is often necessary to model interventions that may have affected the variable to be forecast. For example, competitor activity, advertising expenditure, industrial action, and so on, can all have an effect.
+
+When the effect lasts only for one period, we use a spike variable. This is a dummy variable taking value one in the period of the intervention and zero elsewhere. A spike variable is equivalent to a dummy variable for handling an
+outlier.
+
+Other interventions have an immediate and permanent effect. If an intervention causes a level shift (i.e., the value of the series changes suddenly and permanently from the time of intervention), then we use a step variable. A step variable takes value zero before the intervention and one from the time of intervention onwards.
+
+Another form of permanent effect is a change of slope. Here the intervention is handled using a piecewise linear trend as discussed earlier (where $\tau$ is the time of intervention).
+
+### Trading days {-}
+
+The number of trading days in a month can vary considerably and can have a substantial effect on sales data. To allow for this, the number of trading days in each month can be included as a predictor. An alternative that allows for the effects of different days of the week has the following predictors:
+
+$$\begin{aligned} x_{1} &= \text{\# Mondays in month;} \\ x_{2} &= \text{\#
+Tuesdays in month;} \\ & \vdots \\ x_{7} &= \text{\# Sundays in
+month.}\end{aligned}$$
+
+### Distributed lags {-}
+
+It is often useful to include advertising expenditure as a predictor. However, since the effect of advertising can last beyond the actual campaign, we need to include lagged values of advertising expenditure. So the following predictors may be used.
+
+$$\begin{aligned} x_{1} &= \text{advertising for previous month;} \\ x_{2} &=
+\text{advertising for two months previously;} \\ &\vdots \\ x_{m} &=
+\text{advertising for $m$ months previously.}\end{aligned}$$
+
+It is common to require the coefficients to decrease as the lag increases. In Chapter \@ref(ch-dynamic) we discuss methods to allow this constraint to be implemented.
 
 ### Easter {-}
 
 Easter is different from most holidays because it is not held on the same date each year and the effect can last for several days. In this case, a dummy variable can be used with value one where any part of the holiday falls in the particular time period and zero otherwise.
 
 For example, with monthly data, when Easter falls in March then the dummy variable takes value 1 in March, when it falls in April, the dummy variable
-takes value 1 in April, and when it starts in March and finishes in April, the dummy variable takes value 1 for both months.
+takes value 1 in April, and when it starts in March and finishes in April, the dummy variable takes value 1 for both months. 
 
-## Least squares estimation {#sec-4-2-LSprinciple}
+`easter(ausbeer)`
+
+## Least squares estimation {#Regr-LSprinciple}
 
 In practice, of course, we have a collection of observations but we do not know the values of the coefficients $\beta_0,\beta_1, \dots, \beta_k$. These need to be estimated from the data.
 
@@ -182,82 +226,63 @@ $$
   \beta_{0} - \beta_{1} x_{1,t} - \beta_{2} x_{2,t} - \cdots - \beta_{k} x_{k,t})^2.
 $$
 
-This is called "least squares" estimation because it gives the least value for the sum of squared errors.  Finding the best estimates of the coefficients is often called "fitting" the model to the data, or sometimes "learning" or "training" the model. The line shown in Figure \@ref(fig:ConsInc2) was obtained in this way.
+This is called "least squares" estimation because it gives the least value for the sum of squared errors.  Finding the best estimates of the coefficients is often called "fitting" the model to the data, or sometimes "learning" or "training" the model. The line shown in Figure \@ref(fig:ConsInc2) was obtained in this way. 
 
-When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section&nbsp;\@ref(sec-matrixequations).
+When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section \@ref(sec-matrixequations).
 
-The estimated coefficients are used for forecasting. For each set of values for the predictors $x_1,\dots,x_k$ we can forecast a corresponding value of $y$ using 
-$$
-  \hat{y} = \hat\beta_{0} + \hat\beta_{1} x_{1} + \hat\beta_{2} x_{2} + \cdots + \hat\beta_{k} x_{k}.
-$$ 
+Predictions of $y_t$ can be obtained by ignoring the error in the regression equation and using the estimated coefficients. That is for each set of values for the predictors $x_1,\dots,x_k$ we can forecast a corresponding value of $y$ using 
+\begin{equation}
+  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}.
+  (\#eq:prediction)
+\end{equation}
 
-### Example: Australian quarterly beer production {-}
 
-Recall the Australian quarterly beer production data shown below.
+#### Example: Australian quarterly beer production {-}
 
-```{r beeragain, echo=TRUE, cache=TRUE, warning=FALSE, message=FALSE}
+Recall the Australian quarterly beer production data shown below in Figure \@ref(fig:beeragain).
+
+```{r beeragain, echo=TRUE, cache=TRUE, fig.cap="Australian quarterly beer production."}
 beer2 <- window(ausbeer, start=1992)
-autoplot(beer2)
+autoplot(beer2) + xlab("Year") + ylab("Megalitres") 
 ```
 
-We want to forecast the value of future beer production. There are no other variables available for predictors. Instead, we can use the number of quarters since the start of the series as a predictor variable (the trend). We may also use the quarter of the year corresponding to each observation as a predictor variable (a seasonal dummy variable). Then, knowing the number of quarters since the start of the series and the specific quarter of interest, we can forecast the value of beer production in that quarter.
-
-```{r ausbeerfit, echo=TRUE, cache=TRUE}
-fit <- tslm(beer2 ~ trend + season) 
-summary(fit)
-```
-
-Thus, we model the Australian beer production data using a regression model with a linear trend and quarterly dummy variables: 
+We want to forecast the value of future beer production. We can model this data using a regression model with a linear trend and quarterly dummy variables, 
 \[
   y_{t} = \beta_{0} + \beta_{1} t + \beta_{2}d_{2,t} + \beta_3 d_{3,t} + \beta_4 d_{4,t} + \varepsilon_{t},
 \]
-where $d_{i,t} = 1$ if $t$ is in quarter $i$ and 0 otherwise. The first quarter variable has been omitted, so the coefficients associated with the other quarters are measures of the difference between those quarters and the first quarter.
+where $d_{i,t} = 1$ if $t$ is in quarter $i$ and 0 otherwise. The first quarter variable has been omitted, so the coefficients associated with the other quarters are measures of the difference between those quarters and the first quarter. 
 
-There is a strong downward trend of `r round(fit$coef['trend'], 3)` megalitres per quarter. On average, the second quarter has production of `r -round(fit$coef['season2'], 1)` megalitres lower than the first quarter, the third quarter has production of `r -round(fit$coef['season3'], 1)` megalitres lower than the first quarter, and the fourth quarter has production `r round(fit$coef['season4'], 1)` megalitres higher than the first quarter. The model explains `r round(summary(fit)$r.squared*100,1)`% of the variation in the beer production data.
+```{r fig.beerfit, echo=TRUE, cache=TRUE}
+fit.beer <- tslm(beer2 ~ trend + season) 
+summary(fit.beer)
+```
+
+There is a strong downward trend of `r round(fit.beer$coef['trend'], 3)` megalitres per quarter. On average, the second quarter has production of `r -round(fit.beer$coef['season2'], 1)` megalitres lower than the first quarter, the third quarter has production of `r -round(fit.beer$coef['season3'], 1)` megalitres lower than the first quarter, and the fourth quarter has production `r round(fit.beer$coef['season4'], 1)` megalitres higher than the first quarter.
 
 ### Fitted values {-}
 
-Predictions of $y$ can be calculated by ignoring the error in the regression equation. That is
-\[
-  \hat{y} = \hat\beta_{0} + \hat\beta_{1} x_{1} + \hat\beta_{2} x_{2} + \cdots + \hat\beta_{k} x_{k}.
-\]
-Plugging in values of $x_1,\dots,x_k$ into the right hand side of this equation gives a prediction of $y$ for that combination of predictors.
-
-When the values of $x_1,\dots,x_k$ are new values (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
-
-When this calculation is done using values of the predictors from the data that were used to estimate the model, we call the resulting values of $y$ the "fitted values".  We write these as 
-$$
-  \hat{y}_t = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t},
-$$ 
-for $t=1,\dots,T$. Each $\hat{y}_t$ is the forecast corresponding to the observation $y_t$ using the predictor information. These are "predictions" of the data used in estimating the model. They are not genuine forecasts as the actual value of $y$ for that set of predictors was used in estimating the model, and so the value of $\hat{y}$ is affected by the true value of $y$.
-
-The following plots show the actual values compared to the predicted (i.e., fitted) values for the Australian beer data.
+Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the right hand side of equation \@ref(eq:prediction) returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. The following plots show the actual values compared to the predicted (i.e., fitted) values for the Australian beer data. `maybe comment on these`
 
 ```{r beerlm2, echo=TRUE, cache=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
-df <- cbind(Data=beer2, fitted=fitted(fit))
+df <- cbind(Data=beer2, Fitted=fitted(fit.beer))
 autoplot(df[,1:2]) + xlab("Year") + ylab("") +
-  ggtitle("Quarterly Beer Production")
+  ggtitle("Quarterly Beer Production")+
+  guides(colour=guide_legend(title=" "))
 ```
 
 ```{r beerlm3, echo=TRUE, cache=TRUE, fig.cap="Actual beer production plotted against predicted beer production."}
 df <- as.data.frame(df)
-ggplot(df,aes(x=Data, y=fitted, colour=as.factor(cycle(beer2)))) + 
+ggplot(df,aes(x=Data, y=Fitted, colour=as.factor(cycle(beer2)))) + 
   geom_point() +
-  xlab("Predicted values") + ylab("Actual values") + 
+  xlab("Fitted") + ylab("Actual values") + 
   ggtitle("Quarterly beer production") +
   scale_color_brewer(palette="Dark2", name="Quarter")
 ```
 
-```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
-fcast <- forecast(fit) 
-autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
-```
 
-Forecasts obtained from the model are shown in Figure \@ref(fig:beerlm1).
+## Evaluating the regression model {#Regr-EvaluatingSLR}
 
-## Evaluating the regression model {#sec-4-4-EvaluatingSLR}
-
-The difference between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the forecast errors or "residuals": 
+The difference between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the forecast errors or "residuals" 
 \begin{align*}
   e_t &= y_t - \hat{y}_t \\
       &= y_t - \hat\beta_{0} - \hat\beta_{1} x_{1,t} - \hat\beta_{2} x_{2,t} - \cdots - \hat\beta_{k} x_{k,t}.
@@ -270,30 +295,18 @@ $$
 $$
 As a result of these properties, it is clear that the average of the residuals is zero, and that the correlation between the residuals and the observations for the predictor variable is also zero.
 
+`comment on regression through the origin not necessarily having sum zero resids`
+
 After selecting the regression variables and fitting a regression model, it is necessary to plot the residuals to check that the assumptions of the model have been satisfied. There are a series of plots that should be produced in order to check different aspects of the fitted model and the underlying assumptions.
-
-### Residual plots against predictors {-}
-
-We would expect the residuals to be randomly scattered without showing any systematic patterns. A simple and quick way for a first check is to examine a scatterplot of the residuals against each of the predictor variables. 
-
-If these scatterplots show a pattern, then the relationship may be nonlinear and the model will need to be modified accordingly. See Section \@ref(sec-5-6-NonLinear) for a discussion of nonlinear regression.
-
-It is also necessary to plot the residuals against any predictors *not* in the model. If these show a pattern, then the predictor may need to be added to the model (possibly in a nonlinear form).
-
-### Residual plots against fitted values {-}
-
-A plot of the residuals against the fitted values should also show no pattern. If a pattern is observed, there may be "heteroscedasticity" in the errors. That is, the variance of the residuals may not be constant. To overcome this problem, a transformation of the forecast variable (such as a logarithm or square root) may be required.
 
 ### ACF plot of residuals {-}
 
-You should always look at an ACF plot of the residuals. This will reveal if there is any autocorrelation in the residuals (suggesting that there is information that has not been accounted for in the model).
+With time series data it is highly likely that the value of a variable observed in the current time period will be influenced by its value in the previous period, or even the period before that, and so on. Therefore when fitting a regression model to time series data, it is very common to find autocorrelation in the residuals. In this case, the estimated model violates the assumption of no autocorrelation in the errors, and our forecasts may be inefficient --- there is some information left over which should be accounted for in the model in order to obtain better forecasts. The forecasts from a model with autocorrelated errors are still unbiased, and so are not "wrong", but they will usually have larger prediction intervals than they need to. Therefore we should always look at an ACF plot of the residuals. 
 
 Figure \@ref(fig:beerlm4) shows a time plot and ACF of the residuals from the model fitted to the beer production data.
 
 ```{r beerlm4, echo=TRUE, cache=TRUE, fig.cap="Residuals from the regression model for beer production.", fig.height=3}
-fit <- tslm(beer2 ~ trend + season) 
-res <- residuals(fit) 
-
+res <- residuals(fit.beer) 
 p1 <- autoplot(res) + ylab("Residuals") + xlab("Year") 
 p2 <- ggAcf(res) + ggtitle("ACF of residuals")
 gridExtra::grid.arrange(p1, p2, nrow=1)
@@ -303,92 +316,156 @@ There is an outlier in the residuals (2004:Q4) which suggests there was somethin
 
 The remaining residuals show that the model has captured the patterns in the data quite well, although there is a small amount of autocorrelation left in the residuals (seen in the significant spike in the ACF plot). This suggests that the model can be slightly improved, although it is unlikely to make much difference to the resulting forecasts.
 
-Another test of autocorrelation that is designed to take account of the regression model is the **Durbin-Watson** test. It is used to test the hypothesis that there is no lag one autocorrelation in the residuals.  A small p-value indicates there is significant autocorrelation remaining in the residuals. For the beer model, the Durbin-Watson test reveals some significant lag one autocorrelation.
+Another test of autocorrelation that is designed to take account of the regression model is the **Durbin-Watson** test. It is used to test the hypothesis that there is no first order autocorrelation in the residuals.  A small p-value indicates there is significant autocorrelation remaining in the residuals. For the beer model, the Durbin-Watson test reveals some significant lag one autocorrelation.
 
 ```{r dwtestbeer, echo=TRUE, cache=TRUE}
-dwtest(fit, alt="two.sided") 
+dwtest(fit.beer, alt="two.sided") 
 #It is recommended that the two-sided test always be used 
 #to check for negative as well as positive autocorrelation
 ```
 
 Both the ACF plot and the Durbin-Watson test show that there is some autocorrelation remaining in the residuals. This means there is some information remaining in the residuals that can be exploited to obtain better forecasts. The forecasts from the current model are still unbiased, but will have larger prediction intervals than they need to. A better model in this case will be a dynamic-regression model which will be covered in Chapter \@ref(ch-dynamic).
 
-A third possible test is the **Breusch-Godfrey** test designed to look for significant higher-lag autocorrelations.
+A third possible test is the **Breusch-Godfrey** test designed to look for significant higher-order autocorrelations.
 
 ```{r bgtestbeer, echo=TRUE, cache=TRUE}
 #Test for autocorrelations up to lag 5. 
-bgtest(fit,5)
+bgtest(fit.beer,5)
 ```
 
-With time series data it is highly likely that the value of a variable observed in the current time period will be influenced by its value in the previous period, or even the period before that, and so on. Therefore when fitting a regression model to time series data, it is very common to find autocorrelation in the residuals. In this case, the estimated model violates the assumption of no autocorrelation in the errors, and our forecasts may be inefficient --- there is some information left over which should be utilized in order to obtain better forecasts. The forecasts from a model with autocorrelated errors are still unbiased, and so are not "wrong", but they will usually have larger prediction intervals than they need to.
 
+### Residual plots against predictors {-}
+
+We would expect the residuals to be randomly scattered without showing any systematic patterns. A simple and quick way for a first check is to examine a scatterplot of the residuals against each of the predictor variables. 
+
+If these scatterplots show a pattern, then the relationship may be nonlinear and the model will need to be modified accordingly. See Section \@ref(sec-5-6-NonLinear) for a discussion of nonlinear regression.
+
+It is also necessary to plot the residuals against any predictors *not* in the model. If these show a pattern, then the predictor may need to be added to the model (possibly in a nonlinear form).
+
+`I've added this but not sure it's useful - need to revisit when I get a better example`
+```{r resids, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of residuals versus income."}
+df <- as.data.frame(cbind(income=usconsumption[,"income"], res=residuals(fit.cons)))
+ggplot(df, aes(x=income, y=res)) +
+  ylab("Residuals")+xlab("% change in income")+
+  geom_point() 
+```
+
+### Residual plots against fitted values {-}
+
+A plot of the residuals against the fitted values should also show no pattern. If a pattern is observed, there may be "heteroscedasticity" in the errors. That is, the variance of the residuals may not be constant. To overcome this problem, a transformation of the forecast variable (such as a logarithm or square root) may be required. 
+
+Figure \@ref(fig:electrendseas) shows the residuals against the fitted values from fitting a linear trend and seasonal dummies to the electricity data we first encountered in Section \@ref(sec-transformations). The plot shows that the trend in the data is not linear and that the forecast variable requires a transformation as we observe a heteroscedastic pattern with variation increasing along the x-axis.
+
+
+```{r electrendseas, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of residuals versus fitted."}
+fit <- tslm(elec ~ trend + season) 
+df <- as.data.frame(cbind(fitd=fitted(fit), res=residuals(fit)))
+
+ggplot(df, aes(x=fitd, y=res,colour=as.factor(cycle(elec)))) +
+  ylab("residuals")+xlab("fitted")+
+  geom_point()  +
+  scale_color_brewer(palette="Paired", name="Quarter")
+```
 
 ### Histogram of residuals {-}
 
-Finally, it is a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier.
 
-```{r beerlm5, echo=TRUE, cache=TRUE, fig.cap="Histogram of residuals from regression model for beer production.", message=FALSE, warning=FALSE}
+Finally, it is a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier. The histogram in Figure \@ref(fig:beerhist)
+below shows, that the residuals from modelling the beer data seem to be slightly negatively skewed, although that is partly due to the outlier.
+
+```{r beerhist, echo=TRUE, cache=TRUE, fig.cap="Histogram of residuals from regression model for beer production.", message=FALSE, warning=FALSE}
 x <- -43:43
-ggplot() + geom_histogram(aes(res), binwidth=7) + 
+ggplot() + geom_histogram(aes(res), binwidth=6) + 
   xlab("Residuals") + ggtitle("Histogram of residuals") +
-  geom_line(aes(x=x, y=length(res)*7*dnorm(x,0,sd(res)), col="red")) +
-  geom_rug() + guides(col=FALSE)
+  geom_line(aes(x=x, y=length(res)*6*dnorm(x,0,sd(res)), col="red")) + geom_rug() + guides(col=FALSE)
 ```
 
-In this case, the residuals seem to be slightly negatively skewed, although that is partly due to the outlier.
+We can use the `checkresiduals` function introduced in Section \@ref(toolbox-resids).
+
+```{r beercheck, echo=TRUE, cache=TRUE, fig.cap="Analysing the residuals from a regression model for beer production.", message=FALSE, warning=FALSE}
+checkresiduals(tslm(beer2 ~ trend + season))
+```
+
+
+
 
 ### Outliers and influential observations {-}
 
 Observations that take on extreme values compared to the majority of the data are called "outliers". Observations that have a large influence on the estimation results of a regression model are called "influential observations". Usually, influential observations are also outliers that are extreme in the $x$ direction.
 
-There are formal methods for detecting outliers and influential observations that are beyond the scope of this textbook. As we suggested at the beginning of Chapter \@ref(ch-graphics), getting familiar with your data prior to performing any analysis is of vital importance. A scatter plot of $y$ against $x$ is always a useful starting point in regression analysis and often helps to identify unusual observations.
+There are formal methods for detecting outliers and influential observations that are beyond the scope of this textbook. As we suggested at the beginning of Chapter \@ref(ch-graphics), getting familiar with your data prior to performing any analysis is of vital importance. A scatter plot of $y$ against each $x$ is always a useful starting point in regression analysis and often helps to identify unusual observations.
 
 One source for an outlier occurring is an incorrect data entry. Simple descriptive statistics of your data can identify minima and maxima that are not sensible. If such an observation is identified, and it has been incorrectly recorded, it should be immediately removed from the sample.
 
 Outliers also occur when some observations are simply different. In this case it may not be wise for these observations to be removed. If an observation has been identified as a likely outlier it is important to study it and analyze the possible reasons behind it. The decision of removing or retaining such an observation can be a challenging one (especially when outliers are influential observations). It is wise to report results both with and without the removal of such observations.
 
+#### Example {-}
+Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US income on consumption (the example introduced in Section \ref(Regr-Intro). In the left panel the ourlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
+
+
+```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, cache=TRUE, message=FALSE,warning=FALSE}
+
+yx <- as.data.frame(usconsumption)
+fit1 <- lm(consumption ~ income, data=yx) 
+
+yx[1,]<-c(-4,1)
+fit2 <- lm(consumption ~ income, data=yx) 
+p1 <- ggplot(yx, aes(x=income, y=consumption)) +
+  ylab("% change in consumption")+xlab("% change in income")+
+  geom_point()+ 
+  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")
+
+yx[1,]<-c(-4,6)
+fit2 <- lm(consumption ~ income, data=yx) 
+p2 <- ggplot(yx, aes(x=income, y=consumption)) +
+  ylab("% change in consumption")+xlab("% change in income")+
+  geom_point()+ 
+  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")
+
+gridExtra::grid.arrange(p1, p2, nrow=1)
+```
+
 ### Goodness-of-fit {-}
 
-A common way to summarize how well a linear regression model fits the data is via the coefficient of determination or $R^2$. This can be calculated as **the square of the correlation between the observed $y$ values and the predicted $\hat{y}$ values**. Alternatively, it can also be calculated as: 
+A common way to summarize how well a linear regression model fits the data is via the coefficient of determination or $R^2$. This can be calculated as the square of the correlation between the observed $y$ values and the predicted $\hat{y}$ values. Alternatively, it can also be calculated as, 
 $$
   R^2 = \frac{\sum(\hat{y}_{t} - \bar{y})^2}{\sum(y_{t}-\bar{y})^2},
 $$ 
-where the summations are over all observations. Thus, it is also **the proportion of variation in the forecast variable that is accounted for (or explained) by the regression model**.
+where the summations are over all observations. Thus, it reflects the proportion of variation in the forecast variable that is accounted for (or explained) by the regression model.
 
-If the predictions are close to the actual values, we would expect $R^2$ to be close to 1. On the other hand, if the predictions are unrelated to the actual values, then $R^2=0$. In all cases, $R^2$ lies between 0 and 1.
+If the predictions are close to the actual values, we would expect $R^2$ to be close to 1. On the other hand, if the predictions are unrelated to the actual values, then $R^2=0$. In all cases, $R^2$ lies between 0 and 1. `as long as we have an intercept`
 
-In simple linear regression, the value of $R^2$ is also equal to the square of the correlation between $y$ and $x$. 
+In simple linear regression, the value of $R^2$ is also equal to the square of the correlation between $y$ and $x$.
 
+The $R^2$ value is commonly used, often incorrectly, in forecasting. There are no set rules of what a good $R^2$ value is and typical values of $R^2$ depend on the type of data used. Validating a model’s forecasting performance on the test data is much better than measuring the $R^2$ value on the training data.
 
-
-The $R^2$ value is commonly used, often incorrectly, in forecasting. There are no set rules of what a good $R^2$ value is and typical values of $R^2$ depend on the type of data used. Validating a model’s forecasting performance on the test data is much better than measuring the $R^2$ value on the training data
+Figure \@ref(fig:beerlm3) plots the actual monthly beer production versus the fitted values. The correlation between these variables is $r=`r round(cor(fit.beer$fitted.values,beer2)[1],2)`$ hence $R^2= `r round(cor(fit.beer$fitted.values,beer2)[1]^2,2)`$.  In this case model does an excellent job as it explains most of the variation in the beer production data.
 
 ### Standard error of the regression {-}
 
 Another measure of how well the model has fitted the data is the standard deviation of the residuals, which is often known as the "standard error of the regression" and is calculated by
 $$\label{eq-4-se} 
-  s_e=\sqrt{\frac{1}{T-2}\sum_{t=1}^{T}{e_t^2}}.
+  s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.
 $$
 
-Notice that this calculation is slightly different from the usual standard deviation where we divide by $T-1$ (see p.). Here, we divide by $T-2$ because we have estimated two parameters (the intercept and slope) in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation.
+Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation.
 
 The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. In Figure \@ref(fig-4-car), $s_e$ is part of the R output labeled  `Residual standard error`" and takes the value 0.4703 tonnes per year.
 
 We should warn here that the evaluation of the standard error can be highly subjective as it is scale dependent. The main reason we introduce it here is that it is required when generating forecast intervals, discussed in Section \@ref(sec-4-5-ForeWithRegr).
 
-
-
-
 ### Spurious regression {-}
 
 More often than not, time series data are "non-stationary"; that is, the values of the time series do not fluctuate around a constant mean or with a constant variance. We will deal with time series stationarity in more detail in Chapter \@ref(ch-arima), but here we need to address the effect non-stationary data can have on regression models.
 
-```{r spurious, echo=TRUE, cache=TRUE, fig.cap="Trending time series data can appear to be related, as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE,warning=FALSE}
+```{r spurious, fig.height=5,echo=TRUE, cache=TRUE, fig.cap="Trending time series data can appear to be related, as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE,warning=FALSE}
 df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,AustralianPassengers=ausair))
-p1 <- autoplot(ausair) + xlab("Year") + ylab("Air Passengers in Australia (millions)")
-p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea (million tons)")
-gridExtra::grid.arrange(p1,p2,ncol=2)
-ggplot(df,aes(x=GuineaRiceProduction, y=AustralianPassengers)) + geom_point()
+p1 <- autoplot(ausair) + xlab("Year") + ylab("Air Passengers in Australia")
+p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")
+p3<-ggplot(df,aes(x=GuineaRiceProduction, y=AustralianPassengers)) + geom_point() + ylab("Air Passengers in Australia (millions)")+ xlab("Rice Production in Guinea (million tons)")
+library(gridExtra)
+grid.arrange(arrangeGrob(p1, p2),p3, ncol = 2)
+
 ```
 
 For example consider the two variables plotted in Figure \@ref(fig:spurious), which appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea. 
@@ -397,7 +474,18 @@ Regressing non-stationary time series can lead to spurious regressions. High $R^
 
 Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
 
-## Forecasting with regression {#sec-4-5-ForeWithRegr}
+## Forecasting with regression {#Regr-ForeWithRegr}
+
+
+```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
+fcast <- forecast(fit) 
+autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
+```
+
+Forecasts obtained from the model are shown in Figure \@ref(fig:beerlm1).
+
+When the values of $x_1,\dots,x_k$ are new values (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
+
 
 Forecasts from a simple linear model are easily obtained using the equation
 $$
@@ -425,7 +513,7 @@ of interest. The resulting forecasts are calculated and shown in Figure
 \@ref(fig:ConsInc4).
 
 ```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US."}
-fcast <- forecast(fit.ex3, newdata=data.frame(income=c(-1,1))) 
+fcast <- forecast(fit.cons, newdata=data.frame(income=c(-1,1))) 
 autoplot(fcast)
 ```
 
@@ -510,52 +598,7 @@ holiday indicators) or deterministic functions of time. In such cases, there is
 no difference betweeen ex ante and ex post forecasts.
 
 
-### Intervention variables {-}
 
-It is often necessary to model interventions that may have affected the
-variable to be forecast. For example, competitor activity, advertising
-expenditure, industrial action, and so on, can all have an effect.
-
-When the effect lasts only for one period, we use a spike variable. This is a
-dummy variable taking value one in the period of the intervention and zero
-elsewhere. A spike variable is equivalent to a dummy variable for handling an
-outlier.
-
-Other interventions have an immediate and permanent effect. If an intervention
-causes a level shift (i.e., the value of the series changes suddenly and
-permanently from the time of intervention), then we use a step variable. A step
-variable takes value zero before the intervention and one from the time of
-intervention onwards.
-
-Another form of permanent effect is a change of slope. Here the intervention is
-handled using a piecewise linear trend as discussed earlier (where $\tau$ is
-the time of intervention).
-
-### Trading days {-}
-
-The number of trading days in a month can vary considerably and can have a
-substantial effect on sales data. To allow for this, the number of trading days
-in each month can be included as a predictor. An alternative that allows for
-the effects of different days of the week has the following predictors:
-
-$$\begin{aligned} x_{1} &= \text{\# Mondays in month;} \\ x_{2} &= \text{\#
-Tuesdays in month;} \\ & \vdots \\ x_{7} &= \text{\# Sundays in
-month.}\end{aligned}$$
-
-### Distributed lags {-}
-
-It is often useful to include advertising expenditure as a predictor. However,
-since the effect of advertising can last beyond the actual campaign, we need to
-include lagged values of advertising expenditure. So the following predictors
-may be used.
-
-$$\begin{aligned} x_{1} &= \text{advertising for previous month;} \\ x_{2} &=
-\text{advertising for two months previously;} \\ &\vdots \\ x_{m} &=
-\text{advertising for $m$ months previously.}\end{aligned}$$
-
-It is common to require the coefficients to decrease as the lag increases. In
-Chapter \@ref(ch-dynamic) we discuss methods to allow this constraint to be
-implemented.
 
 ## Selecting predictors {#sec-5-3-SelectingPredictors}
 

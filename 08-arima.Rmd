@@ -256,7 +256,7 @@ We normally restrict autoregressive models to stationary data, and then some con
 
 When $p\ge3$ the restrictions are much more complicated. R takes care of these restrictions when estimating a model.
 
-##Moving average models
+##Moving average models {#sec:mamodels}
 
 ```{r maq, fig.cap="Two examples of data from moving average models with different parameters. Left: MA(1) with $y_t = 20 + e_t + 0.8e_{t-1}$. Right: MA(2) with $y_t = e_t- e_{t-1}+0.8e_{t-2}$. In both cases, $e_t$ is normally distributed white noise with mean zero and variance one.", echo=FALSE, fig.height=3, cache=FALSE}
 set.seed(2)
@@ -306,10 +306,10 @@ More complicated conditions hold for $q\ge3$. Again, R will take care of these c
 ##Non-seasonal ARIMA models
 
 If we combine differencing with autoregression and a moving average model, we obtain a non-seasonal ARIMA model. ARIMA is an acronym for AutoRegressive Integrated Moving Average model ("integration" in this context is the reverse of differencing). The full model can be written as
-$$\label{eq-8-arima}
+\begin{equation}
   y'_{t} = c + \phi_{1}y'_{t-1} + \cdots + \phi_{p}y'_{t-p}
-     + \theta_{1}e_{t-1} + \cdots + \theta_{q}e_{t-q} + e_{t},
-$$
+     + \theta_{1}e_{t-1} + \cdots + \theta_{q}e_{t-q} + e_{t},  (\#eq:8-arima)
+\end{equation}
 where $y'_{t}$ is the differenced series (it may have been differenced more than once). The "predictors" on the right hand side include both lagged values of $y_t$ and lagged errors. We call this an **ARIMA($p, d, q$) model**, where
 
 |      |                                       |
@@ -319,17 +319,6 @@ where $y'_{t}$ is the differenced series (it may have been differenced more than
 | $q =$|order of the moving average part.      |
 
 The same stationarity and invertibility conditions that are used for autoregressive and moving average models apply to this ARIMA model.
-
-Once we start combining components in this way to form more complicated models, it is much easier to work with the backshift notation. Then equation  can be written as
-\begin{equation}
-  \begin{array}{c c c c}
-    (1-\phi_1B - \cdots - \phi_p B^p) & (1-B)^d y_{t} &= &c + (1 + \theta_1 B + \cdots + \theta_q B^q)e_t\\
-    {\uparrow} & {\uparrow} & &{\uparrow}\\
-    \text{AR($p$)} & \text{$d$ differences} & & \text{MA($q$)}\\
-  \end{array}
-\end{equation}
-
-Selecting appropriate values for $p$, $d$ and $q$ can be difficult. The `auto.arima()` function in R will do it for you automatically. Later in this chapter, we will learn how the function works, and some methods for choosing these values yourself.
 
 Many of the models we have already discussed are special cases of the ARIMA model as shown in the following table.
 
@@ -341,12 +330,24 @@ Many of the models we have already discussed are special cases of the ARIMA mode
 | Autoregression         | ARIMA($p$,0,0)                |
 | Moving average         | ARIMA(0,0,$q$)                |
 
-R uses a slightly different parameterization to that shown above.  Rather than \@ref(eq-8-arima), it uses
-$$\label{eq-R-arima}
-  (y'_{t}-\mu) = \phi_{1}(y'_{t-1}-\mu) + \cdots + \phi_{p}(y'_{t-p}-\mu)
-     + \theta_{1}e_{t-1} + \cdots + \theta_{q}e_{t-q} + e_{t},
-$$
-where $\mu = c/(1-\phi_1 - \cdots - \phi_p)$ is an estimate of the mean of the series $\{y'_t\}$.
+Once we start combining components in this way to form more complicated models, it is much easier to work with the backshift notation. Then equation \@ref(eq:8-arima) can be written as
+\begin{equation}
+(\#eq:arimaB)
+  \begin{array}{c c c c}
+    (1-\phi_1B - \cdots - \phi_p B^p) & (1-B)^d y_{t} &= &c + (1 + \theta_1 B + \cdots + \theta_q B^q)e_t\\
+    {\uparrow} & {\uparrow} & &{\uparrow}\\
+    \text{AR($p$)} & \text{$d$ differences} & & \text{MA($q$)}\\
+  \end{array}
+\end{equation}
+
+R uses a slightly different parameterization:
+\begin{equation}
+(\#eq:R-arima)
+  (1-\phi_1B - \cdots - \phi_p B^p)(y_t' - \mu) = (1 + \theta_1 B + \cdots + \theta_q B^q)e_t,
+\end{equation}
+where $y_t' = (1-B)^d y_t$ and $\mu$ is the mean of $y_t'$. To convert to the form given by \@ref(eq:arimaB), set $c = \mu(1-\phi_1 - \cdots - \phi_p )$.
+
+Selecting appropriate values for $p$, $d$ and $q$ can be difficult. The `auto.arima()` function in R will do it for you automatically. Later in this chapter, we will learn how the function works, and some methods for choosing these values yourself.
 
 ### US consumption expenditure {-}
 
@@ -478,19 +479,19 @@ and the Bayesian Information Criterion can be written as
 $$
   \text{BIC} = \text{AIC} + [\log(T)-2](p+q+k+1).
 $$
-Good models are obtained by minimizing either the AIC,  or BIC. Our preference is to use the .
+Good models are obtained by minimizing either the AIC, AICc or BIC. Our preference is to use the AICc.
 
 ##ARIMA modelling in R
 
 ### How does `auto.arima()` work? {-}
 
-The `auto.arima()` function in R uses a variation of the Hyndman and Khandakar algorithm which combines unit root tests, minimization of the  and MLE to obtain an ARIMA model. The algorithm follows these steps.
+The `auto.arima()` function in R uses a variation of the Hyndman and Khandakar algorithm which combines unit root tests, minimization of the AICc and MLE to obtain an ARIMA model. The algorithm follows these steps.
 
 **Hyndman-Khandakar algorithm for automatic ARIMA modelling**
 
 1.  The number of differences $d$ is determined using repeated KPSS tests.
 
-2.  The values of $p$ and $q$ are then chosen by minimizing the  after differencing the data $d$ times. Rather than considering every possible combination of $p$ and $q$, the algorithm uses a stepwise search to traverse the model space.
+2.  The values of $p$ and $q$ are then chosen by minimizing the AICc after differencing the data $d$ times. Rather than considering every possible combination of $p$ and $q$, the algorithm uses a stepwise search to traverse the model space.
 
     (a) The best initial model (with smallest ) is selected from the following four:
 
@@ -508,7 +509,7 @@ The `auto.arima()` function in R uses a variation of the Hyndman and Khandakar a
 
         The best model considered so far (either the current model, or one of these variations) becomes the new current model.
 
-    (c) Repeat Step 2(b) until no lower  can be found.
+    (c) Repeat Step 2(b) until no lower AICc can be found.
 
 The arguments to `auto.arima()` provide for many variations on the algorithm. What is described here is the default behaviour.
 
@@ -534,7 +535,7 @@ When fitting an ARIMA model to a set of time series data, the following procedur
 
 4.  Examine the ACF/PACF: Is an AR($p$) or MA($q$) model appropriate?
 
-5.  Try your chosen model(s), and use the  to search for a better model.
+5.  Try your chosen model(s), and use the AICc to search for a better model.
 
 6.  Check the residuals from your chosen model by plotting the ACF of the residuals, and doing a portmanteau test of the residuals. If they do not look like white noise, try a modified model.
 
@@ -542,10 +543,13 @@ When fitting an ARIMA model to a set of time series data, the following procedur
 
 The automated algorithm only takes care of steps 3--5. So even if you use it, you will still need to take care of the other steps yourself.
 
-The process is summarized in Figure \@ref(fig:diagram).
+The process is summarized in Figure \@ref(fig:arimaflowchart).
 
-```{r diagram, cache=FALSE}
+
+```{r arimaflowchart, echo=FALSE, cache=TRUE, fig.cap="General process for forecasting using an ARIMA model."}
+knitr::include_graphics("arimaflowchart.png")
 ```
+
 
 ###Example: Seasonally adjusted electrical equipment orders {-}
 
@@ -568,7 +572,7 @@ ggtsdisplay(diff(eeadj), main="")
 
 4.  The PACF shown in Figure \@ref(fig:ee2) is suggestive of an AR(3) model. So an initial candidate model is an ARIMA(3,1,0). There are no other obvious candidate models.
 
-5.  We fit an ARIMA(3,1,0) model along with variations including ARIMA(4,1,0), ARIMA(2,1,0), ARIMA(3,1,1), etc. Of these, the ARIMA(3,1,1) has a slightly smaller  value.
+5.  We fit an ARIMA(3,1,0) model along with variations including ARIMA(4,1,0), ARIMA(2,1,0), ARIMA(3,1,1), etc. Of these, the ARIMA(3,1,1) has a slightly smaller AICc value.
 
 ```{r eeadj1, cache=FALSE}
 fit <- Arima(eeadj, order=c(3,1,1))
@@ -578,8 +582,7 @@ summary(fit)
 6.  The ACF plot of the residuals from the ARIMA(3,1,1) model shows all correlations within the threshold limits indicating that the residuals are behaving like white noise. A portmanteau test returns a large p-value, also suggesting the residuals are white noise.
 
 ```{r eeadj2, cache=FALSE}
-ggAcf(residuals(fit))
-Box.test(residuals(fit), lag=24, fitdf=4, type="Ljung")
+checkresiduals(fit)
 ```
 
 7.  Forecasts from the chosen model are shown in Figure \@ref(fig:ee4).
@@ -588,34 +591,40 @@ Box.test(residuals(fit), lag=24, fitdf=4, type="Ljung")
 autoplot(forecast(fit))
 ```
 
-If we had used the automated algorithm instead, we would have obtained exactly the same model in this example.
+If we had used the automated algorithm instead, we would have obtained an ARIMA(3,1,0) model using the default settings, but the ARIMA(3,1,1) model if we had set `approximation=FALSE`.
+
+```{r testmodel, echo=FALSE, message=FALSE, cache=TRUE}
+if(!identical(arimaorder(auto.arima(eeadj)), c(3L,1L,0L)))
+  stop("Claim 1 untrue")
+if(!identical(arimaorder(auto.arima(eeadj, approximation=FALSE)), c(3L,1L,1L)))
+  stop("Claim 2 untrue")
+```
 
 ### Understanding constants in R {-}
 
 A non-seasonal ARIMA model can be written as
-$$\label{eq:c}
+\begin{equation}
+(\#eq:c)
   (1-\phi_1B - \cdots - \phi_p B^p)(1-B)^d y_t = c + (1 + \theta_1 B + \cdots + \theta_q B^q)e_t
-$$
+\end{equation}
 or equivalently as
-$$\label{eq:mu}
+\begin{equation}
+(\#eq:mu)
   (1-\phi_1B - \cdots - \phi_p B^p)(1-B)^d (y_t - \mu t^d/d!) = (1 + \theta_1 B + \cdots + \theta_q B^q)e_t,
-$$
-where $c = \mu(1-\phi_1 - \cdots - \phi_p )$ and $\mu$ is the mean of $(1-B)^d y_t$. R uses the parametrization of equation ??.
+\end{equation}
+where $c = \mu(1-\phi_1 - \cdots - \phi_p )$ and $\mu$ is the mean of $(1-B)^d y_t$. R uses the parametrization of equation \@ref(eq:mu).
 
 Thus, the inclusion of a constant in a non-stationary ARIMA model is equivalent to inducing a polynomial trend of order $d$ in the forecast function. (If the constant is omitted, the forecast function includes a polynomial trend of order $d-1$.) When $d=0$, we have the special case that $\mu$ is the mean of $y_t$.
 
-`arima()`
-: By default, the `arima()` command in R sets $c=\mu=0$ when $d>0$ and provides an estimate of $\mu$ when $d=0$. The parameter $\mu$ is called the "intercept" in the R output. It will be close to the sample mean of the time series, but usually not identical to it as the sample mean is not the maximum likelihood estimate when $p+q>0$.
+By default, the `Arima()` function sets $c=\mu=0$ when $d>0$ and provides an estimate of $\mu$ when $d=0$. It will be close to the sample mean of the time series, but usually not identical to it as the sample mean is not the maximum likelihood estimate when $p+q>0$.
 
-The `arima()` command has an argument `include.mean` which only has an effect when $d=0$ and is `TRUE` by default. Setting `include.mean=FALSE` will force $\mu=0$.
+The argument `include.mean` only has an effect when $d=0$ and is `TRUE` by default. Setting `include.mean=FALSE` will force $\mu=c=0$.
 
-`Arima()`
-: The `Arima()` command from the forecast package provides more flexibility on the inclusion of a constant. It has an argument `include.mean` which has identical functionality to the corresponding argument for `arima()`. It also has an argument `include.drift` which allows $\mu\ne0$ when $d=1$. For $d>1$, no constant is allowed as a quadratic or higher order trend is particularly dangerous when forecasting. The parameter $\mu$ is called the "drift" in the R output when $d=1$.
+The argument `include.drift` allows $\mu\ne0$ when $d=1$. For $d>1$, no constant is allowed as a quadratic or higher order trend is particularly dangerous when forecasting. The parameter $\mu$ is called the "drift" in the R output when $d=1$.
 
-  There is also an argument `include.constant` which, if `TRUE`, will set `include.mean=TRUE` if $d=0$ and `include.drift=TRUE` when $d=1$. If `include.constant=FALSE`, both `include.mean` and `include.drift` will be set to `FALSE`. If `include.constant` is used, the values of `include.mean=TRUE` and `include.drift=TRUE` are ignored.
+There is also an argument `include.constant` which, if `TRUE`, will set `include.mean=TRUE` if $d=0$ and `include.drift=TRUE` when $d=1$. If `include.constant=FALSE`, both `include.mean` and `include.drift` will be set to `FALSE`. If `include.constant` is used, the values of `include.mean=TRUE` and `include.drift=TRUE` are ignored.
 
-`auto.arima()`
-: The `auto.arima()` function automates the inclusion of a constant. By default, for $d=0$ or $d=1$, a constant will be included if it improves the  value; for $d>1$ the constant is always omitted. If `allowdrift=FALSE` is specified, then the constant is only allowed when $d=0$.
+The `auto.arima()` function automates the inclusion of a constant. By default, for $d=0$ or $d=1$, a constant will be included if it improves the AICc value; for $d>1$ the constant is always omitted. If `allowdrift=FALSE` is specified, then the constant is only allowed when $d=0$.
 
 ##Forecasting
 
@@ -682,7 +691,7 @@ $$
 $$
 and a 95% forecast interval is given by $\hat{y}_{T+h|T} \pm 1.96\sqrt{v_{T+h|T}}$.
 
-On page ??, we showed that an AR(1) model can be written as an MA($\infty$) model. Using this equivalence, the above result for MA($q$) models can also be used to obtain forecast intervals for AR(1) models.
+In Section \@ref(sec:mamodels), we showed that an AR(1) model can be written as an MA($\infty$) model. Using this equivalence, the above result for MA($q$) models can also be used to obtain forecast intervals for AR(1) models.
 
 More general results, and other special cases of multi-step forecast intervals for an ARIMA($p$,$d$,$q$) model, are given in more advanced textbooks such as Brockwell and Davis (1991, Section 9.5).
 
@@ -706,9 +715,9 @@ A seasonal ARIMA model is formed by including additional seasonal terms in the A
 
 where $m =$ number of observations per year. We use uppercase notation for the seasonal parts of the model, and lowercase notation for the non-seasonal parts of the model.
 
-The seasonal part of the model consists of terms that are very similar to the non-seasonal components of the model, but they involve backshifts of the seasonal period. For example, an ARIMA$(1, 1, 1)(1, 1, 1)_{4}$ model (without a constant) is for quarterly data ($m=4$) and can be written as
+The seasonal part of the model consists of terms that are very similar to the non-seasonal components of the model, but they involve backshifts of the seasonal period. For example, an ARIMA$(1,1,1)(1,1,1)$_{4}$ model (without a constant) is for quarterly data ($m=4$) and can be written as
 $$
-  (1 - \phi_{1}B)~(1 - \Phi_{1}B^{4}) ~(1 - B)~ (1 - B^{4})y_{t} ~= ~
+  (1 - \phi_{1}B)~(1 - \Phi_{1}B^{4}) (1 - B) (1 - B^{4})y_{t} =
   (1 + \theta_{1}B)~ (1 + \Theta_{1}B^{4})e_{t}.
 $$
 
@@ -755,13 +764,11 @@ fit <- Arima(euretail, order=c(0,1,1), seasonal=c(0,1,1))
 ggtsdisplay(residuals(fit))
 ```
 
-Both the ACF and PACF show significant spikes at lag 2, and almost significant spikes at lag 3, indicating some additional non-seasonal terms need to be included in the model. The  of the ARIMA(0,1,2)(0,1,1)$_4$ model is 74.36, while that for the ARIMA(0,1,3)(0,1,1)$_4$ model is 68.53. We tried other models with AR terms as well, but none that gave a smaller  value. Consequently, we choose the ARIMA(0,1,3)(0,1,1)$_4$ model. Its residuals are plotted in Figure \@ref(fig:euretail5). All the spikes are now within the significance limits, and so the residuals appear to be white noise. A Ljung-Box test also shows that the residuals have no remaining autocorrelations.
+Both the ACF and PACF show significant spikes at lag 2, and almost significant spikes at lag 3, indicating some additional non-seasonal terms need to be included in the model. The AICc of the ARIMA(0,1,2)(0,1,1)$_4$ model is 74.36, while that for the ARIMA(0,1,3)(0,1,1)$_4$ model is 68.53. We tried other models with AR terms as well, but none that gave a smaller AICc value. Consequently, we choose the ARIMA(0,1,3)(0,1,1)$_4$ model. Its residuals are plotted in Figure \@ref(fig:euretail5). All the spikes are now within the significance limits, and so the residuals appear to be white noise. A Ljung-Box test also shows that the residuals have no remaining autocorrelations.
 
 ```{r euretail5, fig.cap="Residuals from the fitted ARIMA(0,1,3)(0,1,1)$_4$ model for the European retail trade index data.", cache=FALSE}
 fit3 <- Arima(euretail, order=c(0,1,3), seasonal=c(0,1,1))
-res <- residuals(fit3)
-ggtsdisplay(res)
-Box.test(res, lag=16, fitdf=4, type="Ljung")
+checkresiduals(fit3)
 ```
 
 So we now have a seasonal ARIMA model that passes the required checks and is ready for forecasting. Forecasts from the model for the next three years are shown in Figure \@ref(fig:euretail6). Notice how the forecasts follow the recent trend in the data (this occurs because of the double differencing). The large and rapidly increasing prediction intervals show that the retail trade index could start increasing or decreasing at any time --- while the point forecasts trend downwards, the prediction intervals allow for the data to trend upwards during the forecast period.
@@ -792,7 +799,7 @@ Our second example is more difficult. We will try to forecast monthly cortecoste
 lh02 <- log(h02)
 tmp <- cbind("H02 sales (million scripts)" = h02,
              "Log H02 sales"=lh02)
-autoplot(tmp, facets=TRUE) + xlab("Year")
+autoplot(tmp, facets=TRUE) + xlab("Year") + ylab("")
 ```
 
 Data from July 1991 to June 2008 are plotted in Figure \@ref(fig:h02). There is a small increase in the variance with the level, and so we take logarithms to stabilize the variance.
@@ -808,7 +815,7 @@ ggtsdisplay(diff(lh02,12), xlab="Year",
 
 In the plots of the seasonally differenced data, there are spikes in the PACF at lags 12 and 24, but nothing at seasonal lags in the ACF. This may be suggestive of a seasonal AR(2) term. In the non-seasonal lags, there are three significant spikes in the PACF suggesting a possible AR(3) term. The pattern in the ACF is not indicative of any simple model.
 
-Consequently, this initial analysis suggests that a possible model for these data is an ARIMA(3,0,0)(2,1,0)$_{12}$. We fit this model, along with some variations on it, and compute their  values which are shown in the following table.
+Consequently, this initial analysis suggests that a possible model for these data is an ARIMA(3,0,0)(2,1,0)$_{12}$. We fit this model, along with some variations on it, and compute their AICc values which are shown in the following table.
 
 | Model | AICc|
 |:------: |:------:|
@@ -820,7 +827,7 @@ Consequently, this initial analysis suggests that a possible model for these dat
 | ARIMA(3,0,1)(0,1,2)$_{12}$ | $-485.48$ |
 | ARIMA(3,0,1)(1,1,1)$_{12}$ | $-484.25$ |
 
-Of these models, the best is the ARIMA(3,0,1)(0,1,2)$_{12}$ model (i.e., it has the smallest  value).
+Of these models, the best is the ARIMA(3,0,1)(0,1,2)$_{12}$ model (i.e., it has the smallest AICc value).
 
 ```{r h02arima}
 (fit <- Arima(h02, order=c(3,0,1), seasonal=c(0,1,2), lambda=0))
@@ -829,8 +836,7 @@ Of these models, the best is the ARIMA(3,0,1)(0,1,2)$_{12}$ model (i.e., it has 
 The residuals from this model are shown in Figure \@ref(fig:h02res). There are significant spikes in both the ACF and PACF, and the model fails a Ljung-Box test. The model can still be used for forecasting, but the prediction intervals may not be accurate due to the correlated residuals.
 
 ```{r h02res, fig.cap="Residuals from the ARIMA(3,0,1)(0,1,2)$_{12}$ model applied to the H02 monthly script sales data.", cache=FALSE}
-ggtsdisplay(residuals(fit))
-Box.test(residuals(fit), lag=36, fitdf=6, type="Ljung")
+checkresiduals(fit)
 ```
 
 Next we will try using the automatic ARIMA algorithm. Running `auto.arima()` with arguments left at their default values led to an ARIMA(2,1,3)(0,1,1)$_{12}$ model. However, the model still fails a Ljung-Box test. Sometimes it is just not possible to find a model that passes all the tests.
@@ -840,8 +846,7 @@ Finally, we tried running `auto.arima()` with differencing specified to be $d=0$
 ```{r h02arima2, cache=TRUE}
 fit <- auto.arima(h02, lambda=0, d=0, D=1, max.order=9,
   stepwise=FALSE, approximation=FALSE)
-ggtsdisplay(residuals(fit))
-Box.test(residuals(fit), lag=36, fitdf=8, type="Ljung")
+checkresiduals(fit)
 ```
 
 #### Test set evaluation: {-}
@@ -884,9 +889,9 @@ knitr::kable(data.frame(Model=modelname,RMSE=rmse),
              digits=4)
 ```
 
-The models that have the lowest  values tend to give slightly better results than the other models, but there is not a large difference. Also, the only model that passed the residual tests did not give the best test set RMSE values.
+The models that have the lowest AICc values tend to give slightly better results than the other models, but there is not a large difference. Also, the only model that passed the residual tests did not give the best test set RMSE values.
 
-When models are compared using  values, it is important that all models have the same orders of differencing. However, when comparing models using a test set, it does not matter how the forecasts were produced --- the comparisons are always valid. Consequently, in the table above, we can include some models with only seasonal differencing and some models with both first and seasonal differencing. But in the earlier table containing  values, we compared models with only seasonal differencing.
+When models are compared using AICc values, it is important that all models have the same orders of differencing. However, when comparing models using a test set, it does not matter how the forecasts were produced --- the comparisons are always valid. Consequently, in the table above, we can include some models with only seasonal differencing and some models with both first and seasonal differencing. But in the earlier table containing AICc values, we compared models with only seasonal differencing.
 
 None of the models considered here pass all the residual tests. In practice, we would normally use the best model we could find, even if it did not pass all tests.
 

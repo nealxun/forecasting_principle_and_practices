@@ -6,27 +6,27 @@ Each of the tools discussed in this chapter will be used repeatedly in subsequen
 
 ## Some simple forecasting methods {#sec-2-methods}
 
-Some forecasting methods are very simple and surprisingly effective. Here are four methods that we will use as benchmarks for other forecasting methods. 
+Some forecasting methods are very simple and surprisingly effective. Here are four methods that we will use as benchmarks for other forecasting methods.
 
 ###Average method {-}
 
 Here, the forecasts of all future values are equal to the mean of the historical data. If we let the historical data be denoted by $y_{1},\dots,y_{T}$, then we can write the forecasts as
-$$ 
-  \hat{y}_{T+h|T} = \bar{y} = (y_{1}+\dots+y_{T})/T. 
+$$
+  \hat{y}_{T+h|T} = \bar{y} = (y_{1}+\dots+y_{T})/T.
 $$
 The notation $\hat{y}_{T+h|T}$ is a short-hand for the estimate of $y_{T+h}$ based on the data $y_1,\dots,y_T$.
 
 
 ```r
-meanf(y, h) 
+meanf(y, h)
 # y contains the time series
 # h is the forecast horizon
 ```
 
 ###Naïve method {-}
 
-Naïve forecasts are where all forecasts are simply set to be the value of the last observation. That is, 
-$$ 
+Naïve forecasts are where all forecasts are simply set to be the value of the last observation. That is,
+$$
   \hat{y}_{T+h|T} = y_{T}.
 $$
 This method works remarkably well for many economic and financial time series.
@@ -39,9 +39,9 @@ rwf(y, h) # Alternative
 ###Seasonal naïve method {-}
 
 A similar method is useful for highly seasonal data. In this case, we set each forecast to be equal to the last observed value from the same season of the year (e.g., the same month of the previous year). Formally, the forecast for time $T+h$ is written as
-$$ 
+$$
    \hat{y}_{T+h|T} = y_{T+h-km},
-$$ 
+$$
 where $m=$ the seasonal period, $k=\lfloor (h-1)/m\rfloor+1$, and $\lfloor u \rfloor$ denotes the integer part of $u$. That looks more complicated than it really is. For example, with monthly data, the forecast for all future February values is equal to the last observed February value. With quarterly data, the forecast of all future Q2 values is equal to the last observed Q2 value (where Q2 means the second quarter). Similar rules apply for other months and quarters, and for other seasonal periods.
 
 ```r
@@ -52,9 +52,9 @@ snaive(y, h)
 ###Drift method {-}
 
 A variation on the naïve method is to allow the forecasts to increase or decrease over time, where the amount of change over time (called the "drift") is set to be the average change seen in the historical data. Thus the forecast for time $T+h$ is given by
-$$ 
-  \hat{y}_{T+h|T} = y_{T} + \frac{h}{T-1}\sum_{t=2}^T (y_{t}-y_{t-1}) = y_{T} + h \left( \frac{y_{T} -y_{1}}{T-1}\right). 
-$$ 
+$$
+  \hat{y}_{T+h|T} = y_{T} + \frac{h}{T-1}\sum_{t=2}^T (y_{t}-y_{t-1}) = y_{T} + h \left( \frac{y_{T} -y_{1}}{T-1}\right).
+$$
 This is equivalent to drawing a line between the first and last observations, and extrapolating it into the future.
 
 ```r
@@ -63,7 +63,7 @@ rwf(y, h, drift=TRUE)
 
 ###Examples {-}
 
-Figure \@ref(fig:beerf) shows the first three methods applied to the quarterly beer production data. 
+Figure \@ref(fig:beerf) shows the first three methods applied to the quarterly beer production data.
 
 ```{r beerf, fig.cap="Forecasts of Australian quarterly beer production.", warning=FALSE, message=FALSE, cache=TRUE}
 # Set training data from 1992-2007
@@ -74,23 +74,23 @@ autoplot(beer2) +
   geom_forecast(naive(beer2, h=11), PI=FALSE, series="Naïve") +
   geom_forecast(snaive(beer2, h=11), PI=FALSE, series="Seasonal naïve") +
   ggtitle("Forecasts for quarterly beer production") +
-  xlab("Year") + ylab("Megalitres") + 
+  xlab("Year") + ylab("Megalitres") +
   guides(colour=guide_legend(title="Forecast")) + fppcols()
 ```
 
-In Figure \@ref(fig:djf), the non-seasonal methods were applied to a series of 250 days of the Dow Jones Index. 
+In Figure \@ref(fig:djf), the non-seasonal methods were applied to a series of 250 days of the Dow Jones Index.
 
 ```{r djf, fig.cap="Forecasts based on 250 days of the Dow Jones Index.", message=FALSE, warning=FALSE, cache=TRUE}
 # Set training data to first 250 days
 dj2 <- window(dj,end=250)
 # Plot some forecasts
-autoplot(dj2) + 
+autoplot(dj2) +
   geom_forecast(meanf(dj2, h=42), PI=FALSE, series="Mean") +
   geom_forecast(rwf(dj2, h=42), PI=FALSE, series="Naïve") +
   geom_forecast(rwf(dj2, drift=TRUE, h=42), PI=FALSE, series="Drift") +
   ggtitle("Dow Jones Index (daily ending 15 Jul 94)") +
   xlab("Day") + ylab("") +
-  guides(colour=guide_legend(title="Forecast")) + 
+  guides(colour=guide_legend(title="Forecast")) +
   fppcols()
 ```
 
@@ -107,11 +107,11 @@ If the data show variation that increases or decreases with the level of the ser
 Sometimes other transformations are also used (although they are not so interpretable). For example, square roots and cube roots can be used. These are called *power transformations* because they can be written in the form $w_{t} = y_{t}^p$.
 
 A useful family of transformations, that includes both logarithms and power transformations, is the family of "Box-Cox transformations", which depend on the parameter $\lambda$ and are defined as follows:
-$$ 
-  w_t  = 
-    \begin{cases} 
-      \log(y_t) & \text{if $\lambda=0$};  \\ 
-      (y_t^\lambda-1)/\lambda & \text{otherwise}. 
+$$
+  w_t  =
+    \begin{cases}
+      \log(y_t) & \text{if $\lambda=0$};  \\
+      (y_t^\lambda-1)/\lambda & \text{otherwise}.
     \end{cases}
 $$
 
@@ -122,7 +122,7 @@ If $\lambda=1$, then $w_t = y_t-1$, so the transformed data is shifted downwards
 Use the slider below to see the effect of varying $\lambda$ to transform Australian monthly electricity demand:
 
 ```{r, echo=FALSE}
-knitr::include_app("https://robjhyndman.shinyapps.io/BoxCox/", 
+knitr::include_app("https://robjhyndman.shinyapps.io/BoxCox/",
   height = "650px")
 ```
 
@@ -136,12 +136,12 @@ autoplot(BoxCox(elec,lambda))
 ```
 
 Having chosen a transformation, we need to forecast the transformed data. Then, we need to reverse the transformation (or *back-transform*) to obtain forecasts on the original scale. The reverse Box-Cox transformation is given by
-$$ 
-  y_{t} = 
-    \begin{cases} 
-      \exp(w_{t}) & \lambda=0;\\ 
+$$
+  y_{t} =
+    \begin{cases}
+      \exp(w_{t}) & \lambda=0;\\
       (\lambda w_t+1)^{1/\lambda} & \text{otherwise}.
-    \end{cases} 
+    \end{cases}
   $$
 Often a small adjustment is made to the back-transformed forecasts to correct for bias that arises due to the transformation.
 
@@ -192,7 +192,7 @@ Actually, fitted values are often not true forecasts because any parameters invo
 $$
   \hat{y}_t = \hat{c}
 $$
-where $\hat{c}$ is the average computed over all available observations, including those at times *after* $t$. Similarly, for the drift method, the drift parameter is estimated using all available observations. In this case, the fitted values are given by 
+where $\hat{c}$ is the average computed over all available observations, including those at times *after* $t$. Similarly, for the drift method, the drift parameter is estimated using all available observations. In this case, the fitted values are given by
 $$
  \hat{y}_t = y_{t-1} + \hat{c}
 $$
@@ -206,7 +206,7 @@ In both cases, there is a parameter to be estimated from the data. The "hat" abo
 
 The "residuals" in a time series model are what is left over after fitting a model. For many (but not all) time series models, the residuals are equal to the difference between the observations and the corresponding fitted values:
 $$
-  e_{t} = y_{t}-\hat{y}_{t}. 
+  e_{t} = y_{t}-\hat{y}_{t}.
 $$
 
 Residuals are useful in checking whether a model has adequately captured the information in the data. A good forecasting method will yield residuals with the following properties:
@@ -236,13 +236,13 @@ The following graphs show the Dow Jones Index (DJI), and the residuals obtained 
 
 ```{r, fig.cap="The Dow Jones Index measured daily to 15 July 1994.", cache=TRUE}
 dj2 <- window(dj, end=250)
-autoplot(dj2) + xlab("Day") + ylab("") + 
+autoplot(dj2) + xlab("Day") + ylab("") +
   ggtitle("Dow Jones Index (daily ending 15 Jul 94)")
 ```
 
 ```{r, fig.cap="Residuals from forecasting the Dow Jones Index using the naïve method.", cache=TRUE, warning=FALSE}
 res <- residuals(naive(dj2))
-autoplot(res) + xlab("Day") + ylab("") + 
+autoplot(res) + xlab("Day") + ylab("") +
   ggtitle("Residuals from naïve method")
 ```
 
@@ -266,8 +266,8 @@ In order to overcome this problem, we test whether the first $h$ autocorrelation
 
 One such test is the *Box-Pierce test*, based on the following statistic
 $$
-  Q = T \sum_{k=1}^h r_k^2, 
-$$ 
+  Q = T \sum_{k=1}^h r_k^2,
+$$
 where $h$ is the maximum lag being considered and $T$ is the number of observations. If each $r_k$ is close to zero, then $Q$ will be small. If some $r_k$ values are large (positive or negative), then $Q$ will be large. We suggest using $h=10$ for non-seasonal data and $h=2m$ for seasonal data, where $m$ is the period of seasonality. However, the test is not good when $h$ is large, so if these values are larger than $T/5$, then use $h=T/5$
 
 A related (and more accurate) test is the *Box-Ljung test*, based on
@@ -279,7 +279,7 @@ Again, large values of $Q^*$ suggest that the autocorrelations do not come from 
 
 How large is too large? If the autocorrelations did come from a white noise series, then both $Q$ and $Q^*$ would have a $\chi^2$ distribution with $(h - K)$ degrees of freedom, where $K$ is the number of parameters in the model. If they are calculated from raw data (rather than the residuals from a model), then set $K=0$.
 
-For the Dow-Jones example, the naïve model has no parameters, so $K=0$ in that case also. 
+For the Dow-Jones example, the naïve model has no parameters, so $K=0$ in that case also.
 
 ```{r, cache=TRUE}
 # lag=h and fitdf=K
@@ -301,7 +301,7 @@ checkresiduals(naive(dj2))
 
 ### Training and test sets {-}
 
-It is important to evaluate forecast accuracy using genuine forecasts. Consequently, the size of the residuals is not a reliable indication of how large true forecast errors are likely to be. The accuracy of forecasts can only be determined by considering how well a model performs on new data that were not used when fitting the model. 
+It is important to evaluate forecast accuracy using genuine forecasts. Consequently, the size of the residuals is not a reliable indication of how large true forecast errors are likely to be. The accuracy of forecasts can only be determined by considering how well a model performs on new data that were not used when fitting the model.
 
 When choosing models, it is common practice to separate the available data into two portions, training and test data, where the training data is used to estimate any parameters of a forecasting method and the test data is used to evaluate its accuracy. Because the test data is not used in determining the forecasts, it should provide a reliable indication of how well the model is likely to forecast on new data.
 
@@ -331,7 +331,7 @@ Some references describe the test set as the "hold-out set" because these data a
 
 ### Forecast errors  {-}
 
-A forecast "error" is the difference between an observed value and its forecast. Here "error" does not mean a mistake, it means the unpredictable part of an observation. 
+A forecast "error" is the difference between an observed value and its forecast. Here "error" does not mean a mistake, it means the unpredictable part of an observation.
 
 When computed on the test set, the forecast error is the difference between the observed values and the forecasts obtaining using the training data:
 $$
@@ -363,8 +363,8 @@ Measures based on percentage errors have the disadvantage of being infinite or u
 [^1]: That is, a percentage is valid on a ratio scale, but not on an interval scale. Only ratio scale variables have meaningful zeros.
 
 They also have the disadvantage that they put a heavier penalty on negative errors than on positive errors. This observation led to the use of the so-called "symmetric" MAPE (sMAPE) proposed by @Armstrong85[&nbsp;p.348], which was used in the M3 forecasting competition. It is defined by
-$$ 
-  \text{sMAPE} = \text{mean}\left(200|y_{t} - \hat{y}_{t}|/(y_{t}+\hat{y}_{t})\right). 
+$$
+  \text{sMAPE} = \text{mean}\left(200|y_{t} - \hat{y}_{t}|/(y_{t}+\hat{y}_{t})\right).
 $$
 However, if $y_{t}$ is close to zero, $\hat{y}_{t}$ is also likely to be close to zero. Thus, the measure still involves division by a number close to zero, making the calculation unstable. Also, the value of sMAPE can be negative, so it is not really a measure of "absolute percentage errors" at all.
 
@@ -372,19 +372,19 @@ However, if $y_{t}$ is close to zero, $\hat{y}_{t}$ is also likely to be close t
 
 ### Scaled errors {-}
 
-Scaled errors were proposed by @HK06 as an alternative to using percentage errors when comparing forecast accuracy across series with different units. They proposed scaling the errors based on the *training* MAE from a simple forecast method. 
+Scaled errors were proposed by @HK06 as an alternative to using percentage errors when comparing forecast accuracy across series with different units. They proposed scaling the errors based on the *training* MAE from a simple forecast method.
 
 For a non-seasonal time series, a useful way to define a scaled error uses naïve forecasts:
 $$
   q_{j} = \frac{\displaystyle e_{j}}
     {\displaystyle\frac{1}{T-1}\sum_{t=2}^T |y_{t}-y_{t-1}|}.
 $$
-Because the numerator and denominator both involve values on the scale of the original data, $q_{j}$ is independent of the scale of the data. A scaled error is less than one if it arises from a better forecast than the average naïve forecast computed on the training data. Conversely, it is greater than one if the forecast is worse than the average naïve forecast computed on the training data. 
+Because the numerator and denominator both involve values on the scale of the original data, $q_{j}$ is independent of the scale of the data. A scaled error is less than one if it arises from a better forecast than the average naïve forecast computed on the training data. Conversely, it is greater than one if the forecast is worse than the average naïve forecast computed on the training data.
 
-For seasonal time series, a scaled error can be defined using seasonal naïve forecasts: 
-$$ 
+For seasonal time series, a scaled error can be defined using seasonal naïve forecasts:
+$$
   q_{j} = \frac{\displaystyle e_{j}}
-    {\displaystyle\frac{1}{T-m}\sum_{t=m+1}^T |y_{t}-y_{t-m}|}. 
+    {\displaystyle\frac{1}{T-m}\sum_{t=m+1}^T |y_{t}-y_{t-m}|}.
 $$
 
 The *mean absolute scaled error* is simply
@@ -405,7 +405,7 @@ autoplot(window(ausbeer, start=1992)) +
   geom_forecast(beerfit2, series="Naïve", PI=FALSE) +
   geom_forecast(beerfit3, series="Seasonal naïve", PI=FALSE) +
   xlab("Year") + ylab("Megalitres") +
-  ggtitle("Forecasts for quarterly beer production")  + 
+  ggtitle("Forecasts for quarterly beer production")  +
   guides(colour=guide_legend(title="Forecast")) + fppcols()
 ```
 
@@ -470,7 +470,7 @@ Here, the best method is the drift method (regardless of which accuracy measure 
 
 ###Time series cross-validation {-}
 
-A more sophisticated version of training/test sets is time series cross-validation. In this procedure, there are a series of test sets, each consisting of a single observation. The corresponding training set consists only of observations that occurred *prior* to the observation that forms the test set. Thus, no future observations can be used in constructing the forecast. Since it is not possible to obtain a reliable forecast based on a very small training set, the earliest observations are not considered as test sets.  
+A more sophisticated version of training/test sets is time series cross-validation. In this procedure, there are a series of test sets, each consisting of a single observation. The corresponding training set consists only of observations that occurred *prior* to the observation that forms the test set. Thus, no future observations can be used in constructing the forecast. Since it is not possible to obtain a reliable forecast based on a very small training set, the earliest observations are not considered as test sets.
 
 
 The following diagram illustrates the series of training and test sets, where the blue observations form the training sets, and the red observations form the test sets.
@@ -529,9 +529,24 @@ sqrt(mean(e^2, na.rm=TRUE))
 sqrt(mean(residuals(rwf(dj, drift=TRUE))^2, na.rm=TRUE))
 ```
 
-As expected, the RMSE from the residuals is smaller, as the corresponding "forecasts" are based on a model fitted to the entire data set, rather than being true forecasts. 
+As expected, the RMSE from the residuals is smaller, as the corresponding "forecasts" are based on a model fitted to the entire data set, rather than being true forecasts.
 
 A good way to choose the best forecasting model is to find the model with the smallest RMSE computed using time series cross-validation.
+
+The ugliness of the above R code makes this a good opportunity to introduce some alternative ways of stringing R functions together. In the above code, we are nesting functions within functions within functions, so you have to read the code from the inside out, making it difficult to understand what is being computed. Instead, we can use the pipe operator `%>%` as follows
+
+```r
+dj %>% tsCV(forecastfunction=rwf, drift=TRUE, h=1) -> e
+e^2 %>% mean(na.rm=TRUE) %>% sqrt
+dj %>% rwf(drift=TRUE) %>% residuals -> res
+res^2 %>% mean(na.rm=TRUE) %>% sqrt
+```
+
+The left hand side of each pipe is passed as the first argument to the function on the right hand side. This is consistent with the way we read from left to right. A consequence of using pipes is that all other arguments must be named, which also helps readability. When using pipes, it is natural to use the right arrow assignment `->` rather than the left arrow. For example, the third line above can be read as "Take the `dj` series, pass it to `rwf` with `drift=TRUE`, compute the resulting residuals, and store them as `res`".
+
+In this book, we will use the pipe operator whenever it makes the code easier to read.
+
+
 
 ## Prediction intervals
 
@@ -586,7 +601,7 @@ Prediction intervals are computed for you when using any of the benchmark foreca
 naive(dj2)
 ```
 
-When plotted, the prediction intervals are shown as shaded region, with the strength of color indicating the probability associated with the interval. 
+When plotted, the prediction intervals are shown as shaded region, with the strength of color indicating the probability associated with the interval.
 
 ```{r djforecasts2, echo=TRUE, cache=TRUE}
 autoplot(naive(dj2))
@@ -599,7 +614,7 @@ This book uses the facilities in the `forecast` package in R (which is loaded au
 
 ### Functions that output a forecast object: {-}
 
-Many functions, including `meanf`, `naive`, `snaive` and `rwf`, produce output in the form of a `forecast` object (i.e., an object of class `forecast`). This allows other functions (such as `autoplot`) to work consistently across a range of forecasting models. 
+Many functions, including `meanf`, `naive`, `snaive` and `rwf`, produce output in the form of a `forecast` object (i.e., an object of class `forecast`). This allows other functions (such as `autoplot`) to work consistently across a range of forecasting models.
 
 Objects of class `forecast` contain information about the forecasting method, the data used, the point forecasts obtained, prediction intervals, residuals and fitted values. There are several functions designed to work with these objects including `autoplot`, `summary` and `print`.
 
@@ -622,7 +637,7 @@ The following list shows all the functions that produce `forecast` objects.
 
 So far we have used functions which produce a `forecast` object directly. But a more common approach, which we will focus on in the rest of the book, will be to fit a model to the data, and then use the `forecast()` function to produce forecasts from that model.
 
-The `forecast()` function works with many different types of input. It generally takes a time series or time series model as its main argument, and produces forecasts appropriately. It always returns objects of class `forecast`. 
+The `forecast()` function works with many different types of input. It generally takes a time series or time series model as its main argument, and produces forecasts appropriately. It always returns objects of class `forecast`.
 
 If the first argument is of class `ts`, it returns forecasts from the automatic ETS algorithm discussed in Chapter \@ref(ch-expsmooth).
 
@@ -636,7 +651,7 @@ That works quite well if you have no idea what sort of model to use. But by the 
 
 ## Exercises
 
-1. For the following series, find an appropriate Box-Cox transformation in order to stabilize the variance. 
+1. For the following series, find an appropriate Box-Cox transformation in order to stabilize the variance.
 
     * `usnetelec`
     * `usgdp`
@@ -692,7 +707,7 @@ That works quite well if you have no idea what sort of model to use. But by the 
 
     c. Calculate forecasts using `snaive` applied to `x1`.
 
-    d. Compare the accuracy of your forecasts against the actual values stored in `x2`. 
+    d. Compare the accuracy of your forecasts against the actual values stored in `x2`.
 
     ```r
     f1 <- snaive(x1)

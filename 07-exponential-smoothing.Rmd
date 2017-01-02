@@ -317,8 +317,7 @@ The smoothing parameter for the slope parameter is estimated to be essentially z
 
 ```{r fig-7-comp, fig.cap="Forecasting livestock, sheep in Asia: comparing forecasting performance of non-seasonal method.", echo=TRUE, cache=TRUE}
 autoplot(fc) +
-  xlab("Year") + ylab("Livestock, sheep in Asia (millions)") +
-  fppcols()
+  xlab("Year") + ylab("Livestock, sheep in Asia (millions)")
 ```
 
 The resulting forecasts look sensible with increasing trend, and relatively wide prediction intervals reflecting the variation in the historical data. The prediction intervals are calculated using the methods described in Section \@ref(sec-7-ETS).
@@ -476,7 +475,7 @@ hw(x, damped=TRUE, seasonal="multiplicative")
 
 ##A taxonomy of exponential smoothing methods {#sec-7-6-Taxonomy}
 
-Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combinations of the trend and seasonal components, nine exponential smoothing methods are possible, listed in Table \@ref(tab:taxonomy). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (A$\damped$,N) is the method with damped trend and no seasonality; and so on.
+Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combinations of the trend and seasonal components, nine exponential smoothing methods are possible, listed in Table \@ref(tab:taxonomy). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (A<sub>d</sub>,N) is the method with damped trend and no seasonality; and so on.
 
 
 Table: (\#tab:taxonomy) A two-way classification of exponential smoothing methods.
@@ -526,7 +525,7 @@ Each model consists of a measurement equation that describes the observed data, 
 
 For each method there exist two models: one with additive errors and one with multiplicative errors. The point forecasts produced by the models are identical if they use the same smoothing parameter values. They will, however, generate different prediction intervals.
 
-To distinguish between a model with additive errors and one with multiplicative errors (and also to distinguish the models from the methods), we add a third letter to the classification of Table \@ref(tab:taxonomy). We label each state space model as ETS($\cdot,\cdot,\cdot$) for (Error, Trend, Seasonal). This label can also be thought of as ExponenTial Smoothing. Using the same notation as in Table \@ref(tab:taxonomy), the possibilities for each component are: Error $=\{$A,M$\}$, Trend $=\{$N,A,A_{\text{d}}$\}$ and Seasonal $=\{$N,A,M$\}$.
+To distinguish between a model with additive errors and one with multiplicative errors (and also to distinguish the models from the methods), we add a third letter to the classification of Table \@ref(tab:taxonomy). We label each state space model as ETS($\cdot,\cdot,\cdot$) for (Error, Trend, Seasonal). This label can also be thought of as ExponenTial Smoothing. Using the same notation as in Table \@ref(tab:taxonomy), the possibilities for each component are: Error $=\{$A,M$\}$, Trend $=\{$N,A,A<sub>d</sub>$\}$ and Seasonal $=\{$N,A,M$\}$.
 
 ### ETS(A,N,N): simple exponential smoothing with additive errors {-}
 
@@ -771,7 +770,8 @@ autoplot(fit)
 ```
 
 ```{r MAMforecasts, fig.cap="Forecasting international visitor nights in Australia using an ETS(M,A,M) model.", echo=TRUE, cache=TRUE}
-autoplot(forecast(fit,h=8)) +
+fit %>% forecast(h=8) %>%
+  autoplot() +
   ylab("International visitor night in Australia (millions)")
 ```
 

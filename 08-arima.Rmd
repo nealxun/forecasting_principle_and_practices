@@ -960,7 +960,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
 
     (b) Why are the critical values at different distances from the mean of zero? Why are the autocorrelations different in each figure when they each refer to white noise?
 
-2. A classic example of a non-stationary series is the daily closing IBM stock price series (data set `ibmclose`). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows the series is non-stationary and should be differenced.
+2. A classic example of a non-stationary series is the daily closing IBM stock price series (data set `ibmclose`). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.
 
 3. For the following series, find an appropriate Box-Cox transformation and order of differencing in order to obtain stationary data.
 
@@ -986,8 +986,8 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (b) Produce a time plot for the series. How does the plot change as you change $\phi_1$?
     (c) Write your own code to generate data from an MA(1) model with $\theta_{1}  =  0.6$ and $\sigma^2=1$.
     (d) Produce a time plot for the series. How does the plot change as you change $\theta_1$?
-    (e) Generate data from an ARMA(1,1) model with $\phi_{1} = 0.6$ and $\theta_{1}  = 0.6$ and $\sigma^2=1$.
-    (f) Generate data from an AR(2) model with $\phi_{1} =-0.8$ and $\phi_{2} = 0.3$ and $\sigma^2=1$. (Note that these parameters will give a non-stationary series.)
+    (e) Generate data from an ARMA(1,1) model with $\phi_{1} = 0.6$, $\theta_{1}  = 0.6$ and $\sigma^2=1$.
+    (f) Generate data from an AR(2) model with $\phi_{1} =-0.8$, $\phi_{2} = 0.3$ and $\sigma^2=1$. (Note that these parameters will give a non-stationary series.)
     (g) Graph the latter two series and compare them.
 
 6. Consider the number of women murdered each year (per 100,000 standard population) in the United States (data set `wmurders`).

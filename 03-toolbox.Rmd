@@ -270,7 +270,7 @@ $$
 $$
 where $h$ is the maximum lag being considered and $T$ is the number of observations. If each $r_k$ is close to zero, then $Q$ will be small. If some $r_k$ values are large (positive or negative), then $Q$ will be large. We suggest using $h=10$ for non-seasonal data and $h=2m$ for seasonal data, where $m$ is the period of seasonality. However, the test is not good when $h$ is large, so if these values are larger than $T/5$, then use $h=T/5$
 
-A related (and more accurate) test is the *Box-Ljung test*, based on
+A related (and more accurate) test is the *Ljung-Box test*, based on
 $$
   Q^* = T(T+2) \sum_{k=1}^h (T-k)^{-1}r_k^2.
 $$
@@ -290,7 +290,7 @@ Box.test(res,lag=10, fitdf=0, type="Lj")
 
 For both $Q$ and $Q^*$, the results are not significant (i.e., the $p$-values are relatively large). Thus, we can conclude that the residuals are not distinguishable from a white noise series.
 
-All of these methods for checking residuals are conveniently packaged into one R function, which will produce a time plot, ACF plot and histogram of the residuals (with an overlayed normal distribution for comparison), and do a Box-Ljung test with the correct degrees of freedom:
+All of these methods for checking residuals are conveniently packaged into one R function, which will produce a time plot, ACF plot and histogram of the residuals (with an overlayed normal distribution for comparison), and do a Ljung-Box test with the correct degrees of freedom:
 
 ```{r checkresiduals, cache=TRUE, warning=FALSE}
 checkresiduals(naive(dj2))

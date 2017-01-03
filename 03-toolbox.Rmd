@@ -162,9 +162,9 @@ For example, if you are studying the monthly milk production on a farm, there wi
 ```{r cowmilk, fig.cap="Monthly milk production per cow. Source: @Cryer2008.", cache=TRUE}
 monthdays <- rep(c(31,28,31,30,31,30,31,31,30,31,30,31),14)
 monthdays[26 + (4*12)*(0:2)] <- 29
-tmp <- cbind(Monthly = milk, DailyAverage=milk/monthdays)
-autoplot(tmp, facet=TRUE) + xlab("Years") + ylab("Pounds") +
-  ggtitle("Milk production per cow")
+cbind(Monthly = milk, DailyAverage=milk/monthdays) %>%
+  autoplot(facet=TRUE) + xlab("Years") + ylab("Pounds") +
+    ggtitle("Milk production per cow")
 ```
 
 Notice how much simpler the seasonal pattern is in the average daily production plot compared to the average monthly production plot. By looking at the average daily production instead of the average monthly production, we effectively remove the variation due to the different month lengths. Simpler patterns are usually easier to model and lead to more accurate forecasts.

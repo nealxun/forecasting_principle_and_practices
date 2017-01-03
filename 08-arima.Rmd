@@ -108,13 +108,12 @@ $$
 Forecasts from this model are equal to the last observation from the relevant season. That is, this model gives seasonal naïve forecasts.
 
 ```{r a10diff, fig.cap="Logs and seasonal differences of the A10 (antidiabetic) sales data. The logarithms stabilize the variance, while the seasonal differences remove the seasonality and trend.", fig.height=6, cache=FALSE}
-tmp <- cbind(
-  "Sales ($million)" = a10,
-  "Monthly log sales" = log(a10),
-  "Annual change in log sales" = diff(log(a10),12))
-autoplot(tmp, facets=TRUE) +
-  xlab("Year") + ylab("") +
-  ggtitle("Antidiabetic drug sales")
+cbind("Sales ($million)" = a10,
+      "Monthly log sales" = log(a10),
+      "Annual change in log sales" = diff(log(a10),12)) %>%
+  autoplot(facets=TRUE) +
+    xlab("Year") + ylab("") +
+    ggtitle("Antidiabetic drug sales")
 ```
 
 Figure \@ref(fig:a10diff) shows the seasonal differences of the logarithm of the monthly scripts for A10 (antidiabetic) drugs sold in Australia. The transformation and differencing have made the series look relatively stationary.
@@ -124,14 +123,13 @@ To distinguish seasonal differences from ordinary differences, we sometimes refe
 Sometimes it is necessary to do both a seasonal difference and a first difference to obtain stationary data, as is shown in Figure \@ref(fig:usmelec). Here, the data are first transformed using logarithms (second panel), then seasonal differences are calculated (third panel). The data still seem a little non-stationary, and so a further lot of first differences are computed (bottom panel).
 
 ```{r usmelec, fig.height=6, cache=FALSE, fig.cap="Top panel: US net electricity generation (billion kWh). Other panels show the same data after transforming and differencing."}
-tmp <- cbind(
-  "Billion kWh" = usmelec,
-  "Logs" = log(usmelec),
-  "Seasonally\n differenced logs" = diff(log(usmelec),12),
-  "Doubly\n differenced logs" = diff(diff(log(usmelec),12),1))
-autoplot(tmp, facets=TRUE) +
-  xlab("Year") + ylab("") +
-  ggtitle("Monthly US net electricity generation")
+cbind("Billion kWh" = usmelec,
+      "Logs" = log(usmelec),
+      "Seasonally\n differenced logs" = diff(log(usmelec),12),
+      "Doubly\n differenced logs" = diff(diff(log(usmelec),12),1)) %>%
+  autoplot(facets=TRUE) +
+    xlab("Year") + ylab("") +
+    ggtitle("Monthly US net electricity generation")
 ```
 
 There is a degree of subjectivity in selecting which differences to apply. The seasonally differenced data in Figure \@ref(fig:a10diff) do not show substantially different behaviour from the seasonally differenced data in Figure \@ref(fig:usmelec). In the latter case, we could have decided to stop with the seasonally differenced data, and not done an extra round of differencing. In the former case, we could have decided that the data were not sufficiently stationary and taken an extra round of differencing. Some formal tests for differencing will be discussed later, but there are always some choices to be made in the modeling process, and different analysts may make different choices.
@@ -718,6 +716,7 @@ $$
 
 The additional seasonal terms are simply multiplied by the non-seasonal terms.
 
+
 ### ACF/PACF {-}
 
 The seasonal part of an AR or MA model will be seen in the seasonal lags of the PACF and ACF. For example, an ARIMA(0,0,0)(0,0,1)$_{12}$ model will show:
@@ -794,9 +793,9 @@ Our second example is more difficult. We will try to forecast monthly cortecoste
 
 ```{r h02, fig.cap="Cortecosteroid drug sales in Australia (in millions of scripts per month). Logged data shown in bottom panel.", cache=FALSE}
 lh02 <- log(h02)
-tmp <- cbind("H02 sales (million scripts)" = h02,
-             "Log H02 sales"=lh02)
-autoplot(tmp, facets=TRUE) + xlab("Year") + ylab("")
+cbind("H02 sales (million scripts)" = h02,
+      "Log H02 sales"=lh02) %>%
+  autoplot(facets=TRUE) + xlab("Year") + ylab("")
 ```
 
 Data from July 1991 to June 2008 are plotted in Figure \@ref(fig:h02). There is a small increase in the variance with the level, so we take logarithms to stabilize the variance.
@@ -970,10 +969,9 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (d) `enplanements`
     (e) `visitors`
 
+4. For the `enplanements` data, write down the differences you chose above using backshift operator notation.
 
 3. For your retail data (Exercise 1 of Section \@ref(ex:graphics)), find the appropriate order of differencing (after transformation if necessary) to obtain stationary data.
-
-4. For the `enplanements` data, write down the differences you chose above using backshift operator notation.
 
 
 5. Use R to simulate and plot some data from simple ARIMA models.

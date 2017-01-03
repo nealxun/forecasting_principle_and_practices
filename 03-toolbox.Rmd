@@ -649,7 +649,7 @@ forecast(ausbeer)
 
 That works quite well if you have no idea what sort of model to use. But by the end of this book, you should not need to use `forecast()` in this "blind" fashion. Instead, you will fit a model appropriate to the data, and then use `forecast()` to produce forecasts from that model.
 
-## Exercises
+## Exercises {#ex:toolbox}
 
 1. For the following series, find an appropriate Box-Cox transformation in order to stabilize the variance.
 
@@ -660,7 +660,7 @@ That works quite well if you have no idea what sort of model to use. But by the 
 
 2. Why is a Box-Cox transformation unhelpful for the `cangas` data?
 
-3. What Box-Cox transformation would you select for your retail data (from Exercises \@ref(ex:graphics))?
+3. What Box-Cox transformation would you select for your retail data (from Exercise 1 in Section \@ref(ex:graphics))?
 
 4. Calculate the residuals from a seasonal naïve forecast applied to the quarterly Australian beer production data from 1992. The following code will help.
 
@@ -690,39 +690,39 @@ That works quite well if you have no idea what sort of model to use. But by the 
     d. If your model doesn’t forecast well, you should make it more complicated.
     e. Always choose the model with the best forecast accuracy as measured on the test set.
 
-7. For your retail time series (from Exercises \@ref(ex:graphics))?
+7. For your retail time series (from Exercise 1 in Section \@ref(ex:graphics))?
 
     a. Split the data into two parts using
 
-    ```r
-    x1 <- window(mytimeseries, end=c(2010,12))
-    x2 <- window(mytimeseries, start=2011)
-    ```
+        ```r
+        x1 <- window(mytimeseries, end=c(2010,12))
+        x2 <- window(mytimeseries, start=2011)
+        ```
 
     b. Check that your data have been split appropriately by producing the following plot.
 
-    ```r
-    autoplot(cbind(x1,x2))
-    ```
+        ```r
+        autoplot(cbind(x1,x2))
+        ```
 
     c. Calculate forecasts using `snaive` applied to `x1`.
 
     d. Compare the accuracy of your forecasts against the actual values stored in `x2`.
 
-    ```r
-    f1 <- snaive(x1)
-    accuracy(f1,x2)
-    ```
+        ```r
+        f1 <- snaive(x1)
+        accuracy(f1,x2)
+        ```
 
     e. Check the residuals.
 
-    ```r
-    checkresiduals(f1)
-    ```
+        ```r
+        checkresiduals(f1)
+        ```
 
-    Do the residuals appear to be uncorrelated and normally distributed?
+        Do the residuals appear to be uncorrelated and normally distributed?
 
-    e. How sensitive are the accuracy measures to the training/test split?
+    f. How sensitive are the accuracy measures to the training/test split?
 
 
 8. Use the Dow Jones index (data set `dowjones`) to do the following:

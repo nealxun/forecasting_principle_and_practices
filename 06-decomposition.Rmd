@@ -460,22 +460,17 @@ As well as the naïve method, several other possible forecasting methods are ava
 1. Show that a $3\times5$ MA is equivalent to a 7-term weighted moving average with weights of 0.067, 0.133, 0.200, 0.200, 0.200, 0.133, and 0.067.
 
 2. The `plastics` data set consists of the monthly sales (in thousands) of product A for a plastics manufacturer for five years.
-
     (a) Plot the time series of sales of product A. Can you identify seasonal fluctuations and/or a trend-cycle?
-
     (b) Use a classical multiplicative decomposition to calculate the trend-cycle and seasonal indices.
-
     (c) Do the results support the graphical interpretation from part (a)?
-
     (d) Compute and plot the seasonally adjusted data.
-
     (e) Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier?
-
     (f) Does it make any difference if the outlier is near the end rather than in the middle of the time series?
-
     (g) Return to the original data, and use a random walk with drift to produce forecasts of the seasonally adjusted data.
-
     (h) Reseasonalize the results to give forecasts on the original scale. [Hint: use the stlf function with `method="naive"`.]
+
+3. Recall your retail time series data  (from Exercise 1 in Section \@ref(ex:graphics)).
+   Decompose the series using X11. Does it reveal any outliers, or unusual features that you had not noticed previously?
 
 3. Figures \@ref(fig:labour) and \@ref(fig:labour2) shows the result of decomposing the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.
 
@@ -489,18 +484,19 @@ As well as the naïve method, several other possible forecasting methods are ava
     ```
 
     a. Write about 3--5 sentences describing the results of the seasonal adjustment. Pay particular attention to the scales of the graphs in making your interpretation.
-
     b. Is the recession of 1991/1992 visible in the estimated components?
 
 
-4. We will use the `bricksq` data for this exercise.
 
+4. We will use the `bricksq` data for this exercise.
     a. Use an STL decomposition to calculate the trend-cycle and seasonal indices. (Experiment with having fixed or changing seasonality.)
     b. Compute and plot the seasonally adjusted data.
     c. Use a naïve method to produce forecasts of the seasonally adjusted data.
     d. Reseasonalize the results to give forecasts on the original scale.
     e. Do the residuals look uncorrelated?
     f. Repeat with a robust STL decomposition. Does it make much difference?
+
+
 
 ## Further reading
 

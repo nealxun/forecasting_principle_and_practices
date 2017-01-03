@@ -70,7 +70,7 @@ The time plot immediately reveals some interesting features.
 -   There is a long-term fluctuation in the level of the series which increases during 1987, decreases in 1989, and increases again through 1990 and 1991.
 -   There are some periods of missing observations.
 
-Any model will need to take all these features into account in order to effectively forecast the passenger load into the future. 
+Any model will need to take all these features into account in order to effectively forecast the passenger load into the future.
 
 A simpler time series is shown in Figure \@ref(fig:a10).
 
@@ -93,7 +93,7 @@ Seasonal
   : A *seasonal* pattern occurs when a time series is affected by seasonal factors such as the time of the year or the day of the week. Seasonality is always of a fixed and known frequency. The monthly sales of antidiabetic drugs above shows seasonality which is induced partly by the change in the cost of the drugs at the end of the calendar year.
 
 Cyclic
-  : A *cycle* occurs when the data exhibit rises and falls that are not of a fixed frequency. These fluctuations are usually due to economic conditions, and are often related to the "business cycle".  The duration of these fluctuations is usually at least 2 years. 
+  : A *cycle* occurs when the data exhibit rises and falls that are not of a fixed frequency. These fluctuations are usually due to economic conditions, and are often related to the "business cycle".  The duration of these fluctuations is usually at least 2 years.
 
 Many people confuse cyclic behaviour with seasonal behaviour, but they are really quite different. If the fluctuations are not of a fixed frequency then they are cyclic; if the frequency is unchanging and associated with some aspect of the calendar, then the pattern is seasonal. In general, the average length of cycles is longer than the length of a seasonal pattern, and the magnitudes of cycles tend to be more variable than the magnitudes of seasonal patterns. Cycles and seasonality are discussed further in Section \@ref(sec-6-1-TSpatterns).
 
@@ -106,7 +106,7 @@ smallfonts <- theme(text = element_text(size = 7),
             axis.text = element_text(size=6))
 p1 <- autoplot(hsales) + smallfonts +
         xlab("Year") + ylab("millions") +
-        ggtitle("Sales of new one-family houses, USA") 
+        ggtitle("Sales of new one-family houses, USA")
 p2 <- autoplot(ustreas) + smallfonts +
         xlab("Day") + ylab("Number") +
         ggtitle("US treasury bill contracts")
@@ -114,12 +114,12 @@ p3 <- autoplot(qauselec) + smallfonts +
         xlab("Year") + ylab("billion kWh") +
         ggtitle("Australian quarterly electricity production")
 p4 <- autoplot(diff(dj)) + smallfonts +
-        xlab("Day") + ylab("Change in index") + 
+        xlab("Day") + ylab("Change in index") +
         ggtitle("Dow Jones index")
 gridExtra::grid.arrange(p1,p2,p3,p4,ncol=2)
 ```
 
-  1. The monthly housing sales (top left) show strong seasonality within each year, as well as some strong cyclic behaviour with a period of about 6--10 years. There is no apparent trend in the data over this period. 
+  1. The monthly housing sales (top left) show strong seasonality within each year, as well as some strong cyclic behaviour with a period of about 6--10 years. There is no apparent trend in the data over this period.
 
   2. The US treasury bill contracts (top right) show results from the Chicago market for 100 consecutive trading days in 1981. Here there is no seasonality, but an obvious downward trend. Possibly, if we had a much longer series, we would see that this downward trend is actually part of a long cycle, but when viewed over only 100 days it appears to be a trend.
 
@@ -153,7 +153,7 @@ ggseasonplot(a10, polar=TRUE) +
 An alternative plot that emphasises the seasonal patterns is where the data for each season are collected together in separate mini time plots.
 
 ```{r subseriesplot, fig.cap="Seasonal subseries plot of monthly antidiabetic drug sales in Australia.", cache=TRUE}
-ggsubseriesplot(a10) + ylab("$ million") + 
+ggsubseriesplot(a10) + ylab("$ million") +
   ggtitle("Seasonal subseries plot: antidiabetic drug sales")
 ```
 
@@ -175,7 +175,7 @@ We can study how relationship between takings and roomnights by plotting one ser
 
 ```{r motel2, fig.cap="Monthly takings plotted against room nights for accommodation in Victoria, Australia.", cache=TRUE}
 qplot(Roomnights/1000, Takings/1000, data=as.data.frame(motel)) +
-  ylab("Takings ($million)") + xlab("Room nights (thousands)") 
+  ylab("Takings ($million)") + xlab("Room nights (thousands)")
 ```
 
 This scatterplot helps us to visualize the relationship between the variables.
@@ -193,14 +193,14 @@ This scatterplot helps us to visualize the relationship between the variables.
 
 ##Lag plots
 
-Figure \@ref(fig:beerlagplot) displays scatterplots of quarterly Australian beer production, where the horizontal axis shows lagged values of the time series. Each graph shows $y_{t}$ plotted against $y_{t-k}$ for different values of $k$. 
+Figure \@ref(fig:beerlagplot) displays scatterplots of quarterly Australian beer production, where the horizontal axis shows lagged values of the time series. Each graph shows $y_{t}$ plotted against $y_{t-k}$ for different values of $k$.
 
 ```{r beerlagplot, fig.cap="Lagged scatterplots for quarterly beer production.", fig.width=8, fig.height=8, cache=TRUE}
 beer2 <- window(ausbeer, start=1992)
 gglagplot(beer2, lags=9, do.lines=FALSE, continuous=FALSE)
 ```
 
-Here the colours indicate the quarter of the variable on the vertical axis. 
+Here the colours indicate the quarter of the variable on the vertical axis.
 The relationship is strongly positive at lags 4 and 8, reflecting the strong quarterly seasonality in the data.  The negative relationship seen for lags 2 and 6 occurs because peaks (in Q4) are plotted against troughs (in Q2)
 
 The `window` function used here is very useful when extracting a portion of a time series. In this case, we have extracted the data from `ausbeer`, beginning in 1992.
@@ -208,14 +208,14 @@ The `window` function used here is very useful when extracting a portion of a ti
 
 ##Autocorrelation
 
-Just as correlation measures the extent of a linear relationship between two variables, autocorrelation measures the linear relationship between *lagged values* of a time series.  
+Just as correlation measures the extent of a linear relationship between two variables, autocorrelation measures the linear relationship between *lagged values* of a time series.
 
 There are several autocorrelation coefficients, corresponding to each panel in the lag plot. For example, $r_{1}$ measures the relationship between $y_{t}$ and $y_{t-1}$, $r_{2}$ measures the relationship between $y_{t}$ and $y_{t-2}$, and so on.
 
 The value of $r_{k}$ can be written as
 $$
  r_{k} = \frac{\sum\limits_{t=k+1}^T (y_{t}-\bar{y})(y_{t-k}-\bar{y})}
- {\sum\limits_{t=1}^T (y_{t}-\bar{y})^2}, 
+ {\sum\limits_{t=1}^T (y_{t}-\bar{y})^2},
 $$
 where $T$ is the length of the time series.
 
@@ -244,10 +244,10 @@ In this graph:
 
 ### Trend and seasonality in ACF plots {-}
 
- 
+
 When data have a trend, the autocorrelations for small lags tend to be large and positive because observations nearby in time are also nearby in size. So the ACF of trended time series tend to have positive values that slowly decrease as the lags increase.
 
-When data are seasonal, the autocorrelations will be larger for the seasonal lags (at multiples of the seasonal frequency) than for other lags. 
+When data are seasonal, the autocorrelations will be larger for the seasonal lags (at multiples of the seasonal frequency) than for other lags.
 
 When data are both trended and seasonal, you see a combination of these effects, as illustrated in Figure \@ref(fig:acfelec).
 
@@ -280,7 +280,7 @@ ggAcf(y)
 For white noise series, we expect each autocorrelation to be close to zero. Of course, they will not be exactly equal to zero as there is some random variation. For a white noise series, we expect 95% of the spikes in the ACF to lie within $\pm 2/\sqrt{T}$ where $T$ is the length of the time series. It is common to plot these bounds on a graph of the ACF (the blue dashed lines above). If one or more large spikes are outside these bounds, or if substantially more than 5% of spikes are outside these bounds, then the series is probably not white noise.
 
 In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r format(2/sqrt(50),digits=2)`$. All of the autocorrelation coefficients lie within these limits, confirming that the data are white noise.
-  
+
 
 ## Exercises {#ex:graphics}
 
@@ -312,7 +312,7 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
     Use the help files to find out what the series are.
 
-3. The `arrivals` data set comprises quarterly international arrivals (in thousands) to Australia from Japan, New Zealand, UK and the US. Use `autoplot` and `ggseasonplot` and compare the differences between the arrivals from these four countries. Can  you identify any unusual observations? 
+3. The `arrivals` data set comprises quarterly international arrivals (in thousands) to Australia from Japan, New Zealand, UK and the US. Use `autoplot` and `ggseasonplot` and compare the differences between the arrivals from these four countries. Can  you identify any unusual observations?
 
 
 4. The following time plots and ACF plots correspond to four different time series. Your task is to match each  time plot in the first row with one of the ACF plots in the second row.
@@ -330,7 +330,7 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
     acfa <- ggAcf(USAccDeaths, ci=0) + xlab("") + ggtitle("A") + ylim(-0.4,1)
     acfd <- ggAcf(AirPassengers, ci=0) + xlab("") + ggtitle("D") + ylim(-0.4,1)
     acfc <- ggAcf(mink, ci=0) + xlab("") + ggtitle("C") + ylim(-0.4,1)
-    gridExtra::grid.arrange(tp1,tp2,tp3,tp4, 
+    gridExtra::grid.arrange(tp1,tp2,tp3,tp4,
                             acfa,acfb,acfc,acfd,nrow=2)
     ```
 
@@ -338,4 +338,4 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
  * @Cleveland1993 is a classic book on the principles of visualization for data analysis. While it is more than 20 years old, the ideas are timeless.
  * @Unwin2015 is a modern introduction to graphical data analysis using R. It does not have much information on time series graphics, but plenty of excellent general advice on using graphics for data analysis.
- 
+

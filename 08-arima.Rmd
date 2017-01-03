@@ -834,7 +834,7 @@ for(i in seq_along(aicc))
 modelname <- sub("\\[12\\]","$_{12}$",modelname)
 j <- order(aicc)
 knitr::kable(data.frame(Model=modelname,AICc=aicc)[j,],
-             digits=2, row.names=FALSE, align='cc')
+             digits=2, row.names=FALSE, align='cc', booktabs=TRUE)
 ```
 
 Of these models, the best is the ARIMA(3,0,1)(0,1,2)$_{12}$ model (i.e., it has the smallest AICc value).
@@ -898,7 +898,7 @@ for(i in seq(length(rmse)))
 modelname <- sub("\\[12\\]","$_{12}$",modelname)
 j <- order(rmse)
 knitr::kable(data.frame(Model=modelname,RMSE=rmse)[j,],
-             digits=4, row.names=FALSE, align='cc')
+             digits=4, row.names=FALSE, align='cc', booktabs=TRUE)
 ```
 
 The models chosen manually and with `auto.arima` are both in the top four models based on their RMSE values.

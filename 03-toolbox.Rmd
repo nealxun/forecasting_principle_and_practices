@@ -427,7 +427,7 @@ tab[2,] <- accuracy(beerfit2, beer3)[2,c(2,3,5,6)]
 tab[3,] <- accuracy(beerfit3, beer3)[2,c(2,3,5,6)]
 colnames(tab) <- c("RMSE","MAE","MAPE","MASE")
 rownames(tab) <- c("Mean method", "Naïve method", "Seasonal naïve method")
-knitr::kable(tab, digits=2)
+knitr::kable(tab, digits=2, booktabs=TRUE)
 ```
 
 It is obvious from the graph that the seasonal naïve method is best for these data, although it can still be improved, as we will discover later. Sometimes, different accuracy measures will lead to different results as to which forecast method is best. However, in this case, all of the results point to the seasonal naïve method as the best of these three methods for this data set.
@@ -463,7 +463,7 @@ tab[2,] <- accuracy(djfc2, dj3)[2,c(2,3,5,6)]
 tab[3,] <- accuracy(djfc3, dj3)[2,c(2,3,5,6)]
 colnames(tab) <- c("RMSE","MAE","MAPE","MASE")
 rownames(tab) <- c("Mean method", "Naïve method", "Drift method")
-knitr::kable(tab, digits=2)
+knitr::kable(tab, digits=2, booktabs=TRUE)
 ```
 
 Here, the best method is the drift method (regardless of which accuracy measure is used).

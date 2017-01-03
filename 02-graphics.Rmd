@@ -13,7 +13,7 @@ Suppose you have annual observations for the last few years:
 ```{r, echo=FALSE, cache=TRUE}
 x <- c(123,39,78,52,110)
 yr <- 2012:2016
-knitr::kable(data.frame(Year=yr,Observation=x))
+knitr::kable(data.frame(Year=yr,Observation=x), booktabs=TRUE)
 ```
 
 We turn this into a `ts` object using the `ts` function:
@@ -39,7 +39,7 @@ The "frequency" is the number of observations before the seasonal pattern repeat
 ```{r, echo=FALSE, cache=TRUE}
 tab <- data.frame(Data=c("Annual","Quarterly","Monthly","Weekly"),
   frequency=c(1,4,12,52))
-knitr::kable(tab)
+knitr::kable(tab, booktabs=TRUE)
 ```
 
 Actually, there are not 52 weeks in a year, but 365.25/7 = `r format(365.25/7,digits=4)` on average, allowing for a leap year every fourth year. But most functions which use `ts` objects require integer frequency.

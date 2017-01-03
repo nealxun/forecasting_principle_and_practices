@@ -170,7 +170,7 @@ tab <- apply(tab, 2, function(x){j <- grep("[ ]*NA",x); x[j] <- ""; return(x)})
 tab[1,] <- c("","$t$","$y_t$","$\\ell_t$","$\\hat{y}_{t+1|t}$")
 tab[n+3,] <- c("","$h$","","","$\\hat{y}_{T+h|T}$")
 # Show table
-knitr::kable(tab, caption="Forecasting the total oil production in millions of tonnes for Saudi Arabia using simple exponential smoothing.")
+knitr::kable(tab, caption="Forecasting the total oil production in millions of tonnes for Saudi Arabia using simple exponential smoothing.", booktabs=TRUE)
 ```
 
 The black line in Figure \@ref(fig:ses) is a plot of the data, which shows a changing level over time.
@@ -406,7 +406,7 @@ ctab <- rbind(head(ctab,length(aust)+4),
               c("$h$",rep("",4), "$\\hat{y}_{T+h|T}$"),
               tail(ctab,8))
 # Output
-knitr::kable(ctab, caption="Applying Holt-Winters' method with additive seasonality for forecasting international visitor nights in Australia. Notice that the additive seasonal component sums to approximately zero. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.250$, $\\beta^*=0.0069$, $\\gamma=0.456$ and RMSE$=1.786$).")
+knitr::kable(ctab, booktabs=TRUE, caption="Applying Holt-Winters' method with additive seasonality for forecasting international visitor nights in Australia. Notice that the additive seasonal component sums to approximately zero. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.250$, $\\beta^*=0.0069$, $\\gamma=0.456$ and RMSE$=1.786$).")
 ```
 
 ```{r tab76, echo=FALSE, cache=TRUE}
@@ -427,7 +427,7 @@ ctab <- rbind(head(ctab,length(aust)+4),
               c("$h$",rep("",4), "$\\hat{y}_{T+h|T}$"),
               tail(ctab,8))
 # Output
-knitr::kable(ctab,digits=2, caption="Applying Holt-Winters' method with multiplicative seasonality for forecasting international visitor nights in Australia. Notice that the multiplicative seasonal component sums to approximately $m=4$. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.479$, $\\beta^*=0.055$, $\\gamma=0.0001$ and RMSE$=1.590$).")
+knitr::kable(ctab,digits=2, booktabs=TRUE, caption="Applying Holt-Winters' method with multiplicative seasonality for forecasting international visitor nights in Australia. Notice that the multiplicative seasonal component sums to approximately $m=4$. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.479$, $\\beta^*=0.055$, $\\gamma=0.0001$ and RMSE$=1.590$).")
 ```
 
 ```{r checkhw, echo=FALSE, cache=TRUE}

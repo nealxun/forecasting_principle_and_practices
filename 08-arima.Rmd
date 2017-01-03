@@ -908,7 +908,7 @@ When models are compared using AICc values, it is important that all models have
 
 None of the models considered here pass all of the residual tests. In practice, we would normally use the best model we could find, even if it did not pass all of the tests.
 
-Forecasts from the ARIMA(3,0,1)(0,1,2)$_{12}$ model (which has the lowest RMSE value on the test set, and the best AICc value amongst models with only seasonal differencing) are shown in Figure \@ref(h02f).
+Forecasts from the ARIMA(3,0,1)(0,1,2)$_{12}$ model (which has the lowest RMSE value on the test set, and the best AICc value amongst models with only seasonal differencing) are shown in Figure \@ref(fig:h02f).
 
 ```{r h02f, fig.cap="Forecasts from the ARIMA(3,0,1)(0,1,2)$_{12}$ model applied to the H02 monthly script sales data.", cache=FALSE}
 h02 %>%
@@ -970,7 +970,11 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (d) `enplanements`
     (e) `visitors`
 
+
+3. For your retail data (Exercise 1 of Section \@ref(ex:graphics)), find the appropriate order of differencing (after transformation if necessary) to obtain stationary data.
+
 4. For the `enplanements` data, write down the differences you chose above using backshift operator notation.
+
 
 5. Use R to simulate and plot some data from simple ARIMA models.
 
@@ -996,9 +1000,17 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (b) Should you include a constant in the model? Explain.
     (c) Write this model in terms of the backshift operator.
     (d) Fit the model using R and examine the residuals. Is the model satisfactory?
-    (e) Forecast three times ahead. Check your forecasts by hand to make sure you know how they have been calculated.
+    (e) Forecast three times ahead. Check your forecasts by hand to make sure that you know how they have been calculated.
     (f) Create a plot of the series with forecasts and prediction intervals for the next three periods shown.
     (g) Does `auto.arima` give the same model you have chosen? If not, which model do you think is better?
+
+6. For the `usgdp` series:
+	  a. if necessary, find a suitable Box-Cox transformation for the data;
+	  b. fit a suitable ARIMA model to the transformed data using `auto.arima()`;
+	  c. try some other plausible models by experimenting with the orders chosen;
+	  d. choose what you think is the best model and check the residual diagnostics;
+	  e. produce forecasts of your fitted model. Do the forecasts look reasonable?
+	  f. compare the results with what you would obtain using `ets()` (with no transformation).
 
 7. Consider the quarterly number of international tourists to Australia for the period 1999--2010. (Data set `austourists`.)
 
@@ -1007,7 +1019,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (c) What can you learn from the PACF graph?
     (d) Produce plots of the seasonally differenced data $(1 - B^{4})Y_{t}$. What model do these graphs suggest?
     (e) Does `auto.arima` give the same model that you chose? If not, which model do you think is better?
-    (f) Write the model in terms of the backshift operator, and then without using the backshift operator.
+    (f) Write the model in terms of the backshift operator, then without using the backshift operator.
 
 8. Consider the total net generation of electricity (in billion kilowatt hours) by the U.S. electric industry (monthly for the period 1985--1996). (Data set `usmelec`.) In general there are two peaks per year: in mid-summer and mid-winter.
 
@@ -1016,7 +1028,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (c) Are the data stationary? If not, find an appropriate differencing which yields stationary data.
     (d) Identify a couple of ARIMA models that might be useful in describing the time series. Which of your models is the best according to their AIC values?
     (e) Estimate the parameters of your best model and do diagnostic testing on the residuals. Do the residuals resemble white noise? If not, try to find another ARIMA model which fits better.
-    (f) Forecast the next 15 years of generation of electricity by the U.S. electric industry. Get the latest figures from <http://data.is/zgRWCO> to check on the accuracy of your forecasts.
+    (f) Forecast the next 15 years of electricity generation by the U.S. electric industry. Get the latest figures from <http://data.is/zgRWCO> to check the accuracy of your forecasts.
     (g) How many years of forecasts do you think are sufficiently accurate to be usable?
 
 9. For the `mcopper` data:
@@ -1039,11 +1051,16 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
 
 11. For the same time series you used in Exercise 10, try using a non-seasonal model applied to the seasonally adjusted data obtained from STL. The `stlf()` function will make the calculations easy (with `method="arima"`). Compare the forecasts with those obtained in Exercise 10. Which do you think is the best approach?
 
+12. For your retail time series (Exercise 4 above):
+    a. develop an appropriate seasonal ARIMA model;
+    b. compare the forecasts with those you obtained in earlier chapters;
+    c. Obtain up-to-date retail data from the [ABS website](https://goo.gl/twfCyD) (Cat 8501.0, Table 11), and compare your forecasts with the actual numbers. How good were the forecasts from the various models?
+
 
 ##Further reading
 
 - @BJRL15
-- @BDbook02
+- @BDbook16
 - @Chatfield2000
 - @PTT01
 - @Shumway2011

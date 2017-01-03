@@ -551,7 +551,7 @@ Then the equations of the model can be written as
   y_t &= \ell_{t-1} + \varepsilon_t (\#eq:ann-1a)\\
   \ell_t&=\ell_{t-1}+\alpha \varepsilon_t. (\#eq:ann-2a)
 \end{align}
-We refer to \@ref(eq:ann-1a) as the *measurement* (or observation) equation and (\#eq:ann-2a) as the *state* (or transition) equation. These two equations, together with the statistical distribution of the errors, form a fully specified statistical model. Specifically, these constitute an innovations state space model underlying simple exponential smoothing.
+We refer to \@ref(eq:ann-1a) as the *measurement* (or observation) equation and \@ref(eq:ann-2a) as the *state* (or transition) equation. These two equations, together with the statistical distribution of the errors, form a fully specified statistical model. Specifically, these constitute an innovations state space model underlying simple exponential smoothing.
 
 The term "innovations" comes from the fact that all equations in this type of specification use the same random error process, $\varepsilon_t$. For the same reason, this formulation is also referred to as a "single source of error" model, in contrast to alternative multiple source of error formulation swhich we do not present here.
 
@@ -610,35 +610,36 @@ knitr::include_graphics("statespacemodels.png")
 ```
 ------------------------------------
 
+## Estimation and model selection
 
 ### Estimating ETS models {-}
 
 An alternative to estimating the parameters by minimizing the sum of squared errors is to maximize the "likelihood". The likelihood is the probability of the data arising from the specified model. Thus, a large likelihood is associated with a good model. For an additive error model, maximizing the likelihood gives the same results as minimizing the sum of squared errors. However, different results will be obtained for multiplicative error models. In this section, we will estimate the smoothing parameters $\alpha$, $\beta$, $\gamma$ and $\phi$, and the initial states $\ell_0$, $b_0$, $s_0,s_{-1},\dots,s_{-m+1}$, by maximizing the likelihood.
 
-The possible values that the smoothing parameters can take are restricted. Traditionally, the parameters have been constrained to lie between 0 and 1 so that the equations can be interpreted as weighted averages. That is, $0< \alpha,\beta^*,\gamma^*,\phi<1$. For the state space models, we have set $\beta=\alpha\beta^*$ and $\gamma=(1-\alpha)\gamma^*$. Therefore, the traditional restrictions translate to $0< \alpha <1$,  $0 < \beta < \alpha$  and $0< \gamma < 1-\alpha$. In practice, the damping parameter $\phi$ is usually constrained further to prevent numerical difficulties in estimating the model. A common constraint is to set $0.8<\phi<0.98$.
+The possible values that the smoothing parameters can take are restricted. Traditionally, the parameters have been constrained to lie between 0 and 1 so that the equations can be interpreted as weighted averages. That is, $0< \alpha,\beta^*,\gamma^*,\phi<1$. For the state space models, we have set $\beta=\alpha\beta^*$ and $\gamma=(1-\alpha)\gamma^*$. Therefore, the traditional restrictions translate to $0< \alpha <1$,  $0 < \beta < \alpha$  and $0< \gamma < 1-\alpha$. In practice, the damping parameter $\phi$ is usually constrained further to prevent numerical difficulties in estimating the model. In R, it is restricted so that $0.8<\phi<0.98$.
 
 Another way to view the parameters is through a consideration of the mathematical properties of the state space models. The parameters are constrained in order to prevent observations in the distant past having a continuing effect on current forecasts. This leads to some *admissibility* constraints on the parameters, which are usually (but not always) less restrictive than the usual region. For example, for the ETS(A,N,N) model, the usual parameter region is $0< \alpha <1$ but the admissible region is $0< \alpha <2$. For the ETS(A,A,N) model, the usual parameter region is $0<\alpha<1$ and $0<\beta<\alpha$ but the admissible region is $0<\alpha<2$ and $0<\beta<4-2\alpha$.
 
 ### Model selection {-}
 
-A great advantage of the ETS statistical framework is that information criteria can be used for model selection. The AIC, AIC$_{\text{c}}$ and BIC, introduced in Section \@ref(sec-5-3-SelectingPredictors), can be used here to determine which of the 30 ETS models is most appropriate for a given time series.
+A great advantage of the ETS statistical framework is that information criteria can be used for model selection. The AIC, AIC$_{\text{c}}$ and BIC, introduced in Section \@ref(sec-5-3-SelectingPredictors), can be used here to determine which of the ETS models is most appropriate for a given time series.
 
 For ETS models, Akaike’s Information Criterion (AIC) is defined as
 $$
   \text{AIC} = -2\log(L) + 2k,
 $$
-where $L$ is the likelihood of the model and $k$ is the total number of parameters and initial states that have been estimated.
+where $L$ is the likelihood of the model and $k$ is the total number of parameters and initial states that have been estimated (including the residual variance).
 
 The AIC corrected for small sample bias (AIC$_\text{c}$) is defined as
 $$
-  \text{AIC}_{\text{c}} = \text{AIC} + \frac{2k(k+1)}{T-k-1},
+  \text{AIC}_{\text{c}} = \text{AIC} + \frac{k(k+1)}{T-k-1},
 $$
 and the Bayesian Information Criterion (BIC) is
 $$
   \text{BIC} = \text{AIC} + k[\log(T)-2].
 $$
 
-Three of the combinations of (Error, Trend, Seasonal) can lead to numerical difficulties. Specifically, the models that can cause such instabilities are ETS(A,N,M), ETS(A,A,M), and ETS(A,A,M). We normally do not consider these particular combinations when selecting a model.
+Three of the combinations of (Error, Trend, Seasonal) can lead to numerical difficulties. Specifically, the models that can cause such instabilities are ETS(A,N,M), ETS(A,A,M), and ETS(A,A<sub>d</sub>,M). We normally do not consider these particular combinations when selecting a model.
 
 Models with multiplicative errors are useful when the data are strictly positive, but are not numerically stable when the data contain zeros or negative values. Therefore, multiplicative error models will not be considered if the time series is not strictly positive. In that case, only the six fully additive models will be applied.
 
@@ -650,97 +651,65 @@ The R code below shows the most important arguments that this function can take,
 
 ```r
 ets(y, model="ZZZ", damped=NULL, alpha=NULL, beta=NULL, gamma=NULL,
-    phi=NULL, lambda=NULL, biasadj=FALSE,
-    ic=c("aicc","aic","bic"),
-    additive.only=FALSE, restrict=TRUE, allow.multiplicative.trend=FALSE)
+    phi=NULL, lambda=NULL, biasadj=FALSE, additive.only=FALSE,
+    restrict=TRUE, allow.multiplicative.trend=FALSE)
 ```
 
-y
+`y`
 :   The time series to be forecast.
 
-model
+`model`
 :   A three-letter code indicating the model to be estimated using the ETS classification and notation. The possible inputs are "N" for none, "A" for additive, "M" for multiplicative, or "Z" for automatic selection. If any of the inputs is left as "Z", then this component is selected according to the information criterion chosen. The default value of `ZZZ` ensures that all components are selected using the information criterion.
 
-damped
+`damped`
 :   If `damped=TRUE`, then a damped trend will be used (either A or M). If `damped=FALSE`, then a non-damped trend will used. If `damped=NULL` (the default), then either a damped or a non-damped trend will be selected, depending on which model has the smallest value for the information criterion.
 
-alpha, beta, gamma, phi
+`alpha`, `beta`, `gamma`, `phi`
 :   The values of the smoothing parameters can be specified using these arguments. If they are set to `NULL` (the default setting for each of them), the parameters are estimated.
 
-lambda
+`lambda`
 :   Box-Cox transformation parameter. It will be ignored if `lambda=NULL` (the default value). Otherwise, the time series will be transformed before the model is estimated. When `lambda` is not `NULL`, `additive.only` is set to `TRUE`.
 
-biasadj
+`biasadj`
 :   If `TRUE` and `lambda` is not `NULL`, then the back-transformed fitted values and forecasts will be bias-adjusted.
 
-additive.only
+`additive.only`
 :   Only models with additive components will be considered if `additive.only=TRUE`. Otherwise, all models will be considered.
 
-ic
-:   The information criterion to be used in selecting models, set by default to `aicc`.
-
-restrict
+`restrict`
 :   If `restrict=TRUE` (the default), the models that cause numerical difficulties are not considered in model selection.
 
-allow.multiplicative.trend
+`allow.multiplicative.trend`
 :   Multiplicative trend models are also available, but not covered in this book. Set this argument to `TRUE` to allow these models to be considered.
 
-### Forecasting with ETS models {-}
+###Working with `ets` objects {-}
 
-Point forecasts are obtained from the models by iterating the equations for $t=T+1,\dots,T+h$ and setting all $\varepsilon_t=0$ for $t>T$.
+The `ets()` function will return an object of class `ets`. There are many R functions designed to make working with `ets` objects easy. A few of them are described below.
 
-For example, for model ETS(M,A,N), $y_{T+1} = (\ell_T + b_T )(1+ \varepsilon_{T+1}).$ Therefore $\hat{y}_{T+1|T}=\ell_{T}+b_{T}.$ Similarly,
-\begin{align*}
-y_{T+2} &= (\ell_{T+1} + b_{T+1})(1 + \varepsilon_{T+1})\\
-        &= \left[
-              (\ell_T + b_T) (1+ \alpha\varepsilon_{T+1}) +
-              b_T + \beta (\ell_T + b_T)\varepsilon_{T+1}
-            \right]
-   ( 1 + \varepsilon_{T+1}).
-\end{align*}
-Therefore, $\hat{y}_{T+2|T}= \ell_{T}+2b_{T},$ and so on. These forecasts are identical to the forecasts from Holt’s linear method, and also to those from model ETS(A,A,N). Thus, the point forecasts obtained from the method and from the two models that underlie the method are identical (assuming that the same parameter values are used).
+`coef()`
+: returns all fitted parameters.
 
-A big advantage of the models is that prediction intervals can also be generated --- something that cannot be done using the methods. The prediction intervals will differ between models with additive and multiplicative methods.
+`accuracy()`
+: returns accuracy measures computed on the training data.
 
-For some models, there are exact formulae that enable prediction intervals to be calculated (see @expsmooth for the formulas). A more general approach that works for all models is to simulate future sample paths, conditional on the last estimate of the states, and to obtain prediction intervals from the percentiles of these simulated future paths.
+`summary()`
+: prints some summary information about the fitted model.
 
-To obtain forecasts from an ETS model, we use the `forecast` function. The R code below shows the possible arguments that this function takes when applied to an ETS model. We explain each of the arguments in what follows.
+`autoplot()` and `plot()`
+: produce time plots of the components.
 
-```r
-forecast(object, h=ifelse(object$m>1, 2*object$m, 10),
-level=c(80,95), fan=FALSE, simulate=FALSE, bootstrap=FALSE, npaths=5000,
-PI=TRUE, lambda=object$lambda, biasadj=NULL, ...)
-```
+`residuals()`
+: returns residuals from the estimated model.
 
-object
-:   The object returned by the `ets()` function.
+`fitted()`
+: returns one-step forecasts for the training data.
 
-h
-:   The forecast horizon --- the number of periods to be forecast.
+`simulate()`
+: will simulate future sample paths from the fitted model.
 
-level
-:   The confidence level for the prediction intervals.
+`forecast()`
+: computes point forecasts and prediction intervals, as described in the next section.
 
-fan
-:   If `fan=TRUE`, `level=seq(50,99,by=1)`. This is suitable for fan plots.
-
-simulate
-:   If `simulate=TRUE`, prediction intervals are produced by simulation rather than using algebraic formulae. Simulation will also be used (even if `simulate=FALSE`) where there are no algebraic formulae available for the particular model.
-
-bootstrap
-:   If `bootstrap=TRUE` and `simulate=TRUE`, then the simulated prediction intervals use re-sampled errors rather than normally distributed errors.
-
-npaths
-:   The number of sample paths used in computing simulated prediction intervals.
-
-PI
-:   If `PI=TRUE`, then prediction intervals are produced; otherwise only point forecasts are calculated.
-
-lambda
-:   The Box-Cox transformation parameter. This is ignored if `lambda=NULL`. Otherwise, the forecasts are back-transformed via an inverse Box-Cox transformation.
-
-biasadj
-:   If `lambda` is not `NULL`, the backtransformed forecasts (and prediction intervals) are bias-adjusted.
 
 ### Example: International tourist visitor nights in Australia {-}
 
@@ -768,6 +737,75 @@ Figure \@ref(fig:MAMstates) shows the states over time, while Figure \@ref(fig:M
 ```{r MAMstates, fig.cap="Graphical representation of the estimated states over time.", echo=TRUE, cache=TRUE}
 autoplot(fit)
 ```
+
+Because this model has multiplicative errors, the residuals are not equivalent to the one-step forecast errors. The residuals are given by $\hat{\varepsilon}_t$, while the one-step forecast errors are defined as $y_t - \hat{y}_{t|t-1}$. We can obtain both using the `residuals` function.
+
+```{r MAMresiduals, fig.cap="Residuals and one-step forecast errors from the ETS(M,A,M) model."}
+cbind('Residuals' = residuals(fit),
+      'Forecast errors' = residuals(fit, type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+```
+
+
+## Forecasting with ETS models
+
+Point forecasts are obtained from the models by iterating the equations for $t=T+1,\dots,T+h$ and setting all $\varepsilon_t=0$ for $t>T$.
+
+For example, for model ETS(M,A,N), $y_{T+1} = (\ell_T + b_T )(1+ \varepsilon_{T+1}).$ Therefore $\hat{y}_{T+1|T}=\ell_{T}+b_{T}.$ Similarly,
+\begin{align*}
+y_{T+2} &= (\ell_{T+1} + b_{T+1})(1 + \varepsilon_{T+1})\\
+        &= \left[
+              (\ell_T + b_T) (1+ \alpha\varepsilon_{T+1}) +
+              b_T + \beta (\ell_T + b_T)\varepsilon_{T+1}
+            \right]
+   ( 1 + \varepsilon_{T+1}).
+\end{align*}
+Therefore, $\hat{y}_{T+2|T}= \ell_{T}+2b_{T},$ and so on. These forecasts are identical to the forecasts from Holt’s linear method, and also to those from model ETS(A,A,N). Thus, the point forecasts obtained from the method and from the two models that underlie the method are identical (assuming that the same parameter values are used).
+
+ETS point forecasts are equal to the medians of the forecast distributions. For models with only additive components, the forecast distributions are normal, so the medians and means are equal. For ETS models with multiplicative errors, or with multiplicative seasonality, the point forecasts will not be equal to the means of the forecast distributions.
+
+A big advantage of the models is that prediction intervals can also be generated --- something that cannot be done using the methods. The prediction intervals will differ between models with additive and multiplicative methods.
+
+For some models, there are exact formulae that enable prediction intervals to be calculated (see @expsmooth for the formulas). A more general approach that works for all models is to simulate future sample paths, conditional on the last estimate of the states, and to obtain prediction intervals from the percentiles of these simulated future paths.
+
+To obtain forecasts from an ETS model, we use the `forecast` function. The R code below shows the possible arguments that this function takes when applied to an ETS model. We explain each of the arguments in what follows.
+
+```r
+forecast(object, h=ifelse(object$m>1, 2*object$m, 10),
+level=c(80,95), fan=FALSE, simulate=FALSE, bootstrap=FALSE, npaths=5000,
+PI=TRUE, lambda=object$lambda, biasadj=NULL, ...)
+```
+
+`object`
+:   The object returned by the `ets()` function.
+
+`h`
+:   The forecast horizon --- the number of periods to be forecast.
+
+`level`
+:   The confidence level for the prediction intervals.
+
+`fan`
+:   If `fan=TRUE`, `level=seq(50,99,by=1)`. This is suitable for fan plots.
+
+`simulate`
+:   If `simulate=TRUE`, prediction intervals are produced by simulation rather than using algebraic formulae. Simulation will also be used (even if `simulate=FALSE`) where there are no algebraic formulae available for the particular model.
+
+`bootstrap`
+:   If `bootstrap=TRUE` and `simulate=TRUE`, then the simulated prediction intervals use re-sampled errors rather than normally distributed errors.
+
+`npaths`
+:   The number of sample paths used in computing simulated prediction intervals.
+
+`PI`
+:   If `PI=TRUE`, then prediction intervals are produced; otherwise only point forecasts are calculated.
+
+`lambda`
+:   The Box-Cox transformation parameter. This is ignored if `lambda=NULL`. Otherwise, the forecasts are back-transformed via an inverse Box-Cox transformation.
+
+`biasadj`
+:   If `lambda` is not `NULL`, the backtransformed forecasts (and prediction intervals) are bias-adjusted.
+
 
 ```{r MAMforecasts, fig.cap="Forecasting international visitor nights in Australia using an ETS(M,A,M) model.", echo=TRUE, cache=TRUE}
 fit %>% forecast(h=8) %>%
@@ -798,11 +836,11 @@ days’ sales for paperback and hardcover books (data set `books`).
     Which model gives the best RMSE?
 
 3. Recall your retail time series data  (from Exercise 1 in Section \@ref(ex:graphics)).
-  a. Why is multiplicative seasonality necessary for this series?
-  b. Apply Holt-Winters’ multiplicative method to the data. Experiment with making the trend damped.
-  c. Compare the RMSE of the one-step forecasts from the two methods. Which do you prefer?
-  d. Check that the residuals from the best method look like white noise.
-  e. Now find the test set RMSE, while training the model to the end of 2010. Can you beat the seasonal naïve approach from Exercise 7 in Section \@ref{ex:toolbox}?
+    a. Why is multiplicative seasonality necessary for this series?
+    b. Apply Holt-Winters’ multiplicative method to the data. Experiment with making the trend damped.
+    c. Compare the RMSE of the one-step forecasts from the two methods. Which do you prefer?
+    d. Check that the residuals from the best method look like white noise.
+    e. Now find the test set RMSE, while training the model to the end of 2010. Can you beat the seasonal naïve approach from Exercise 7 in Section \@ref{ex:toolbox}?
 
 4. For the same retail data, try an STL decomposition applied to the Box-Cox transformed series, followed by ETS on the seasonally adjusted data. How does that compare with your best previous forecasts on the test set?
 
@@ -831,11 +869,11 @@ days’ sales for paperback and hardcover books (data set `books`).
         vi) For each model, look at the residual diagnostics and compare the forecasts for the next two years. Which do you prefer?
 
 6.
-    a. Use `ets()`` on some of these series:
+    a. Use `ets()` on some of these series:
 
-    > `bicoal`, `chicken`, `dole`, `usdeaths`, `bricksq`, `lynx`, `ibmclose`, `eggs`, `bricksq`, `ausbeer`
+        `bicoal`, `chicken`, `dole`, `usdeaths`, `bricksq`, `lynx`, `ibmclose`, `eggs`, `bricksq`, `ausbeer`
 
-    Does it always give good forecasts?
+        Does it always give good forecasts?
 
     b. Find an example where it does not work well. Can you figure out why?
 

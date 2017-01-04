@@ -500,8 +500,4 @@ As well as the naïve method, several other possible forecasting methods are ava
 
 ## Further reading
 
-- @Cleveland1990
-- @GM01
-- @LQ01
-- @MW03
-- @Theodosiou2011
+A detailed modern discussion of SEATS and X11 decomposition methods is provided by @Dagum2016. @Cleveland1990 introduced STL, and still provides the best description of the algorithm. For a discussion of forecasting using STL, see @Theodosiou2011.

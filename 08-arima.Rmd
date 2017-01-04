@@ -1057,17 +1057,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
 
 ##Further reading
 
-- @BJRL15
-- @BDbook16
-- @Chatfield2000
-- @PTT01
-- @Shumway2011
+The classic text which popularized ARIMA modelling was @BJ70. The most recent edition is @BJRL15, and it is still an excellent reference for all things ARIMA. @BDbook16 provides a good introduction to the mathematical background to the models, while @PTT01 describes some alternative automatic algorithms to the one used by `auto.arima()`.
 
 
-
-An alternative is to use a `msts` object which handles multiple seasonality time series. Then you can specify all the frequencies that might be relevant. It is also flexible enough to handle non-integer frequencies.
-
-You won't necessarily want to include all of these frequencies --- just the ones that are likely to be present in the data. For example, if you have only 180 days of data, you can probably ignore the annual seasonality. If the data are measurements of a natural phenomenon (e.g., temperature), you might also be able to ignore the weekly seasonality.
-
-With multiple seasonalities, you could use a TBATS model, or Fourier terms in a regression or ARIMA model. The `fourier` function from the forecast package will handle `msts` objects.
 

@@ -161,38 +161,6 @@ The weights take random values to begin with, which are then updated using the o
 
 The number of hidden layers, and the number of nodes in each hidden layer, must be specified in advance. We will consider how these can be chosen using cross-validation later in this chapter.
 
-###Example: Credit scoring {-}
-
-To illustrate neural network forecasting, we will use the credit scoring example that was discussed in Chapter 5. There we fitted the following linear regression model:
-$$
-  y = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{2} + \beta_3x_3 + \beta_4x_4 + e,
-$$
-where
-\begin{align*}
-  y     & =  \text{credit score},         \\
-  x_{1} & =  \text{log savings}, \\
-  x_{2} & =  \text{log income},      \\
-  x_{3} & =  \text{log time at current address},\\
-  x_4   &=  \text{log time in current job},\\
-  e     & =  \text{error}.
-\end{align*}
-
-Here "$\log$" means the transformation $\log(x+1)$. This could be represented by the network shown in Figure \@ref(fig-10-nnet) where the inputs are $x_1,\dots,x_4$ and the output is $y$. The more sophisticated neural network shown in Figure \@ref(fig-10-nnet1) could be fitted as follows.
-
-```{r, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
-library(caret, quietly=TRUE) 
-creditlog <- data.frame(score=credit[["score"]],
-  log.savings=log(credit[["savings"]]+1),
-  log.income=log(credit[["income"]]+1),
-  log.address=log(credit[["time.address"]]+1),
-  log.employed=log(credit[["time.employed"]]+1),
-  fte=credit[["fte"]],
-  single=credit[["single"]]) 
-fit <- avNNet(score ~ log.savings +
-  log.income + log.address + log.employed, 
-  data=creditlog, repeats=25, 
-  size=3, decay=0.1, linout=TRUE, trace=FALSE)
-```
 
 The `avNNet` function from the **caret** package fits a feed-forward neural network with one hidden layer. The network specified here contains three nodes (`size=3`) in the hidden layer. The decay parameter has been set to 0.1. The argument `repeats=25` indicates that 25 networks were trained and their predictions are to be averaged. The argument `linout=TRUE` indicates that the output is obtained using a linear function. In this book, we will always specify `linout=TRUE`.
 

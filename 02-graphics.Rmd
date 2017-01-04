@@ -18,7 +18,7 @@ knitr::kable(data.frame(Year=yr,Observation=x), booktabs=TRUE)
 
 We turn this into a `ts` object using the `ts` function:
 
-```{r, echo=TRUE, cache=TRUE}
+```r
 y <- ts(c(123,39,78,52,110), start=2012)
 ```
 
@@ -26,7 +26,7 @@ It is assumed that you have annual data, with one observation per year, so you o
 
 For observations that are more frequent than once per year, you simply add a `frequency` argument. For example, if your monthly data is already stored as a numerical vector `z`, then it can be converted to a `ts` object like this:
 
-```{r
+```r
 y <- ts(z, start=2003, frequency=12)
 ```
 

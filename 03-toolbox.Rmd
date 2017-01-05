@@ -542,7 +542,7 @@ dj %>% rwf(drift=TRUE) %>% residuals -> res
 res^2 %>% mean(na.rm=TRUE) %>% sqrt
 ```
 
-The left hand side of each pipe is passed as the first argument to the function on the right hand side. This is consistent with the way we read from left to right. A consequence of using pipes is that all other arguments must be named, which also helps readability. When using pipes, it is natural to use the right arrow assignment `->` rather than the left arrow. For example, the third line above can be read as "Take the `dj` series, pass it to `rwf` with `drift=TRUE`, compute the resulting residuals, and store them as `res`".
+The left hand side of each pipe is passed as the first argument to the function on the right hand side. This is consistent with the way we read from left to right in English. A consequence of using pipes is that all other arguments must be named, which also helps readability. When using pipes, it is natural to use the right arrow assignment `->` rather than the left arrow. For example, the third line above can be read as "Take the `dj` series, pass it to `rwf` with `drift=TRUE`, compute the resulting residuals, and store them as `res`".
 
 In this book, we will use the pipe operator whenever it makes the code easier to read.
 

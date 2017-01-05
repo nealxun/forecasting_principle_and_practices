@@ -309,7 +309,7 @@ The invertibility constraints are similar to the stationarity constraints.
 
 More complicated conditions hold for $q\ge3$. Again, R will take care of these constraints when estimating the models.
 
-##Non-seasonal ARIMA models
+##Non-seasonal ARIMA models {#sec:nonseasonalarima}
 
 If we combine differencing with autoregression and a moving average model, we obtain a non-seasonal ARIMA model. ARIMA is an acronym for AutoRegressive Integrated Moving Average model (in this context, "integration" is the reverse of differencing). The full model can be written as
 \begin{equation}

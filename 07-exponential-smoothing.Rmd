@@ -269,12 +269,12 @@ Figure \@ref(fig:dampedtrend) shows the forecasts for years 2014--2018 generated
 ```{r dampedtrend, fig.cap="Forecasting Air Passengers in Australia (millions of passengers). For the damped trend method, $\\phi=0.90$.", echo=TRUE, cache=TRUE}
 fc <- holt(air, h=15)
 fc2 <- holt(air, damped=TRUE, phi = 0.9, h=15)
-autoplot(air, series="Data") +
+autoplot(air) +
   geom_forecast(fc, PI=FALSE, series="Holt's method") +
   geom_forecast(fc2, PI=FALSE, series="Damped Holt's method") +
   ggtitle("Forecasts from Holt's method") +
   xlab("Year") + ylab("Air passengers in Australia (millions)") +
-  fppcols()
+  guides(colour=guide_legend(title="Forecast")) + fppcols()
 ```
 
 We have set the damping parameter to a relatively low number $(\phi=0.90)$ to exaggerate the effect of damping for comparison. Usually, we would estimate $\phi$ along with the other parameters.
@@ -368,11 +368,11 @@ In this example we employ the Holt-Winters method with both additive and multipl
 aust <- window(austourists,start=2005)
 fit1 <- hw(aust,seasonal="additive")
 fit2 <- hw(aust,seasonal="multiplicative")
-autoplot(aust, series="Data") +
+autoplot(aust) +
   geom_forecast(fit1, PI=FALSE, series="HW additive forecasts") +
   geom_forecast(fit2, PI=FALSE, series="HW multiplicative forecasts") +
   xlab("Year") + ylab("International visitor night in Australia (millions)") +
-  fppcols()
+  guides(colour=guide_legend(title="Forecast")) + fppcols()
 ```
 
 ```{r tab75, echo=FALSE, cache=TRUE}

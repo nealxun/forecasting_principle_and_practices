@@ -971,11 +971,9 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
 
 4. For the `enplanements` data, write down the differences you chose above using backshift operator notation.
 
-3. For your retail data (Exercise 1 of Section \@ref(ex:graphics)), find the appropriate order of differencing (after transformation if necessary) to obtain stationary data.
+5. For your retail data (Exercise 1 of Section \@ref(ex:graphics)), find the appropriate order of differencing (after transformation if necessary) to obtain stationary data.
 
-
-5. Use R to simulate and plot some data from simple ARIMA models.
-
+6. Use R to simulate and plot some data from simple ARIMA models.
     (a) Use the following R code to generate data from an AR(1) model with $\phi_{1} = 0.6$ and $\sigma^2=1$. The process starts with $y_1=0$.
 
     ```r
@@ -992,7 +990,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (f) Generate data from an AR(2) model with $\phi_{1} =-0.8$, $\phi_{2} = 0.3$ and $\sigma^2=1$. (Note that these parameters will give a non-stationary series.)
     (g) Graph the latter two series and compare them.
 
-6. Consider the number of women murdered each year (per 100,000 standard population) in the United States (data set `wmurders`).
+7. Consider the number of women murdered each year (per 100,000 standard population) in the United States (data set `wmurders`).
 
     (a) By studying appropriate graphs of the series in R, find an appropriate ARIMA($p,d,q$) model for these data.
     (b) Should you include a constant in the model? Explain.
@@ -1002,7 +1000,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (f) Create a plot of the series with forecasts and prediction intervals for the next three periods shown.
     (g) Does `auto.arima` give the same model you have chosen? If not, which model do you think is better?
 
-6. For the `usgdp` series:
+8. For the `usgdp` series:
 	  a. if necessary, find a suitable Box-Cox transformation for the data;
 	  b. fit a suitable ARIMA model to the transformed data using `auto.arima()`;
 	  c. try some other plausible models by experimenting with the orders chosen;
@@ -1010,8 +1008,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
 	  e. produce forecasts of your fitted model. Do the forecasts look reasonable?
 	  f. compare the results with what you would obtain using `ets()` (with no transformation).
 
-7. Consider the quarterly number of international tourists to Australia for the period 1999--2010. (Data set `austourists`.)
-
+9. Consider the quarterly number of international tourists to Australia for the period 1999--2010. (Data set `austourists`.)
     (a) Describe the time plot.
     (b) What can you learn from the ACF graph?
     (c) What can you learn from the PACF graph?
@@ -1019,18 +1016,16 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (e) Does `auto.arima` give the same model that you chose? If not, which model do you think is better?
     (f) Write the model in terms of the backshift operator, then without using the backshift operator.
 
-8. Consider the total net generation of electricity (in billion kilowatt hours) by the U.S. electric industry (monthly for the period 1985--1996). (Data set `usmelec`.) In general there are two peaks per year: in mid-summer and mid-winter.
-
+10. Consider the total net generation of electricity (in billion kilowatt hours) by the U.S. electric industry (monthly for the period January 1973 -- June 2013). (Data set `usmelec`.) In general there are two peaks per year: in mid-summer and mid-winter.
     (a) Examine the 12-month moving average of this series to see what kind of trend is involved.
     (b) Do the data need transforming? If so, find a suitable transformation.
     (c) Are the data stationary? If not, find an appropriate differencing which yields stationary data.
     (d) Identify a couple of ARIMA models that might be useful in describing the time series. Which of your models is the best according to their AIC values?
     (e) Estimate the parameters of your best model and do diagnostic testing on the residuals. Do the residuals resemble white noise? If not, try to find another ARIMA model which fits better.
-    (f) Forecast the next 15 years of electricity generation by the U.S. electric industry. Get the latest figures from <http://data.is/zgRWCO> to check the accuracy of your forecasts.
+    (f) Forecast the next 15 years of electricity generation by the U.S. electric industry. Get the latest figures from <https://goo.gl/WZIItv> to check the accuracy of your forecasts.
     (g) How many years of forecasts do you think are sufficiently accurate to be usable?
 
-9. For the `mcopper` data:
-
+11. For the `mcopper` data:
     (a) if necessary, find a suitable Box-Cox transformation for the data;
     (b) fit a suitable ARIMA model to the transformed data using `auto.arima()`;
     (c) try some other plausible models by experimenting with the orders chosen;
@@ -1038,8 +1033,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (e) produce forecasts of your fitted model. Do the forecasts look reasonable?
     (f) compare the results with what you would obtain using `ets()` (with no transformation).
 
-10. Choose one of the following seasonal time series: `condmilk`, `hsales`, `uselec`
-
+12. Choose one of the following seasonal time series: `hsales`, `auscafe`, `qauselec`, `qcement`, `qgas`.
     (a) Do the data need transforming? If so, find a suitable transformation.
     (b) Are the data stationary? If not, find an appropriate differencing which yields stationary data.
     (c) Identify a couple of ARIMA models that might be useful in describing the time series. Which of your models is the best according to their AIC values?
@@ -1047,14 +1041,14 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (e) Forecast the next 24 months of data using your preferred model.
     (f) Compare the forecasts obtained using `ets()`.
 
-11. For the same time series you used in the previous exercise, try using a non-seasonal model applied to the seasonally adjusted data obtained from STL. The `stlf()` function will make the calculations easy (with `method="arima"`). Compare the forecasts with those obtained in the previous exercise. Which do you think is the best approach?
+13. For the same time series you used in the previous exercise, try using a non-seasonal model applied to the seasonally adjusted data obtained from STL. The `stlf()` function will make the calculations easy (with `method="arima"`). Compare the forecasts with those obtained in the previous exercise. Which do you think is the best approach?
 
-12. For your retail time series (Exercise 5 above):
+14. For your retail time series (Exercise 5 above):
     a. develop an appropriate seasonal ARIMA model;
     b. compare the forecasts with those you obtained in earlier chapters;
     c. Obtain up-to-date retail data from the [ABS website](https://goo.gl/twfCyD) (Cat 8501.0, Table 11), and compare your forecasts with the actual numbers. How good were the forecasts from the various models?
 
-13.
+15.
     a. Produce a time plot of the sheep population of England and Wales from 1867--1939 (data set `sheep`).
     b. Assume you decide to fit the following model:
         $$
@@ -1083,7 +1077,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
 
     f. Now fit the model in R and obtain the forecasts using `forecast`. How are they different from yours? Why?
 
-14.
+16.
     a. Plot the annual bituminous coal production in the United States from 1920 to 1968 (data set \verb|bicoal|).
     b. You decide to fit the following model to the series:
 $$y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \phi_3 y_{t-3} + \phi_4 y_{t-4} + e_t$$
@@ -1115,6 +1109,25 @@ where $y_t$ is the coal production in year $t$ and $e_t$ is a white noise series
          Without using the `forecast` function, calculate forecasts for the next three years (1969--1971).
 
     f. Now fit the model in R and obtain the forecasts from the same model. How are they different from yours? Why?
+
+17.
+    a. Install the **rdatamarket** package in R using
+        ```r
+        install.packages("rdatamarket")
+        ```
+    b. Select a time series from <http://datamarket.com/data/list/?q=pricing:free>. Then copy it's short URL and import the data using
+        ```r
+        x <- ts(rdatamarket::dmseries("shorturl")[,1], start=??, frequency=??)
+        ```
+        (Replace `??` with the appropriate values.)
+    c. Plot graphs of the data, and try to identify an appropriate ARIMA model.
+    d. Do residual diagnostic checking of your ARIMA model. Are the residuals white noise?
+    e. Use your chosen ARIMA model to forecast the next four years.
+    f. Now try to identify an appropriate ETS model.
+    g. Do residual diagnostic checking of your ETS model. Are the residuals white noise?
+    h. Use your chosen ETS model to forecast the next four years.
+    i. Which of the two models do you prefer?
+
 
 
 ##Further reading

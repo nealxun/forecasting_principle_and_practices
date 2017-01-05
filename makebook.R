@@ -4,7 +4,7 @@ options(warn=1)
 
 # provide default formats if necessary
 if (length(formats) == 0)
-	formats <- c('bookdown::pdf_book', 'bookdown::gitbook')
+	formats <- "bookdown::gitbook" #c('bookdown::pdf_book', 'bookdown::gitbook')
 
 # render the book to all formats unless they are specified via command-line args
 for (fmt in formats)

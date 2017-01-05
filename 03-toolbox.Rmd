@@ -121,7 +121,7 @@ If $\lambda=1$, then $w_t = y_t-1$, so the transformed data is shifted downwards
 
 Use the slider below to see the effect of varying $\lambda$ to transform Australian monthly electricity demand:
 
-```{r, echo=FALSE}
+```{r BoxCoxShiny, echo=FALSE}
 knitr::include_app("https://robjhyndman.shinyapps.io/BoxCox/",
   height = "650px")
 ```
@@ -130,7 +130,7 @@ A good value of $\lambda$ is one which makes the size of the seasonal variation 
 
 The `BoxCox.lambda()` function will choose a value of lambda for you.
 
-```{r, echo=TRUE, cache=TRUE}
+```{r BoxCoxlambda, echo=TRUE, cache=TRUE}
 (lambda <- BoxCox.lambda(elec))
 autoplot(BoxCox(elec,lambda))
 ```
@@ -234,23 +234,23 @@ $$
 
 The following graphs show the Dow Jones Index (DJI), and the residuals obtained from forecasting the DJI using the naïve method.
 
-```{r, fig.cap="The Dow Jones Index measured daily to 15 July 1994.", cache=TRUE}
+```{r DJautoplot, fig.cap="The Dow Jones Index measured daily to 15 July 1994.", cache=TRUE}
 dj2 <- window(dj, end=250)
 autoplot(dj2) + xlab("Day") + ylab("") +
   ggtitle("Dow Jones Index (daily ending 15 Jul 94)")
 ```
 
-```{r, fig.cap="Residuals from forecasting the Dow Jones Index using the naïve method.", cache=TRUE, warning=FALSE}
+```{r DJresid, fig.cap="Residuals from forecasting the Dow Jones Index using the naïve method.", cache=TRUE, warning=FALSE}
 res <- residuals(naive(dj2))
 autoplot(res) + xlab("Day") + ylab("") +
   ggtitle("Residuals from naïve method")
 ```
 
-```{r, fig.cap="Histogram of the residuals from the naïve method applied to the Dow Jones Index. The left tail is a little too long for a normal distribution.", cache=TRUE, warning=FALSE, message=FALSE}
+```{r DJhist, fig.cap="Histogram of the residuals from the naïve method applied to the Dow Jones Index. The left tail is a little too long for a normal distribution.", cache=TRUE, warning=FALSE, message=FALSE}
 gghistogram(res) + ggtitle("Histogram of residuals")
 ```
 
-```{r, fig.cap="ACF of the residuals from the naïve method applied to the Dow Jones Index. The lack of correlation suggesting the forecasts are good.", cache=TRUE, fig.height=3}
+```{r DJacf, fig.cap="ACF of the residuals from the naïve method applied to the Dow Jones Index. The lack of correlation suggesting the forecasts are good.", cache=TRUE, fig.height=3}
 ggAcf(res) + ggtitle("ACF of residuals")
 ```
 
@@ -281,7 +281,7 @@ How large is too large? If the autocorrelations did come from a white noise seri
 
 For the Dow-Jones example, the naïve model has no parameters, so $K=0$ in that case also.
 
-```{r, cache=TRUE}
+```{r Boxtest, cache=TRUE}
 # lag=h and fitdf=K
 Box.test(res, lag=10, fitdf=0)
 
@@ -305,7 +305,7 @@ It is important to evaluate forecast accuracy using genuine forecasts. Consequen
 
 When choosing models, it is common practice to separate the available data into two portions, training and test data, where the training data is used to estimate any parameters of a forecasting method and the test data is used to evaluate its accuracy. Because the test data is not used in determining the forecasts, it should provide a reliable indication of how well the model is likely to forecast on new data.
 
-```{r, fig.height=1, echo=FALSE, cache=TRUE}
+```{r traintest, fig.height=1, echo=FALSE, cache=TRUE}
 train = 1:18
 test = 19:24
 par(mar=c(0,0,0,0))
@@ -419,7 +419,7 @@ accuracy(beerfit2, beer3)
 accuracy(beerfit3, beer3)
 ```
 
-```{r echo=FALSE, cache=TRUE}
+```{r beeraccuracytable, echo=FALSE, cache=TRUE}
 beer3 <- window(ausbeer, start=2008)
 tab <- matrix(NA,ncol=4,nrow=3)
 tab[1,] <- accuracy(beerfit1, beer3)[2,c(2,3,5,6)]
@@ -434,7 +434,7 @@ It is obvious from the graph that the seasonal naïve method is best for these d
 
 To take a non-seasonal example, consider the Dow Jones Index. The following graph shows the 250 observations ending on 15 July 1994, along with forecasts of the next 42 days obtained from three different methods.
 
-```{r, fig.cap="Forecasts of the Dow Jones Index from 16 July 1994.", cache=TRUE, warning=FALSE}
+```{r djfc, fig.cap="Forecasts of the Dow Jones Index from 16 July 1994.", cache=TRUE, warning=FALSE}
 dj2 <- window(dj, end=250)
 djfc1 <- meanf(dj2, h=42)
 djfc2 <- rwf(dj2, h=42)
@@ -455,7 +455,7 @@ accuracy(djfc2, dj3)
 accuracy(djfc3, dj3)
 ```
 
-```{r echo=FALSE, cache=TRUE}
+```{r djaccuracytable, echo=FALSE, cache=TRUE}
 dj3 <- window(dj, start=251)
 tab <- matrix(NA,ncol=4,nrow=3)
 tab[1,] <- accuracy(djfc1, dj3)[2,c(2,3,5,6)]
@@ -523,7 +523,7 @@ text(28,.95,"time")
 
 Time series cross validation is implemented with the `tsCV` function. In the following example, we compare the residual RMSE with the RMSE obtained via time series cross-validation.
 
-```{r tscv}
+```{r tscv, cache=TRUE}
 e <- tsCV(dj, rwf, drift=TRUE, h=1)
 sqrt(mean(e^2, na.rm=TRUE))
 sqrt(mean(residuals(rwf(dj, drift=TRUE))^2, na.rm=TRUE))
@@ -558,7 +558,7 @@ where $\hat\sigma$ is an estimate of the standard deviation of the forecast dist
 
 When forecasting one step ahead, the standard deviation of the forecast distribution is almost the same as the standard deviation of the residuals. (In fact, the two standard deviations are identical if there are no parameters to be estimated, as is the case with the naïve method. For forecasting methods involving parameters to be estimated, the standard deviation of the forecast distribution is slightly larger than the residual standard deviation, although this difference is often ignored.)
 
-```{r, echo=FALSE}
+```{r djpi, echo=FALSE, cache=TRUE}
 djsd <- sqrt(mean(res^2, na.rm=TRUE))
 djf <- tail(dj2,1)
 mult <- -qnorm(.5-c(80,95)/200)
@@ -643,7 +643,7 @@ If the first argument is of class `ts`, it returns forecasts from the automatic 
 
 Here is a simple example, applying `forecast()` to the `ausbeer` data:
 
-```{r, cache=TRUE}
+```{r ausbeerfc, cache=TRUE}
 forecast(ausbeer)
 ```
 

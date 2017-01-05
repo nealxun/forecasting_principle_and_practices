@@ -10,7 +10,7 @@ A time series can be thought of as a list of numbers, along with some informatio
 
 Suppose you have annual observations for the last few years:
 
-```{r, echo=FALSE, cache=TRUE}
+```{r tstable, echo=FALSE, cache=TRUE}
 x <- c(123,39,78,52,110)
 yr <- 2012:2016
 knitr::kable(data.frame(Year=yr,Observation=x), booktabs=TRUE)
@@ -36,7 +36,7 @@ Almost all of the data used in this book is already stored as `ts` objects. But 
 
 The "frequency" is the number of observations before the seasonal pattern repeats.^[This is the opposite of the definition of frequency in physics, or in Fourier analysis, where this would be called the "period".] When using the `ts()` function in R, the following choices should be used.
 
-```{r, echo=FALSE, cache=TRUE}
+```{r freqtable, echo=FALSE, cache=TRUE}
 tab <- data.frame(Data=c("Annual","Quarterly","Monthly","Weekly"),
   frequency=c(1,4,12,52))
 knitr::kable(tab, booktabs=TRUE)
@@ -221,11 +221,11 @@ where $T$ is the length of the time series.
 
 The first nine autocorrelation coefficients for the beer production data are given in the following table.
 
-```{r, echo=FALSE, cache=TRUE}
+```{r beeracftable, echo=FALSE, cache=TRUE}
 beeracf <- matrix(acf(c(beer2), lag.max=9,
                       plot=FALSE)$acf[-1,,1], nrow=1)
 colnames(beeracf) <- paste("$r_",1:9,"$",sep="")
-knitr::kable(beeracf, booktabs=TRUE,
+knitr::kable(beeracf, booktabs=TRUE, format="pandoc",
              align="c", digits=3,
              format.args=list(nsmall=3))
 ```

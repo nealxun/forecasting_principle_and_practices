@@ -127,7 +127,7 @@ fc <- ses(oildata, h=5)
 round(accuracy(fc),2)
 ```
 
-```{r, echo=FALSE, cache=TRUE}
+```{r sesparam, echo=FALSE, cache=TRUE}
 #tmp <- accuracy(fc)
 #print(round(c(tmp[,c("MAE","RMSE","MAPE")],SSE=sum(residuals(fc)^2)),1))
 alpha <- fc$model$par[1]
@@ -307,7 +307,7 @@ mean(abs(e3), na.rm=TRUE)
 Based on MSE, Holt's method is best. But based on MAE, simple exponential smoothing is best. Conflicts such as this are common in forecasting comparisons. As forecasting tasks can vary by many dimensions (length of forecast horizon, size of test set, forecast error measures, frequency of data, etc.), it is unlikely that one method will be better than all others for all forecasting scenarios. What we require from a forecasting method are consistently sensible forecasts, and these should be frequently evaluated against the task at hand. In this case, the data are clearly trended, so we will prefer Holt's method, and apply it to the whole data set to get forecasts for future years.
 
 
-```{r, echo=TRUE, cache=TRUE}
+```{r holtmodel, echo=TRUE, cache=TRUE}
 fc <- holt(livestock)
 # Estimated parameters:
 fc[["model"]]
@@ -512,7 +512,7 @@ Table \@ref(tab:pegels) gives the recursive formulae for applying the nine expon
 Table: (\#tab:pegels) Formulae for recursive calculations and point forecasts. In each case, $\ell_t$ denotes the series level at time $t$, $b_t$ denotes the slope at time $t$, $s_t$ denotes the seasonal component of the series at time $t$, and $m$ denotes the number of seasons in a year; $\alpha$, $\beta^*$, $\gamma$ and $\phi$ are smoothing parameters, $\phi_h = \phi+\phi^2+\dots+\phi^{h}$ and $h_m^+ = \lfloor(h-1) \text{ mod } m\rfloor + 1$.
 
 ------------------------------------
-```{r, echo=FALSE, cache=TRUE}
+```{r pegelstable, echo=FALSE, cache=TRUE}
 knitr::include_graphics("pegelstable.png")
 ```
 ------------------------------------
@@ -715,7 +715,7 @@ The `ets()` function will return an object of class `ets`. There are many R func
 
 We now employ the ETS statistical framework to forecast tourist visitor nights in Australia by international arrivals over the period 2016--2019. We let the `ets()` function select the model by minimizing the AICc.
 
-```{r, echo=TRUE, cache=TRUE}
+```{r austouristsets, echo=TRUE, cache=TRUE}
 aust <- window(austourists, start=2005)
 fit <- ets(aust)
 summary(fit)
@@ -740,7 +740,7 @@ autoplot(fit)
 
 Because this model has multiplicative errors, the residuals are not equivalent to the one-step forecast errors. The residuals are given by $\hat{\varepsilon}_t$, while the one-step forecast errors are defined as $y_t - \hat{y}_{t|t-1}$. We can obtain both using the `residuals` function.
 
-```{r MAMresiduals, fig.cap="Residuals and one-step forecast errors from the ETS(M,A,M) model."}
+```{r MAMresiduals, fig.cap="Residuals and one-step forecast errors from the ETS(M,A,M) model.", cache=TRUE}
 cbind('Residuals' = residuals(fit),
       'Forecast errors' = residuals(fit, type='response')) %>%
   autoplot(facet=TRUE) + xlab("Year") + ylab("")

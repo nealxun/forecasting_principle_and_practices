@@ -92,7 +92,7 @@ autoplot(elecsales) + xlab("Year") + ylab("GWh") +
 
 For example, consider Figure \@ref(fig:ressales1) which shows the volume of electricity sold to residential customers in South Australia each year from 1989 to 2008 (hot water sales have been excluded). The data are also shown in Table \@ref(tab:elecsales).
 
-```{r, echo=TRUE, cache=TRUE}
+```{r elecma, echo=TRUE, cache=TRUE}
 ma5 <- ma(elecsales, 5)
 ```
 ```{r elecsales, echo=FALSE, cache=TRUE}
@@ -145,13 +145,13 @@ It is possible to apply a moving average to a moving average. One reason for doi
 
 For example, we might take a moving average of order 4, and then apply another moving average of order 2 to the results. In the following table, this has been done for the first few years of the Australian quarterly beer production data.
 
-```{r, echo=TRUE, cache=TRUE}
+```{r beerma, echo=TRUE, cache=TRUE}
 beer2 <- window(ausbeer,start=1992)
 ma4 <- ma(beer2, order=4, centre=FALSE)
 ma2x4 <- ma(beer2, order=4, centre=TRUE)
 ```
 
-```{r echo=FALSE, cache=TRUE}
+```{r matable, echo=FALSE, cache=TRUE}
 tab <- data.frame(Year=trunc(time(beer2)),
              Quarter=paste("Q",cycle(beer2),sep=''),
              Data=beer2,

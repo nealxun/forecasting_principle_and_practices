@@ -625,7 +625,7 @@ Although we have calculated forecasts from the ARIMA models in our examples, we 
 
 Beginning with $h=1$, these steps are then repeated for $h=2,3,\dots$ until all forecasts have been calculated.
 
-```{r, echo=FALSE, message=FALSE, cache=TRUE}
+```{r arimaparam, echo=FALSE, message=FALSE, cache=TRUE}
 phi1 <- fit$coef['ar1']
 phi2 <- fit$coef['ar2']
 phi3 <- fit$coef['ar3']
@@ -833,7 +833,7 @@ for(i in seq_along(aicc))
 }
 modelname <- sub("\\[12\\]","$_{12}$",modelname)
 j <- order(aicc)
-knitr::kable(data.frame(Model=modelname,AICc=aicc)[j,],
+knitr::kable(data.frame(Model=modelname,AICc=aicc)[j,], format="pandoc",
              digits=2, row.names=FALSE, align='cc', booktabs=TRUE)
 ```
 
@@ -847,7 +847,7 @@ if(!identical(arimaorder(auto.arima(h02, lambda=0)),
   stop("h02 auto.arima model incorrect")
 ```
 
-```{r h02arima}
+```{r h02arima, cache=TRUE}
 (fit <- Arima(h02, order=c(3,0,1), seasonal=c(0,1,2), lambda=0))
 ```
 
@@ -897,7 +897,7 @@ for(i in seq(length(rmse)))
 }
 modelname <- sub("\\[12\\]","$_{12}$",modelname)
 j <- order(rmse)
-knitr::kable(data.frame(Model=modelname,RMSE=rmse)[j,],
+knitr::kable(data.frame(Model=modelname,RMSE=rmse)[j,], format="pandoc",
              digits=4, row.names=FALSE, align='cc', booktabs=TRUE)
 ```
 

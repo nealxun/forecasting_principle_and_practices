@@ -12,7 +12,6 @@ bookdown::gitbook:
       in_header: mathjax-config.html
   keep_md: yes
   split_by: section
-  download: no
   toc_depth: 2
   fig_caption: yes
   fig_height: 5.3
@@ -27,4 +26,6 @@ bookdown::pdf_book:
   pandoc_args: --chapters
   toc_depth: 2
   toc_unnumbered: yes
+  fig_height: 4.2
+  fig_width: 6.5
 bookdown::epub_book: default

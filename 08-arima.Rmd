@@ -1047,12 +1047,74 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (e) Forecast the next 24 months of data using your preferred model.
     (f) Compare the forecasts obtained using `ets()`.
 
-11. For the same time series you used in Exercise 10, try using a non-seasonal model applied to the seasonally adjusted data obtained from STL. The `stlf()` function will make the calculations easy (with `method="arima"`). Compare the forecasts with those obtained in Exercise 10. Which do you think is the best approach?
+11. For the same time series you used in the previous exercise, try using a non-seasonal model applied to the seasonally adjusted data obtained from STL. The `stlf()` function will make the calculations easy (with `method="arima"`). Compare the forecasts with those obtained in the previous exercise. Which do you think is the best approach?
 
-12. For your retail time series (Exercise 4 above):
+12. For your retail time series (Exercise 5 above):
     a. develop an appropriate seasonal ARIMA model;
     b. compare the forecasts with those you obtained in earlier chapters;
     c. Obtain up-to-date retail data from the [ABS website](https://goo.gl/twfCyD) (Cat 8501.0, Table 11), and compare your forecasts with the actual numbers. How good were the forecasts from the various models?
+
+13.
+    a. Produce a time plot of the sheep population of England and Wales from 1867--1939 (data set `sheep`).
+    b. Assume you decide to fit the following model:
+        $$
+          y_t = y_{t-1} + \phi_1(y_{t-1}-y_{t-2}) + \phi_2(y_{t-2}-y_{t-3}) + \phi_3(y_{t-3}-y_{t-4}) + e_t,
+        $$
+        where $e_t$ is a white noise series. What sort of ARIMA model is this (i.e., what are $p$, $d$, and $q$)?
+    c. By examining the ACF and PACF of the differenced data, explain why this model is appropriate.
+    d. The last five values of the series are given below:
+
+        |Year              | 1935| 1936| 1937| 1938| 1939|
+        |:-----------------|----:|----:|----:|----:|----:|
+        |Millions of sheep | 1648| 1665| 1627| 1791| 1797|
+
+        ```{r sheepfit, echo=FALSE, cache=TRUE}
+        fit <- Arima(sheep, order=c(3,1,0))
+        phi1 <- coef(fit)['ar1']
+        phi2 <- coef(fit)['ar2']
+        phi3 <- coef(fit)['ar3']
+        ```
+
+        The estimated parameters are
+        $\phi_1 = `r format(phi1, digits=2, nsmall=2)`$,
+        $\phi_2 = `r format(phi2, digits=2, nsmall=2)`$, and
+        $\phi_3 = `r format(phi3, digits=2, nsmall=2)`$.
+        Without using the `forecast` function, calculate forecasts for the next three years (1940--1942).
+
+    f. Now fit the model in R and obtain the forecasts using `forecast`. How are they different from yours? Why?
+
+14.
+    a. Plot the annual bituminous coal production in the United States from 1920 to 1968 (data set \verb|bicoal|).
+    b. You decide to fit the following model to the series:
+$$y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \phi_3 y_{t-3} + \phi_4 y_{t-4} + e_t$$
+where $y_t$ is the coal production in year $t$ and $e_t$ is a white noise series.
+       What sort of ARIMA model is this (i.e., what are $p$, $d$, and $q$)?
+    b. Explain why this model was chosen using the ACF and PACF.
+    c. The last five values of the series are given below.
+
+        |Year              | 1964| 1965| 1966| 1967| 1968|
+        |:-----------------|----:|----:|----:|----:|----:|
+        |Millions of tons  | 467 | 512 | 534 | 552 | 545 |
+
+        ```{r bicoalfit, echo=FALSE, cache=TRUE}
+        fit <- Arima(bicoal, order=c(4,0,0))
+        mu <- coef(fit)['intercept']
+        phi1 <- coef(fit)['ar1']
+        phi2 <- coef(fit)['ar2']
+        phi3 <- coef(fit)['ar3']
+        phi4 <- coef(fit)['ar4']
+        intercept <- mu * (1-phi1-phi2-phi3-phi4)
+        ```
+
+         The estimated parameters are
+         $c = `r format(intercept, digits=2, nsmall=2)`$,
+         $\phi_1 = `r format(phi1, digits=2, nsmall=2)`$,
+         $\phi_2 = `r format(phi2, digits=2, nsmall=2)`$,
+         $\phi_3 = `r format(phi3, digits=2, nsmall=2)`$, and
+         $\phi_4 = `r format(phi4, digits=2, nsmall=2)`$.
+         Without using the `forecast` function, calculate forecasts for the next three years (1969--1971).
+
+    f. Now fit the model in R and obtain the forecasts from the same model. How are they different from yours? Why?
 
 
 ##Further reading

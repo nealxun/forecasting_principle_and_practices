@@ -815,19 +815,28 @@ fit %>% forecast(h=8) %>%
 
 ## Exercises
 
-1. Data set `books` contains the daily sales of paperback and
+1. Consider the `pigs` series --- the number of pigs slaughtered in Victoria each month.
+    a. Use the `ses` function in R to find the optimal values of $\alpha$ and $\ell_0$, and generate forecasts for the next four months.
+    b. Compute a 95% prediction interval for the first forecast using $\hat{y} \pm 1.96s$ where $s$ is the standard deviation of the residuals. Compare your interval with the interval produced by R.
+
+2. Write your own function to implement simple exponential smoothing. The function should take arguments `y` (the time series), `alpha` (the smoothing parameter $\alpha$) and `level` (the initial level $\ell_0$). It should return the forecast of the next observation in the series. Does it give the same forecast as `ses`?
+
+3. Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the `optim` function to find the optimal values of $\alpha$ and $\ell_0$. Do you get the same values as the `ses` function?
+
+4. Combine your previous two functions to produce a function which both finds the optimal values of  $\alpha$ and $\ell_0$, and produces a forecast of the next observation in the series.
+
+4. Data set `books` contains the daily sales of paperback and
 hardcover books at the same store. The task is to forecast the next four
-days’ sales for paperback and hardcover books (data set `books`).
+days’ sales for paperback and hardcover books.
     a. Plot the series and discuss the main features of the data.
     b. Use the `ses` function to forecast each series, and plot the forecasts.
     c. Compute the RMSE values for the training data in each case.
 
-
 2.
-    a. Apply Holt’s linear method to the `paperback` and `hardback` series and compute four-day forecasts in each case.
+    a. Now apply Holt’s linear method to the `paperback` and `hardback` series and compute four-day forecasts in each case.
     b. Compare the RMSE measures of Holt’s method for the two series to those of simple exponential smoothing in the previous question. (Remember that Holt's method is using one more parameter than SES.) Discuss the merits of the two forecasting methods for these data sets.
     c. Compare the forecasts for the two series using both methods. Which do you think is best?
-    d. Calculate a 95% prediction interval for the first forecast for each series, using the RMSE values and assuming normal errors. Compare your intervals with those produced by R.
+    d. Calculate a 95% prediction interval for the first forecast for each series, using the RMSE values and assuming normal errors. Compare your intervals with those produced using `ses` and `holt`.
 
 3. For this exercise, use the price of a dozen eggs in the United States from 1900--1993 (data set `eggs`). Experiment with the various options in the `holt()` function to see how much the forecasts change with damped trend, or with a Box-Cox transformation. Try to develop an intuition of what each argument is doing to the forecasts.
 
@@ -840,38 +849,40 @@ days’ sales for paperback and hardcover books (data set `books`).
     b. Apply Holt-Winters’ multiplicative method to the data. Experiment with making the trend damped.
     c. Compare the RMSE of the one-step forecasts from the two methods. Which do you prefer?
     d. Check that the residuals from the best method look like white noise.
-    e. Now find the test set RMSE, while training the model to the end of 2010. Can you beat the seasonal naïve approach from Exercise 7 in Section \@ref{ex:toolbox}?
+    e. Now find the test set RMSE, while training the model to the end of 2010. Can you beat the seasonal naïve approach from Exercise 7 in Section \@ref(ex:toolbox)?
 
 4. For the same retail data, try an STL decomposition applied to the Box-Cox transformed series, followed by ETS on the seasonally adjusted data. How does that compare with your best previous forecasts on the test set?
 
-4. For this exercise, use the quarterly UK passenger vehicle production data from 1977:1--2005:1 (data set `ukcars`).
+4. For this exercise, use the quarterly UK passenger vehicle production data from 1977Q1--2005Q1 (data set `ukcars`).
     a. Plot the data and describe the main features of the series.
     b. Decompose the series using STL and obtain the seasonally adjusted data.
-    c. Forecast the next two years of the series using an additive damped trend method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of the one-step forecasts from your method.
-    d. Forecast the next two years of the series using Holt’s linear method applied to the seasonally adjusted data. Then reseasonalize the forecasts. Record the parameters of the method and report the RMSE of of the one-step forecasts from your method.
+    c. Forecast the next two years of the series using an additive damped trend method applied to the seasonally adjusted data. (This can be done in one step using `stlf` with arguments `etsmodel="AAN", damped=TRUE`.
+    d. Forecast the next two years of the series using Holt’s linear method applied to the seasonally adjusted data (as before but with `damped=FALSE`).
     e. Now use `ets()` to choose a seasonal model for the data.
-    f. Compare the RMSE of the fitted model with the RMSE of the model you obtained using an STL decomposition with Holt’s method. Which gives the better in-sample fits?
-    g. Compare the forecasts from the two approaches? Which seems most reasonable?
+    f. Compare the RMSE of the ETS model with the RMSE of the models you obtained using  STL decompositions.  Which gives the better in-sample fits?
+    g. Compare the forecasts from the three approaches? Which seems most reasonable?
+    h. Check the residuals of your preferred model.
 
 
 5. For this exercise, use the monthly Australian short-term overseas visitors data, May 1985--April 2005. (Data set: `visitors`.)
     a. Make a time plot of your data and describe the main features of the series.
-    b. Forecast the next two years using Holt-Winters’ multiplicative method.
+    b. Split your data into a training set and a test set comprising the last two years of available data. Forecast the test set using Holt-Winters’ multiplicative method.
     c. Why is multiplicative seasonality necessary here?
-    d. Experiment with making the trend exponential and/or damped.
-    e. Compare the RMSE of the one-step forecasts from the various methods. Which do you prefer?
-    f. Now fit each of the following models to the same data:
-        i) a multiplicative Holt-Winters’ method;
-        ii) an ETS model;
-        iii) an additive ETS model applied to a Box-Cox transformed series;
-        iv) a seasonal naive method applied to the Box-Cox transformed series;
-        v) an STL decomposition applied to the Box-Cox transformed data followed by an ETS model applied to the seasonally adjusted (transformed) data.
-        vi) For each model, look at the residual diagnostics and compare the forecasts for the next two years. Which do you prefer?
+    d. Forecast the two-year test set using each of the following methods:
+        i) an ETS model;
+        ii) an additive ETS model applied to a Box-Cox transformed series;
+        iii) a seasonal naive method;
+        iv) an STL decomposition applied to the Box-Cox transformed data followed by an ETS model applied to the seasonally adjusted (transformed) data.
+    e. Which method gives the best forecasts? Does it pass the residual tests?
+    f. Compare the same five methods using time series cross-validation with the `tsCV` function instead of using a training and test set. Do you come to the same conclusions?
 
-6.
+6. Compare `ets`, `snaive` and `stlf` on the following six time series. For `stlf`, you might need to use a Box-Cox transformation. Use a test set of three years to decide what gives the best forecasts.
+       `ausbeer`, `bricksq`, `dole`, `a10`, `h02`, `usmelec`.
+
+7.
     a. Use `ets()` on some of these series:
 
-        `bicoal`, `chicken`, `dole`, `usdeaths`, `bricksq`, `lynx`, `ibmclose`, `eggs`, `bricksq`, `ausbeer`
+        `bicoal`, `chicken`, `dole`, `usdeaths`, `lynx`, `ibmclose`, `eggs`.
 
         Does it always give good forecasts?
 

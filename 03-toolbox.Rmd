@@ -729,7 +729,7 @@ That works quite well if you have no idea what sort of model to use. But by the 
 
     a.  Produce a time plot of the series.
     b.  Produce forecasts using the drift method and plot them.
-    c.  Show that the graphed forecasts are identical to extending the line drawn between the first and last observations.
+    c.  Show that the forecasts are identical to extending the line drawn between the first and last observations.
     d.  Try using some of the other benchmark functions to forecast the same data set. Which do you think is best? Why?
 
 9. Consider the daily closing IBM stock prices (data set `ibmclose`).
@@ -737,12 +737,14 @@ That works quite well if you have no idea what sort of model to use. But by the 
     a. Produce some plots of the data in order to become familiar with it.
     b.  Split the data into a training set of 300 observations and a test set of 69 observations.
     c.  Try using various benchmark methods to forecast the training set and compare the results on the test set. Which method did best?
+    d. Check the residuals of your preferred method. Do they resemble white noise?
 
 10.  Consider the sales of new one-family houses in the USA, Jan 1973 -- Nov 1995 (data set `hsales`).
 
     a. Produce some plots of the data in order to become familiar with it.
     b.  Split the `hsales` data set into a training set and a test set, where the test set is the last two years of data.
     c.  Try using various benchmark methods to forecast the training set and compare the results on the test set. Which method did best?
+    d. Check the residuals of your preferred method. Do they resemble white noise?
 
 ## Further reading
 

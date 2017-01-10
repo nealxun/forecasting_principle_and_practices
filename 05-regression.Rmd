@@ -53,11 +53,21 @@ Notice that the observations do not lie on the straight line but are scattered a
 
 #### Example: US consumption expenditure {-}
 
-Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US for the period March 1970 to Dec 2016.
+Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US from Q1 1960 to Dec 2016.
   
 ```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US."}
 autoplot(usconsumption, ylab="% change", xlab="Year")+
 guides(colour=guide_legend(title=" "))
+
+setwd("C:/George/FPPLocalOnly")
+usdata <- read.csv("usconsumption.csv")
+
+usts <- ts(usdata[-1],start = 1960,frequency = 4)
+
+autoplot(usts[,1:2], ylab="% change", xlab="Year")+
+guides(colour=guide_legend(title=" "))
+
+
 ```
 
 ```{r, cache=TRUE, include=FALSE}

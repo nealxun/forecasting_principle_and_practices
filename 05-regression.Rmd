@@ -353,6 +353,13 @@ A third possible test is the **Breusch-Godfrey** test designed to look for signi
 bgtest(fit.beer,5)
 ```
 
+### Histogram of residuals {-}
+
+It is always a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier. Using the `checkresiduals` function introduced in Section \@ref(toolbox-resids) we can obtain a histogram of the residuals as well  as other useful residual diagnostics. The histogram in Figure \@ref(fig:beerresidcheck) below shows, that the residuals from modelling the beer data seem to be slightly negatively skewed, although that is partly due to the outlier.
+
+```{r beerresidcheck, echo=TRUE, cache=TRUE, fig.cap="Analysing the residuals from a regression model for beer production.", message=FALSE, warning=FALSE}
+checkresiduals(tslm(beer2 ~ trend + season))
+```
 
 ### Residual plots against predictors {-}
 
@@ -420,7 +427,7 @@ One source for an outlier occurring is an incorrect data entry. Simple descripti
 Outliers also occur when some observations are simply different. In this case it may not be wise for these observations to be removed. If an observation has been identified as a likely outlier it is important to study it and analyze the possible reasons behind it. The decision of removing or retaining such an observation can be a challenging one (especially when outliers are influential observations). It is wise to report results both with and without the removal of such observations.
 
 #### Example {-}
-Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US income on consumption (the example introduced in Section \ref(Regr-Intro). In the left panel the ourlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
+Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US income on consumption (the example introduced in Section \@ref(Regr-Intro)). In the left panel the ourlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which is the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
 
 
 ```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, cache=TRUE, message=FALSE,warning=FALSE}
@@ -478,6 +485,12 @@ We should warn here that the evaluation of the standard error can be highly subj
 
 More often than not, time series data are "non-stationary"; that is, the values of the time series do not fluctuate around a constant mean or with a constant variance. We will deal with time series stationarity in more detail in Chapter \@ref(ch-arima), but here we need to address the effect non-stationary data can have on regression models.
 
+For example consider the two variables plotted in Figure \@ref(fig:spurious). These appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea. 
+
+Regressing non-stationary time series can lead to spurious regressions. High $R^2$s and high residual autocorrelation can be signs of spurious regression. We discuss the issues surrounding non-stationary data and spurious regressions in detail in Chapter \@ref(ch-dynamic).
+
+Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
+
 ```{r spurious, fig.height=5,echo=TRUE, cache=TRUE, fig.cap="Trending time series data can appear to be related, as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE,warning=FALSE}
 df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,AustralianPassengers=ausair))
 p1 <- autoplot(ausair) + xlab("Year") + ylab("Air Passengers in Australia")
@@ -488,11 +501,7 @@ grid.arrange(arrangeGrob(p1, p2),p3, ncol = 2)
 
 ```
 
-For example consider the two variables plotted in Figure \@ref(fig:spurious), which appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea. 
 
-Regressing non-stationary time series can lead to spurious regressions. High $R^2$s and high residual autocorrelation can be signs of spurious regression. We discuss the issues surrounding non-stationary data and spurious regressions in detail in Chapter \@ref(ch-dynamic).
-
-Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
 
 ## Forecasting with regression {#Regr-ForeWithRegr}
 

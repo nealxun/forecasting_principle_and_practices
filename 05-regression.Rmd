@@ -60,12 +60,12 @@ autoplot(usconsumption, ylab="% change", xlab="Year")+
 guides(colour=guide_legend(title=" "))
 
 setwd("C:/George/FPPLocalOnly")
-usdata <- read.csv("usconsumption.csv")
+#usdata <- read.csv("usconsumption.csv")
 
-usts <- ts(usdata[-1],start = 1960,frequency = 4)
+#usts <- ts(usdata[-1],start = 1960,frequency = 4)
 
-autoplot(usts[,1:2], ylab="% change", xlab="Year")+
-guides(colour=guide_legend(title=" "))
+#autoplot(usts[,1:2], ylab="% change", xlab="Year")+
+#guides(colour=guide_legend(title=" "))
 
 
 ```
@@ -111,14 +111,38 @@ where $y$ is the variable to be forecast and $x_{1},\dots,x_{k}$ are the $k$ pre
 
 #### Example: US consumption expenditure (revisited) {-}
 
-An attmept to improve the simple linear regression model considered in the US consumption expenditure example above would be to include more predictors in the model. Including other relevant predictors in the model will help capture more of the variation in the consumption data.
+Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful for forecasting US consumption expenditure. These are quarterly percentage changes of industrial production and personal savings, and quarterly changes in the unemployment rate as this is already a percentage. Building a multiple linear regression model can potentially generate more accurate forecasts as we expect consumption expenditure does to not only depend on personal income but other predictors as well. 
 
-Building a multiple linear regression model may potentially generate more accurate forecasts as consumption expenditure does not only depend on personal income but other predictors as well. Figure \@ref(fig:MultiPredictors) shows three prossible predictors. These are quarterly percentage changes in industrial production and personal savings, and quarterly changes in the unemployment rate as this is already a percentage.
 
-```{r MultiPredictors, echo=TRUE, cache=TRUE, fig.cap="Quarterly percentage changes in industrial production and personal savings and quarterly changes in the unemployment rate for the US."}
+```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="Quarterly percentage changes of industrial production and personal savings and quarterly changes of the unemployment rate for the US."}
+
+
 autoplot(usts[,3:5], ylab="", xlab="Year",facets = TRUE)+
 guides(colour=guide_legend(title=" "))
 ```
+
+The 
+```{r MultiPredictors, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
+
+require(GGally)
+df<-as.data.frame(usts)
+
+my_fn <- function(data, mapping, ...){
+  p <- ggplot(data = df, mapping = mapping) + 
+    geom_point() + 
+    geom_smooth(method=lm)
+  p
+}
+
+g = ggpairs(df, lower = list(continuous = my_fn))
+g
+
+```
+
+
+
+
+
 
 ### Assumptions {-}
 

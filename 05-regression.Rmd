@@ -53,7 +53,7 @@ Notice that the observations do not lie on the straight line but are scattered a
 
 #### Example: US consumption expenditure {-}
 
-Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US from Q1 1960 to Dec 2016.
+Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US from the first quarter of 1960 to the third quarter of 2016.
   
 ```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US."}
 autoplot(usconsumption, ylab="% change", xlab="Year")+
@@ -71,14 +71,15 @@ guides(colour=guide_legend(title=" "))
 ```
 
 ```{r, cache=TRUE, include=FALSE}
-fit.cons <- tslm(consumption ~ income, data=usconsumption) 
+#fit.cons <- tslm(consumption ~ income, data=usconsumption)
+fit.cons <- tslm(consumption ~ income, data=usts) 
 ```
 
 A scatter plot of consumption against income is shown in Figure \@ref(fig:ConsInc2) along with the estimated regression line
 $$
-  \hat{y}_t=`r coef(fit.cons)[1]` + `r coef(fit.cons)[2]`x_t.
+  \hat{y}_t=`r round(coef(fit.cons)[1],2)` + `r round(coef(fit.cons)[2],2)`x_t.
 $$
-We will show how this line is estimated in Section \@ref(regr-LSprinciple). The fitted line is positively sloped showing a positive relationship between income and consumption. 
+We will show how this line is estimated in Section \@ref(Regr-LSprinciple). The fitted line is positively sloped showing a positive relationship between income and consumption. 
 
 The interpretation of the intercept requires that a value of $x=0$ makes sense. In this case when $x=0$ (when there is no change in personal disposable income since the last quarter) the predicted value of $y$ corresponding to $x=0$ is `r round(coef(fit.cons)[1], 2)` (there is a predicted increase in personal consumption expenditure of `r round(coef(fit.cons)[1], 2)`%). Even when $x=0$ does not make sense, the intercept is an important part of the model. Without it, the slope coefficient can be distorted unnecessarily. The intercept should always be included unless the requirement is to force the regression line through the origin.
 
@@ -86,7 +87,7 @@ The slope coefficient shows that a one unit increase in $x$ (a 1% increase in pe
 
 
 ```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
-ggplot(as.data.frame(usconsumption), aes(x=income, y=consumption)) +
+ggplot(as.data.frame(usts), aes(x=income, y=consumption)) +
   ylab("% change in consumption")+xlab("% change in income")+
   geom_point() + geom_smooth(method="lm", se=FALSE)
 ```
@@ -108,7 +109,16 @@ When there are two or more predictor variables, the model is called a "multiple 
 \end{equation}
 where $y$ is the variable to be forecast and $x_{1},\dots,x_{k}$ are the $k$ predictor variables. Each of the predictor variables must be numerical. The coefficients $\beta_{1},\dots,\beta_{k}$ measure the effect of each predictor after taking account of the effect of all other predictors in the model. Thus, the coefficients measure the *marginal effects* of the predictor variables.
 
-#### Example: multiple linear regression {-}
+#### Example: US consumption expenditure (revisited) {-}
+
+An attmept to improve the simple linear regression model considered in the US consumption expenditure example above would be to include more predictors in the model. Including other relevant predictors in the model will help capture more of the variation in the consumption data.
+
+Building a multiple linear regression model may potentially generate more accurate forecasts as consumption expenditure does not only depend on personal income but other predictors as well. Figure \@ref(fig:MultiPredictors) shows three prossible predictors. These are quarterly percentage changes in industrial production and personal savings, and quarterly changes in the unemployment rate as this is already a percentage.
+
+```{r MultiPredictors, echo=TRUE, cache=TRUE, fig.cap="Quarterly percentage changes in industrial production and personal savings and quarterly changes in the unemployment rate for the US."}
+autoplot(usts[,3:5], ylab="", xlab="Year",facets = TRUE)+
+guides(colour=guide_legend(title=" "))
+```
 
 ### Assumptions {-}
 

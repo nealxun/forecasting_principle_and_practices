@@ -81,7 +81,7 @@ It is worth spending time talking to the people who will use the forecasts to en
 
 Once it has been determined what forecasts are required, it is then necessary to find or collect the data on which the forecasts will be based. The data required for forecasting may already exist. These days, a lot of data are recorded, and the forecaster's task is often to identify where and how the required data are stored. The data may include sales records of a company, the historical demand for a product, or the unemployment rate for a geographical region. A large part of a forecaster's time can be spent in locating and collating the available data prior to developing suitable forecasting methods.
 
-## Forecasting data and methods
+## Forecasting data and methods {#Intro-DataAndMethods}
 
 The appropriate forecasting methods depend largely on what data are available.
 

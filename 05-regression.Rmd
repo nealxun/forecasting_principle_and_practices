@@ -53,11 +53,11 @@ Notice that the observations do not lie on the straight line but are scattered a
 
 #### Example: US consumption expenditure {-}
 
-Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US from the first quarter of 1960 to the third quarter of 2016.
+Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US from 1960Q1 to 2016Q3.
   
 ```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US."}
-autoplot(usconsumption, ylab="% change", xlab="Year")+
-guides(colour=guide_legend(title=" "))
+#autoplot(usconsumption, ylab="% change", xlab="Year")+
+#guides(colour=guide_legend(title=" "))
 
 setwd("C:/George/FPPLocalOnly")
 usdata <- read.csv("usconsumption.csv")
@@ -72,7 +72,7 @@ guides(colour=guide_legend(title=" "))
 
 ```{r, cache=TRUE, include=FALSE}
 #fit.cons <- tslm(consumption ~ income, data=usconsumption)
-fit.cons <- tslm(consumption ~ income, data=usts) 
+fit.cons <- tslm(Consumption ~ Income, data=usts) 
 ```
 
 A scatter plot of consumption against income is shown in Figure \@ref(fig:ConsInc2) along with the estimated regression line
@@ -87,7 +87,7 @@ The slope coefficient shows that a one unit increase in $x$ (a 1% increase in pe
 
 
 ```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
-ggplot(as.data.frame(usts), aes(x=income, y=consumption)) +
+ggplot(as.data.frame(usts), aes(x=Income, y=Consumption)) +
   ylab("% change in consumption")+xlab("% change in income")+
   geom_point() + geom_smooth(method="lm", se=FALSE)
 ```
@@ -95,6 +95,7 @@ ggplot(as.data.frame(usts), aes(x=income, y=consumption)) +
 The estimation results are shown below.
 
 ```{r ConsInc3, echo=TRUE, cache=TRUE}
+fit.cons <- tslm(Consumption ~ Income, data=usts) 
 summary(fit.cons)
 ```
 
@@ -111,17 +112,16 @@ where $y$ is the variable to be forecast and $x_{1},\dots,x_{k}$ are the $k$ pre
 
 #### Example: US consumption expenditure (revisited) {-}
 
-Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful for forecasting US consumption expenditure. These are quarterly percentage changes of industrial production and personal savings, and quarterly changes in the unemployment rate (as this is already a percentage). Building a multiple linear regression model can potentially generate more accurate forecasts as we expect consumption expenditure to not only depend on personal income but other predictors as well. 
+Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful for forecasting US consumption expenditure. These are quarterly percentage changes in industrial production and personal savings, and quarterly changes in the unemployment rate (as this is already a percentage). Building a multiple linear regression model can potentially generate more accurate forecasts as we expect consumption expenditure to not only depend on personal income but other predictors as well. 
 
 
-```{r MultiPredictors, echo=TRUE, cache=TRUE, fig.cap="Quarterly percentage changes of industrial production and personal savings and quarterly changes in the unemployment rate for the US."}
-
+```{r MultiPredictors, echo=FALSE, fig.cap="Quarterly percentage changes in industrial production and personal savings and quarterly changes in the unemployment rate for the US over the period 1960Q1 to 2016Q3.", cache=TRUE}
 
 autoplot(usts[,3:5], ylab="", xlab="Year",facets = TRUE)+
 guides(colour=guide_legend(title=" "))
 ```
 
-The first column of Figure \@ref(fig:ScatterMatrix) shows the relationships between consumption expenditure and each predictor. The fitted regression lines show positive relationships for consumption wiht each income and industrial production and negative relationships with each unemployment and savings. The strength of these relationships are shown by the correlation coefficients across the first row.
+The first column of Figure \@ref(fig:ScatterMatrix) shows the relationships between consumption expenditure and each of the predictors. The fitted regression lines show positive relationships between consumption and each income and industrial production and negative relationships with each savings and unemployment. The strength of these relationships are shown by the correlation coefficients across the first row.
 
 ```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
 
@@ -139,12 +139,12 @@ ggpairs(df, lower = list(continuous = my_fn))
 
 ```
 
-The multiple linear regression model we will try to fit will be 
+The multiple linear regression model we will try to fit is
 \begin{equation}
 y_t=\beta_0 + \beta_1 x_{1,t}+ \beta_2 x_{2,t}+ \beta_3 x_{3,t}+ \beta_4 x_{4,t}+\varepsilon_t,
  (\#eq:usMLR)
 \end{equation}
-where $y$ is the percentage change in real personal consumption expenditure, $x_1$ is the and real personal disposable income ( xx ) for the US from the first quarter of 1960 to the third quarter of 2016.
+where $y$ is the percentage change in real personal consumption expenditure, $x_1$ is the percentage change in real personal disposable income, $x_2$ is the percentage change in industrial production, $x_3$ is the percentage change in personal savings and $x_4$ is the change in the unemployment rate.
 
 
 ### Assumptions {-}
@@ -190,7 +190,7 @@ The following is estimation output from fitting the multiple linear regression m
 For forecasting purposes, the final two columns are of limited interest. The "t value" is the ratio of a $\beta$ coefficient to its standard error and the last column gives the p-value: the probability of the estimated $\beta$ coefficient being as large as it is if there was no real relationship between the credit score and the predictor. This is useful when studying the effect of each predictor, but is not particularly useful when forecasting.
 
 ```{r, cache=TRUE,echo=TRUE, include=TRUE}
-fit.consMR <- tslm(consumption ~ income+production+unempl+savings, data=usts)
+fit.consMR <- tslm(Consumption ~ Income+Production+Unemployment+Savings, data=usts)
 summary(fit.consMR)
 ```
 
@@ -198,11 +198,11 @@ summary(fit.consMR)
 
 ### Fitted values {-}
 
-Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the right hand side of equation \@ref(eq:prediction) returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. The following plots show the actual values compared to the predicted (i.e., fitted) values for the percentage change in US consumption expenditure data. 
+Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the right hand side of equation \@ref(eq:prediction) returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. The following plots show the actual values compared to the fitted (i.e.,predicted) values for the percentage change in the US consumption expenditure series. The time plot shows that the fitted values follow the actual data fairly closely. This is verified by the strong positive relationship shown by the scatterplot. 
 
 
 ```{r usfitted1, echo=TRUE, cache=TRUE, fig.cap="Time plot of US consumtpion expenditure and predicted expenditure."}
-df <- cbind(Data=usts[,"consumption"], Fitted=fitted(fit.consMR))
+df <- cbind(Data=usts[,"Consumption"], Fitted=fitted(fit.consMR))
 autoplot(df[,1:2]) + xlab("Year") + ylab("") +
   ggtitle("Percentage change in US consumption expenditure")+
   guides(colour=guide_legend(title=" "))
@@ -212,13 +212,11 @@ autoplot(df[,1:2]) + xlab("Year") + ylab("") +
 df <- as.data.frame(df)
 ggplot(df,aes(x=Data, y=Fitted)) + 
   geom_point() +
-  xlab("Fitted") + ylab("Actual values") + 
+  xlab("Fitted (predicted values)") + ylab("Data (actual values)") + 
   ggtitle("Percentage change in US consumption expenditure") +
-  scale_color_brewer(palette="Dark2", name="Quarter")
+  scale_color_brewer(palette="Dark2", name="Quarter")+
+  geom_smooth(method="lm", se=FALSE)
 ```
-
-
-
 
 
 
@@ -282,45 +280,7 @@ Notice that only six dummy variables are needed to code seven categories. That i
 
 Many beginners will try to add a seventh dummy variable for the seventh category. This is known as the "dummy variable trap" because it will cause the regression to fail. There will be one too many parameters to estimate when an intercept is also included. The general rule is to use one fewer dummy variables than categories. So for quarterly data, use three dummy variables; for monthly data, use 11 dummy variables; and for daily data, use six dummy variables.
 
-The interpretation of each of the coefficients associated with the dummy variables is that it is *a measure of the effect of that category relative to the omitted category*. In the above example, the coefficient of $x_{1,t}$ associated with Monday will measure the effect of Monday compared to Sunday on the forecast variable. An example of interpreting estimated dummy variable coefficients capturing the quarterly seasonality of Australian beer production follows in Section \@ref(sec-5-3-LSprinciple). 
-
-### Intervention variables {-}
-
-It is often necessary to model interventions that may have affected the variable to be forecast. For example, competitor activity, advertising expenditure, industrial action, and so on, can all have an effect.
-
-When the effect lasts only for one period, we use a spike variable. This is a dummy variable taking value one in the period of the intervention and zero elsewhere. A spike variable is equivalent to a dummy variable for handling an
-outlier.
-
-Other interventions have an immediate and permanent effect. If an intervention causes a level shift (i.e., the value of the series changes suddenly and permanently from the time of intervention), then we use a step variable. A step variable takes value zero before the intervention and one from the time of intervention onwards.
-
-Another form of permanent effect is a change of slope. Here the intervention is handled using a piecewise linear trend as discussed earlier (where $\tau$ is the time of intervention).
-
-### Trading days {-}
-
-The number of trading days in a month can vary considerably and can have a substantial effect on sales data. To allow for this, the number of trading days in each month can be included as a predictor. An alternative that allows for the effects of different days of the week has the following predictors:
-
-$$\begin{aligned} x_{1} &= \text{\# Mondays in month;} \\ x_{2} &= \text{\#
-Tuesdays in month;} \\ & \vdots \\ x_{7} &= \text{\# Sundays in
-month.}\end{aligned}$$
-
-### Distributed lags {-}
-
-It is often useful to include advertising expenditure as a predictor. However, since the effect of advertising can last beyond the actual campaign, we need to include lagged values of advertising expenditure. So the following predictors may be used.
-
-$$\begin{aligned} x_{1} &= \text{advertising for previous month;} \\ x_{2} &=
-\text{advertising for two months previously;} \\ &\vdots \\ x_{m} &=
-\text{advertising for $m$ months previously.}\end{aligned}$$
-
-It is common to require the coefficients to decrease as the lag increases. In Chapter \@ref(ch-dynamic) we discuss methods to allow this constraint to be implemented.
-
-### Easter {-}
-
-Easter is different from most holidays because it is not held on the same date each year and the effect can last for several days. In this case, a dummy variable can be used with value one where any part of the holiday falls in the particular time period and zero otherwise.
-
-For example, with monthly data, when Easter falls in March then the dummy variable takes value 1 in March, when it falls in April, the dummy variable
-takes value 1 in April, and when it starts in March and finishes in April, the dummy variable takes value 1 for both months. 
-
-`easter(ausbeer)`
+The interpretation of each of the coefficients associated with the dummy variables is that it is *a measure of the effect of that category relative to the omitted category*. In the above example, the coefficient of $x_{1,t}$ associated with Monday will measure the effect of Monday compared to Sunday on the forecast variable. An example of interpreting estimated dummy variable coefficients capturing the quarterly seasonality of Australian beer production follows. 
 
 #### Example: Australian quarterly beer production {-}
 
@@ -361,6 +321,46 @@ ggplot(df,aes(x=Data, y=Fitted, colour=as.factor(cycle(beer2)))) +
   scale_color_brewer(palette="Dark2", name="Quarter")
 ```
 
+
+### Intervention variables {-}
+
+It is often necessary to model interventions that may have affected the variable to be forecast. For example, competitor activity, advertising expenditure, industrial action, and so on, can all have an effect.
+
+When the effect lasts only for one period, we use a spike variable. This is a dummy variable taking value one in the period of the intervention and zero elsewhere. A spike variable is equivalent to a dummy variable for handling an
+outlier.
+
+Other interventions have an immediate and permanent effect. If an intervention causes a level shift (i.e., the value of the series changes suddenly and permanently from the time of intervention), then we use a step variable. A step variable takes value zero before the intervention and one from the time of intervention onwards.
+
+Another form of permanent effect is a change of slope. Here the intervention is handled using a piecewise linear trend as discussed earlier (where $\tau$ is the time of intervention).
+
+### Trading days {-}
+
+The number of trading days in a month can vary considerably and can have a substantial effect on sales data. To allow for this, the number of trading days in each month can be included as a predictor. An alternative that allows for the effects of different days of the week has the following predictors:
+
+$$\begin{aligned} x_{1} &= \text{\# Mondays in month;} \\ x_{2} &= \text{\#
+Tuesdays in month;} \\ & \vdots \\ x_{7} &= \text{\# Sundays in
+month.}\end{aligned}$$
+
+### Distributed lags {-}
+
+It is often useful to include advertising expenditure as a predictor. However, since the effect of advertising can last beyond the actual campaign, we need to include lagged values of advertising expenditure. So the following predictors may be used.
+
+$$\begin{aligned} x_{1} &= \text{advertising for previous month;} \\ x_{2} &=
+\text{advertising for two months previously;} \\ &\vdots \\ x_{m} &=
+\text{advertising for $m$ months previously.}\end{aligned}$$
+
+It is common to require the coefficients to decrease as the lag increases. In Chapter \@ref(ch-dynamic) we discuss methods to allow this constraint to be implemented.
+
+### Easter {-}
+
+Easter is different from most holidays because it is not held on the same date each year and the effect can last for several days. In this case, a dummy variable can be used with value one where any part of the holiday falls in the particular time period and zero otherwise.
+
+For example, with monthly data, when Easter falls in March then the dummy variable takes value 1 in March, when it falls in April, the dummy variable
+takes value 1 in April, and when it starts in March and finishes in April, the dummy variable takes value 1 for both months. 
+
+`easter(ausbeer)`
+
+
 ## Evaluating the regression model {#Regr-EvaluatingSLR}
 
 The difference between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the forecast errors or "residuals" 
@@ -393,7 +393,7 @@ p2 <- ggAcf(res) + ggtitle("ACF of residuals")
 gridExtra::grid.arrange(p1, p2, nrow=1)
 ```
 
-There is an outlier in the residuals (2004:Q4) which suggests there was something unusual happening in that quarter. It would be worth investigating that outlier to see if there were any unusual circumstances or events that may have reduced beer production for the quarter.
+There is an outlier in the residuals (2004Q4) which suggests there was something unusual happening in that quarter. It would be worth investigating that outlier to see if there were any unusual circumstances or events that may have reduced beer production for the quarter.
 
 The remaining residuals show that the model has captured the patterns in the data quite well, although there is a small amount of autocorrelation left in the residuals (seen in the significant spike in the ACF plot). This suggests that the model can be slightly improved, although it is unlikely to make much difference to the resulting forecasts.
 
@@ -424,18 +424,21 @@ checkresiduals(tslm(beer2 ~ trend + season))
 
 ### Residual plots against predictors {-}
 
-We would expect the residuals to be randomly scattered without showing any systematic patterns. A simple and quick way for a first check is to examine a scatterplot of the residuals against each of the predictor variables. 
+We would expect the residuals to be randomly scattered without showing any systematic patterns. A simple and quick way for a first check is to examine a scatterplot of the residuals against each of the predictor variables. Figure \@ref(fig:resids) seems to be randomly scattered
 
 If these scatterplots show a pattern, then the relationship may be nonlinear and the model will need to be modified accordingly. See Section \@ref(sec-5-6-NonLinear) for a discussion of nonlinear regression.
 
 It is also necessary to plot the residuals against any predictors *not* in the model. If these show a pattern, then the predictor may need to be added to the model (possibly in a nonlinear form).
 
-`I've added this but not sure it's useful - need to revisit when I get a better example`
-```{r resids, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of residuals versus income."}
-df <- as.data.frame(cbind(income=usconsumption[,"income"], res=residuals(fit.cons)))
-ggplot(df, aes(x=income, y=res)) +
-  ylab("Residuals")+xlab("% change in income")+
-  geom_point() 
+```{r resids, echo=TRUE, cache=TRUE, fig.cap="Scatterplots of residuals versus each predictor."}
+df <- as.data.frame(cbind(res=residuals(fit.consMR),Income=usts[,"Income"],Production=usts[,"Production"],Savings=usts[,"Savings"],Unemployment=usts[,"Unemployment"]))
+p1 <- ggplot(df, aes(x=Income, y=res)) + geom_point() + ylab("Residuals")
+p2 <- ggplot(df, aes(x=Production, y=res)) + geom_point() + ylab("Residuals")
+p3 <- ggplot(df, aes(x=Savings, y=res)) + geom_point() + ylab("Residuals")
+p4 <- ggplot(df, aes(x=Unemployment, y=res)) + geom_point() + ylab("Residuals")
+
+gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
+
 ```
 
 ### Residual plots against fitted values {-}
@@ -455,27 +458,6 @@ ggplot(df, aes(x=fitd, y=res,colour=as.factor(cycle(elec)))) +
   scale_color_brewer(palette="Paired", name="Quarter")
 ```
 
-### Histogram of residuals {-}
-
-
-Finally, it is a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier. The histogram in Figure \@ref(fig:beerhist)
-below shows, that the residuals from modelling the beer data seem to be slightly negatively skewed, although that is partly due to the outlier.
-
-```{r beerhist, echo=TRUE, cache=TRUE, fig.cap="Histogram of residuals from regression model for beer production.", message=FALSE, warning=FALSE}
-x <- -43:43
-ggplot() + geom_histogram(aes(res), binwidth=6) + 
-  xlab("Residuals") + ggtitle("Histogram of residuals") +
-  geom_line(aes(x=x, y=length(res)*6*dnorm(x,0,sd(res)), col="red")) + geom_rug() + guides(col=FALSE)
-```
-
-We can use the `checkresiduals` function introduced in Section \@ref(toolbox-resids).
-
-```{r beercheck, echo=TRUE, cache=TRUE, fig.cap="Analysing the residuals from a regression model for beer production.", message=FALSE, warning=FALSE}
-checkresiduals(tslm(beer2 ~ trend + season))
-```
-
-
-
 
 ### Outliers and influential observations {-}
 
@@ -493,19 +475,19 @@ Figure \@ref(fig:outlier) highlights the effect of a single outlier when regress
 
 ```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, cache=TRUE, message=FALSE,warning=FALSE}
 
-yx <- as.data.frame(usconsumption)
-fit1 <- lm(consumption ~ income, data=yx) 
+yx <- as.data.frame(usts[,1:2])
+fit1 <- lm(Consumption ~ Income, data=yx) 
 
 yx[1,]<-c(-4,1)
-fit2 <- lm(consumption ~ income, data=yx) 
-p1 <- ggplot(yx, aes(x=income, y=consumption)) +
+fit2 <- lm(Consumption ~ Income, data=yx) 
+p1 <- ggplot(yx, aes(x=Income, y=Consumption)) +
   ylab("% change in consumption")+xlab("% change in income")+
   geom_point()+ 
   geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")
 
 yx[1,]<-c(-4,6)
-fit2 <- lm(consumption ~ income, data=yx) 
-p2 <- ggplot(yx, aes(x=income, y=consumption)) +
+fit2 <- lm(Consumption ~ Income, data=yx) 
+p2 <- ggplot(yx, aes(x=Income, y=Consumption)) +
   ylab("% change in consumption")+xlab("% change in income")+
   geom_point()+ 
   geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")
@@ -603,7 +585,7 @@ of interest. The resulting forecasts are calculated and shown in Figure
 \@ref(fig:ConsInc4).
 
 ```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US."}
-fcast <- forecast(fit.cons, newdata=data.frame(income=c(-1,1))) 
+fcast <- forecast(fit.cons, newdata=data.frame(Income=c(-1,1))) 
 autoplot(fcast)
 ```
 

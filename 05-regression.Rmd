@@ -111,19 +111,17 @@ where $y$ is the variable to be forecast and $x_{1},\dots,x_{k}$ are the $k$ pre
 
 #### Example: US consumption expenditure (revisited) {-}
 
-Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful for forecasting US consumption expenditure. These are quarterly percentage changes of industrial production and personal savings, and quarterly changes of the unemployment rate, as this is already a percentage. Building a multiple linear regression model can potentially generate more accurate forecasts as we expect consumption expenditure to not only depend on personal income but other predictors as well. 
+Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful for forecasting US consumption expenditure. These are quarterly percentage changes of industrial production and personal savings, and quarterly changes in the unemployment rate (as this is already a percentage). Building a multiple linear regression model can potentially generate more accurate forecasts as we expect consumption expenditure to not only depend on personal income but other predictors as well. 
 
 
-```{r MultiPredictors, echo=TRUE, cache=TRUE, fig.cap="Quarterly percentage changes of industrial production and personal savings and quarterly changes of the unemployment rate for the US."}
+```{r MultiPredictors, echo=TRUE, cache=TRUE, fig.cap="Quarterly percentage changes of industrial production and personal savings and quarterly changes in the unemployment rate for the US."}
 
 
 autoplot(usts[,3:5], ylab="", xlab="Year",facets = TRUE)+
 guides(colour=guide_legend(title=" "))
 ```
 
-Figure \@ref(fig:ScatterMatrix) provides a matrix of scatterplots between all the variables under consideration. 
-
-The first column of Figure \@ref(fig:ScatterMatrix) shows the relationships between consumption expenditure and each predictor. The fitted regression lines show positive raltionships with income and industrial production and negative relationships with unemployment and savings. The strength of these relationships are shown by the correlation coefficients across the first row.
+The first column of Figure \@ref(fig:ScatterMatrix) shows the relationships between consumption expenditure and each predictor. The fitted regression lines show positive relationships for consumption wiht each income and industrial production and negative relationships with each unemployment and savings. The strength of these relationships are shown by the correlation coefficients across the first row.
 
 ```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
 
@@ -137,19 +135,16 @@ my_fn <- function(data, mapping, ...){
   p
 }
 
-g = ggpairs(df, lower = list(continuous = my_fn))
-g
+ggpairs(df, lower = list(continuous = my_fn))
 
 ```
 
 The multiple linear regression model we will try to fit will be 
-$$
-y_t=\beta_0 + \beta_1 x_{1,t}+ \beta_2 x_{2,t}+ \beta_3 x_{3,t}+ \beta_4 x_{4,t}+\varepsilon_t
-$$
-where 
-
-$y_t$ is etc etc.
-
+\begin{equation}
+y_t=\beta_0 + \beta_1 x_{1,t}+ \beta_2 x_{2,t}+ \beta_3 x_{3,t}+ \beta_4 x_{4,t}+\varepsilon_t,
+ (\#eq:usMLR)
+\end{equation}
+where $y$ is the percentage change in real personal consumption expenditure, $x_1$ is the and real personal disposable income ( xx ) for the US from the first quarter of 1960 to the third quarter of 2016.
 
 
 ### Assumptions {-}
@@ -167,8 +162,6 @@ Second, we make the following assumptions about the errors $(\varepsilon_{1},\do
 It is also useful to have the errors normally distributed with constant variance in order to easily produce prediction intervals.
 
 Another important assumption in the linear regression model is that each $x$ is not a random variable. If we were performing a controlled experiment in a laboratory, we could control the values of each $x$ (so they would not be random) and observe the resulting values of $y$. With observational data (including most data in business and economics) it is not possible to control the value of $x$, and hence we make this an assumption.
-
-
 
 ## Least squares estimation {#Regr-LSprinciple}
 
@@ -190,9 +183,9 @@ Predictions of $y_t$ can be obtained by ignoring the error in the regression equ
   (\#eq:prediction)
 \end{equation}
 
-#### Example: US consumption expenditure revisited {-}
+#### Example: US consumption expenditure (revisited) {-}
 
-The following is estimation output from the fitting the multiple linear regression model for forecasting US consumption expenditure. The first column gives the estimates of each $\beta$ coefficient and the second column gives its standard error (i.e., the standard deviation which would be obtained from repeatedly estimating the $\beta$ coefficients on similar data sets). The standard error gives a measure of the uncertainty in the estimated $\beta$ coefficient.
+The following is estimation output from fitting the multiple linear regression model of equation \@ref(eq:usMLR) for forecasting US consumption expenditure. The first column gives the estimates of each $\beta$ coefficient and the second column gives its standard error (i.e., the standard deviation which would be obtained from repeatedly estimating the $\beta$ coefficients on similar data sets). The standard error gives a measure of the uncertainty in the estimated $\beta$ coefficient.
 
 For forecasting purposes, the final two columns are of limited interest. The "t value" is the ratio of a $\beta$ coefficient to its standard error and the last column gives the p-value: the probability of the estimated $\beta$ coefficient being as large as it is if there was no real relationship between the credit score and the predictor. This is useful when studying the effect of each predictor, but is not particularly useful when forecasting.
 

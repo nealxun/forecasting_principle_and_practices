@@ -81,14 +81,14 @@ $$
 $$
 We will show how this line is estimated in Section \@ref(Regr-LSprinciple). The fitted line is positively sloped showing a positive relationship between income and consumption. 
 
-The interpretation of the intercept requires that a value of $x=0$ makes sense. In this case when $x=0$ (when there is no change in personal disposable income since the last quarter) the predicted value of $y$ corresponding to $x=0$ is `r round(coef(fit.cons)[1], 2)` (there is a predicted increase in personal consumption expenditure of `r round(coef(fit.cons)[1], 2)`%). Even when $x=0$ does not make sense, the intercept is an important part of the model. Without it, the slope coefficient can be distorted unnecessarily. The intercept should always be included unless the requirement is to force the regression line through the origin.
+The interpretation of the intercept requires that a value of $x=0$ makes sense. In this case when $x=0$ (when there is no change in personal disposable income since the last quarter) the predicted value of $y$ is `r round(coef(fit.cons)[1], 2)` (there is a predicted increase in personal consumption expenditure of `r round(coef(fit.cons)[1], 2)`%). Even when $x=0$ does not make sense, the intercept is an important part of the model. Without it, the slope coefficient can be distorted unnecessarily. The intercept should always be included unless the requirement is to force the regression line through the origin (for a discussion see REFERENCE). In all that follows we assume that an intercept is always included in the model.
 
 The slope coefficient shows that a one unit increase in $x$ (a 1% increase in personal disposable income) results on average in `r round(coef(fit.cons)[2], 2)` units increase in $y$ (an average `r round(coef(fit.cons)[2], 2)`% increase in personal consumption expenditure). Alternatively the estimated equation shows that a value of 1 for $x$ (the percentage increase in personal disposable income) will result in a forecast value of `r round(coef(fit.cons)[1], 2)` + `r  round(coef(fit.cons)[2], 2)`$\times1$ = 0.83 for $y$ (the percentage increase in personal consumption expenditure).
 
 
 ```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
 ggplot(as.data.frame(usts), aes(x=Income, y=Consumption)) +
-  ylab("% change in consumption")+xlab("% change in income")+
+  ylab("Consumption (quarterly % change)")+xlab("Income (quarterly % change)")+
   geom_point() + geom_smooth(method="lm", se=FALSE)
 ```
 
@@ -173,7 +173,7 @@ $$
   \beta_{0} - \beta_{1} x_{1,t} - \beta_{2} x_{2,t} - \cdots - \beta_{k} x_{k,t})^2.
 $$
 
-This is called "least squares" estimation because it gives the least value for the sum of squared errors.  Finding the best estimates of the coefficients is often called "fitting" the model to the data, or sometimes "learning" or "training" the model. The line shown in Figure \@ref(fig:ConsInc2) was obtained in this way. 
+This is called "least squares" estimation because it gives the least value for the sum of squared errors.  Finding the best estimates of the coefficients is often called "fitting" the model to the data, or sometimes "learning" or "training" the model. The lines shown in Figures \@ref(fig:ConsInc2) and \@ref(fig:ScatterMatrix) were obtained in this way. 
 
 When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section \@ref(sec-matrixequations).
 
@@ -187,10 +187,10 @@ Predictions of $y_t$ can be obtained by ignoring the error in the regression equ
 
 The following is estimation output from fitting the multiple linear regression model of equation \@ref(eq:usMLR) for forecasting US consumption expenditure. The first column gives the estimates of each $\beta$ coefficient and the second column gives its standard error (i.e., the standard deviation which would be obtained from repeatedly estimating the $\beta$ coefficients on similar data sets). The standard error gives a measure of the uncertainty in the estimated $\beta$ coefficient.
 
-For forecasting purposes, the final two columns are of limited interest. The "t value" is the ratio of a $\beta$ coefficient to its standard error and the last column gives the p-value: the probability of the estimated $\beta$ coefficient being as large as it is if there was no real relationship between the credit score and the predictor. This is useful when studying the effect of each predictor, but is not particularly useful when forecasting.
+For forecasting purposes, the final two columns are of limited interest. The "t value" is the ratio of an estimated $\beta$ coefficient to its standard error and the last column gives the p-value: the probability of the estimated $\beta$ coefficient being as large as it is if there was no real relationship between the credit score and the predictor. This is useful when studying the effect of each predictor, but is not particularly useful when forecasting.
 
 ```{r, cache=TRUE,echo=TRUE, include=TRUE}
-fit.consMR <- tslm(Consumption ~ Income+Production+Unemployment+Savings, data=usts)
+fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings, data=usts)
 summary(fit.consMR)
 ```
 
@@ -358,12 +358,12 @@ Easter is different from most holidays because it is not held on the same date e
 For example, with monthly data, when Easter falls in March then the dummy variable takes value 1 in March, when it falls in April, the dummy variable
 takes value 1 in April, and when it starts in March and finishes in April, the dummy variable takes value 1 for both months. 
 
-`easter(ausbeer)`
+May be add this as an exercies try `easter(ausbeer)` and interpret what you see. 
 
 
 ## Evaluating the regression model {#Regr-EvaluatingSLR}
 
-The difference between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the forecast errors or "residuals" 
+The difference between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the in-sample forecast errors or "residuals" 
 \begin{align*}
   e_t &= y_t - \hat{y}_t \\
       &= y_t - \hat\beta_{0} - \hat\beta_{1} x_{1,t} - \hat\beta_{2} x_{2,t} - \cdots - \hat\beta_{k} x_{k,t}.
@@ -382,7 +382,7 @@ After selecting the regression variables and fitting a regression model, it is n
 
 ### ACF plot of residuals {-}
 
-With time series data it is highly likely that the value of a variable observed in the current time period will be influenced by its value in the previous period, or even the period before that, and so on. Therefore when fitting a regression model to time series data, it is very common to find autocorrelation in the residuals. In this case, the estimated model violates the assumption of no autocorrelation in the errors, and our forecasts may be inefficient --- there is some information left over which should be accounted for in the model in order to obtain better forecasts. The forecasts from a model with autocorrelated errors are still unbiased, and so are not "wrong", but they will usually have larger prediction intervals than they need to. Therefore we should always look at an ACF plot of the residuals. 
+With time series data we are considering in this book it is highly likely that the value of a variable observed in the current time period will be influenced by its value in the previous period, or even the period before that, and so on. Therefore when fitting a regression model to time series data, it is very common to find autocorrelation in the residuals. In this case, the estimated model violates the assumption of no autocorrelation in the errors, and our forecasts may be inefficient --- there is some information left over which should be accounted for in the model in order to obtain better forecasts. The forecasts from a model with autocorrelated errors are still unbiased, and so are not "wrong", but they will usually have larger prediction intervals than they need to. Therefore we should always look at an ACF plot of the residuals.
 
 Figure \@ref(fig:beerlm4) shows a time plot and ACF of the residuals from the model fitted to the beer production data.
 
@@ -393,7 +393,7 @@ p2 <- ggAcf(res) + ggtitle("ACF of residuals")
 gridExtra::grid.arrange(p1, p2, nrow=1)
 ```
 
-There is an outlier in the residuals (2004Q4) which suggests there was something unusual happening in that quarter. It would be worth investigating that outlier to see if there were any unusual circumstances or events that may have reduced beer production for the quarter.
+There seems to be an outlier in the residuals (2004Q4) which suggests that  something unusual happened in that quarter. It would be worth investigating that outlier to see if there were any unusual circumstances or events that may have reduced beer production for the quarter.
 
 The remaining residuals show that the model has captured the patterns in the data quite well, although there is a small amount of autocorrelation left in the residuals (seen in the significant spike in the ACF plot). This suggests that the model can be slightly improved, although it is unlikely to make much difference to the resulting forecasts.
 
@@ -416,7 +416,7 @@ lmtest::bgtest(fit.beer,5)
 
 ### Histogram of residuals {-}
 
-It is always a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier. Using the `checkresiduals` function introduced in Section \@ref(toolbox-resids) we can obtain a histogram of the residuals as well  as other useful residual diagnostics. The histogram in Figure \@ref(fig:beerresidcheck) below shows, that the residuals from modelling the beer data seem to be slightly negatively skewed, although that is partly due to the outlier.
+It is always a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier. Using the `checkresiduals` function introduced in Section \@ref(toolbox-resids) we can obtain a histogram of the residuals as well  as the other useful residual diagnostics metnioned above. The histogram in Figure \@ref(fig:beerresidcheck) below shows, that the residuals from modelling the beer data seem to be slightly negatively skewed, although that is partly due to the outlier.
 
 ```{r beerresidcheck, echo=TRUE, cache=TRUE, fig.cap="Analysing the residuals from a regression model for beer production.", message=FALSE, warning=FALSE}
 checkresiduals(tslm(beer2 ~ trend + season))
@@ -424,11 +424,13 @@ checkresiduals(tslm(beer2 ~ trend + season))
 
 ### Residual plots against predictors {-}
 
-We would expect the residuals to be randomly scattered without showing any systematic patterns. A simple and quick way for a first check is to examine a scatterplot of the residuals against each of the predictor variables. Figure \@ref(fig:resids) seems to be randomly scattered
+We would expect the residuals to be randomly scattered without showing any systematic patterns. A simple and quick way for a first check is to examine a scatterplot of the residuals against each of the predictor variables.
 
 If these scatterplots show a pattern, then the relationship may be nonlinear and the model will need to be modified accordingly. See Section \@ref(sec-5-6-NonLinear) for a discussion of nonlinear regression.
 
-It is also necessary to plot the residuals against any predictors *not* in the model. If these show a pattern, then the predictor may need to be added to the model (possibly in a nonlinear form).
+It is also necessary to plot the residuals against any predictors *not* in the model. If these show a pattern, then the predictor may need to be added to the model (possibly in a nonlinear form). 
+
+The residuals from the multiple regression model for forecasting US consumption plotted agaist each predictor in Figure \@ref(fig:resids) seem to be randomly scattered and therefore we would be satisfied with these in this case.
 
 ```{r resids, echo=TRUE, cache=TRUE, fig.cap="Scatterplots of residuals versus each predictor."}
 df <- as.data.frame(cbind(res=residuals(fit.consMR),Income=usts[,"Income"],Production=usts[,"Production"],Savings=usts[,"Savings"],Unemployment=usts[,"Unemployment"]))
@@ -452,10 +454,9 @@ Figure \@ref(fig:electrendseas) shows the residuals against the fitted values fr
 fit <- tslm(elec ~ trend + season) 
 df <- as.data.frame(cbind(fitd=fitted(fit), res=residuals(fit)))
 
-ggplot(df, aes(x=fitd, y=res,colour=as.factor(cycle(elec)))) +
+ggplot(df, aes(x=fitd, y=res)) +
   ylab("residuals")+xlab("fitted")+
-  geom_point()  +
-  scale_color_brewer(palette="Paired", name="Quarter")
+  geom_point()  
 ```
 
 
@@ -470,7 +471,7 @@ One source for an outlier occurring is an incorrect data entry. Simple descripti
 Outliers also occur when some observations are simply different. In this case it may not be wise for these observations to be removed. If an observation has been identified as a likely outlier it is important to study it and analyze the possible reasons behind it. The decision of removing or retaining such an observation can be a challenging one (especially when outliers are influential observations). It is wise to report results both with and without the removal of such observations.
 
 #### Example {-}
-Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US income on consumption (the example introduced in Section \@ref(Regr-Intro)). In the left panel the ourlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which is the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
+Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US consumption on income (the example introduced in Section \@ref(Regr-Intro)). In the left panel the ourlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which is the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
 
 
 ```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, cache=TRUE, message=FALSE,warning=FALSE}
@@ -483,14 +484,17 @@ fit2 <- lm(Consumption ~ Income, data=yx)
 p1 <- ggplot(yx, aes(x=Income, y=Consumption)) +
   ylab("% change in consumption")+xlab("% change in income")+
   geom_point()+ 
-  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")
+  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+ 
+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")+
+  geom_point(x=1,y=-4, shape = 1, size = 7,col="blue")
 
 yx[1,]<-c(-4,6)
 fit2 <- lm(Consumption ~ Income, data=yx) 
 p2 <- ggplot(yx, aes(x=Income, y=Consumption)) +
   ylab("% change in consumption")+xlab("% change in income")+
   geom_point()+ 
-  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")
+  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")+
+  geom_point(x=6,y=-4, shape = 1, size = 7,col="blue")
 
 gridExtra::grid.arrange(p1, p2, nrow=1)
 ```
@@ -507,9 +511,9 @@ If the predictions are close to the actual values, we would expect $R^2$ to be c
 
 In simple linear regression, the value of $R^2$ is also equal to the square of the correlation between $y$ and $x$.
 
-The $R^2$ value is commonly used, often incorrectly, in forecasting. There are no set rules of what a good $R^2$ value is and typical values of $R^2$ depend on the type of data used. Validating a model’s forecasting performance on the test data is much better than measuring the $R^2$ value on the training data.
+The $R^2$ value is commonly used, often incorrectly, in forecasting. $R^2$ will never decrease when adding an extra predictor to the model and this can lead to overfitting. There are no set rules of what a good $R^2$ value is and typical values of $R^2$ depend on the type of data used. Validating a model’s forecasting performance on the test data is much better than measuring the $R^2$ value on the training data. 
 
-Figure \@ref(fig:beerlm3) plots the actual monthly beer production versus the fitted values. The correlation between these variables is $r=`r round(cor(fit.beer$fitted.values,beer2)[1],2)`$ hence $R^2= `r round(cor(fit.beer$fitted.values,beer2)[1]^2,2)`$.  In this case model does an excellent job as it explains most of the variation in the beer production data.
+Figure \@ref(fig:beerlm3) plots the actual monthly beer production versus the fitted values. The correlation between these variables is $r=`r round(cor(fit.beer$fitted.values,beer2)[1],2)`$ hence $R^2= `r round(cor(fit.beer$fitted.values,beer2)[1]^2,2)`$.  In this case model does an excellent job as it explains most of the variation in the beer production data. `add here something about the R2 of the SR v MR if it the model selection works out`.
 
 ### Standard error of the regression {-}
 
@@ -543,132 +547,6 @@ library(gridExtra)
 grid.arrange(arrangeGrob(p1, p2),p3, ncol = 2)
 
 ```
-
-
-
-## Forecasting with regression {#Regr-ForeWithRegr}
-
-
-```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
-fcast <- forecast(fit) 
-autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
-```
-
-Forecasts obtained from the model are shown in Figure \@ref(fig:beerlm1).
-
-When the values of $x_1,\dots,x_k$ are new values (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
-
-
-Forecasts from a simple linear model are easily obtained using the equation
-$$
-  \hat{y}=\hat{\beta}_0+\hat{\beta}_1 x
-$$
-where $x$ is the value of the predictor for which we require a forecast. That is, if we input a value of $x$ in the equation we obtain a corresponding forecast $\hat{y}$. 
-
-When this calculation is done using an observed value of $x$ from the data, we call the resulting value of $\hat{y}$ a "fitted value". This is not a genuine forecast as the actual value of $y$ for that predictor value was used in estimating the model, and so the value of $\hat{y}$ is affected by the true value of $y$. When the values of $x$ is a new value (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
-
-Assuming that the regression errors are normally distributed, an approximate 95% **forecast interval** (also called a prediction interval) associated with this forecast is given by
-$$\label{eq-4-pi}
-  \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
-$$
-where $N$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is given by equation . Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28 in equation . Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation .
-
-Equation  shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is, we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
-
-
-
-### Scenario based forecasting {-}
-
-In this setting the forecaster assumes possible scenarios for the predictor variable that are of interest. For example the US policy maker may want to forecast consumption if there is a 1% growth in income for each of the quarters
-in 2011. Alternatively a 1% decline in income for each of the quarters may be
-of interest. The resulting forecasts are calculated and shown in Figure
-\@ref(fig:ConsInc4).
-
-```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US."}
-fcast <- forecast(fit.cons, newdata=data.frame(Income=c(-1,1))) 
-autoplot(fcast)
-```
-
-Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
-
-An alternative approach is to use genuine forecasts for the predictor variable. For example, a pure time series based approach can be used to generate forecasts for the predictor variable (more on this in Chapter \@ref(ch-dynamic)) or forecasts published by some other source such as a government agency can be used.
-
-### Ex-ante versus ex-post forecasts {-}
-
-When using regression models with time series data, we need to distinguish between two different types of forecasts that can be produced, depending on what is assumed to be known when the forecasts are computed.
-
-*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex ante forecasts of consumption for the four quarters in 2011 should only use information that was available *before*
-2011. These are the only genuine forecasts, made in advance using whatever information is available at the time.
-
-*Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption for each of the 2011 quarters may use the actual observations of income for each of these quarters, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
-
-The model from which ex-post forecasts are produced should not be estimated using data from the forecast period. That is, ex-post forecasts can assume knowledge of the predictor variable (the $x$ variable), but should not assume knowledge of the data that are to be forecast (the $y$ variable).
-
-A comparative evaluation of ex ante forecasts and ex post forecasts can help to separate out the sources of forecast uncertainty. This will show whether forecast errors have arisen due to poor forecasts of the predictor or due to a poor forecasting model.
-
-[Linear trend]\@ref(ex-4-LinTrend)
-
-A common feature of time series data is a trend. Using regression we can model and forecast the trend in time series data by including $t=1,\dots,T,$ as a predictor variable: 
-$$
-  y_t=\beta_0+\beta_1t+\varepsilon_t.
-$$
-Figure \@ref(fig-4-Tourism) shows a time series plot of aggregate tourist arrivals to Australia over the period 1980 to 2010 with the fitted linear trend line $\hat{y}_t= 0.3375+0.1761t$. Also plotted are the point and forecast intervals for the years 2011 to 2015.
-
-![Forecasting international tourist arrivals to Australia for the period
-2011-2015 using a linear trend. 80% and 95% forecast intervals are
-shown.](fig_4_Tourism)
-
-\@ref(fig-4-Tourism)
-
-fit.ex4 \<- tslm(austa   trend) f \<- forecast(fit.ex4, h=5,level=c(80,95))
-plot(f, ylab="International tourist arrivals to Australia (millions)",
-xlab="t") lines(fitted(fit.ex4),col="blue") summary(fit.ex4)
-
-Coefficients: Estimate Std. Error t value Pr(\>|t|) (Intercept) 0.337535
-0.100366 3.363 0.00218 \*\* trend 0.176075 0.005475 32.157 \< 2e-16
-\*\*\*
-
-
-
-
-### R$^2^$: the coefficient of determination {-}
-
-The $R^2^$ value was introduced in Section~\ref{sec-4-4-EvaluatingSLR}. It is
-the square of the correlation between the actual values and the predicted
-values. The following graph shows the actual values plotted against the fitted
-values for the credit score data.
-
-
-
-Recall that the value of $R^2$ can also be calculated as the proportion of
-variation in the forecast variable that is explained by the regression model:
-$$R^2 = \frac{\sum(\hat{y}_{i} - \bar{y})^2}{\sum(y_{i}-\bar{y})^2}$$ In this
-case, $R^2=0.47$, so about half of the variation in the scores can be predicted
-using the model.
-
-Thus, the model is not really sufficient to replace a more detailed approach to
-credit scoring, but it might be helpful in filtering out customers who will get
-a very low score. In the above graph it is evident that anyone with a predicted
-score below 35 has a true score not much more than 60. Consequently, if the
-bank wanted to identify high scoring customers quickly, using this model will
-provide a first filter, and more detailed information need only be collected on
-a subset of the customers.
-
-
-### Ex-post and ex ante forecasting
-
-As discussed in Section \@ref(sec-4-8-TimeSeries), ex ante forecasts are those
-that are made using only the information that is available in advance, while ex
-post forecasts are those that are made using later information on the
-predictors.
-
-Normally, we cannot use future values of the predictor variables when producing
-ex ante forecasts because their values will not be known in advance. However,
-the special predictors introduced in this section are all known in advance, as
-they are based on calendar variables (e.g., seasonal dummy variables or public
-holiday indicators) or deterministic functions of time. In such cases, there is
-no difference betweeen ex ante and ex post forecasts.
-
 
 
 
@@ -838,6 +716,132 @@ stepwise regression will not work and the starting model will need to use only
 a subset of potential predictors. In this case, an extra step needs to be
 inserted in which predictors are also added one at a time, with the model being
 retained if it improves the measure of predictive accuracy.
+
+
+## Forecasting with regression {#Regr-ForeWithRegr}
+
+
+```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
+fcast <- forecast(fit) 
+autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
+```
+
+Forecasts obtained from the model are shown in Figure \@ref(fig:beerlm1).
+
+When the values of $x_1,\dots,x_k$ are new values (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
+
+
+Forecasts from a simple linear model are easily obtained using the equation
+$$
+  \hat{y}=\hat{\beta}_0+\hat{\beta}_1 x
+$$
+where $x$ is the value of the predictor for which we require a forecast. That is, if we input a value of $x$ in the equation we obtain a corresponding forecast $\hat{y}$. 
+
+When this calculation is done using an observed value of $x$ from the data, we call the resulting value of $\hat{y}$ a "fitted value". This is not a genuine forecast as the actual value of $y$ for that predictor value was used in estimating the model, and so the value of $\hat{y}$ is affected by the true value of $y$. When the values of $x$ is a new value (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
+
+Assuming that the regression errors are normally distributed, an approximate 95% **forecast interval** (also called a prediction interval) associated with this forecast is given by
+$$\label{eq-4-pi}
+  \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
+$$
+where $N$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is given by equation . Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28 in equation . Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation .
+
+Equation  shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is, we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
+
+
+
+### Scenario based forecasting {-}
+
+In this setting the forecaster assumes possible scenarios for the predictor variable that are of interest. For example the US policy maker may want to forecast consumption if there is a 1% growth in income for each of the quarters
+in 2011. Alternatively a 1% decline in income for each of the quarters may be
+of interest. The resulting forecasts are calculated and shown in Figure
+\@ref(fig:ConsInc4).
+
+```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US."}
+fcast <- forecast(fit.cons, newdata=data.frame(Income=c(-1,1))) 
+autoplot(fcast)
+```
+
+Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
+
+An alternative approach is to use genuine forecasts for the predictor variable. For example, a pure time series based approach can be used to generate forecasts for the predictor variable (more on this in Chapter \@ref(ch-dynamic)) or forecasts published by some other source such as a government agency can be used.
+
+### Ex-ante versus ex-post forecasts {-}
+
+When using regression models with time series data, we need to distinguish between two different types of forecasts that can be produced, depending on what is assumed to be known when the forecasts are computed.
+
+*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex ante forecasts of consumption for the four quarters in 2011 should only use information that was available *before*
+2011. These are the only genuine forecasts, made in advance using whatever information is available at the time.
+
+*Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption for each of the 2011 quarters may use the actual observations of income for each of these quarters, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
+
+The model from which ex-post forecasts are produced should not be estimated using data from the forecast period. That is, ex-post forecasts can assume knowledge of the predictor variable (the $x$ variable), but should not assume knowledge of the data that are to be forecast (the $y$ variable).
+
+A comparative evaluation of ex ante forecasts and ex post forecasts can help to separate out the sources of forecast uncertainty. This will show whether forecast errors have arisen due to poor forecasts of the predictor or due to a poor forecasting model.
+
+[Linear trend]\@ref(ex-4-LinTrend)
+
+A common feature of time series data is a trend. Using regression we can model and forecast the trend in time series data by including $t=1,\dots,T,$ as a predictor variable: 
+$$
+  y_t=\beta_0+\beta_1t+\varepsilon_t.
+$$
+Figure \@ref(fig-4-Tourism) shows a time series plot of aggregate tourist arrivals to Australia over the period 1980 to 2010 with the fitted linear trend line $\hat{y}_t= 0.3375+0.1761t$. Also plotted are the point and forecast intervals for the years 2011 to 2015.
+
+![Forecasting international tourist arrivals to Australia for the period
+2011-2015 using a linear trend. 80% and 95% forecast intervals are
+shown.](fig_4_Tourism)
+
+\@ref(fig-4-Tourism)
+
+fit.ex4 \<- tslm(austa   trend) f \<- forecast(fit.ex4, h=5,level=c(80,95))
+plot(f, ylab="International tourist arrivals to Australia (millions)",
+xlab="t") lines(fitted(fit.ex4),col="blue") summary(fit.ex4)
+
+Coefficients: Estimate Std. Error t value Pr(\>|t|) (Intercept) 0.337535
+0.100366 3.363 0.00218 \*\* trend 0.176075 0.005475 32.157 \< 2e-16
+\*\*\*
+
+
+
+
+### R$^2^$: the coefficient of determination {-}
+
+The $R^2^$ value was introduced in Section~\ref{sec-4-4-EvaluatingSLR}. It is
+the square of the correlation between the actual values and the predicted
+values. The following graph shows the actual values plotted against the fitted
+values for the credit score data.
+
+
+
+Recall that the value of $R^2$ can also be calculated as the proportion of
+variation in the forecast variable that is explained by the regression model:
+$$R^2 = \frac{\sum(\hat{y}_{i} - \bar{y})^2}{\sum(y_{i}-\bar{y})^2}$$ In this
+case, $R^2=0.47$, so about half of the variation in the scores can be predicted
+using the model.
+
+Thus, the model is not really sufficient to replace a more detailed approach to
+credit scoring, but it might be helpful in filtering out customers who will get
+a very low score. In the above graph it is evident that anyone with a predicted
+score below 35 has a true score not much more than 60. Consequently, if the
+bank wanted to identify high scoring customers quickly, using this model will
+provide a first filter, and more detailed information need only be collected on
+a subset of the customers.
+
+
+### Ex-post and ex ante forecasting
+
+As discussed in Section \@ref(sec-4-8-TimeSeries), ex ante forecasts are those
+that are made using only the information that is available in advance, while ex
+post forecasts are those that are made using later information on the
+predictors.
+
+Normally, we cannot use future values of the predictor variables when producing
+ex ante forecasts because their values will not be known in advance. However,
+the special predictors introduced in this section are all known in advance, as
+they are based on calendar variables (e.g., seasonal dummy variables or public
+holiday indicators) or deterministic functions of time. In such cases, there is
+no difference betweeen ex ante and ex post forecasts.
+
+
 
 
 ## Matrix formulation {#sec-matrixequations}

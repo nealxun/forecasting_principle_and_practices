@@ -60,12 +60,12 @@ autoplot(usconsumption, ylab="% change", xlab="Year")+
 guides(colour=guide_legend(title=" "))
 
 setwd("C:/George/FPPLocalOnly")
-#usdata <- read.csv("usconsumption.csv")
+usdata <- read.csv("usconsumption.csv")
 
-#usts <- ts(usdata[-1],start = 1960,frequency = 4)
+usts <- ts(usdata[-1],start = 1960,frequency = 4)
 
-#autoplot(usts[,1:2], ylab="% change", xlab="Year")+
-#guides(colour=guide_legend(title=" "))
+autoplot(usts[,1:2], ylab="% change", xlab="Year")+
+guides(colour=guide_legend(title=" "))
 
 
 ```
@@ -111,18 +111,21 @@ where $y$ is the variable to be forecast and $x_{1},\dots,x_{k}$ are the $k$ pre
 
 #### Example: US consumption expenditure (revisited) {-}
 
-Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful for forecasting US consumption expenditure. These are quarterly percentage changes of industrial production and personal savings, and quarterly changes in the unemployment rate as this is already a percentage. Building a multiple linear regression model can potentially generate more accurate forecasts as we expect consumption expenditure does to not only depend on personal income but other predictors as well. 
+Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful for forecasting US consumption expenditure. These are quarterly percentage changes of industrial production and personal savings, and quarterly changes of the unemployment rate, as this is already a percentage. Building a multiple linear regression model can potentially generate more accurate forecasts as we expect consumption expenditure to not only depend on personal income but other predictors as well. 
 
 
-```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="Quarterly percentage changes of industrial production and personal savings and quarterly changes of the unemployment rate for the US."}
+```{r MultiPredictors, echo=TRUE, cache=TRUE, fig.cap="Quarterly percentage changes of industrial production and personal savings and quarterly changes of the unemployment rate for the US."}
 
 
 autoplot(usts[,3:5], ylab="", xlab="Year",facets = TRUE)+
 guides(colour=guide_legend(title=" "))
 ```
 
-The 
-```{r MultiPredictors, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
+Figure \@ref(fig:ScatterMatrix) provides a matrix of scatterplots between all the variables under consideration. 
+
+The first column of Figure \@ref(fig:ScatterMatrix) shows the relationships between consumption expenditure and each predictor. The fitted regression lines show positive raltionships with income and industrial production and negative relationships with unemployment and savings. The strength of these relationships are shown by the correlation coefficients across the first row.
+
+```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
 
 require(GGally)
 df<-as.data.frame(usts)
@@ -130,7 +133,7 @@ df<-as.data.frame(usts)
 my_fn <- function(data, mapping, ...){
   p <- ggplot(data = df, mapping = mapping) + 
     geom_point() + 
-    geom_smooth(method=lm)
+    geom_smooth(method=lm, se=FALSE)
   p
 }
 
@@ -139,8 +142,13 @@ g
 
 ```
 
+The multiple linear regression model we will try to fit will be 
+$$
+y_t=\beta_0 + \beta_1 x_{1,t}+ \beta_2 x_{2,t}+ \beta_3 x_{3,t}+ \beta_4 x_{4,t}+\varepsilon_t
+$$
+where 
 
-
+$y_t$ is etc etc.
 
 
 
@@ -159,6 +167,67 @@ Second, we make the following assumptions about the errors $(\varepsilon_{1},\do
 It is also useful to have the errors normally distributed with constant variance in order to easily produce prediction intervals.
 
 Another important assumption in the linear regression model is that each $x$ is not a random variable. If we were performing a controlled experiment in a laboratory, we could control the values of each $x$ (so they would not be random) and observe the resulting values of $y$. With observational data (including most data in business and economics) it is not possible to control the value of $x$, and hence we make this an assumption.
+
+
+
+## Least squares estimation {#Regr-LSprinciple}
+
+In practice, of course, we have a collection of observations but we do not know the values of the coefficients $\beta_0,\beta_1, \dots, \beta_k$. These need to be estimated from the data.
+
+The least squares principle provides a way of choosing the coefficients effectively by minimizing the sum of the squared errors. That is, we choose the values of $\beta_0, \beta_1, \dots, \beta_k$ that minimize
+$$
+  \sum_{t=1}^T \varepsilon_t^2 = \sum_{t=1}^T (y_t - 
+  \beta_{0} - \beta_{1} x_{1,t} - \beta_{2} x_{2,t} - \cdots - \beta_{k} x_{k,t})^2.
+$$
+
+This is called "least squares" estimation because it gives the least value for the sum of squared errors.  Finding the best estimates of the coefficients is often called "fitting" the model to the data, or sometimes "learning" or "training" the model. The line shown in Figure \@ref(fig:ConsInc2) was obtained in this way. 
+
+When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section \@ref(sec-matrixequations).
+
+Predictions of $y_t$ can be obtained by ignoring the error in the regression equation and using the estimated coefficients. That is for each set of values for the predictors $x_1,\dots,x_k$ we can forecast a corresponding value of $y$ using 
+\begin{equation}
+  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}.
+  (\#eq:prediction)
+\end{equation}
+
+#### Example: US consumption expenditure revisited {-}
+
+The following is estimation output from the fitting the multiple linear regression model for forecasting US consumption expenditure. The first column gives the estimates of each $\beta$ coefficient and the second column gives its standard error (i.e., the standard deviation which would be obtained from repeatedly estimating the $\beta$ coefficients on similar data sets). The standard error gives a measure of the uncertainty in the estimated $\beta$ coefficient.
+
+For forecasting purposes, the final two columns are of limited interest. The "t value" is the ratio of a $\beta$ coefficient to its standard error and the last column gives the p-value: the probability of the estimated $\beta$ coefficient being as large as it is if there was no real relationship between the credit score and the predictor. This is useful when studying the effect of each predictor, but is not particularly useful when forecasting.
+
+```{r, cache=TRUE,echo=TRUE, include=TRUE}
+fit.consMR <- tslm(consumption ~ income+production+unempl+savings, data=usts)
+summary(fit.consMR)
+```
+
+
+
+### Fitted values {-}
+
+Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the right hand side of equation \@ref(eq:prediction) returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. The following plots show the actual values compared to the predicted (i.e., fitted) values for the percentage change in US consumption expenditure data. 
+
+
+```{r usfitted1, echo=TRUE, cache=TRUE, fig.cap="Time plot of US consumtpion expenditure and predicted expenditure."}
+df <- cbind(Data=usts[,"consumption"], Fitted=fitted(fit.consMR))
+autoplot(df[,1:2]) + xlab("Year") + ylab("") +
+  ggtitle("Percentage change in US consumption expenditure")+
+  guides(colour=guide_legend(title=" "))
+```
+
+```{r usfitted2, echo=TRUE, cache=TRUE, fig.cap="Actual US consumtpion expenditure plotted against predicted US consumtpion expenditure."}
+df <- as.data.frame(df)
+ggplot(df,aes(x=Data, y=Fitted)) + 
+  geom_point() +
+  xlab("Fitted") + ylab("Actual values") + 
+  ggtitle("Percentage change in US consumption expenditure") +
+  scale_color_brewer(palette="Dark2", name="Quarter")
+```
+
+
+
+
+
 
 ## Some useful predictors {#Regr-UsefulPredictors}
 
@@ -260,27 +329,6 @@ takes value 1 in April, and when it starts in March and finishes in April, the d
 
 `easter(ausbeer)`
 
-## Least squares estimation {#Regr-LSprinciple}
-
-In practice, of course, we have a collection of observations but we do not know the values of the coefficients $\beta_0,\beta_1, \dots, \beta_k$. These need to be estimated from the data.
-
-The least squares principle provides a way of choosing the coefficients effectively by minimizing the sum of the squared errors. That is, we choose the values of $\beta_0, \beta_1, \dots, \beta_k$ that minimize
-$$
-  \sum_{t=1}^T \varepsilon_t^2 = \sum_{t=1}^T (y_t - 
-  \beta_{0} - \beta_{1} x_{1,t} - \beta_{2} x_{2,t} - \cdots - \beta_{k} x_{k,t})^2.
-$$
-
-This is called "least squares" estimation because it gives the least value for the sum of squared errors.  Finding the best estimates of the coefficients is often called "fitting" the model to the data, or sometimes "learning" or "training" the model. The line shown in Figure \@ref(fig:ConsInc2) was obtained in this way. 
-
-When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section \@ref(sec-matrixequations).
-
-Predictions of $y_t$ can be obtained by ignoring the error in the regression equation and using the estimated coefficients. That is for each set of values for the predictors $x_1,\dots,x_k$ we can forecast a corresponding value of $y$ using 
-\begin{equation}
-  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}.
-  (\#eq:prediction)
-\end{equation}
-
-
 #### Example: Australian quarterly beer production {-}
 
 Recall the Australian quarterly beer production data shown below in Figure \@ref(fig:beeragain).
@@ -303,9 +351,6 @@ summary(fit.beer)
 
 There is a strong downward trend of `r round(fit.beer$coef['trend'], 3)` megalitres per quarter. On average, the second quarter has production of `r -round(fit.beer$coef['season2'], 1)` megalitres lower than the first quarter, the third quarter has production of `r -round(fit.beer$coef['season3'], 1)` megalitres lower than the first quarter, and the fourth quarter has production `r round(fit.beer$coef['season4'], 1)` megalitres higher than the first quarter.
 
-### Fitted values {-}
-
-Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the right hand side of equation \@ref(eq:prediction) returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. The following plots show the actual values compared to the predicted (i.e., fitted) values for the Australian beer data. `maybe comment on these`
 
 ```{r beerlm2, echo=TRUE, cache=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
 df <- cbind(Data=beer2, Fitted=fitted(fit.beer))
@@ -322,7 +367,6 @@ ggplot(df,aes(x=Data, y=Fitted, colour=as.factor(cycle(beer2)))) +
   ggtitle("Quarterly beer production") +
   scale_color_brewer(palette="Dark2", name="Quarter")
 ```
-
 
 ## Evaluating the regression model {#Regr-EvaluatingSLR}
 
@@ -363,7 +407,7 @@ The remaining residuals show that the model has captured the patterns in the dat
 Another test of autocorrelation that is designed to take account of the regression model is the **Durbin-Watson** test. It is used to test the hypothesis that there is no first order autocorrelation in the residuals.  A small p-value indicates there is significant autocorrelation remaining in the residuals. For the beer model, the Durbin-Watson test reveals some significant lag one autocorrelation.
 
 ```{r dwtestbeer, echo=TRUE, cache=TRUE}
-dwtest(fit.beer, alt="two.sided") 
+lmtest::dwtest(fit.beer, alt="two.sided") 
 #It is recommended that the two-sided test always be used 
 #to check for negative as well as positive autocorrelation
 ```
@@ -374,7 +418,7 @@ A third possible test is the **Breusch-Godfrey** test designed to look for signi
 
 ```{r bgtestbeer, echo=TRUE, cache=TRUE}
 #Test for autocorrelations up to lag 5. 
-bgtest(fit.beer,5)
+lmtest::bgtest(fit.beer,5)
 ```
 
 ### Histogram of residuals {-}

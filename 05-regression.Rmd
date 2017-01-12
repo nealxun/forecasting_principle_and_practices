@@ -59,7 +59,7 @@ Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (gro
 #autoplot(usconsumption, ylab="% change", xlab="Year")+
 #guides(colour=guide_legend(title=" "))
 
-setwd("C:/George/FPPLocalOnly")
+#setwd("C:/George/FPPLocalOnly")
 usdata <- read.csv("usconsumption.csv")
 
 usts <- ts(usdata[-1],start = 1960,frequency = 4)
@@ -125,7 +125,6 @@ The first column of Figure \@ref(fig:ScatterMatrix) shows the relationships betw
 
 ```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
 
-require(GGally)
 df<-as.data.frame(usts)
 
 my_fn <- function(data, mapping, ...){
@@ -135,7 +134,7 @@ my_fn <- function(data, mapping, ...){
   p
 }
 
-ggpairs(df, lower = list(continuous = my_fn))
+GGally::ggpairs(df, lower = list(continuous = my_fn))
 
 ```
 
@@ -192,6 +191,7 @@ For forecasting purposes, the final two columns are of limited interest. The "t 
 ```{r, cache=TRUE,echo=TRUE, include=TRUE}
 fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings, data=usts)
 summary(fit.consMR)
+checkresiduals(fit.consMR)
 ```
 
 
@@ -422,6 +422,8 @@ It is always a good idea to check if the residuals are normally distributed. As 
 checkresiduals(tslm(beer2 ~ trend + season))
 ```
 
+
+
 ### Residual plots against predictors {-}
 
 We would expect the residuals to be randomly scattered without showing any systematic patterns. A simple and quick way for a first check is to examine a scatterplot of the residuals against each of the predictor variables.
@@ -543,8 +545,7 @@ df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,AustralianPassengers=a
 p1 <- autoplot(ausair) + xlab("Year") + ylab("Air Passengers in Australia")
 p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")
 p3<-ggplot(df,aes(x=GuineaRiceProduction, y=AustralianPassengers)) + geom_point() + ylab("Air Passengers in Australia (millions)")+ xlab("Rice Production in Guinea (million tons)")
-library(gridExtra)
-grid.arrange(arrangeGrob(p1, p2),p3, ncol = 2)
+gridExtra::grid.arrange(arrangeGrob(p1, p2),p3, ncol = 2)
 
 ```
 

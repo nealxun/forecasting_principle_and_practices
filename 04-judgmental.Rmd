@@ -224,7 +224,7 @@ colnames(tfcvn) <- c("Observed data",
 autoplot(tfcvn) + xlab("Year") + 
   ylab("Total visitor nights (thousands)") +
   scale_color_manual(name="",
-    values=c("#000000","#1b9e77","#d95f02","#7570b3"),
+    values=c("#000000","#E69F00", "#56B4E9", "#CC79A7"),
     breaks=colnames(tfcvn))
 ```
 

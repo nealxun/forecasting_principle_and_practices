@@ -188,13 +188,14 @@ Alternatively, the stochastic trend model can be estimated.
 
 ```{r austaparams2, cache=FALSE, echo=FALSE}
 drift <- coef(fit2)['drift']
+theta1 <- coef(fit2)['ma1']
 sigma2 <- fit2$sigma2
 ```
 
 This model can be written as $y_t-y_{t-1} = 0.15 + e_t$, or equivalently
 \begin{align*}
   y_t &= `r format(drift, digits=2)` t + n_t \\
-  n_t &= n_{t-1} + e_{t}\\
+  n_t &= n_{t-1} + `r format(theta1,digits=2, nsmall=2)` e_{t-1} + e_{t}\\
   e_t &\sim \text{NID}(0,`r format(sigma2, digits=3)`).
 \end{align*}
 
@@ -208,7 +209,7 @@ autoplot(austa) +
   geom_forecast(fc2, series="Stochastic trend") +
   geom_forecast(fc1, series="Deterministic trend") +
   ggtitle("Forecasts from deterministic and stochastic trend models") +
-  xlab("Year") +
+  xlab("Year") + ylab("Visitors to Australia (millions)") +
   guides(colour=guide_legend(title="Forecast")) + fppcols()
 ```
 
@@ -301,6 +302,64 @@ autoplot(fc8) + ylab("Quotes") +
  -->
 
 ## Exercises
+
+
+1.  Consider monthly sales and advertising data for an automotive parts company (data set `advert`).
+    a. Fit a standard regression model $y_t = a + b x_t + n_t$ where $y_t$ denotes sales and $x_t$ denotes advertising using the `lm()` function.
+    b. Show that the residuals have significant autocorrelation.
+    c. What difference does it make you use the \verb|Arima| function instead:
+
+        ```r
+        Arima(advert[,'sales'], xreg=advert[,'advert'], order=c(0,0,0))
+        ```
+    d. Refit the model using `auto.arima()`. How much difference does the error model make to the estimated parameters? What ARIMA model for the errors is selected?
+    e. Check the residuals of the fitted model.
+    f. Assuming the advertising budget for the next six months is exactly 80 units per month, produce sales forecasts with prediction intervals for the next six months.
+
+2.  This exercise uses data set `huron` giving the level of Lake Huron from 1875--1972.
+    a. Fit a piecewise linear trend model to the Lake Huron data with a knot at 1920 and an ARMA error structure. 
+    b. Forecast the level for the next 30 years. 
+
+3. This exercise concerns `motel`: the total monthly takings from accommodation and the total room nights occupied at hotels, motels, and guest houses in Victoria, Australia, between January 1980 and June 1995. Total monthly takings are in thousands of Australian dollars; total room nights occupied are in thousands.
+    a. Use the data to calculate the average cost of a night's accommodation in Victoria each month.
+    b. Estimate the monthly CPI.
+    c. Produce time series plots of both variables and explain why logarithms of both variables need to be taken before fitting any models.
+    d. Fit an appropriate regression model with ARIMA errors. Explain your reasoning in arriving at the final model.
+    e. Forecast the average price per room for the next twelve months using your fitted model. (Hint: You will need to produce forecasts of the CPI figures first.)
+
+4. Electricity consumption is often modeled as a function of temperature. Temperature is measured by daily heating degrees  and cooling degrees. Heating degrees is $18^\circ$C minus the average daily temperature when the daily average is below $18^\circ$C; otherwise it is zero.  This provides a measure of our need to heat ourselves as temperature falls.  Cooling degrees measures our need to cool ourselves as the temperature rises.  It is defined as the average daily temperature minus $18^\circ$C when the daily average is above $18^\circ$C; otherwise it is zero.  Let $y_t$ denote the monthly total of kilowatt-hours of electricity used, let $x_{1,t}$ denote the monthly total of heating degrees, and let $x_{2,t}$ denote the monthly total of cooling degrees.
+
+An analyst fits the following model to a set of such data:
+$$y^*_t = b_1x^*_{1,t} + b_2x^*_{2,t} + n_t,$$
+where
+$$
+(1-B)(1-B^{12})n_t = \frac{1-\theta_1 B}{1-\phi_{12}B^{12} - \phi_{24}B^{24}}e_t$$
+and $y^*_t = \log(Y_t)$, $x^*_{1,t} = \sqrt{x_{1,t}}$ and $x^*_{2,t}=\sqrt{x_{2,t}}$.
+
+  a. What sort of ARIMA model is identified for $N_t$?
+  b. The estimated coefficients are
+
+  |Year              | 1964| 1965| 1966| 1967| 1968|
+  |:-----------------|----:|----:|----:|----:|----:|
+  |Millions of tons  | 467 | 512 | 534 | 552 | 545 |
+
+  | Parameter | Estimate | s.e. | $Z$ | $P$-value |
+  |:----------|:--------:|:--------:|:--------:|:--------:|
+  | $b_1$ & 0.0077 & 0.0015 & 4.98 & 0.000\\
+  | $b_2$ & 0.0208 & 0.0023 & 9.23 & 0.000 \\
+  | $\theta_1$ & 0.5830 & 0.0720 & 8.10 & 0.000 \\
+  | $\phi_{12}$ & $-0.5373$ & 0.0856 & -6.27 &0.000 \\
+  | $\phi_{24}$ & $-0.4667$ & 0.0862 & -5.41 & 0.000 \\
+
+  Explain what the estimates of $b_1$ and $b_2$ tell us about electricity consumption.
+
+  c. Write the equation in a form more suitable for forecasting.
+  d. Describe how this model could be used to forecast electricity demand for the next 12 months.
+  e. Explain why the $N_t$ term should be modeled with an ARIMA model rather than modeling the data using a standard regression package.  In your discussion, comment on the properties of the estimates, the validity of the standard regression results, and the importance of the $N_t$ model in producing forecasts.
+
+
+
+
 
 ## Further reading
 

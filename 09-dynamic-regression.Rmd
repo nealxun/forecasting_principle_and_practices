@@ -68,13 +68,13 @@ Figure \@ref(fig:usconsump) shows the quarterly changes in personal consumption 
 
 
 ```{r usconsump, fig.cap="Percentage changes in quarterly personal consumption expenditure and personal disposable income for the USA, 1970 to 2010.", cache=FALSE}
-autoplot(usconsumption, facets=TRUE) +
+autoplot(uschange[,1:2], facets=TRUE) +
   xlab("Year") + ylab("") +
   ggtitle("Quarterly changes in US consumption and personal income")
 ```
 
 ```{r usconsump2, fig.cap="Residuals ($e_t$) obtained from a regression of change in consumption expenditure on change in disposable income, assuming an ARIMA(1,0,2) error model.", cache=FALSE}
-(fit <- auto.arima(usconsumption[,"consumption"], xreg=usconsumption[,"income"]))
+(fit <- auto.arima(uschange[,"Consumption"], xreg=uschange[,"Income"]))
 ```
 
 ```{r usconsumpparam, echo=FALSE, cache=FALSE}
@@ -82,7 +82,7 @@ phi1 <- coef(fit)['ar1']
 theta1 <- coef(fit)['ma1']
 theta2 <- coef(fit)['ma2']
 intercept <- coef(fit)['intercept']
-slope <- coef(fit)['usconsumption[, "income"]']
+slope <- coef(fit)['uschange[, "Income"]']
 sigma2 <- fit$sigma2
 ```
 
@@ -117,7 +117,7 @@ To forecast a regression model with ARIMA errors, we need to forecast the regres
 To continue the previous example, we will calculate forecasts for the next eight quarters assuming that the future percentage changes in personal disposable income will be equal to the mean percentage change from the last forty years.
 
 ```{r usconsump3, fig.cap="Forecasts obtained from regressing the percentage change in consumption expenditure on the percentage change in disposable income, with an ARIMA(1,0,2) error model.", cache=FALSE}
-fcast <- forecast(fit, xreg=rep(mean(usconsumption[,2]),8))
+fcast <- forecast(fit, xreg=rep(mean(uschange[,2]),8))
 autoplot(fcast) + xlab("Year") +
   ylab("Percentage change")
 ```

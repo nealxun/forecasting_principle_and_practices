@@ -88,9 +88,9 @@ library(vars)
 ```
 
 ```{r, cache=TRUE}
-VARselect(usconsumption, lag.max=8, type="const")[["selection"]]
+VARselect(uschange[,1:2], lag.max=8, type="const")[["selection"]]
 
-var <- VAR(usconsumption, p=3, type="const")
+var <- VAR(uschange[,1:2], p=3, type="const")
 serial.test(var, lags.pt=10, type="PT.asymptotic")
 
 summary(var)

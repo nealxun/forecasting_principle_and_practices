@@ -10,7 +10,6 @@ The forecast variable ($y$) is sometimes also called the regressand, dependent o
 
 ### Simple linear regression {-}
 
-In the simplest case there is only one predictor variable, and it is related to the forecast variable by the simple linear model 
 $$
   y_t = \beta_0 + \beta_1 x_t + \varepsilon_t.
 $$
@@ -56,23 +55,15 @@ Notice that the observations do not lie on the straight line but are scattered a
 Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US from 1960Q1 to 2016Q3.
   
 ```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US."}
-#autoplot(usconsumption, ylab="% change", xlab="Year")+
-#guides(colour=guide_legend(title=" "))
 
-#setwd("C:/George/FPPLocalOnly")
-usdata <- read.csv("usconsumption.csv")
-
-usts <- ts(usdata[-1],start = 1960,frequency = 4)
-
-autoplot(usts[,1:2], ylab="% change", xlab="Year")+
+autoplot(uschange[,1:2], ylab="% change", xlab="Year")+
 guides(colour=guide_legend(title=" "))
 
 
 ```
 
 ```{r, cache=TRUE, include=FALSE}
-#fit.cons <- tslm(consumption ~ income, data=usconsumption)
-fit.cons <- tslm(Consumption ~ Income, data=usts) 
+fit.cons <- tslm(Consumption ~ Income, data=uschange) 
 ```
 
 A scatter plot of consumption against income is shown in Figure \@ref(fig:ConsInc2) along with the estimated regression line
@@ -81,13 +72,13 @@ $$
 $$
 We will show how this line is estimated in Section \@ref(Regr-LSprinciple). The fitted line is positively sloped showing a positive relationship between income and consumption. 
 
-The interpretation of the intercept requires that a value of $x=0$ makes sense. In this case when $x=0$ (when there is no change in personal disposable income since the last quarter) the predicted value of $y$ is `r round(coef(fit.cons)[1], 2)` (there is a predicted increase in personal consumption expenditure of `r round(coef(fit.cons)[1], 2)`%). Even when $x=0$ does not make sense, the intercept is an important part of the model. Without it, the slope coefficient can be distorted unnecessarily. The intercept should always be included unless the requirement is to force the regression line through the origin (for a discussion see REFERENCE). In all that follows we assume that an intercept is always included in the model.
+The interpretation of the intercept requires that a value of $x=0$ makes sense. In this case when $x=0$ (when there is no change in personal disposable income since the last quarter) the predicted value of $y$ is `r round(coef(fit.cons)[1], 2)` (there is a predicted increase in personal consumption expenditure of `r round(coef(fit.cons)[1], 2)`%). Even when $x=0$ does not make sense, the intercept is an important part of the model. Without it, the slope coefficient can be distorted unnecessarily. The intercept should always be included unless the requirement is to force the regression line "through the origin". In what follows we assume that an intercept is always included in the model for all our statements to hold true.
 
 The slope coefficient shows that a one unit increase in $x$ (a 1% increase in personal disposable income) results on average in `r round(coef(fit.cons)[2], 2)` units increase in $y$ (an average `r round(coef(fit.cons)[2], 2)`% increase in personal consumption expenditure). Alternatively the estimated equation shows that a value of 1 for $x$ (the percentage increase in personal disposable income) will result in a forecast value of `r round(coef(fit.cons)[1], 2)` + `r  round(coef(fit.cons)[2], 2)`$\times1$ = 0.83 for $y$ (the percentage increase in personal consumption expenditure).
 
 
 ```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
-ggplot(as.data.frame(usts), aes(x=Income, y=Consumption)) +
+ggplot(as.data.frame(uschange), aes(x=Income, y=Consumption)) +
   ylab("Consumption (quarterly % change)")+xlab("Income (quarterly % change)")+
   geom_point() + geom_smooth(method="lm", se=FALSE)
 ```
@@ -95,7 +86,7 @@ ggplot(as.data.frame(usts), aes(x=Income, y=Consumption)) +
 The estimation results are shown below.
 
 ```{r ConsInc3, echo=TRUE, cache=TRUE}
-fit.cons <- tslm(Consumption ~ Income, data=usts) 
+fit.cons <- tslm(Consumption ~ Income, data=uschange) 
 summary(fit.cons)
 ```
 
@@ -117,15 +108,15 @@ Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful
 
 ```{r MultiPredictors, echo=FALSE, fig.cap="Quarterly percentage changes in industrial production and personal savings and quarterly changes in the unemployment rate for the US over the period 1960Q1 to 2016Q3.", cache=TRUE}
 
-autoplot(usts[,3:5], ylab="", xlab="Year",facets = TRUE)+
-guides(colour=guide_legend(title=" "))
+autoplot(uschange[,3:5], ylab="", xlab="Year",facets = TRUE,colour=TRUE)+
+guides(colour=guide_legend(title=" "))+guides(colour="none")
 ```
 
 The first column of Figure \@ref(fig:ScatterMatrix) shows the relationships between consumption expenditure and each of the predictors. The fitted regression lines show positive relationships between consumption and each income and industrial production and negative relationships with each savings and unemployment. The strength of these relationships are shown by the correlation coefficients across the first row.
 
 ```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
 
-df<-as.data.frame(usts)
+df<-as.data.frame(uschange)
 
 my_fn <- function(data, mapping, ...){
   p <- ggplot(data = df, mapping = mapping) + 
@@ -188,13 +179,10 @@ The following is estimation output from fitting the multiple linear regression m
 
 For forecasting purposes, the final two columns are of limited interest. The "t value" is the ratio of an estimated $\beta$ coefficient to its standard error and the last column gives the p-value: the probability of the estimated $\beta$ coefficient being as large as it is if there was no real relationship between the credit score and the predictor. This is useful when studying the effect of each predictor, but is not particularly useful when forecasting.
 
-```{r, cache=TRUE,echo=TRUE, include=TRUE}
-fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings, data=usts)
+```{r usestim, echo=TRUE, fig.cap="Multiple regression output from least squares estimation.", cache=TRUE}
+fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings, data=uschange)
 summary(fit.consMR)
-checkresiduals(fit.consMR)
 ```
-
-
 
 ### Fitted values {-}
 
@@ -202,7 +190,7 @@ Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the r
 
 
 ```{r usfitted1, echo=TRUE, cache=TRUE, fig.cap="Time plot of US consumtpion expenditure and predicted expenditure."}
-df <- cbind(Data=usts[,"Consumption"], Fitted=fitted(fit.consMR))
+df <- cbind(Data=uschange[,"Consumption"], Fitted=fitted(fit.consMR))
 autoplot(df[,1:2]) + xlab("Year") + ylab("") +
   ggtitle("Percentage change in US consumption expenditure")+
   guides(colour=guide_legend(title=" "))
@@ -416,26 +404,24 @@ lmtest::bgtest(fit.beer,5)
 
 ### Histogram of residuals {-}
 
-It is always a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier. Using the `checkresiduals` function introduced in Section \@ref(toolbox-resids) we can obtain a histogram of the residuals as well  as the other useful residual diagnostics metnioned above. The histogram in Figure \@ref(fig:beerresidcheck) below shows, that the residuals from modelling the beer data seem to be slightly negatively skewed, although that is partly due to the outlier.
+It is always a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier. Using the `checkresiduals` function introduced in Section \@ref(toolbox-resids) we can obtain a histogram of the residuals as well as the other useful residual diagnostics mentioned above. The histogram in Figure \@ref(fig:beerresidcheck) below shows, that the residuals from modelling the beer data seem to be slightly negatively skewed, although that is partly due to the outlier. 
 
 ```{r beerresidcheck, echo=TRUE, cache=TRUE, fig.cap="Analysing the residuals from a regression model for beer production.", message=FALSE, warning=FALSE}
-checkresiduals(tslm(beer2 ~ trend + season))
+checkresiduals(fit.beer)
 ```
-
-
 
 ### Residual plots against predictors {-}
 
 We would expect the residuals to be randomly scattered without showing any systematic patterns. A simple and quick way for a first check is to examine a scatterplot of the residuals against each of the predictor variables.
 
-If these scatterplots show a pattern, then the relationship may be nonlinear and the model will need to be modified accordingly. See Section \@ref(sec-5-6-NonLinear) for a discussion of nonlinear regression.
+If these scatterplots show a pattern, then the relationship may be nonlinear and the model will need to be modified accordingly. See Section \@ref(Regr-NonLinear) for a discussion of nonlinear regression.
 
 It is also necessary to plot the residuals against any predictors *not* in the model. If these show a pattern, then the predictor may need to be added to the model (possibly in a nonlinear form). 
 
 The residuals from the multiple regression model for forecasting US consumption plotted agaist each predictor in Figure \@ref(fig:resids) seem to be randomly scattered and therefore we would be satisfied with these in this case.
 
 ```{r resids, echo=TRUE, cache=TRUE, fig.cap="Scatterplots of residuals versus each predictor."}
-df <- as.data.frame(cbind(res=residuals(fit.consMR),Income=usts[,"Income"],Production=usts[,"Production"],Savings=usts[,"Savings"],Unemployment=usts[,"Unemployment"]))
+df <- as.data.frame(cbind(res=residuals(fit.consMR),Income=uschange[,"Income"],Production=uschange[,"Production"],Savings=uschange[,"Savings"],Unemployment=uschange[,"Unemployment"]))
 p1 <- ggplot(df, aes(x=Income, y=res)) + geom_point() + ylab("Residuals")
 p2 <- ggplot(df, aes(x=Production, y=res)) + geom_point() + ylab("Residuals")
 p3 <- ggplot(df, aes(x=Savings, y=res)) + geom_point() + ylab("Residuals")
@@ -478,7 +464,7 @@ Figure \@ref(fig:outlier) highlights the effect of a single outlier when regress
 
 ```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, cache=TRUE, message=FALSE,warning=FALSE}
 
-yx <- as.data.frame(usts[,1:2])
+yx <- as.data.frame(uschange[,1:2])
 fit1 <- lm(Consumption ~ Income, data=yx) 
 
 yx[1,]<-c(-4,1)
@@ -526,7 +512,7 @@ $$
 
 Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation.
 
-The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. In Figure \@ref(fig-4-car), $s_e$ is part of the R output labeled  `Residual standard error`" and takes the value 0.4703 tonnes per year.
+The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. In Section \@ref(Regr-LSprinciple) $s_e$ is part of the R estimation output labeled  `Residual standard error`" and takes the value `r round(summary(fit.consMR)$sigma,2)`%.
 
 We should warn here that the evaluation of the standard error can be highly subjective as it is scale dependent. The main reason we introduce it here is that it is required when generating forecast intervals, discussed in Section \@ref(sec-4-5-ForeWithRegr).
 
@@ -534,54 +520,48 @@ We should warn here that the evaluation of the standard error can be highly subj
 
 More often than not, time series data are "non-stationary"; that is, the values of the time series do not fluctuate around a constant mean or with a constant variance. We will deal with time series stationarity in more detail in Chapter \@ref(ch-arima), but here we need to address the effect non-stationary data can have on regression models.
 
-For example consider the two variables plotted in Figure \@ref(fig:spurious). These appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea. 
+For example consider the two variables plotted below in Figure \@ref(fig:spurious). These appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea. 
 
-Regressing non-stationary time series can lead to spurious regressions. High $R^2$s and high residual autocorrelation can be signs of spurious regression. We discuss the issues surrounding non-stationary data and spurious regressions in detail in Chapter \@ref(ch-dynamic).
+
+
+```{r spurious, echo=FALSE, fig.height=5, warning=FALSE, fig.cap="Trending time series data can appear to be related as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE, cache=TRUE}
+aussies=window(ausair,end=2011)
+df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,aussies))
+p1 <- autoplot(aussies) + xlab("Year") + ylab("Air Passengers in Australia")
+p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")
+p3<-ggplot(df,aes(x=GuineaRiceProduction, y=aussies)) + geom_point() + ylab("Air Passengers in Australia (millions)")+ xlab("Rice Production in Guinea (million tons)")
+gridExtra::grid.arrange(gridExtra::arrangeGrob(p1, p2),p3, ncol = 2)
+```
+Regressing non-stationary time series can lead to spurious regressions. The output of regressing Australian air passengers on rice production in Guinea is shown below. High $R^2$s and high residual autocorrelation can be signs of spurious regression. We discuss the issues surrounding non-stationary data and spurious regressions in detail in Chapter \@ref(ch-dynamic).
 
 Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
 
-```{r spurious, fig.height=5,echo=TRUE, cache=TRUE, fig.cap="Trending time series data can appear to be related, as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE,warning=FALSE}
-df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,AustralianPassengers=ausair))
-p1 <- autoplot(ausair) + xlab("Year") + ylab("Air Passengers in Australia")
-p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")
-p3<-ggplot(df,aes(x=GuineaRiceProduction, y=AustralianPassengers)) + geom_point() + ylab("Air Passengers in Australia (millions)")+ xlab("Rice Production in Guinea (million tons)")
-gridExtra::grid.arrange(arrangeGrob(p1, p2),p3, ncol = 2)
 
+```{r, fig.cap="Residuals from a spurious regression.", echo=TRUE}
+fit<-tslm(aussies ~ guinearice)
+summary(fit)
+checkresiduals(fit)
 ```
 
-
-
-## Selecting predictors {#sec-5-3-SelectingPredictors}
-
+## Selecting predictors {#Regr-SelectingPredictors}
 
 When there are many possible predictors, we need some strategy to select the
 best predictors to use in a regression model.
 
 A common approach that is *not recommended* is to plot the forecast variable
-against a particular predictor and if it shows no noticeable relationship, drop
-it. This is invalid because it is not always possible to see the relationship
-from a scatterplot, especially when the effect of other predictors has not been
-accounted for.
+against a particular predictor and if it shows no noticeable relationship, drop it. This is invalid because it is not always possible to see the relationship from a scatterplot, especially when the effect of other predictors has not been accounted for.
 
 Another common approach which is also invalid is to do a multiple linear
-regression on all the predictors and disregard all variables whose $p$-values
-are greater than 0.05. To start with, statistical significance does not always
-indicate predictive value. Even if forecasting is not the goal, this is not a
-good strategy because the $p$-values can be misleading when two or more
-predictors are correlated with each other (see Section
-\@ref(sec-5-8-MultiCol)).
+regression on all the predictors and disregard all variables whose $p$-values are greater than 0.05. To start with, statistical significance does not always indicate predictive value. Even if forecasting is not the goal, this is not a good strategy because the $p$-values can be misleading when two or more predictors are correlated with each other (see Section
+\@ref(Regr-MultiCol)).
 
-Instead, we will use a measure of predictive accuracy. Five such measures are
-introduced in this section.
+Instead, we will use a measure of predictive accuracy. Five such measures are introduced in this section.
 
-### Adjusted R {-}$^2$
+### Adjusted R$^2$  {-}
 
-Computer output for regression will always give the $R^2$ value, discussed in
-Section \@ref(sec-5-1-IntroMR). However, it is not a good measure of the
+Computer output for regression will always give the $R^2$ value, discussed in Section \@ref(Regr-Intro). However, it is not a good measure of the
 predictive ability of a model. Imagine a model which produces forecasts that
-are exactly 20% of the actual values. In that case, the $R^2$ value would be 1
-(indicating perfect correlation), but the forecasts are not very close to the
-actual values.
+are exactly 20% of the actual values. In that case, the $R^2$ value would be 1 (indicating perfect correlation), but the forecasts are not very close to the actual values.
 
 In addition, $R^2$ does not allow for "degrees of freedom". Adding *any*
 variable tends to increase the value of $R^2$, even if that variable is
@@ -591,16 +571,13 @@ whether a model will give good predictions.
 An equivalent idea is to select the model which gives the minimum sum of
 squared errors (SSE), given by $$\text{SSE} = \sum_{i=1}^N e_{i}^2.$$
 
-Minimizing the SSE is equivalent to maximizing $R^2$ and will always choose the
-model with the most variables, and so is not a valid way of selecting
+Minimizing the SSE is equivalent to maximizing $R^2$ and will always choose the model with the most variables, and so is not a valid way of selecting
 predictors.
 
 An alternative, designed to overcome these problems, is the adjusted $R^2$
 (also called "R-bar-squared"): $$\bar{R}^2 = 1-(1-R^2)\frac{N-1}{N-k-1},$$
 where $N$ is the number of observations and $k$ is the number of predictors.
-This is an improvement on $R^2$ as it will no longer increase with each added
-predictor. Using this measure, the best model will be the one with the largest
-value of $\bar{R}^2$.
+This is an improvement on $R^2$ as it will no longer increase with each added predictor. Using this measure, the best model will be the one with the largest value of $\bar{R}^2$.
 
 Maximizing $\bar{R}^2$ is equivalent to minimizing the following estimate of
 the variance of the forecast errors: $$\hat{\sigma}^2 =
@@ -609,71 +586,58 @@ the variance of the forecast errors: $$\hat{\sigma}^2 =
 Maximizing $\bar{R}^2$ works quite well as a method of selecting predictors,
 although it does tend to err on the side of selecting too many predictors.
 
-### Cross-validation
+### Cross-validation 
+####Need to get back to this and add tsCV
 
 As discussed in Section \@ref(accuracy), cross-validation is a very
-useful way of determining the predictive ability of a model. In general, leave-
-one-out cross-validation for regression can be carried out using the following
-steps.
+useful way of determining the predictive ability of a model. In general, leave-one-out cross-validation for regression can be carried out using the following steps.
 
-Remove observation $i$ from the data set, and fit the model using the remaining
-data. Then compute the error ($e_{i}^*=y_{i}-\hat{y}_{i}$) for the omitted
-observation. (This is not the same as the residual because the $i$th
+1. Remove observation $i$ from the data set, and fit the model using the remaining data. Then compute the error ($e_{i}^*=y_{i}-\hat{y}_{i}$) for the omitted observation. (This is not the same as the residual because the $i$th
 observation was not used in estimating the value of $\hat{y}_{i}$.)
-
-Repeat step 1 for $i=1,\dots,N$.
-
-Compute the MSE from $e_{1}^*,\dots,e_{N}^*$. We shall call this the CV.
+2. Repeat step 1 for $i=1,\dots,N$.
+3. Compute the MSE from $e_{1}^*,\dots,e_{N}^*$. We shall call this the CV.
 
 For many forecasting models, this is a time-consuming procedure, but for
-regression there are very fast methods of calculating CV so it takes no longer
-than fitting one model to the full data set. The equation for computing CV is
-given in Section \@ref(sec-5-5-Matrix).
+regression there are very fast methods of calculating CV so it takes no longer than fitting one model to the full data set. The equation for computing CV is given in Section \@ref(sec-5-5-Matrix).
 
 Under this criterion, the best model is the one with the smallest value of CV.
 
-### Akaike {-}’s Information Criterion
+```{r}
+e=tsCV(uschange[,1],fit.consMR,h=3)
+CV(fit.consMR)
+
+```
+
+### Akaike’s Information Criterion {-}
 
 A closely-related method is Akaike’s Information Criterion, which we define as
-$$\text{AIC} = N\log\left(\frac{\text{SSE}}{N}\right) + 2(k+2),$$ where $N$ is
-the number of observations used for estimation and $k$ is the number of
-predictors in the model. Different computer packages use slightly different
-definitions for the AIC, although they should all lead to the same model being
-selected. The $k+2$ part of the equation occurs because there are $k+2$
-parameters in the model --- the $k$ coefficients for the predictors, the
-intercept and the variance of the residuals. The idea here is to penalize the
-fit of the model (SSE) with the number of parameters that need to be estimated.
+$$\text{AIC} = N\log\left(\frac{\text{SSE}}{N}\right) + 2(k+2),$$ 
+where $T$ is the number of observations used for estimation and $k$ is the number of predictors in the model. Different computer packages use slightly different definitions for the AIC, although they should all lead to the same model being selected. The $k+2$ part of the equation occurs because there are $k+2$ parameters in the model --- the $k$ coefficients for the predictors, the intercept and the variance of the residuals. The idea here is to penalize the fit of the model (SSE) with the number of parameters that need to be estimated.
 
 The model with the minimum value of the AIC is often the best model for
-forecasting. For large values of $N$, minimizing the AIC is equivalent to
+forecasting. For large values of $T$, minimizing the AIC is equivalent to
 minimizing the CV value.
 
-### Corrected Akaike {-}’s Information Criterion
+### Corrected Akaike’s Information Criterion {-}
 
-For small values of $N$, the AIC tends to select too many predictors, and so a
-bias-corrected version of the AIC has been developed. $$\text{AIC}_{\text{c}} =
-\text{AIC} + \frac{2(k+2)(k+3)}{N-k-3}.$$ As with the AIC, the AIC$_\text{c}$
-should be minimized.
+For small values of $T$, the AIC tends to select too many predictors, and so a bias-corrected version of the AIC has been developed,
+$$
+\text{AIC}_{\text{c}} =
+\text{AIC} + \frac{2(k+2)(k+3)}{N-k-3}.
+$$ 
+As with the AIC, the AIC$_\text{c}$ should be minimized.
 
 ### Schwarz Bayesian Information Criterion {-}
 
-A related measure is Schwarz’s Bayesian Information Criterion (known as SBIC,
-BIC or SC): $$\text{BIC} = N\log\left(\frac{\text{SSE}}{N}\right) +
-(k+2)\log(N).$$ As with the AIC, minimizing the BIC is intended to give the
-best model. The model chosen by BIC is either the same as that chosen by AIC,
-or one with fewer terms. This is because the BIC penalizes the number of
-parameters more heavily than the AIC. For large values of $N$, minimizing BIC
-is similar to leave-$v$-out cross-validation when $v = N[1-1/(\log(N)-1)]$.
+A related measure is Schwarz’s Bayesian Information Criterion (known as SBIC, BIC or SC), 
+$$
+\text{BIC} = N\log\left(\frac{\text{SSE}}{N}\right)+ (k+2)\log(N).
+$$ 
+As with the AIC, minimizing the BIC is intended to give the best model. The model chosen by BIC is either the same as that chosen by AIC, or one with fewer terms. This is because the BIC penalizes the number of parameters more heavily than the AIC. `For large values of $T$, minimizing BIC is similar to leave-$v$-out cross-validation when $v = T[1-1/(\log(T)-1)]$.NOT RELEVANT HERE`
 
-Many statisticians like to use BIC because it has the feature that if there is
-a true underlying model, then with enough data the BIC will select that model.
-However, in reality there is rarely if ever a true underlying model, and even
-if there was a true underlying model, selecting that model will not necessarily
-give the best forecasts (because the parameter estimates may not be accurate).
+Many statisticians like to use BIC because it has the feature that if there is a true underlying model, then with enough data the BIC will select that model. However, in reality there is rarely if ever a true underlying model, and even if there was a true underlying model, selecting that model will not necessarily give the best forecasts (because the parameter estimates may not be accurate).
 
 \# To obtain all these measures in R, use CV(fit)
-
-
 
 ### Best subset regression {-}
 
@@ -723,7 +687,7 @@ retained if it improves the measure of predictive accuracy.
 
 
 ```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
-fcast <- forecast(fit) 
+fcast <- forecast(fit.beer) 
 autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
 ```
 
@@ -806,7 +770,7 @@ Coefficients: Estimate Std. Error t value Pr(\>|t|) (Intercept) 0.337535
 
 ### R$^2^$: the coefficient of determination {-}
 
-The $R^2^$ value was introduced in Section~\ref{sec-4-4-EvaluatingSLR}. It is
+The $R^2^$ value was introduced in Section~\@ref(Regr-EvaluatingSLR). It is
 the square of the correlation between the actual values and the predicted
 values. The following graph shows the actual values plotted against the fitted
 values for the credit score data.
@@ -845,7 +809,7 @@ no difference betweeen ex ante and ex post forecasts.
 
 
 
-## Matrix formulation {#sec-matrixequations}
+## Matrix formulation {#Regr-MatrixEquations}
 
 *Warning: this is a more advanced optional section and assumes knowledge of
 matrix algebra.*
@@ -916,7 +880,7 @@ ignores any errors in $\bm{X}^*$. So if the future values of the predictors are
 uncertain, then the prediction interval calculated using this expression will
 be too narrow.
 
-## Non-linear regression {#sec-5-6-NonLinear}
+## Non-linear regression {#Regr-NonLinear}
 
 Although the linear relationship assumed at the beginning of this chapter is often adequate, there are cases for which a non-linear functional form is more suitable. The scatter plot of Carbon versus City in Figure \@ref(fig-4-car)  hows an example where a non-linear functional form is required.
 
@@ -1008,7 +972,7 @@ This usually gives a better fit to the data, although forecasting values of
 Carbon when City is outside the range of the historical data becomes very
 unreliable.
 
-## Correlation, causation and forecasting {#sec-5-8-MultiCol}
+## Correlation, causation and forecasting {#Regr-MultiCol}
 
 
 ### Correlation is not causation {-}

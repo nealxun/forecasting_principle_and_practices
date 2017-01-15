@@ -510,7 +510,7 @@ $$\label{eq-4-se}
   s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.
 $$
 
-Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation.
+Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation. Here, we divide by $T−k−1$ because we have estimated k+1 parameters (the intercept and a coefficient for each predictor variable) in computing the residuals. 
 
 The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. In Section \@ref(Regr-LSprinciple) $s_e$ is part of the R estimation output labeled  `Residual standard error`" and takes the value `r round(summary(fit.consMR)$sigma,2)`%.
 
@@ -521,8 +521,6 @@ We should warn here that the evaluation of the standard error can be highly subj
 More often than not, time series data are "non-stationary"; that is, the values of the time series do not fluctuate around a constant mean or with a constant variance. We will deal with time series stationarity in more detail in Chapter \@ref(ch-arima), but here we need to address the effect non-stationary data can have on regression models.
 
 For example consider the two variables plotted below in Figure \@ref(fig:spurious). These appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea. 
-
-
 
 ```{r spurious, echo=FALSE, fig.height=5, warning=FALSE, fig.cap="Trending time series data can appear to be related as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE, cache=TRUE}
 aussies=window(ausair,end=2011)
@@ -603,7 +601,8 @@ regression there are very fast methods of calculating CV so it takes no longer t
 Under this criterion, the best model is the one with the smallest value of CV.
 
 ```{r}
-e=tsCV(uschange[,1],fit.consMR,h=3)
+# This will not work here
+# e=tsCV(uschange[,1],fit.consMR,h=3)
 CV(fit.consMR)
 
 ```
@@ -611,7 +610,7 @@ CV(fit.consMR)
 ### Akaike’s Information Criterion {-}
 
 A closely-related method is Akaike’s Information Criterion, which we define as
-$$\text{AIC} = N\log\left(\frac{\text{SSE}}{N}\right) + 2(k+2),$$ 
+$$\text{AIC} = T\log\left(\frac{\text{SSE}}{T}\right) + 2(k+2),$$ 
 where $T$ is the number of observations used for estimation and $k$ is the number of predictors in the model. Different computer packages use slightly different definitions for the AIC, although they should all lead to the same model being selected. The $k+2$ part of the equation occurs because there are $k+2$ parameters in the model --- the $k$ coefficients for the predictors, the intercept and the variance of the residuals. The idea here is to penalize the fit of the model (SSE) with the number of parameters that need to be estimated.
 
 The model with the minimum value of the AIC is often the best model for
@@ -623,7 +622,7 @@ minimizing the CV value.
 For small values of $T$, the AIC tends to select too many predictors, and so a bias-corrected version of the AIC has been developed,
 $$
 \text{AIC}_{\text{c}} =
-\text{AIC} + \frac{2(k+2)(k+3)}{N-k-3}.
+\text{AIC} + \frac{2(k+2)(k+3)}{T-k-3}.
 $$ 
 As with the AIC, the AIC$_\text{c}$ should be minimized.
 
@@ -631,23 +630,52 @@ As with the AIC, the AIC$_\text{c}$ should be minimized.
 
 A related measure is Schwarz’s Bayesian Information Criterion (known as SBIC, BIC or SC), 
 $$
-\text{BIC} = N\log\left(\frac{\text{SSE}}{N}\right)+ (k+2)\log(N).
+\text{BIC} = T\log\left(\frac{\text{SSE}}{T}\right)+ (k+2)\log(T).
 $$ 
-As with the AIC, minimizing the BIC is intended to give the best model. The model chosen by BIC is either the same as that chosen by AIC, or one with fewer terms. This is because the BIC penalizes the number of parameters more heavily than the AIC. `For large values of $T$, minimizing BIC is similar to leave-$v$-out cross-validation when $v = T[1-1/(\log(T)-1)]$.NOT RELEVANT HERE`
+As with the AIC, minimizing the BIC is intended to give the best model. The model chosen by BIC is either the same as that chosen by AIC, or one with fewer terms. This is because the BIC penalizes the number of parameters more heavily than the AIC. For large values of $T$, minimizing BIC is similar to leave-$v$-out cross-validation when $v = T[1-1/(\log(T)-1)]$.`is this ok here?`
 
 Many statisticians like to use BIC because it has the feature that if there is a true underlying model, then with enough data the BIC will select that model. However, in reality there is rarely if ever a true underlying model, and even if there was a true underlying model, selecting that model will not necessarily give the best forecasts (because the parameter estimates may not be accurate).
 
-\# To obtain all these measures in R, use CV(fit)
+#### Example: US consumption (continued) {-}
+To obtain all these measures in R, use `CV(fit)`. In the multiple regression example for forecasting US consumption we considered four predictors. With four predictors, there are $2^4=16$ possible models. Now we can check if all four predictors are actually useful, or whether we can drop one or more of them. All 16 models were fitted and the results are summarised below in Table \@ref(tab:tblusMR). A "1" indicates that the variable was included in the model. The results have been sorted according to the AICc and therefore the best models are given at the top of the table, and the worst at the bottom of the table. There is clear separation between the models in the first four rows and the ones below. This indicates that Income and Savings should both be included in the model. However we would probably only one of Production and Unemployment as these two variables are highly (negatively) correlated, as shown in Figure \@ref(fig:ScatterMatrix). All criteria point towards including Unemployment.
+
+```{r tblusMR, echo=FALSE, cache=TRUE}
+fit <- list()
+fit[[1]] <- lm(Consumption ~ Income + Production + Savings + Unemployment, data = uschange)
+fit[[2]] <- lm(Consumption ~ Income + Production + Savings , data = uschange)
+fit[[3]] <- lm(Consumption ~ Income + Production + Unemployment, data = uschange)
+fit[[4]] <- lm(Consumption ~ Income + Savings + Unemployment, data = uschange)
+fit[[5]] <- lm(Consumption ~ Income + Production , data = uschange)
+fit[[6]] <- lm(Consumption ~ Income + Savings , data = uschange)
+fit[[7]] <- lm(Consumption ~ Income + Unemployment, data = uschange)
+fit[[8]] <- lm(Consumption ~ Income, data = uschange)
+fit[[9]] <- lm(Consumption ~ Production + Savings + Unemployment, data = uschange)
+fit[[10]] <- lm(Consumption ~ Production + Savings , data = uschange)
+fit[[11]] <- lm(Consumption ~ Production + Unemployment, data = uschange)
+fit[[12]] <- lm(Consumption ~ Production, data = uschange)
+fit[[13]] <- lm(Consumption ~ Savings + Unemployment, data = uschange)
+fit[[14]] <- lm(Consumption ~ Savings , data = uschange)
+fit[[15]] <- lm(Consumption ~ Unemployment, data = uschange)
+fit[[16]] <- lm(Consumption ~ 1, data = uschange)
+
+out <- matrix(0, ncol = 9, nrow = 16)
+colnames(out) <- c("Income", "Production", "Savings", "Unemployment", names(CV(fit[[1]])))
+for (i in 1:16) out[i, 5:9] <- CV(fit[[i]])
+out[c(1:8), 1] <- 1
+out[c(1:3, 5, 9:12), 2] <- 1
+out[c(1:2, 4, 6, 9:10, 13:14), 3] <- 1
+out[c(1, 3:4, 7, 9, 11, 13, 15), 4] <- 1
+j <- order(out[, 7])
+
+knitr::kable(out[j, ], digits=3, booktabs=TRUE,align = c(rep("c", 4)),caption="All 16 possible models for forecasting US consumption with 4 predictors.")
+
+```
 
 ### Best subset regression {-}
 
-Where possible, all potential regression models can be fitted (as was done in
-the above example) and the best one selected based on one of the measures
-discussed here. This is known as "best subsets" regression or "all possible
-subsets" regression.
+Where possible, all potential regression models can be fitted (as was done in the above example) and the best one selected based on one of the measures discussed here. This is known as "best subsets" regression or "all possible subsets" regression.
 
-It is recommended that one of CV, AIC or AIC$_\text{c}$ be used for this
-purpose. If the value of $N$ is large enough, they will all lead to the same
+It is recommended that one of CV, AIC or AIC$_\text{c}$ be used for this purpose. If the value of $N$ is large enough, they will all lead to the same
 model. Most software packages will at least produce AIC, although CV and
 AIC$_\text{c}$ will be more accurate for smaller values of $N$.
 
@@ -664,23 +692,22 @@ possible models. For example, 40 predictors leads to $2^{40} >$ 1 trillion
 possible models! Consequently, a strategy is required to limit the number of
 models to be explored.
 
-An approach that works quite well is *backwards stepwise regression*:
+An approach that works quite well is *backwards stepwise regression*: 
 
-Start with the model containing all potential predictors.
+* Start with the model containing all potential predictors.
+* Remove one predictor at a time. Keep the model if it improves the measure of predictive accuracy.
+* Iterate until no further improvement.
 
-Try subtracting one predictor at a time. Keep the model if it improves the
-measure of predictive accuracy.
+If the number of potential predictors is too large, then the backwards stepwise regression will not work and the *forward stepwise regression* can be used. This procedure starts with a model that includes only the intercept. Predictors are added one at a time, and the one that most improves the measure of predictive accuracy is retained in the model. The procedure is repeated until no further improvement can be achieved.  
 
-Iterate until no further improvement.
+Alternatively for eihter the backwards or forward direction a starting model can be one that that includes a subset of potential predictors. In this case, an extra step needs to be
+included. For the backwards procedrue with each step we should also consider adding a predictor and for the forward procedure with each each step we should also consider dropping a predictor. These are usually referred to as *hybrid* procedures.
+
 
 It is important to realise that a stepwise approach is not guaranteed to lead
-to the best possible model. But it almost always leads to a good model.
+to the best possible model. But it almost always leads to a good model. For further details see:
 
-If the number of potential predictors is too large, then this backwards
-stepwise regression will not work and the starting model will need to use only
-a subset of potential predictors. In this case, an extra step needs to be
-inserted in which predictors are also added one at a time, with the model being
-retained if it improves the measure of predictive accuracy.
+See James, G., D. Witten, T. Hastie, and R. Tibshirani. 2013. An Introduction to Statistical Learning. New York: Springer.
 
 
 ## Forecasting with regression {#Regr-ForeWithRegr}

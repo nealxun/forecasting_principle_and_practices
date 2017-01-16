@@ -585,15 +585,15 @@ Maximizing $\bar{R}^2$ works quite well as a method of selecting predictors,
 although it does tend to err on the side of selecting too many predictors.
 
 ### Cross-validation 
-####Need to get back to this and add tsCV
+####Make sure that this CV is valid here / possibly manipulate cvTS code to do this properly?? {-}
+
 
 As discussed in Section \@ref(accuracy), cross-validation is a very
 useful way of determining the predictive ability of a model. In general, leave-one-out cross-validation for regression can be carried out using the following steps.
 
-1. Remove observation $i$ from the data set, and fit the model using the remaining data. Then compute the error ($e_{i}^*=y_{i}-\hat{y}_{i}$) for the omitted observation. (This is not the same as the residual because the $i$th
-observation was not used in estimating the value of $\hat{y}_{i}$.)
-2. Repeat step 1 for $i=1,\dots,N$.
-3. Compute the MSE from $e_{1}^*,\dots,e_{N}^*$. We shall call this the CV.
+1. Remove observation $t$ from the data set, and fit the model using the remaining data. Then compute the error ($e_{t}^*=y_{t}-\hat{y}_{t}$) for the omitted observation. (This is not the same as the residual because the $t$th observation was not used in estimating the value of $\hat{y}_{t}$.)
+2. Repeat step 1 for $t=1,\dots,T$.
+3. Compute the MSE from $e_{1}^*,\dots,e_{T}^*$. We shall call this the CV.
 
 For many forecasting models, this is a time-consuming procedure, but for
 regression there are very fast methods of calculating CV so it takes no longer than fitting one model to the full data set. The equation for computing CV is given in Section \@ref(sec-5-5-Matrix).
@@ -604,7 +604,6 @@ Under this criterion, the best model is the one with the smallest value of CV.
 # This will not work here
 # e=tsCV(uschange[,1],fit.consMR,h=3)
 CV(fit.consMR)
-
 ```
 
 ### Akaike’s Information Criterion {-}
@@ -658,6 +657,8 @@ fit[[14]] <- lm(Consumption ~ Savings , data = uschange)
 fit[[15]] <- lm(Consumption ~ Unemployment, data = uschange)
 fit[[16]] <- lm(Consumption ~ 1, data = uschange)
 
+fit.consBest<-lm(Consumption ~ Income + Savings + Unemployment, data = uschange)
+
 out <- matrix(0, ncol = 9, nrow = 16)
 colnames(out) <- c("Income", "Production", "Savings", "Unemployment", names(CV(fit[[1]])))
 for (i in 1:16) out[i, 5:9] <- CV(fit[[i]])
@@ -698,7 +699,7 @@ An approach that works quite well is *backwards stepwise regression*:
 * Remove one predictor at a time. Keep the model if it improves the measure of predictive accuracy.
 * Iterate until no further improvement.
 
-If the number of potential predictors is too large, then the backwards stepwise regression will not work and the *forward stepwise regression* can be used. This procedure starts with a model that includes only the intercept. Predictors are added one at a time, and the one that most improves the measure of predictive accuracy is retained in the model. The procedure is repeated until no further improvement can be achieved.  
+If the number of potential predictors is too large, then the backwards stepwise regression will not work and the *forward stepwise regression* can be used instead. This procedure starts with a model that includes only the intercept. Predictors are added one at a time, and the one that most improves the measure of predictive accuracy is retained in the model. The procedure is repeated until no further improvement can be achieved.  
 
 Alternatively for eihter the backwards or forward direction a starting model can be one that that includes a subset of potential predictors. In this case, an extra step needs to be
 included. For the backwards procedrue with each step we should also consider adding a predictor and for the forward procedure with each each step we should also consider dropping a predictor. These are usually referred to as *hybrid* procedures.
@@ -712,12 +713,57 @@ See James, G., D. Witten, T. Hastie, and R. Tibshirani. 2013. An Introduction to
 
 ## Forecasting with regression {#Regr-ForeWithRegr}
 
+### Ex-ante versus ex-post forecasts {-}
+
+When using regression models for time series data, we need to distinguish between the different types of forecasts that can be produced, depending on what is assumed to be known when the forecasts are computed.
+
+*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex-ante forecasts for the percentage change in US consumption for 2016Q4 (the quarter following the end of the sample) should only use information that was available *upto and before* 2016Q3. These are genuine forecasts, made in advance using whatever information is available at the time. Ex-ante forecasts for 2016Q4 can be obtained by first generating genuine forecasts for each of the predictors for 2016Q4. For example one of the simple methods introduced in Section \@ref(sec-2-methods) can be used or more sophisticated pure time series approached that follow in Chapters \@ref(ExpSm) and \@ref(ARIMA). Alternatively forecasts by some other source such as a government agency can be used.
+
+### Example 
+
+*Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption for 2016Q4 may use the actual observations of the predictors for 2016Q4, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
+
+The model from which ex-post forecasts are produced should not be estimated using data from the forecast period. That is, ex-post forecasts can assume knowledge of the predictor variable (the $x$ variable), but should not assume knowledge of the data that are to be forecast (the $y$ variable).
+
+A comparative evaluation of ex-ante forecasts and ex-post forecasts can help to separate out the sources of forecast uncertainty. This will show whether forecast errors have arisen due to poor forecasts of the predictor or due to a poor forecasting model.
+
+
+
+
+### Scenario based forecasting {-}
+
+In this setting the forecaster assumes possible scenarios for the predictor variable that are of interest. For example the US policy maker may want to forecast consumption if there is a 1% growth in each income and savings but no change in unemployment,  for each of the four quarters following the end of the sample. 
+
+in 2011. Alternatively a 1% decline in income for each of the quarters may be
+of interest. The resulting forecasts are calculated and shown in Figure
+\@ref(fig:ConsInc4).
+
+```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US."}
+
+fit.consBest<-lm(Consumption ~ Income + Savings + Unemployment, data = uschange)
+newdata=data.frame(cbind(Income=c(1,1,1,1),Savings=c(1,1,1,1),Unemployment=c(0,0,0,0)))
+fcast.up <- forecast(fit.consBest, newdata=newdata) 
+
+newdata=data.frame(cbind(Income=c(-1,-1,-1,-1),Savings=c(-1,-1,-1,-1),Unemployment=c(0,0,0,0)))
+fcast.down <- forecast(fit.consBest, newdata=newdata) 
+# autoplot is giving me trouble
+
+fcast <- forecast(fit.cons, newdata=data.frame(Income=c(-1,1)))
+autoplot(fcast, ylab="% change in consumption", xlab="% change in income")
+
+```
+
+Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
+
+
+
+### Building a predictive regression {-}
+
 
 ```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
 fcast <- forecast(fit.beer) 
 autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
 ```
-
 Forecasts obtained from the model are shown in Figure \@ref(fig:beerlm1).
 
 When the values of $x_1,\dots,x_k$ are new values (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
@@ -741,34 +787,8 @@ Equation  shows that the forecast interval is wider when $x$ is far from $\bar{x
 
 
 
-### Scenario based forecasting {-}
 
-In this setting the forecaster assumes possible scenarios for the predictor variable that are of interest. For example the US policy maker may want to forecast consumption if there is a 1% growth in income for each of the quarters
-in 2011. Alternatively a 1% decline in income for each of the quarters may be
-of interest. The resulting forecasts are calculated and shown in Figure
-\@ref(fig:ConsInc4).
 
-```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US."}
-fcast <- forecast(fit.cons, newdata=data.frame(Income=c(-1,1))) 
-autoplot(fcast)
-```
-
-Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
-
-An alternative approach is to use genuine forecasts for the predictor variable. For example, a pure time series based approach can be used to generate forecasts for the predictor variable (more on this in Chapter \@ref(ch-dynamic)) or forecasts published by some other source such as a government agency can be used.
-
-### Ex-ante versus ex-post forecasts {-}
-
-When using regression models with time series data, we need to distinguish between two different types of forecasts that can be produced, depending on what is assumed to be known when the forecasts are computed.
-
-*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex ante forecasts of consumption for the four quarters in 2011 should only use information that was available *before*
-2011. These are the only genuine forecasts, made in advance using whatever information is available at the time.
-
-*Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption for each of the 2011 quarters may use the actual observations of income for each of these quarters, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
-
-The model from which ex-post forecasts are produced should not be estimated using data from the forecast period. That is, ex-post forecasts can assume knowledge of the predictor variable (the $x$ variable), but should not assume knowledge of the data that are to be forecast (the $y$ variable).
-
-A comparative evaluation of ex ante forecasts and ex post forecasts can help to separate out the sources of forecast uncertainty. This will show whether forecast errors have arisen due to poor forecasts of the predictor or due to a poor forecasting model.
 
 [Linear trend]\@ref(ex-4-LinTrend)
 
@@ -793,30 +813,6 @@ Coefficients: Estimate Std. Error t value Pr(\>|t|) (Intercept) 0.337535
 \*\*\*
 
 
-
-
-### R$^2^$: the coefficient of determination {-}
-
-The $R^2^$ value was introduced in Section~\@ref(Regr-EvaluatingSLR). It is
-the square of the correlation between the actual values and the predicted
-values. The following graph shows the actual values plotted against the fitted
-values for the credit score data.
-
-
-
-Recall that the value of $R^2$ can also be calculated as the proportion of
-variation in the forecast variable that is explained by the regression model:
-$$R^2 = \frac{\sum(\hat{y}_{i} - \bar{y})^2}{\sum(y_{i}-\bar{y})^2}$$ In this
-case, $R^2=0.47$, so about half of the variation in the scores can be predicted
-using the model.
-
-Thus, the model is not really sufficient to replace a more detailed approach to
-credit scoring, but it might be helpful in filtering out customers who will get
-a very low score. In the above graph it is evident that anyone with a predicted
-score below 35 has a true score not much more than 60. Consequently, if the
-bank wanted to identify high scoring customers quickly, using this model will
-provide a first filter, and more detailed information need only be collected on
-a subset of the customers.
 
 
 ### Ex-post and ex ante forecasting

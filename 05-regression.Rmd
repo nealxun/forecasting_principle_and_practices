@@ -507,8 +507,7 @@ Figure \@ref(fig:beerlm3) plots the actual monthly beer production versus the fi
 
 Another measure of how well the model has fitted the data is the standard deviation of the residuals, which is often known as the "standard error of the regression" and is calculated by
 $$\label{eq-4-se} 
-  s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.
-$$
+s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.$$
 
 Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation. Here, we divide by $T−k−1$ because we have estimated k+1 parameters (the intercept and a coefficient for each predictor variable) in computing the residuals. 
 
@@ -522,6 +521,7 @@ More often than not, time series data are "non-stationary"; that is, the values 
 
 For example consider the two variables plotted below in Figure \@ref(fig:spurious). These appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea. 
 
+
 ```{r spurious, echo=FALSE, fig.height=5, warning=FALSE, fig.cap="Trending time series data can appear to be related as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE, cache=TRUE}
 aussies=window(ausair,end=2011)
 df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,aussies))
@@ -530,6 +530,7 @@ p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")
 p3<-ggplot(df,aes(x=GuineaRiceProduction, y=aussies)) + geom_point() + ylab("Air Passengers in Australia (millions)")+ xlab("Rice Production in Guinea (million tons)")
 gridExtra::grid.arrange(gridExtra::arrangeGrob(p1, p2),p3, ncol = 2)
 ```
+
 Regressing non-stationary time series can lead to spurious regressions. The output of regressing Australian air passengers on rice production in Guinea is shown below. High $R^2$s and high residual autocorrelation can be signs of spurious regression. We discuss the issues surrounding non-stationary data and spurious regressions in detail in Chapter \@ref(ch-dynamic).
 
 Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
@@ -557,20 +558,13 @@ Instead, we will use a measure of predictive accuracy. Five such measures are in
 
 ### Adjusted R$^2$  {-}
 
-Computer output for regression will always give the $R^2$ value, discussed in Section \@ref(Regr-Intro). However, it is not a good measure of the
-predictive ability of a model. Imagine a model which produces forecasts that
-are exactly 20% of the actual values. In that case, the $R^2$ value would be 1 (indicating perfect correlation), but the forecasts are not very close to the actual values.
+Computer output for regression will always give the $R^2$ value, discussed in Section \@ref(Regr-Intro). However, it is not a good measure of the predictive ability of a model. Imagine a model which produces forecasts that are exactly 20% of the actual values. In that case, the $R^2$ value would be 1 (indicating perfect correlation), but the forecasts are not very close to the actual values.
 
-In addition, $R^2$ does not allow for "degrees of freedom". Adding *any*
-variable tends to increase the value of $R^2$, even if that variable is
-irrelevant. For these reasons, forecasters should not use $R^2$ to determine
-whether a model will give good predictions.
+In addition, $R^2$ does not allow for "degrees of freedom". Adding *any* variable tends to increase the value of $R^2$, even if that variable is irrelevant. For these reasons, forecasters should not use $R^2$ to determine whether a model will give good predictions.
 
-An equivalent idea is to select the model which gives the minimum sum of
-squared errors (SSE), given by $$\text{SSE} = \sum_{i=1}^N e_{i}^2.$$
+An equivalent idea is to select the model which gives the minimum sum of squared errors (SSE), given by $$\text{SSE} = \sum_{i=1}^N e_{i}^2.$$
 
-Minimizing the SSE is equivalent to maximizing $R^2$ and will always choose the model with the most variables, and so is not a valid way of selecting
-predictors.
+Minimizing the SSE is equivalent to maximizing $R^2$ and will always choose the model with the most variables, and so is not a valid way of selecting predictors.
 
 An alternative, designed to overcome these problems, is the adjusted $R^2$
 (also called "R-bar-squared"): $$\bar{R}^2 = 1-(1-R^2)\frac{N-1}{N-k-1},$$
@@ -672,6 +666,7 @@ knitr::kable(out[j, ], digits=3, booktabs=TRUE,align = c(rep("c", 4)),caption="A
 
 ```
 
+
 ### Best subset regression {-}
 
 Where possible, all potential regression models can be fitted (as was done in the above example) and the best one selected based on one of the measures discussed here. This is known as "best subsets" regression or "all possible subsets" regression.
@@ -719,7 +714,16 @@ When using regression models for time series data, we need to distinguish betwee
 
 *Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex-ante forecasts for the percentage change in US consumption for 2016Q4 (the quarter following the end of the sample) should only use information that was available *upto and before* 2016Q3. These are genuine forecasts, made in advance using whatever information is available at the time. Ex-ante forecasts for 2016Q4 can be obtained by first generating genuine forecasts for each of the predictors for 2016Q4. For example one of the simple methods introduced in Section \@ref(sec-2-methods) can be used or more sophisticated pure time series approached that follow in Chapters \@ref(ExpSm) and \@ref(ARIMA). Alternatively forecasts by some other source such as a government agency can be used.
 
-### Example 
+#### Example: Australian quarterly beer production {-}
+
+Normally, we cannot use future values of the predictor variables when producing ex-ante forecasts because their values will not be known in advance. However, the special predictors introduced in Section \@ref(Regr-UsefulPredictors) are all known in advance, as they are based on calendar variables (e.g., seasonal dummy variables or public
+holiday indicators) or deterministic functions of time. In such cases, there is
+no difference betweeen ex ante and ex post forecasts.
+
+```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
+fcast <- forecast(fit.beer) 
+autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
+```
 
 *Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption for 2016Q4 may use the actual observations of the predictors for 2016Q4, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
 
@@ -753,6 +757,7 @@ autoplot(fcast, ylab="% change in consumption", xlab="% change in income")
 
 ```
 
+
 Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
 
 
@@ -760,10 +765,7 @@ Forecast intervals for scenario based forecasts do not include the uncertainty a
 ### Building a predictive regression {-}
 
 
-```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
-fcast <- forecast(fit.beer) 
-autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
-```
+
 Forecasts obtained from the model are shown in Figure \@ref(fig:beerlm1).
 
 When the values of $x_1,\dots,x_k$ are new values (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
@@ -779,8 +781,7 @@ When this calculation is done using an observed value of $x$ from the data, we c
 
 Assuming that the regression errors are normally distributed, an approximate 95% **forecast interval** (also called a prediction interval) associated with this forecast is given by
 $$\label{eq-4-pi}
-  \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
-$$
+  \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},$$
 where $N$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is given by equation . Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28 in equation . Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation .
 
 Equation  shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is, we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
@@ -794,8 +795,9 @@ Equation  shows that the forecast interval is wider when $x$ is far from $\bar{x
 
 A common feature of time series data is a trend. Using regression we can model and forecast the trend in time series data by including $t=1,\dots,T,$ as a predictor variable: 
 $$
-  y_t=\beta_0+\beta_1t+\varepsilon_t.
-$$
+  y_t=\beta_0+\beta_1t+\varepsilon_t.$$
+
+  
 Figure \@ref(fig-4-Tourism) shows a time series plot of aggregate tourist arrivals to Australia over the period 1980 to 2010 with the fitted linear trend line $\hat{y}_t= 0.3375+0.1761t$. Also plotted are the point and forecast intervals for the years 2011 to 2015.
 
 ![Forecasting international tourist arrivals to Australia for the period
@@ -816,18 +818,6 @@ Coefficients: Estimate Std. Error t value Pr(\>|t|) (Intercept) 0.337535
 
 
 ### Ex-post and ex ante forecasting
-
-As discussed in Section \@ref(sec-4-8-TimeSeries), ex ante forecasts are those
-that are made using only the information that is available in advance, while ex
-post forecasts are those that are made using later information on the
-predictors.
-
-Normally, we cannot use future values of the predictor variables when producing
-ex ante forecasts because their values will not be known in advance. However,
-the special predictors introduced in this section are all known in advance, as
-they are based on calendar variables (e.g., seasonal dummy variables or public
-holiday indicators) or deterministic functions of time. In such cases, there is
-no difference betweeen ex ante and ex post forecasts.
 
 
 

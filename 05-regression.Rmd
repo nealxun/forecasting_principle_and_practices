@@ -165,13 +165,7 @@ $$
 
 This is called "least squares" estimation because it gives the least value for the sum of squared errors.  Finding the best estimates of the coefficients is often called "fitting" the model to the data, or sometimes "learning" or "training" the model. The lines shown in Figures \@ref(fig:ConsInc2) and \@ref(fig:ScatterMatrix) were obtained in this way. 
 
-When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section \@ref(sec-matrixequations).
-
-Predictions of $y_t$ can be obtained by ignoring the error in the regression equation and using the estimated coefficients. That is for each set of values for the predictors $x_1,\dots,x_k$ we can forecast a corresponding value of $y$ using 
-\begin{equation}
-  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}.
-  (\#eq:prediction)
-\end{equation}
+When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section \@ref(Regr-MatrixEquations).
 
 #### Example: US consumption expenditure (revisited) {-}
 
@@ -186,7 +180,12 @@ summary(fit.consMR)
 
 ### Fitted values {-}
 
-Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the right hand side of equation \@ref(eq:prediction) returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. The following plots show the actual values compared to the fitted (i.e.,predicted) values for the percentage change in the US consumption expenditure series. The time plot shows that the fitted values follow the actual data fairly closely. This is verified by the strong positive relationship shown by the scatterplot. 
+Predictions of $y_t$ can be obtained by ignoring the error in the regression equation and using the estimated coefficients. Hence, plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the regression equation
+\begin{equation}
+  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}.
+  (\#eq:prediction)
+\end{equation}
+returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. The following plots show the actual values compared to the fitted (i.e.,predicted) values for the percentage change in the US consumption expenditure series. The time plot shows that the fitted values follow the actual data fairly closely. This is verified by the strong positive relationship shown by the scatterplot. 
 
 
 ```{r usfitted1, echo=TRUE, cache=TRUE, fig.cap="Time plot of US consumtpion expenditure and predicted expenditure."}
@@ -290,7 +289,7 @@ fit.beer <- tslm(beer2 ~ trend + season)
 summary(fit.beer)
 ```
 
-There is a strong downward trend of `r round(fit.beer$coef['trend'], 3)` megalitres per quarter. On average, the second quarter has production of `r -round(fit.beer$coef['season2'], 1)` megalitres lower than the first quarter, the third quarter has production of `r -round(fit.beer$coef['season3'], 1)` megalitres lower than the first quarter, and the fourth quarter has production `r round(fit.beer$coef['season4'], 1)` megalitres higher than the first quarter.
+There is a strong downward trend of `r round(fit.beer$coef['trend'], 3)` megalitres per quarter. On average, the second quarter has production of `r -round(fit.beer$coef['season2'], 1)` megalitres lower than the first quarter, the third quarter has production of `r -round(fit.beer$coef['season3'], 1)` megalitres lower than the first quarter, and the fourth quarter has production of `r round(fit.beer$coef['season4'], 1)` megalitres higher than the first quarter.
 
 
 ```{r beerlm2, echo=TRUE, cache=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
@@ -568,7 +567,7 @@ Minimizing the SSE is equivalent to maximizing $R^2$ and will always choose the 
 
 An alternative, designed to overcome these problems, is the adjusted $R^2$
 (also called "R-bar-squared"): $$\bar{R}^2 = 1-(1-R^2)\frac{N-1}{N-k-1},$$
-where $N$ is the number of observations and $k$ is the number of predictors.
+where $T$ is the number of observations and $k$ is the number of predictors.
 This is an improvement on $R^2$ as it will no longer increase with each added predictor. Using this measure, the best model will be the one with the largest value of $\bar{R}^2$.
 
 Maximizing $\bar{R}^2$ is equivalent to minimizing the following estimate of
@@ -590,7 +589,7 @@ useful way of determining the predictive ability of a model. In general, leave-o
 3. Compute the MSE from $e_{1}^*,\dots,e_{T}^*$. We shall call this the CV.
 
 For many forecasting models, this is a time-consuming procedure, but for
-regression there are very fast methods of calculating CV so it takes no longer than fitting one model to the full data set. The equation for computing CV is given in Section \@ref(sec-5-5-Matrix).
+regression there are very fast methods of calculating CV so it takes no longer than fitting one model to the full data set. The equation for computing CV is given in Section \@ref(Regr-MatrixEquations).
 
 Under this criterion, the best model is the one with the smallest value of CV.
 
@@ -604,7 +603,7 @@ CV(fit.consMR)
 
 A closely-related method is Akaike’s Information Criterion, which we define as
 $$\text{AIC} = T\log\left(\frac{\text{SSE}}{T}\right) + 2(k+2),$$ 
-where $T$ is the number of observations used for estimation and $k$ is the number of predictors in the model. Different computer packages use slightly different definitions for the AIC, although they should all lead to the same model being selected. The $k+2$ part of the equation occurs because there are $k+2$ parameters in the model --- the $k$ coefficients for the predictors, the intercept and the variance of the residuals. The idea here is to penalize the fit of the model (SSE) with the number of parameters that need to be estimated.
+where $T$ is the number of observations used for estimation and $k$ is the number of predictors in the model. Different computer packages use slightly different definitions for the AIC, although they should all lead to the same model being selected. The $k+2$ part of the equation occurs because there are $k+2$ parameters in the model: the $k$ coefficients for the predictors, the intercept and the variance of the residuals. The idea here is to penalize the fit of the model (SSE) with the number of parameters that need to be estimated.
 
 The model with the minimum value of the AIC is often the best model for
 forecasting. For large values of $T$, minimizing the AIC is equivalent to
@@ -671,15 +670,9 @@ knitr::kable(out[j, ], digits=3, booktabs=TRUE,align = c(rep("c", 4)),caption="A
 
 Where possible, all potential regression models can be fitted (as was done in the above example) and the best one selected based on one of the measures discussed here. This is known as "best subsets" regression or "all possible subsets" regression.
 
-It is recommended that one of CV, AIC or AIC$_\text{c}$ be used for this purpose. If the value of $N$ is large enough, they will all lead to the same
-model. Most software packages will at least produce AIC, although CV and
-AIC$_\text{c}$ will be more accurate for smaller values of $N$.
+It is recommended that one of CV, AIC or AIC$_\text{c}$ be used for this purpose. If the value of $T$ is large enough, they will all lead to the same model. Most software packages will at least produce AIC, although CV and AIC$_\text{c}$ will be more accurate for smaller values of $T$.
 
-While $\bar{R}^2$ is very widely used, and has been around longer than the
-other measures, its tendency to select too many predictor variables makes it
-less suitable for forecasting than either CV, AIC or AIC$_\text{c}$. Also, the
-tendency of BIC to select too few variables makes it less suitable for
-forecasting than either CV, AIC or AIC$_\text{c}$.
+While $\bar{R}^2$ is very widely used, and has been around longer than the other measures, its tendency to select too many predictor variables makes it less suitable for forecasting than either CV, AIC or AIC$_\text{c}$. Also, the tendency of BIC to select too few variables makes it less suitable for forecasting than either CV, AIC or AIC$_\text{c}$.
 
 ### Stepwise regression {-}
 
@@ -708,22 +701,15 @@ See James, G., D. Witten, T. Hastie, and R. Tibshirani. 2013. An Introduction to
 
 ## Forecasting with regression {#Regr-ForeWithRegr}
 
+Recall that predictions of $y$ can be otained using equation \@ref(eq:prediction),  
+$$  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}$$
+which comprises the estimated coefficients and ignores the error in the regression equation. Plugging in the values of the predictor variables $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ returned the fitted (in-sample) values of $y$. What we are interested in here is forecasting future values of $y$.
+
 ### Ex-ante versus ex-post forecasts {-}
 
 When using regression models for time series data, we need to distinguish between the different types of forecasts that can be produced, depending on what is assumed to be known when the forecasts are computed.
 
-*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex-ante forecasts for the percentage change in US consumption for 2016Q4 (the quarter following the end of the sample) should only use information that was available *upto and before* 2016Q3. These are genuine forecasts, made in advance using whatever information is available at the time. Ex-ante forecasts for 2016Q4 can be obtained by first generating genuine forecasts for each of the predictors for 2016Q4. For example one of the simple methods introduced in Section \@ref(sec-2-methods) can be used or more sophisticated pure time series approached that follow in Chapters \@ref(ExpSm) and \@ref(ARIMA). Alternatively forecasts by some other source such as a government agency can be used.
-
-#### Example: Australian quarterly beer production {-}
-
-Normally, we cannot use future values of the predictor variables when producing ex-ante forecasts because their values will not be known in advance. However, the special predictors introduced in Section \@ref(Regr-UsefulPredictors) are all known in advance, as they are based on calendar variables (e.g., seasonal dummy variables or public
-holiday indicators) or deterministic functions of time. In such cases, there is
-no difference betweeen ex ante and ex post forecasts.
-
-```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
-fcast <- forecast(fit.beer) 
-autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
-```
+*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex-ante forecasts for the percentage change in US consumption for 2016Q4 (the quarter following the end of the sample) should only use information that was available *upto and before* 2016Q3. These are genuine forecasts, made in advance using whatever information is available at the time. Ex-ante forecasts for 2016Q4 can be obtained by first genuine forecasts for each of the predictors for 2016Q4. For example we can use one of the simple methods introduced in Section \@ref(sec-2-methods) or more sophisticated pure time series approaches that follow in Chapters \@ref(ch-expsmooth) and \@ref(ch-arima). Alternatively forecasts by some other source, such as a government agency may be available and can be used.
 
 *Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption for 2016Q4 may use the actual observations of the predictors for 2016Q4, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
 
@@ -731,40 +717,44 @@ The model from which ex-post forecasts are produced should not be estimated usin
 
 A comparative evaluation of ex-ante forecasts and ex-post forecasts can help to separate out the sources of forecast uncertainty. This will show whether forecast errors have arisen due to poor forecasts of the predictor or due to a poor forecasting model.
 
+#### Example: Australian quarterly beer production {-}
 
+Normally, we cannot use actual future values of the predictor variables when producing ex-ante forecasts because their values will not be known in advance. However, the special predictors introduced in Section \@ref(Regr-UsefulPredictors) are all known in advance, as they are based on calendar variables (e.g., seasonal dummy variables or public holiday indicators) or deterministic functions of time. In such cases, there is
+no difference betweeen ex ante and ex post forecasts.
 
+```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
+fcast <- forecast(fit.beer) 
+autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression")
+```
 
 ### Scenario based forecasting {-}
 
-In this setting the forecaster assumes possible scenarios for the predictor variable that are of interest. For example the US policy maker may want to forecast consumption if there is a 1% growth in each income and savings but no change in unemployment,  for each of the four quarters following the end of the sample. 
-
-in 2011. Alternatively a 1% decline in income for each of the quarters may be
-of interest. The resulting forecasts are calculated and shown in Figure
-\@ref(fig:ConsInc4).
+In this setting the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the forecasts for the change in consumption if there is a growth of 1% and 0.5% respectively for income and savings, versus a decline of respectively 1% and 0.5% with no change in the unemployment rate for each of the four quarters following the end of the sample. The resulting forecasts are calculated and shown in Figure \@ref(fig:ConsInc4).
 
 ```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US."}
 
-fit.consBest<-lm(Consumption ~ Income + Savings + Unemployment, data = uschange)
-newdata=data.frame(cbind(Income=c(1,1,1,1),Savings=c(1,1,1,1),Unemployment=c(0,0,0,0)))
+fit.consBest<-tslm(Consumption ~ Income + Savings + Unemployment, data = uschange)
+newdata=data.frame(cbind(Income=c(1,1,1,1),Savings=c(0.5,0.5,0.5,0.5),Unemployment=c(0,0,0,0)))
 fcast.up <- forecast(fit.consBest, newdata=newdata) 
-
-newdata=data.frame(cbind(Income=c(-1,-1,-1,-1),Savings=c(-1,-1,-1,-1),Unemployment=c(0,0,0,0)))
+newdata=data.frame(cbind(Income=c(-1,-1,-1,-1),Savings=c(-0.5,-0.5,-0.5,-0.5),Unemployment=c(0,0,0,0)))
 fcast.down <- forecast(fit.consBest, newdata=newdata) 
-# autoplot is giving me trouble
 
-fcast <- forecast(fit.cons, newdata=data.frame(Income=c(-1,1)))
-autoplot(fcast, ylab="% change in consumption", xlab="% change in income")
+# autoplot is giving me trouble - 
+autoplot(uschange[,1])+ylab("% change in US consumption")+
+  autolayer(fcast.up, PI=TRUE, series="increase")+
+  autolayer(fcast.down, PI=TRUE, series="decrease")+
+  guides(colour=guide_legend(title="Scenario"))
 
 ```
 
 
 Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
 
+### Predicition intervals {-}
 
+Each forecast for the change in consumtpion in \@ref(fig:ConsInc4) is surounded by a prediction interval. The general formulat How these are calculated are shown 
 
-### Building a predictive regression {-}
-
-
+## Building a predictive regression {-}
 
 Forecasts obtained from the model are shown in Figure \@ref(fig:beerlm1).
 
@@ -782,114 +772,67 @@ When this calculation is done using an observed value of $x$ from the data, we c
 Assuming that the regression errors are normally distributed, an approximate 95% **forecast interval** (also called a prediction interval) associated with this forecast is given by
 $$\label{eq-4-pi}
   \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},$$
-where $N$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is given by equation . Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28 in equation . Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation .
+where $T$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is given by equation . Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28 in equation . Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation .
 
 Equation  shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is, we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
-
-
-
-
-
-
-[Linear trend]\@ref(ex-4-LinTrend)
-
-A common feature of time series data is a trend. Using regression we can model and forecast the trend in time series data by including $t=1,\dots,T,$ as a predictor variable: 
-$$
-  y_t=\beta_0+\beta_1t+\varepsilon_t.$$
-
-  
-Figure \@ref(fig-4-Tourism) shows a time series plot of aggregate tourist arrivals to Australia over the period 1980 to 2010 with the fitted linear trend line $\hat{y}_t= 0.3375+0.1761t$. Also plotted are the point and forecast intervals for the years 2011 to 2015.
-
-![Forecasting international tourist arrivals to Australia for the period
-2011-2015 using a linear trend. 80% and 95% forecast intervals are
-shown.](fig_4_Tourism)
-
-\@ref(fig-4-Tourism)
-
-fit.ex4 \<- tslm(austa   trend) f \<- forecast(fit.ex4, h=5,level=c(80,95))
-plot(f, ylab="International tourist arrivals to Australia (millions)",
-xlab="t") lines(fitted(fit.ex4),col="blue") summary(fit.ex4)
-
-Coefficients: Estimate Std. Error t value Pr(\>|t|) (Intercept) 0.337535
-0.100366 3.363 0.00218 \*\* trend 0.176075 0.005475 32.157 \< 2e-16
-\*\*\*
-
-
-
-
-### Ex-post and ex ante forecasting
-
-
-
 
 ## Matrix formulation {#Regr-MatrixEquations}
 
 *Warning: this is a more advanced optional section and assumes knowledge of
 matrix algebra.*
 
-The multiple regression model can be written as $$y_{i} = \beta_{0} + \beta_{1}
-x_{1,i} + \beta_{2} x_{2,i} + \cdots + \beta_{k} x_{k,i} + \varepsilon_{i}.$$
-
+Recall that multiple regression model can be written  as   $$y_{i} = \beta_{0} + \beta_{1}
+x_{1,t} + \beta_{2} x_{2,t} + \cdots + \beta_{k} x_{k,t} + \varepsilon_{t}.$$
 This expresses the relationship between a single value of the forecast variable
 and the predictors. It can be convenient to write this in matrix form where all
 the values of the forecast variable are given in a single equation. Let 
-$\bm{y} = (y_{1},\dots,y_{N})'$, 
-$\bm{\varepsilon} = (\varepsilon_{1},\dots,\varepsilon_{N})'$, 
+$\bm{y} = (y_{1},\dots,y_{T})'$, 
+$\bm{\varepsilon} = (\varepsilon_{1},\dots,\varepsilon_{T})'$, 
 $\bm{\beta} = (\beta_{0},\dots,\beta_{k})'$ and
 $$
 \bm{X} = \left[\begin{matrix}
   1 & x_{1,1} & x_{2,1} & \dots & x_{k,1}\\ 
   1 & x_{1,2} & x_{2,2} & \dots & x_{k,2}\\
   \vdots& \vdots& \vdots&& \vdots\\
-  1 & x_{1,N}& x_{2,N}& \dots& x_{k,N}
+  1 & x_{1,T}& x_{2,T}& \dots& x_{k,T}
 \end{matrix}\right].
 $$ 
-Then
+Note that the $\bm{X}$ matrix has $T$ rows reflecting the number of observations and $k+1$ columns reflecting the number of predictors and the intercept which is represented by the column of ones. Then
 $$\bm{y} = \bm{X}\bm{\beta} + \bm{\varepsilon}.$$
 
 ### Least squares estimation {-}
 
 Least squares estimation is obtained by minimizing the expression
-$\bm{\varepsilon}'\bm{\varepsilon} = (\bm{Y} - \bm{X}\bm{\beta})'(\bm{Y} -
+$\bm{\varepsilon}'\bm{\varepsilon} = (\bm{y} - \bm{X}\bm{\beta})'(\bm{y} -
 \bm{X}\bm{\beta})$. It can be shown that this is minimized when $\bm{\beta}$
 takes the value 
-$$\hat{\bm{\beta}} = (\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y}$$ 
+$$\hat{\bm{\beta}} = (\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$$ 
 This is sometimes known as the "normal equation". The estimated coefficients
-require the inversion of the matrix $\bm{X}'\bm{X}$. If this matrix is
-singular, then the model cannot be estimated. This will occur, for example, if
-you fall for the "dummy variable trap" (having the same number of dummy
-variables as there are categories of a categorical predictor).
+require the inversion of the matrix $\bm{X}'\bm{X}$. If $\bm{X}$ is not of full column rank then matrix $\bm{X}'\bm{X}$ is singular and the model cannot be estimated. This will occur, for example, if you fall for the "dummy variable trap", i.e., having the same number of dummy variables as there are categories of a categorical predictor, as discussed in Section \@ref(Regr-UsefulPredictors).
 
 The residual variance is estimated using $$\hat{\sigma}^2 =
-\frac{1}{N-k-1}(\bm{Y} - \bm{X}\hat{\bm{\beta}})'(\bm{Y} -
+\frac{1}{T-k-1}(\bm{y} - \bm{X}\hat{\bm{\beta}})'(\bm{y} -
 \bm{X}\hat{\bm{\beta}}).$$
 
-### Fitted values and cross-validation
+### Fitted values and cross-validation {-}
 
 The normal equation shows that the fitted values can be calculated using
-$$\bm{\hat{Y}} = \bm{X}\hat{\bm{\beta}} =
-\bm{X}(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y} = \bm{H}\bm{Y},$$ where $\bm{H} =
+$$\bm{\hat{y}} = \bm{X}\hat{\bm{\beta}} =
+\bm{X}(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y} = \bm{H}\bm{y},$$ where $\bm{H} =
 \bm{X}(\bm{X}'\bm{X})^{-1}\bm{X}'$ is known as the "hat-matrix" because it is
-used to compute $\bm{\hat{Y}}$ ("Y-hat").
+used to compute $\bm{\hat{y}}$ ("y-hat").
 
-If the diagonal values of $\bm{H}$ are denoted by $h_{1},\dots,h_{N}$, then the
+If the diagonal values of $\bm{H}$ are denoted by $h_{1},\dots,h_{T}$, then the
 cross-validation statistic can be computed using $$\text{CV} =
-\frac{1}{N}\sum_{i=1}^N [e_{i}/(1-h_{i})]^2,$$ where $e_{i}$ is the residual
-obtained from fitting the model to all $N$ observations. Thus, it is not
-necessary to actually fit $N$ separate models when computing the CV statistic.
+\frac{1}{T}\sum_{t=1}^T [e_{t}/(1-h_{t})]^2,$$ where $e_{t}$ is the residual
+obtained from fitting the model to all $T$ observations. Thus, it is not
+necessary to actually fit $T$ separate models when computing the CV statistic.
 
-### Forecasts {-}
+### Forecasts and prediction intervals {-}
 
-Let $\bm{X}^*$ be a row vector containing the values of the predictors for the
-forecasts (in the same format as $\bm{X}$). Then the forecast is given by
-$$\hat{y} = \bm{X}^*\hat{\bm{\beta}} =
-\bm{X}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y}$$ and its variance by $$\sigma^2
-\left[1 + \bm{X}^* (\bm{X}'\bm{X})^{-1} (\bm{X}^*)'\right].$$ Then a 95%
-prediction interval can be calculated (assuming normally distributed errors) as
-$$\hat{y} \pm 1.96 \hat{\sigma} \sqrt{1 + \bm{X}^* (\bm{X}'\bm{X})^{-1}
-(\bm{X}^*)'}.$$ This takes account of the uncertainty due to the error term
-$\varepsilon$ and the uncertainty in the coefficient estimates. However, it
-ignores any errors in $\bm{X}^*$. So if the future values of the predictors are
+Let $\bm{x}^*$ be a row vector containing the values of the predictors (in the same format as $\bm{X}$) for which we want to generate a forecast . Then the forecast is given by
+$$\hat{y} = \bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y}$$ and its variance is given by $$\sigma^2 \left[1 + \bm{x}^* (\bm{X}'\bm{X})^{-1} (\bm{x}^*)'\right].$$ A 95% prediction interval can be calculated (assuming normally distributed errors) as $$\hat{y} \pm 1.96 \hat{\sigma} \sqrt{1 + \bm{x}^* (\bm{X}'\bm{X})^{-1} (\bm{x}^*)'}.$$ This takes account of the uncertainty due to the error term $\varepsilon$ and the uncertainty in the coefficient estimates. However, it
+ignores any errors in $\bm{x}^*$. So if the future values of the predictors are
 uncertain, then the prediction interval calculated using this expression will
 be too narrow.
 
@@ -1244,7 +1187,39 @@ Compute 95% prediction intervals. Make a graph of these prediction intervals and
 
 What is the correlation between $P$ and $P^{2}$? Does this suggest any general problem to be considered in dealing with polynomial regressions---especially of higher orders?
 
+
+
+
+[Linear trend]\@ref(ex-4-LinTrend)
+
+A common feature of time series data is a trend. Using regression we can model and forecast the trend in time series data by including $t=1,\dots,T,$ as a predictor variable: 
+
+$$  y_t=\beta_0+\beta_1t+\varepsilon_t.
+  $$
+
+Figure \@ref(fig-4-Tourism) shows a time series plot of aggregate tourist arrivals to Australia over the period 1980 to 2010 with the fitted linear trend line $\hat{y}_t= 0.3375+0.1761t$. Also plotted are the point and forecast intervals for the years 2011 to 2015.
+
+![Forecasting international tourist arrivals to Australia for the period
+2011-2015 using a linear trend. 80% and 95% forecast intervals are
+shown.](fig_4_Tourism)
+
+\@ref(fig-4-Tourism)
+
+fit.ex4 \<- tslm(austa   trend) f \<- forecast(fit.ex4, h=5,level=c(80,95))
+plot(f, ylab="International tourist arrivals to Australia (millions)",
+xlab="t") lines(fitted(fit.ex4),col="blue") summary(fit.ex4)
+
+Coefficients: Estimate Std. Error t value Pr(\>|t|) (Intercept) 0.337535
+0.100366 3.363 0.00218 \*\* trend 0.176075 0.005475 32.157 \< 2e-16
+\*\*\*
+
+
+
+
 ## Further reading
+
+
+
 
 
 Regression with cross-sectional data

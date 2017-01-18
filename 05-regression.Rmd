@@ -1,4 +1,4 @@
-#Linear regression models {#ch-regression}
+# Linear regression models {#ch-regression}
 
 In this chapter we discuss linear regression models. The basic concept is that we forecast the time series of interest ($y$) assuming it has a linear relationship with other time series ($x$) we observe.
 
@@ -180,9 +180,9 @@ summary(fit.consMR)
 
 ### Fitted values {-}
 
-Predictions of $y_t$ can be obtained by ignoring the error in the regression equation and using the estimated coefficients. Hence, plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the regression equation
+Predictions of $y_t$ can be obtained by ignoring the error in the regression equation and using the estimated coefficients. Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the regression equation
 \begin{equation}
-  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}.
+  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}
   (\#eq:prediction)
 \end{equation}
 returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. The following plots show the actual values compared to the fitted (i.e.,predicted) values for the percentage change in the US consumption expenditure series. The time plot shows that the fitted values follow the actual data fairly closely. This is verified by the strong positive relationship shown by the scatterplot. 
@@ -505,8 +505,7 @@ Figure \@ref(fig:beerlm3) plots the actual monthly beer production versus the fi
 ### Standard error of the regression {-}
 
 Another measure of how well the model has fitted the data is the standard deviation of the residuals, which is often known as the "standard error of the regression" and is calculated by
-$$\label{eq-4-se} 
-s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.$$
+$$\label{regr-eq-se} s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.$$
 
 Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation. Here, we divide by $T−k−1$ because we have estimated k+1 parameters (the intercept and a coefficient for each predictor variable) in computing the residuals. 
 
@@ -752,7 +751,21 @@ Forecast intervals for scenario based forecasts do not include the uncertainty a
 
 ### Predicition intervals {-}
 
-Each forecast for the change in consumtpion in \@ref(fig:ConsInc4) is surounded by a prediction interval. The general formulat How these are calculated are shown 
+Each forecast for the change in consumtpion in Figure \@ref(fig:ConsInc4) is surounded by a prediction interval. The general formulation of how to calculate these for multiple regression is presented in Section \@ref(Regr-MatrixEquations). As this involves the knowledge of some matrix algebra we present here the case for calculating prediction intervals for a simple regression model where a forecast can be obtained using the equation,
+$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x.$$
+Assuming that the regression errors are normally distributed, an approximate 95% predcition interval (also called a forecast interval) associated with this forecast is given by
+$$\hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}}$$
+where $T$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is the standard error of the regression given by equation \@ref{eq:regr-eq-se}. Similarly, an 80\% forecast interval can be obtained by replacing 1.96 by 1.28 in equation~\eqref{eq-4-pi}. Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref{pcmultipiers}. If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation \eqref{eq-4-pi}.
+
+Equation~\eqref{eq-4-pi} shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is,  we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
+
+The estimated regression line in the Car data example is
+\[
+    \hat{y}=12.53-0.22x.
+\]
+For the Chevrolet Aveo (the first car in the list) $x_1$=25 mpg and $y_1=6.6$ tons of CO$_2$ per year. The model returns a fitted value of $\hat{y}_1$=7.00, i.e., $e_1=-0.4$. For a car with City driving fuel economy $x=30$ mpg, the average footprint forecasted is $\hat{y}=5.90$ tons of CO$_2$ per year. The corresponding 95\% and 80\% forecast intervals are [4.95, 6.84] and [5.28, 6.51] respectively (calculated using R)\@.
+
+
 
 ## Building a predictive regression {-}
 

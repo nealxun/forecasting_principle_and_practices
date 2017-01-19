@@ -10,9 +10,7 @@ The forecast variable ($y$) is sometimes also called the regressand, dependent o
 
 ### Simple linear regression {-}
 
-$$
-  y_t = \beta_0 + \beta_1 x_t + \varepsilon_t.
-$$
+$$  y_t = \beta_0 + \beta_1 x_t + \varepsilon_t. $$
 
 An example of data from such a model is shown in Figure \@ref(fig:SLRpop1). The parameters $\beta_0$ and $\beta_1$ denote the intercept and the slope of the line respectively. The intercept $\beta_0$ represents the predicted value of $y$ when $x=0$. The slope $\beta_1$ represents the average predicted change in $y$ resulting from a one unit change in $x$.
 
@@ -218,25 +216,7 @@ It is very common for time series data to be trending. A linear trend can be mod
 $$
   y_{t}= \beta_0+\beta_1t+\varepsilon_t,
 $$
-where $t=1,\ldots,T$. Quadratic or higher order trends can also be obtained by specifying 
-\[
-  x_{1,t} =t,\quad x_{2,t}=t^2,\quad \dots
-\]
-However, it is not recommended that quadratic or higher order trends are used in forecasting. When they are extrapolated, the resulting forecasts are often very unrealistic.
-
-A better approach is to use a piecewise linear trend which bends at some time. If the trend bends at time $\tau$, then it can be specified by including the following predictors in the model.
-\begin{align*}
-  x_{1,t} & = t \\ 
-  x_{2,t} &= \left\{ 
-             \begin{array}{ll} 
-               0 & t < \tau\\ 
-               (t-\tau) &  t \ge \tau
-             \end{array}\right.
-\end{align*}
-If the associated coefficients of $x_{1,t}$ and $x_{2,t}$ are $\beta_1$ and $\beta_2$, then $\beta_1$ gives the slope of the trend before time $\tau$, while the slope of the line after time $\tau$ is given by $\beta_1+\beta_2$.
-
-An extension of this idea is to use a spline (see Section \@ref(sec-5-6-NonLinear)).
-
+where $t=1,\ldots,T$. 
   
 ### Dummy variables {-}
 
@@ -505,7 +485,10 @@ Figure \@ref(fig:beerlm3) plots the actual monthly beer production versus the fi
 ### Standard error of the regression {-}
 
 Another measure of how well the model has fitted the data is the standard deviation of the residuals, which is often known as the "standard error of the regression" and is calculated by
-$$\label{regr-eq-se} s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.$$
+\begin{equation}
+  s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.
+  (\#eq:Regr-se)
+\end{equation}
 
 Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation. Here, we divide by $T−k−1$ because we have estimated k+1 parameters (the intercept and a coefficient for each predictor variable) in computing the residuals. 
 
@@ -549,8 +532,7 @@ A common approach that is *not recommended* is to plot the forecast variable
 against a particular predictor and if it shows no noticeable relationship, drop it. This is invalid because it is not always possible to see the relationship from a scatterplot, especially when the effect of other predictors has not been accounted for.
 
 Another common approach which is also invalid is to do a multiple linear
-regression on all the predictors and disregard all variables whose $p$-values are greater than 0.05. To start with, statistical significance does not always indicate predictive value. Even if forecasting is not the goal, this is not a good strategy because the $p$-values can be misleading when two or more predictors are correlated with each other (see Section
-\@ref(Regr-MultiCol)).
+regression on all the predictors and disregard all variables whose $p$-values are greater than 0.05. To start with, statistical significance does not always indicate predictive value. Even if forecasting is not the goal, this is not a good strategy because the $p$-values can be misleading when two or more predictors are correlated with each other (see Section \@ref(Regr-MultiCol)).
 
 Instead, we will use a measure of predictive accuracy. Five such measures are introduced in this section.
 
@@ -701,16 +683,16 @@ See James, G., D. Witten, T. Hastie, and R. Tibshirani. 2013. An Introduction to
 ## Forecasting with regression {#Regr-ForeWithRegr}
 
 Recall that predictions of $y$ can be otained using equation \@ref(eq:prediction),  
-$$  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}$$
+$$  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t},$$
 which comprises the estimated coefficients and ignores the error in the regression equation. Plugging in the values of the predictor variables $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ returned the fitted (in-sample) values of $y$. What we are interested in here is forecasting future values of $y$.
 
 ### Ex-ante versus ex-post forecasts {-}
 
 When using regression models for time series data, we need to distinguish between the different types of forecasts that can be produced, depending on what is assumed to be known when the forecasts are computed.
 
-*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex-ante forecasts for the percentage change in US consumption for 2016Q4 (the quarter following the end of the sample) should only use information that was available *upto and before* 2016Q3. These are genuine forecasts, made in advance using whatever information is available at the time. Ex-ante forecasts for 2016Q4 can be obtained by first genuine forecasts for each of the predictors for 2016Q4. For example we can use one of the simple methods introduced in Section \@ref(sec-2-methods) or more sophisticated pure time series approaches that follow in Chapters \@ref(ch-expsmooth) and \@ref(ch-arima). Alternatively forecasts by some other source, such as a government agency may be available and can be used.
+*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex-ante forecasts for the percentage change in US consumption for the four quarters following the end of the sample, 2016Q4:2017Q3, should only use information that was available *upto* 2016Q3. These are genuine forecasts, made in advance using whatever information is available at the time. Ex-ante forecasts can be obtained by first generating forecasts for each of the predictors. For example we can use one of the simple methods introduced in Section \@ref(sec-2-methods) or more sophisticated pure time series approaches that follow in Chapters \@ref(ch-expsmooth) and \@ref(ch-arima). Alternatively forecasts by some other source, such as a government agency may be available and can be used.
 
-*Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption for 2016Q4 may use the actual observations of the predictors for 2016Q4, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
+*Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption may use the actual observations of the predictors, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
 
 The model from which ex-post forecasts are produced should not be estimated using data from the forecast period. That is, ex-post forecasts can assume knowledge of the predictor variable (the $x$ variable), but should not assume knowledge of the data that are to be forecast (the $y$ variable).
 
@@ -728,9 +710,9 @@ autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression"
 
 ### Scenario based forecasting {-}
 
-In this setting the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the forecasts for the change in consumption if there is a growth of 1% and 0.5% respectively for income and savings, versus a decline of respectively 1% and 0.5% with no change in the unemployment rate for each of the four quarters following the end of the sample. The resulting forecasts are calculated and shown in Figure \@ref(fig:ConsInc4).
+In this setting the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the projected change in consumption if there is a constant growth of 1% and 0.5% respectively for income and savings, versus a repsective decline of 1% and 0.5% for each of the four quarters following the end of the sample, with no change in the unemployment rate. The resulting forecasts are calculated and shown in Figure \@ref(fig:ConsInc4).
 
-```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US."}
+```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
 
 fit.consBest<-tslm(Consumption ~ Income + Savings + Unemployment, data = uschange)
 newdata=data.frame(cbind(Income=c(1,1,1,1),Savings=c(0.5,0.5,0.5,0.5),Unemployment=c(0,0,0,0)))
@@ -746,55 +728,60 @@ autoplot(uschange[,1])+ylab("% change in US consumption")+
 
 ```
 
-
-Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
+Prediction intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
 
 ### Predicition intervals {-}
 
-Each forecast for the change in consumtpion in Figure \@ref(fig:ConsInc4) is surounded by a prediction interval. The general formulation of how to calculate these for multiple regression is presented in Section \@ref(Regr-MatrixEquations). As this involves the knowledge of some matrix algebra we present here the case for calculating prediction intervals for a simple regression model where a forecast can be obtained using the equation,
+With each forecast for the change in consumption Figure \@ref(fig:ConsInc4) a 95% and an 80% prediction interval is also included. The general formulation of how to calculate prediction intervals for multiple regression models is presented in Section \@ref(Regr-MatrixEquations). As this involves some matrix algebra we present here the case for calculating prediction intervals for a simple regression where a forecast can be generated using the equation, 
 $$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x.$$
 Assuming that the regression errors are normally distributed, an approximate 95% predcition interval (also called a forecast interval) associated with this forecast is given by
-$$\hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}}$$
-where $T$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is the standard error of the regression given by equation \@ref{eq:regr-eq-se}. Similarly, an 80\% forecast interval can be obtained by replacing 1.96 by 1.28 in equation~\eqref{eq-4-pi}. Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref{pcmultipiers}. If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation \eqref{eq-4-pi}.
+\begin{equation} 
+  \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
+  (\#eq:Regr-pi)
+\end{equation}
+where $T$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is the standard error of the regression given by Equation \@ref(eq:Regr-se). Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28. Other prediction intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by Equation \@ref(eq:Regr-pi).
 
-Equation~\eqref{eq-4-pi} shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is,  we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
+Equation \@ref(eq:Regr-pi) shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is,  we are more certain about our forecasts when considering values of the predictor variable close to its sample mean. 
 
-The estimated regression line in the Car data example is
-\[
-    \hat{y}=12.53-0.22x.
+##### No need for the following I think {-}
+I was going to show the difference between a PI for the mean income in the next quarter v a PI for an extreme case. 
+The estimated simple regression line in the US consumpion example is
+\[ \hat{y}_t=`r round(coef(fit.cons)[1],2)` + `r round(coef(fit.cons)[2],2)`x_t.
 \]
+
+```{r, ConsSimple, echo=TRUE, cache=TRUE, fig.cap="Prediction intervals for the mean and extreme increase."}
+
+avInc<-mean(uschange[,"Income"])
+
+fcast.up <- forecast(fit.cons, newdata=data.frame(Income=rep(avInc,8))) 
+fcast.down <- forecast(fit.cons, newdata=data.frame(Income=rep(10,8))) 
+
+fcast.up$upper[1,2]-fcast.up$lower[1,2]
+fcast.down$upper[1,2]-fcast.down$lower[1,2]
+
+# autoplot is giving me trouble - 
+autoplot(uschange[,1])+ylab("% change in US consumption")+
+  autolayer(fcast.up, PI=TRUE, series="increase")+
+  autolayer(fcast.down, PI=TRUE, series="decrease")+
+  guides(colour=guide_legend(title="Scenario"))
+
+```
+
+
+
 For the Chevrolet Aveo (the first car in the list) $x_1$=25 mpg and $y_1=6.6$ tons of CO$_2$ per year. The model returns a fitted value of $\hat{y}_1$=7.00, i.e., $e_1=-0.4$. For a car with City driving fuel economy $x=30$ mpg, the average footprint forecasted is $\hat{y}=5.90$ tons of CO$_2$ per year. The corresponding 95\% and 80\% forecast intervals are [4.95, 6.84] and [5.28, 6.51] respectively (calculated using R)\@.
 
 
 
-## Building a predictive regression {-}
+### Building a predictive regression model {-}
 
-Forecasts obtained from the model are shown in Figure \@ref(fig:beerlm1).
-
-When the values of $x_1,\dots,x_k$ are new values (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
-
-
-Forecasts from a simple linear model are easily obtained using the equation
-$$
-  \hat{y}=\hat{\beta}_0+\hat{\beta}_1 x
-$$
-where $x$ is the value of the predictor for which we require a forecast. That is, if we input a value of $x$ in the equation we obtain a corresponding forecast $\hat{y}$. 
-
-When this calculation is done using an observed value of $x$ from the data, we call the resulting value of $\hat{y}$ a "fitted value". This is not a genuine forecast as the actual value of $y$ for that predictor value was used in estimating the model, and so the value of $\hat{y}$ is affected by the true value of $y$. When the values of $x$ is a new value (i.e., not part of the data that were used to estimate the model), the resulting value of $\hat{y}$ is a genuine forecast.
-
-Assuming that the regression errors are normally distributed, an approximate 95% **forecast interval** (also called a prediction interval) associated with this forecast is given by
-$$\label{eq-4-pi}
-  \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},$$
-where $T$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is given by equation . Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28 in equation . Other appropriate forecasting intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by equation .
-
-Equation  shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is, we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
 
 ## Matrix formulation {#Regr-MatrixEquations}
 
 *Warning: this is a more advanced optional section and assumes knowledge of
 matrix algebra.*
 
-Recall that multiple regression model can be written  as   $$y_{i} = \beta_{0} + \beta_{1}
+Recall that multiple regression model can be written  as   $$y_{t} = \beta_{0} + \beta_{1}
 x_{1,t} + \beta_{2} x_{2,t} + \cdots + \beta_{k} x_{k,t} + \varepsilon_{t}.$$
 This expresses the relationship between a single value of the forecast variable
 and the predictors. It can be convenient to write this in matrix form where all
@@ -810,16 +797,17 @@ $$
   1 & x_{1,T}& x_{2,T}& \dots& x_{k,T}
 \end{matrix}\right].
 $$ 
-Note that the $\bm{X}$ matrix has $T$ rows reflecting the number of observations and $k+1$ columns reflecting the number of predictors and the intercept which is represented by the column of ones. Then
+Then
 $$\bm{y} = \bm{X}\bm{\beta} + \bm{\varepsilon}.$$
+
+Note that the $\bm{X}$ matrix has $T$ rows reflecting the number of observations and $k+1$ columns reflecting the number of predictors and the intercept which is represented by the column of ones. 
 
 ### Least squares estimation {-}
 
 Least squares estimation is obtained by minimizing the expression
 $\bm{\varepsilon}'\bm{\varepsilon} = (\bm{y} - \bm{X}\bm{\beta})'(\bm{y} -
 \bm{X}\bm{\beta})$. It can be shown that this is minimized when $\bm{\beta}$
-takes the value 
-$$\hat{\bm{\beta}} = (\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$$ 
+takes the value $$\hat{\bm{\beta}} = (\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$$ 
 This is sometimes known as the "normal equation". The estimated coefficients
 require the inversion of the matrix $\bm{X}'\bm{X}$. If $\bm{X}$ is not of full column rank then matrix $\bm{X}'\bm{X}$ is singular and the model cannot be estimated. This will occur, for example, if you fall for the "dummy variable trap", i.e., having the same number of dummy variables as there are categories of a categorical predictor, as discussed in Section \@ref(Regr-UsefulPredictors).
 
@@ -849,26 +837,139 @@ ignores any errors in $\bm{x}^*$. So if the future values of the predictors are
 uncertain, then the prediction interval calculated using this expression will
 be too narrow.
 
-## Non-linear regression {#Regr-NonLinear}
+## Nonlinear regression {#Regr-NonLinear}
 
-Although the linear relationship assumed at the beginning of this chapter is often adequate, there are cases for which a non-linear functional form is more suitable. The scatter plot of Carbon versus City in Figure \@ref(fig-4-car)  hows an example where a non-linear functional form is required.
+Although the linear relationship assumed so far in this chapter is often adequate, there are cases for which a nonlinear functional form is more suitable. To keep things simple in this section suppose we have only one predictor $x$. 
 
-Simply transforming variables $y$ and/or $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a non-linear specification. The most commonly used transformation is the (natural) logarithmic (see Section \@ref(sec-2-4-TransAdj)). Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero.
+Simply transforming the forecast variable $y$ and/or the predictor variable $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a nonlinear specification. The most commonly used transformation is the (natural) logarithmic (see Section \@ref(sec-transformations)).
 
 A **log-log** functional form is specified as 
 $$
-  \log y_t=\beta_0+\beta_1 \log x_t + \varepsilon_t.
+  \log y=\beta_0+\beta_1 \log x +\varepsilon.
 $$
-In this model, the slope $\beta_1$ can be interpreted as an elasticity: $\beta_1$ is the average percentage change in $y$ resulting from a $1\%$ change in $x$.
+In this model, the slope $\beta_1$ is interpreted as an elasticity, $\beta_1$ is the average percentage change in $y$ resulting from a $1\%$ change in $x$. Other useful forms can also be specified. The log-linear form is specified by only transforming the forecast variable and the linear-log form is obtained by transforming the predictror. 
+
+Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero. In the case that variable $x$ contain zeros we use the transformation $\log(x+1)$. That is, we add one to the value of the variable and then take logarithms. This has a similar effect to taking logarithms but avoids the problem of zeros. It also has the neat side-effect of zeros on the original scale remaining zeros on the transformed scale. 
+
+There are cases for which simply transforming your data will not be adequate and a more general specification may be required. Then the model we use is
+$$y=f(x)+\varepsilon$$
+where $f$ is a nonlinear function. In standard (linear) regression, $f(x)=\beta_{0} + \beta_{1} x$. In the specification of nonlinear regression that follows, we allow $f$ to be a more flexible nonlinear function of $x$, compared to simply a logarithmic or other transformation. 
+
+One of the simplest specifications is to make $f$ piecewise linear. That is, we introduce points where the slope of $f$ can change. These points are called "knots". This can be achieved by leting $x_{1,t}=x$ and introducing variable $x_{2,t}=x$ such that 
+\begin{align*}
+  x_{1,t} & = x \\ 
+  x_{2,t} = (x-c)_+ &= \left\{ 
+             \begin{array}{ll} 
+               0 & x < c\\ 
+               (x-c) &  x \ge c
+             \end{array}\right.
+\end{align*}
+The notation $(x-c)_+$ means the value $x-c$ if it is positive and 0 otherwise. This forces the slope to bend at point $c$. Additional bends can be included in the relationship by adding further variables of the above form. An example of this follows by considering $x=t$ and fitting a piecewise linear trend to a times series. 
+
+Piecewise linear relationships constructed in this way are a special case of *regression splines*. In general, a linear regression spline is obtained using
+$$ x_{1}= x \quad x_{2} = (x-c_{1})_+ \quad\ldots\quad x_{k} = (x-c_{k-1})_+$$
+where $c_{1},\dots,c_{k-1}$ are the knots (the points at which the line can bend). Selecting the number of knots ($k-1$) and where they should be positioned can be difficult and somewhat arbitrary. Some automatic knot selection algorithms are available in some software, but are not yet widely used.
+
+A smoother result is obtained using piecewise cubics rather than piecewise lines. These are constrained so they are continuous (they join up) and they are smooth (so there are no sudden changes of direction as we see with piecewise linear splines). In general, a cubic regression spline is written as
+$$ x_{1}= x \quad x_{2}=x^2 \quad x_3=x^3 \quad x_4 = (x-c_{1})_+ \quad\dots\quad x_{k} = (x-c_{k-3})_+.$$
+Cubic splines usually give a better fit to the data. However, forecasting values of $y$ when $x$ is outside the range of the historical data becomes very unreliable.  
+
+### Forecasting with a nonlinear trend {-} 
+In Section \@ref(Regr-UsefulPredictors) fitting a linear trend to a time series by setting $x=t$ was introduced. However, there are many cases for which a non-linear trend may be more suitable. An example of a non-linear trend is using quadratic or higher order trends  obtained by specifying 
+\[
+  x_{1,t} =t,\quad x_{2,t}=t^2,\quad \dots
+\]
+However, it is not recommended that quadratic or higher order trends are used in forecasting. When they are extrapolated, the resulting forecasts are often very unrealistic.
+
+A better approach is to use the piecewise specification introduced above and fit a piecwise linear trend which bends at some time. We can think of this as a nonlinear trend constructed of linear pieces. If the trend bends at time $\tau$, then it can be specified by simply replacing $x=t$ and $c=\tau$ above such that we include the predictors,
+\begin{align*}
+  x_{1,t} & = t \\ 
+  x_{2,t} = (t-\tau)_+ &= \left\{ 
+             \begin{array}{ll} 
+               0 & t < \tau\\ 
+               (t-\tau) &  t \ge \tau
+             \end{array}\right.
+\end{align*}
+in the model. If the associated coefficients of $x_{1,t}$ and $x_{2,t}$ are $\beta_1$ and $\beta_2$, then $\beta_1$ gives the slope of the trend before time $\tau$, while the slope of the line after time $\tau$ is given by $\beta_1+\beta_2$. Additional bends can be included in the relationship by adding further variables of the form $(t-\tau)_+$ where $\tau$ is the "knot" or point in time at which the line should bend. 
+
+#### Example: Boston marathon winning times {-}
+
+Figure \@ref(fig:marathonLinear) below in the left panel shows the Boston marathon winning times (in minutes) since it started in 1897. The time series shows a general downward trend as the winning times have been improving over the years. The panel on the right shows the residuals from fitting a linear trend to the data. The plot shows an obvious nonlinear pattern which has not been captured by the linear trend. 
+
+```{r marathonLinear, echo=FALSE, fig.cap="Fitting a linear trend to the Boston marathon winning times is inadequate", message=TRUE, warning=FALSE, cache=TRUE}
+setwd("C:/George/FPPLocalOnly")
+dat <- read.csv("Marathon.csv", header=TRUE, sep=",")
+times<-window(ts(dat[,2], freq=1,start=dat[1,1]))
+fit.lin<-tslm(times~trend)
+
+p1<-autoplot(times)+
+  autolayer(fitted(fit.lin),series = "Linear trend")+ 
+  xlab("Year") +  ylab("Finishing times in minutes")+
+  guides(colour=guide_legend(title=" "))+ 
+  theme(legend.position = "none")
+
+p2<-autoplot(residuals(fit.lin))+
+    xlab("Year") +  ylab("Residuals from a linear trend")
+  
+
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+
+```
+
+
+Fitting an exponential trend to the data can be achieved by transforming the $y$ variable so that the model to be fitted is,
+$$\log y_t=\beta_0+\beta_1 t +\varepsilon_t.$$
+The fitted exponential trend and forward projections from this are shown in Figure \@ref(fig:marathonNonlinear) below. The plot shows that in comparison to the linear trend fitting an exponential trend seems to give a more sensible projection in that the winning times with decrease in the future but in an exponentially decaying rate rather than a linear non-changing rate. 
+
+Simply eyeballing the winning times seems to reveal three very different periods. There seems a lot of volatility in the winning times from the beginning upto aobout 1940 with the winning times decreasing overall but with a significant increase in the decade of the 1920s.
+
+```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE}
+setwd("C:/George/FPPLocalOnly")
+dat <- read.csv("Marathon.csv", header=TRUE, sep=",")
+times<-window(ts(dat[,2], freq=1,start=dat[1,1]))
+fit.lin<-tslm(times~trend)
+fit.exp<-tslm(times~trend,lambda = 0)
+h=10
+fcasts.lin<-forecast(fit.lin,h=h)
+fcasts.exp<-forecast(fit.exp,h=h)
+
+t.break1=1940
+t.break2=1980
+
+t<-ts(dat[,1],start=dat[1,1],freq=1)
+t1<-ts(pmax(0,t-t.break1),start=1897,freq=1)
+t2<-ts(pmax(0,t-t.break2),start=1897,freq=1)
+
+fit.pw=tslm(times~t+t1+t2)
+
+t.new<-t[length(t)]+seq(h)
+t1.new<-t1[length(t1)]+seq(h)
+t2.new<-t2[length(t2)]+seq(h)
+
+newdata<-data.frame(cbind(t=t.new,t1=t1.new,t2=t2.new))
+fcasts.pw<-forecast(fit.pw,newdata = newdata)
+
+fit.spline=tslm(times~t+I(t^2)+I(t^3)+I(t1^3)+I(t2^3))
+fcasts.spline<-forecast(fit.spline,newdata = newdata)
+
+autoplot(times)+
+  autolayer(fitted(fit.lin),series = "Linear")+
+  autolayer(fitted(fit.exp),series="Exponetial")+
+  autolayer(fitted(fit.pw),series = "Piece-wise")+
+  autolayer(fitted(fit.spline),series = "Cubic spline")+
+  autolayer(fcasts.lin$mean,series = "Linear")+
+  autolayer(fcasts.exp$mean,series="Exponetial") +
+  autolayer(fcasts.pw$mean,series="Piece-wise") +
+  autolayer(fcasts.spline$mean,series="Cubic spline") +
+  xlab("Year") +  ylab("Finishing times in minutes")+
+  ggtitle("Boston Marathon")+guides(colour=guide_legend(title=" "))
+
+```
 
 
 The plot shows that in the original scale the slope of the fitted regression line using a log-log functional form is non-constant. The slope depends on $x$ and can be calculated for each point (see Table \@ref(tbl-4-functionalforms)). In the logarithmic scale the slope of the line which is now interpreted as an elasticity is constant. So estimating a log-log functional form produces a constant elasticity estimate in contrast to the linear model which produces a constant slope estimate.
 
-
-
 Other useful forms are the log-linear form and the linear-log form. Table \@ref(tbl-4-functionalforms) summarises these.
-
-
 
 <span>llll</span> Model & Functional form & Slope & Elasticity\ linear &
 $y=\beta_0+\beta_1 x $ & $\beta_1$ & $\beta_1y/x$\ log-log & $\log
@@ -879,14 +980,10 @@ y=\beta_0+\beta_1 x $ & $\beta_1y$ & $\beta_1x$\
 ![The four non-linear forms shown in Table \@ref(tbl-4-functionalforms), for
 $\beta_1<0$.](fig_4_nlforms)
 
-
-
-
 Sometimes the relationship between the forecast variable and a predictor is not
 linear, and then the usual multiple regression equation needs modifying. In
 Section \@ref(sec-4-7-NonLinearFF), we discussed using log transformations to
-deal with a variety of non-linear forms, and in Section
-\@ref(sec-5-2-UsefulPredictors) we showed how to include a piecewise-linear
+deal with a variety of non-linear forms, and in Section \@ref(sec-5-2-UsefulPredictors) we showed how to include a piecewise-linear
 trend in a model; that is a nonlinear trend constructed out of linear pieces.
 Allowing other variables to enter in a nonlinear manner can be handled in
 exactly the same way.
@@ -899,9 +996,6 @@ regression, we allow $f$ to be a nonlinear function of $x$.
 One of the simplest ways to do nonlinear regression is to make $f$ piecewise
 linear. That is, we introduce points where the slope of $f$ can change. These
 points are called "knots".
-
-
-
 
 Additional bends can be included in the relationship by adding further
 variables of the form $(x-c)_+$ where $c$ is the "knot" or point at which the
@@ -940,6 +1034,10 @@ fcast3[["mean"]],col="red")
 This usually gives a better fit to the data, although forecasting values of
 Carbon when City is outside the range of the historical data becomes very
 unreliable.
+
+
+
+
 
 ## Correlation, causation and forecasting {#Regr-MultiCol}
 

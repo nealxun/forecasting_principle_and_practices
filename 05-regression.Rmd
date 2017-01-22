@@ -1193,48 +1193,7 @@ Compute 95% prediction intervals. Make a graph of these prediction intervals and
 
 What is the correlation between $P$ and $P^{2}$? Does this suggest any general problem to be considered in dealing with polynomial regressions---especially of higher orders?
 
-
-
-
-[Linear trend]\@ref(ex-4-LinTrend)
-
-A common feature of time series data is a trend. Using regression we can model and forecast the trend in time series data by including $t=1,\dots,T,$ as a predictor variable: 
-
-$$  y_t=\beta_0+\beta_1t+\varepsilon_t.
-  $$
-
-Figure \@ref(fig-4-Tourism) shows a time series plot of aggregate tourist arrivals to Australia over the period 1980 to 2010 with the fitted linear trend line $\hat{y}_t= 0.3375+0.1761t$. Also plotted are the point and forecast intervals for the years 2011 to 2015.
-
-![Forecasting international tourist arrivals to Australia for the period
-2011-2015 using a linear trend. 80% and 95% forecast intervals are
-shown.](fig_4_Tourism)
-
-\@ref(fig-4-Tourism)
-
-fit.ex4 \ <-  tslm(austa   trend) f \ <-  forecast(fit.ex4, h=5,level=c(80,95))
-plot(f, ylab="International tourist arrivals to Australia (millions)",
-xlab="t") lines(fitted(fit.ex4),col="blue") summary(fit.ex4)
-
-Coefficients: Estimate Std. Error t value Pr(\>|t|) (Intercept) 0.337535
-0.100366 3.363 0.00218 \*\* trend 0.176075 0.005475 32.157 \< 2e-16
-\*\*\*
-
-
-
-
 ## Further reading
-
-
-
-
-
-Regression with cross-sectional data
-
- * Chatterjee, S. and A. S. Hadi (2012). Regression analysis by example. 5th ed. New York: John Wiley & Sons.
- * Fox, J. and H. S. Weisberg (2010). An R Companion to Applied Regression. SAGE Publications, Inc.
- * Harrell, Jr, F. E. (2001). Regression modelling strategies: with applications to linear models, logistic regression, and survival analysis. New York: Springer.
- * Pardoe, I. (2006). Applied regression modeling: a business approach. Hoboken, NJ: John Wiley & Sons.
- * Sheather, S. J. (2009). A modern approach to regression with R. New York: Springer.
 
 Regression with time series data
 

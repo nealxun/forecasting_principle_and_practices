@@ -224,7 +224,7 @@ So far, we have assumed that each predictor takes numerical values. But what abo
 
 This situation can still be handled within the framework of multiple regression models by creating a "dummy variable" taking value 1 corresponding to "yes" and 0 corresponding to "no". A dummy variable is also known as an "indicator variable".
 
-A dummy variable can also be used to account for an outlier in the data. Rather than omit the outlier, a dummy variable removes its effect. In this case, the dummy variable takes value 1 for that observation and 1 everywhere else. An example is the case where a special event has occured. For example when forecasting tourist arrivals to Sydney Australia we will need to account for the effect of the Sydney summer Olympics in 2000.
+A dummy variable can also be used to account for an outlier in the data. Rather than omit the outlier, a dummy variable removes its effect. In this case, the dummy variable takes value 1 for that observation and 1 everywhere else. An example is the case where a special event has occurred. For example when forecasting tourist arrivals to Sydney Australia we will need to account for the effect of the Sydney summer Olympics in 2000.
 
 If there are more than two categories, then the variable can be coded using several dummy variables (one fewer than the total number of categories).
 
@@ -296,7 +296,7 @@ It is often necessary to model interventions that may have affected the variable
 When the effect lasts only for one period, we use a spike variable. This is a dummy variable taking value one in the period of the intervention and zero elsewhere. A spike variable is equivalent to a dummy variable for handling an
 outlier.
 
-Other interventions have an immediate and permanent effect. If an intervention causes a level shift (i.e., the value of the series changes suddenly and permanently from the time of intervention), then we use a step variable. A step variable takes value zero before the intervention and one from the time of intervention onwards.
+Other interventions have an immediate and permanent effect. If an intervention causes a level shift (i.e., the value of the series changes suddenly and permanently from the time of intervention), then we use a step variable. A step variable takes value zero before the intervention and one from the time of intervention onward.
 
 Another form of permanent effect is a change of slope. Here the intervention is handled using a piecewise linear trend as discussed earlier (where $\tau$ is the time of intervention).
 
@@ -325,7 +325,7 @@ Easter is different from most holidays because it is not held on the same date e
 For example, with monthly data, when Easter falls in March then the dummy variable takes value 1 in March, when it falls in April, the dummy variable
 takes value 1 in April, and when it starts in March and finishes in April, the dummy variable takes value 1 for both months. 
 
-May be add this as an exercies try `easter(ausbeer)` and interpret what you see. 
+May be add this as an exercise try `easter(ausbeer)` and interpret what you see. 
 
 
 ## Evaluating the regression model {#Regr-EvaluatingSLR}
@@ -397,7 +397,7 @@ If these scatterplots show a pattern, then the relationship may be nonlinear and
 
 It is also necessary to plot the residuals against any predictors *not* in the model. If these show a pattern, then the predictor may need to be added to the model (possibly in a nonlinear form). 
 
-The residuals from the multiple regression model for forecasting US consumption plotted agaist each predictor in Figure \@ref(fig:resids) seem to be randomly scattered and therefore we would be satisfied with these in this case.
+The residuals from the multiple regression model for forecasting US consumption plotted against each predictor in Figure \@ref(fig:resids) seem to be randomly scattered and therefore we would be satisfied with these in this case.
 
 ```{r resids, echo=TRUE, cache=TRUE, fig.cap="Scatterplots of residuals versus each predictor."}
 df <- as.data.frame(cbind(res=residuals(fit.consMR),Income=uschange[,"Income"],Production=uschange[,"Production"],Savings=uschange[,"Savings"],Unemployment=uschange[,"Unemployment"]))
@@ -438,7 +438,7 @@ One source for an outlier occurring is an incorrect data entry. Simple descripti
 Outliers also occur when some observations are simply different. In this case it may not be wise for these observations to be removed. If an observation has been identified as a likely outlier it is important to study it and analyze the possible reasons behind it. The decision of removing or retaining such an observation can be a challenging one (especially when outliers are influential observations). It is wise to report results both with and without the removal of such observations.
 
 #### Example {-}
-Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US consumption on income (the example introduced in Section \@ref(Regr-Intro)). In the left panel the ourlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which is the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
+Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US consumption on income (the example introduced in Section \@ref(Regr-Intro)). In the left panel the outlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which is the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
 
 
 ```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, cache=TRUE, message=FALSE,warning=FALSE}
@@ -490,11 +490,11 @@ Another measure of how well the model has fitted the data is the standard deviat
   (\#eq:Regr-se)
 \end{equation}
 
-Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation. Here, we divide by $T−k−1$ because we have estimated k+1 parameters (the intercept and a coefficient for each predictor variable) in computing the residuals. 
+Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation. Here, we divide by $T−k−1$ because we have estimated $k+1$ parameters (the intercept and a coefficient for each predictor variable) in computing the residuals. 
 
-The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. In Section \@ref(Regr-LSprinciple) $s_e$ is part of the R estimation output labeled  `Residual standard error`" and takes the value `r round(summary(fit.consMR)$sigma,2)`%.
+The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. In Section \@ref(Regr-LSprinciple) $s_e$ is part of the R estimation output labeled  "Residual standard error" and takes the value `r round(summary(fit.consMR)$sigma,2)`%.
 
-We should warn here that the evaluation of the standard error can be highly subjective as it is scale dependent. The main reason we introduce it here is that it is required when generating forecast intervals, discussed in Section \@ref(sec-4-5-ForeWithRegr).
+We should warn here that the evaluation of the standard error can be highly subjective as it is scale dependent. The main reason we introduce it here is that it is required when generating forecast intervals, discussed in Section \@ref(Regr-ForeWithRegr).
 
 ### Spurious regression {-}
 
@@ -670,8 +670,8 @@ An approach that works quite well is *backwards stepwise regression*:
 
 If the number of potential predictors is too large, then the backwards stepwise regression will not work and the *forward stepwise regression* can be used instead. This procedure starts with a model that includes only the intercept. Predictors are added one at a time, and the one that most improves the measure of predictive accuracy is retained in the model. The procedure is repeated until no further improvement can be achieved.  
 
-Alternatively for eihter the backwards or forward direction a starting model can be one that that includes a subset of potential predictors. In this case, an extra step needs to be
-included. For the backwards procedrue with each step we should also consider adding a predictor and for the forward procedure with each each step we should also consider dropping a predictor. These are usually referred to as *hybrid* procedures.
+Alternatively for either the backwards or forward direction a starting model can be one that that includes a subset of potential predictors. In this case, an extra step needs to be
+included. For the backwards procedure with each step we should also consider adding a predictor and for the forward procedure with each each step we should also consider dropping a predictor. These are usually referred to as *hybrid* procedures.
 
 
 It is important to realise that a stepwise approach is not guaranteed to lead
@@ -682,7 +682,7 @@ See James, G., D. Witten, T. Hastie, and R. Tibshirani. 2013. An Introduction to
 
 ## Forecasting with regression {#Regr-ForeWithRegr}
 
-Recall that predictions of $y$ can be otained using equation \@ref(eq:prediction),  
+Recall that predictions of $y$ can be obtained using equation \@ref(eq:prediction),  
 $$  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t},$$
 which comprises the estimated coefficients and ignores the error in the regression equation. Plugging in the values of the predictor variables $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ returned the fitted (in-sample) values of $y$. What we are interested in here is forecasting future values of $y$.
 
@@ -701,7 +701,7 @@ A comparative evaluation of ex-ante forecasts and ex-post forecasts can help to 
 #### Example: Australian quarterly beer production {-}
 
 Normally, we cannot use actual future values of the predictor variables when producing ex-ante forecasts because their values will not be known in advance. However, the special predictors introduced in Section \@ref(Regr-UsefulPredictors) are all known in advance, as they are based on calendar variables (e.g., seasonal dummy variables or public holiday indicators) or deterministic functions of time. In such cases, there is
-no difference betweeen ex ante and ex post forecasts.
+no difference between ex ante and ex post forecasts.
 
 ```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
 fcast <- forecast(fit.beer) 
@@ -710,7 +710,7 @@ autoplot(fcast) + ggtitle("Forecasts of beer production using linear regression"
 
 ### Scenario based forecasting {-}
 
-In this setting the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the projected change in consumption if there is a constant growth of 1% and 0.5% respectively for income and savings, versus a repsective decline of 1% and 0.5% for each of the four quarters following the end of the sample, with no change in the unemployment rate. The resulting forecasts are calculated and shown in Figure \@ref(fig:ConsInc4).
+In this setting the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the projected change in consumption if there is a constant growth of 1% and 0.5% respectively for income and savings, versus a respective decline of 1% and 0.5% for each of the four quarters following the end of the sample, with no change in the unemployment rate. The resulting forecasts are calculated and shown in Figure \@ref(fig:ConsInc4).
 
 ```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
 
@@ -734,7 +734,7 @@ Prediction intervals for scenario based forecasts do not include the uncertainty
 
 With each forecast for the change in consumption Figure \@ref(fig:ConsInc4) a 95% and an 80% prediction interval is also included. The general formulation of how to calculate prediction intervals for multiple regression models is presented in Section \@ref(Regr-MatrixEquations). As this involves some matrix algebra we present here the case for calculating prediction intervals for a simple regression where a forecast can be generated using the equation, 
 $$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x.$$
-Assuming that the regression errors are normally distributed, an approximate 95% predcition interval (also called a forecast interval) associated with this forecast is given by
+Assuming that the regression errors are normally distributed, an approximate 95% prediction interval (also called a forecast interval) associated with this forecast is given by
 \begin{equation} 
   \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
   (\#eq:Regr-pi)
@@ -745,7 +745,7 @@ Equation \@ref(eq:Regr-pi) shows that the forecast interval is wider when $x$ is
 
 ##### No need for the following I think {-}
 I was going to show the difference between a PI for the mean income in the next quarter v a PI for an extreme case. 
-The estimated simple regression line in the US consumpion example is
+The estimated simple regression line in the US consumption example is
 \[ \hat{y}_t=`r round(coef(fit.cons)[1],2)` + `r round(coef(fit.cons)[2],2)`x_t.
 \]
 
@@ -847,7 +847,7 @@ A **log-log** functional form is specified as
 $$
   \log y=\beta_0+\beta_1 \log x +\varepsilon.
 $$
-In this model, the slope $\beta_1$ is interpreted as an elasticity, $\beta_1$ is the average percentage change in $y$ resulting from a $1\%$ change in $x$. Other useful forms can also be specified. The **log-linear** form is specified by only transforming the forecast variable and the **linear-log** form is obtained by transforming the predictror. 
+In this model, the slope $\beta_1$ is interpreted as an elasticity, $\beta_1$ is the average percentage change in $y$ resulting from a $1\%$ change in $x$. Other useful forms can also be specified. The **log-linear** form is specified by only transforming the forecast variable and the **linear-log** form is obtained by transforming the predictor. 
 
 Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero. In the case that variable $x$ contains zeros we use the transformation $\log(x+1)$. That is, we add one to the value of the variable and then take logarithms. This has a similar effect to taking logarithms but avoids the problem of zeros. It also has the neat side-effect of zeros on the original scale remaining zeros on the transformed scale. 
 
@@ -916,7 +916,7 @@ Fitting an exponential trend to the data can be achieved by transforming the $y$
 $$\log y_t=\beta_0+\beta_1 t +\varepsilon_t.$$
 The fitted exponential trend and forecasts are shown in Figure \@ref(fig:marathonNonlinear) below. Although the exponential trend does not seem to fit the data much better than the linear trend, it gives a more sensible projection in that the winning times will decrease in the future but at a decaying rate rather than a linear non-changing rate. 
 
-Simply eyeballing the winning times reveals three very different periods. There is a lot of volatility in the winning times from the beginning up to about 1940 with the winning times improving/decreasing overall but with significant increases in the decade of the 1920s. The almost linear decrease in times after 1940 is then followed by a flattening out after the 1980s with almost an upturn towards the end of the sample. Following these observations we specify as knots the years 1940 and 1980. We should warn here that subjectively identifying suitable knots in the data can lead to overfitting which can be detrimental to the forecast performance of a model and should be performed wihth caution.
+Simply eyeballing the winning times reveals three very different periods. There is a lot of volatility in the winning times from the beginning up to about 1940 with the winning times improving/decreasing overall but with significant increases in the decade of the 1920s. The almost linear decrease in times after 1940 is then followed by a flattening out after the 1980s with almost an upturn towards the end of the sample. Following these observations we specify as knots the years 1940 and 1980. We should warn here that subjectively identifying suitable knots in the data can lead to overfitting which can be detrimental to the forecast performance of a model and should be performed with caution.
 
 ```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE, fig.cap="Projecting forecasts from a linear, exponential, piecewise linear trends and a cubic spline for the Boston marathon winning times"}
 
@@ -1052,7 +1052,7 @@ to worry about --- multicollinearity is not a problem.
 ## Exercises
 
 
-1. Electricity consumption was recorded for a small town on 12 randomly chosen days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day.
+1 . Electricity consumption was recorded for a small town on 12 randomly chosen days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day.
 
 ```{r, echo=FALSE, cache=TRUE}
 # Not sure how to print this in landscape. Have tried various things even using # rowsnames but kable needs colnames
@@ -1071,7 +1071,7 @@ b. Produce a residual plot. Is the model adequate? Are there any outliers or inf
 
 c. Use the model to predict the electricity consumption that you would expect for a day with maximum temperature $10^\circ$ and a day with maximum temperature $35^\circ$. Do you believe these predictions?
 
-d. Give prediction intervals for your forecasts.
+d. Give prediction intervals for your forecasts. 
 
 The following R code will get you started:
 
@@ -1081,7 +1081,7 @@ The following R code will get you started:
     forecast(fit, newdata=data.frame(temp=c(10,35)))
 ```
 
-2. Data set `olympic` contains the winning times (in seconds) for the men’s 400 meters final in each Olympic Games from 1896 to 2012.
+2 . Data set `olympic` contains the winning times (in seconds) for the men’s 400 meters final in each Olympic Games from 1896 to 2012.
 
 a. Plot the winning time against the year. Describe the main features of the scatterplot.
 
@@ -1093,63 +1093,32 @@ d. Predict the winning time for the men’s 400 meters final in the 2000, 2004, 
 
 e. Find out the actual winning times for these Olympics (see [www.databaseolympics.com](www.databaseolympics.com)). How good were your forecasts and prediction intervals?
 
-An elasticity coefficient is the ratio of the percentage change in the forecast variable ($y$) to the percentage change in the predictor variable ($x$). Mathematically, the elasticity is defined as $(dy/dx)\times(x/y)$. Consider the log-log model, $$\log y=\beta_0+\beta_1 \log x + \varepsilon.$$ Express $y$ as a function of $x$ and show that the coefficient $\beta_1$ is the elasticity coefficient.
+3 . An elasticity coefficient is the ratio of the percentage change in the forecast variable ($y$) to the percentage change in the predictor variable ($x$). Mathematically, the elasticity is defined as $(dy/dx)\times(x/y)$. Consider the log-log model, $$\log y=\beta_0+\beta_1 \log x + \varepsilon.$$ Express $y$ as a function of $x$ and show that the coefficient $\beta_1$ is the elasticity coefficient.
 
+4 . The data set `fancy` concerns the monthly sales figures of a shop which opened in January 1987 and sells gifts, souvenirs, and novelties. The shop is situated on the wharf at a beach resort town in Queensland, Australia. The sales volume varies with the seasonal population of tourists. There is a large influx of visitors to the town at Christmas and for the local surfing festival, held every March since 1988. Over time, the shop has expanded its premises, range of products, and staff.
 
-The data below (data set `fancy`) concern the monthly sales figures of a shop
-which opened in January 1987 and sells gifts, souvenirs, and novelties. The
-shop is situated on the wharf at a beach resort town in Queensland, Australia.
-The sales volume varies with the seasonal population of tourists. There is a
-large influx of visitors to the town at Christmas and for the local surfing
-festival, held every March since
-1988. Over time, the shop has expanded its premises, range of products, and
-      staff.
+a. Produce a time plot of the data and describe the patterns in the graph. Identify any unusual or unexpected fluctuations in the time series.
 
-=0.15cm
+b. Explain why it is necessary to take logarithms of these data before fitting a model.
 
-<span>lrrrrrrr</span> & **1987 & **1988 & **1989 & **1990 & **1991 & **1992 &
-**1993\ **Jan & 1664.81 & 2499.81 & 4717.02 & 5921.10 & 4826.64 & 7615.03 &
-10243.24\ **Feb & 2397.53 & 5198.24 & 5702.63 & 5814.58 & 6470.23 & 9849.69 &
-11266.88\ **Mar & 2840.71 & 7225.14 & 9957.58 & 12421.25 & 9638.77 & 14558.40 &
-21826.84\ **Apr & 3547.29 & 4806.03 & 5304.78 & 6369.77 & 8821.17 & 11587.33 &
-17357.33\ **May & 3752.96 & 5900.88 & 6492.43 & 7609.12 & 8722.37 & 9332.56 &
-15997.79\ **Jun & 3714.74 & 4951.34 & 6630.80 & 7224.75 & 10209.48 & 13082.09 &
-18601.53\ **Jul & 4349.61 & 6179.12 & 7349.62 & 8121.22 & 11276.55 & 16732.78 &
-26155.15\ **Aug & 3566.34 & 4752.15 & 8176.62 & 7979.25 & 12552.22 & 19888.61 &
-28586.52\ **Sep & 5021.82 & 5496.43 & 8573.17 & 8093.06 & 11637.39 & 23933.38 &
-30505.41\ **Oct & 6423.48 & 5835.10 & 9690.50 & 8476.70 & 13606.89 & 25391.35 &
-30821.33\ **Nov & 7600.60 & 12600.08 & 15151.84 & 17914.66 & 21822.11 &
-36024.80 & 46634.38\ **Dec & 19756.21 & 28541.72 & 34061.01 & 30114.41 &
-45060.69 & 80721.71 & 104660.67\
-**************************************
+c. Use R to fit a regression model to the logarithms of these sales data with a linear trend, seasonal dummies and a "surfing festival" dummy variable.
 
-[(a)]
+d. Plot the residuals against time and against the fitted values. Do these plots reveal any problems with the model?
 
-Produce a time plot of the data and describe the patterns in the graph.
-Identify any unusual or unexpected fluctuations in the time series.
+e. Do boxplots of the residuals for each month. Does this reveal any problems with the model?
 
-Explain why it is necessary to take logarithms of these data before fitting a model.
+f. What do the values of the coefficients tell you about each variable?
 
-Use R to fit a regression model to the logarithms of these sales data with a linear trend, seasonal dummies and a "surfing festival" dummy variable.
+g. What does the Durbin-Watson statistic tell you about your model?
 
-Plot the residuals against time and against the fitted values. Do these plots
-reveal any problems with the model?
-
-Do boxplots of the residuals for each month. Does this reveal any problems with
-the model?
-
-What do the values of the coefficients tell you about each variable?
-
-What does the Durbin-Watson statistic tell you about your model?
-
-Regardless of your answers to the above questions, use your regression model to
-predict the monthly sales for 1994, 1995, and 1996. Produce prediction
+h. Regardless of your answers to the above questions, use your regression model to predict the monthly sales for 1994, 1995, and 1996. Produce prediction
 intervals for each of your forecasts.
 
-Transform your predictions and intervals to obtain predictions and intervals
+i. Transform your predictions and intervals to obtain predictions and intervals
 for the raw data.
 
-How could you improve these predictions by modifying the model?
+j. How could you improve these predictions by modifying the model?
+
 
 The data below (data set `texasgas`) shows the demand for natural gas and the
 price of natural gas for 20 towns in Texas in 1969.
@@ -1191,7 +1160,7 @@ For prices 40, 60, 80, 100, and 120 cents per 1,000 cubic feet, compute the fore
 
 Compute 95% prediction intervals. Make a graph of these prediction intervals and discuss their interpretation.
 
-What is the correlation between $P$ and $P^{2}$? Does this suggest any general problem to be considered in dealing with polynomial regressions---especially of higher orders?
+What is the correlation between $P$ and $P^{2}$? Does this suggest any general problem to be considered in dealing with polynomial regressions---especially of higher orders? 
 
 ## Further reading
 

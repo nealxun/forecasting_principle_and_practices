@@ -414,7 +414,7 @@ gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
 
 A plot of the residuals against the fitted values should also show no pattern. If a pattern is observed, there may be "heteroscedasticity" in the errors. That is, the variance of the residuals may not be constant. To overcome this problem, a transformation of the forecast variable (such as a logarithm or square root) may be required. 
 
-Figure \@ref(fig:electrendseas) shows the residuals against the fitted values from fitting a linear trend and seasonal dummies to the electricity data we first encountered in Section \@ref(sec-transformations). The plot shows that the trend in the data is not linear and that the forecast variable requires a transformation as we observe a heteroscedastic pattern with variation increasing along the x-axis.
+Figure \@ref(fig:electrendseas) shows the residuals against the fitted values from fitting a linear trend and seasonal dummies to the electricity data we first encountered in Section \@ref(sec-transformations). The plot shows that the trend in the data is nonlinear and that the forecast variable requires a transformation as we observe a heteroscedastic pattern with variation increasing along the x-axis.
 
 
 ```{r electrendseas, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of residuals versus fitted."}
@@ -839,7 +839,7 @@ be too narrow.
 
 ## Nonlinear regression {#Regr-NonLinear}
 
-Although the linear relationship assumed so far in this chapter is often adequate, there are cases for which a nonlinear functional form is more suitable. To keep things simple in this section suppose we have only one predictor $x$. 
+Although the linear relationship assumed so far in this chapter is often adequate, there are many cases for which a nonlinear functional form is more suitable. To keep things simple in this section suppose we have only one predictor $x$. 
 
 Simply transforming the forecast variable $y$ and/or the predictor variable $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a nonlinear specification. The most commonly used transformation is the (natural) logarithmic (see Section \@ref(sec-transformations)).
 
@@ -847,27 +847,28 @@ A **log-log** functional form is specified as
 $$
   \log y=\beta_0+\beta_1 \log x +\varepsilon.
 $$
-In this model, the slope $\beta_1$ is interpreted as an elasticity, $\beta_1$ is the average percentage change in $y$ resulting from a $1\%$ change in $x$. Other useful forms can also be specified. The log-linear form is specified by only transforming the forecast variable and the linear-log form is obtained by transforming the predictror. 
+In this model, the slope $\beta_1$ is interpreted as an elasticity, $\beta_1$ is the average percentage change in $y$ resulting from a $1\%$ change in $x$. Other useful forms can also be specified. The **log-linear** form is specified by only transforming the forecast variable and the **linear-log** form is obtained by transforming the predictror. 
 
-Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero. In the case that variable $x$ contain zeros we use the transformation $\log(x+1)$. That is, we add one to the value of the variable and then take logarithms. This has a similar effect to taking logarithms but avoids the problem of zeros. It also has the neat side-effect of zeros on the original scale remaining zeros on the transformed scale. 
+Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero. In the case that variable $x$ contains zeros we use the transformation $\log(x+1)$. That is, we add one to the value of the variable and then take logarithms. This has a similar effect to taking logarithms but avoids the problem of zeros. It also has the neat side-effect of zeros on the original scale remaining zeros on the transformed scale. 
 
-There are cases for which simply transforming your data will not be adequate and a more general specification may be required. Then the model we use is
+There are cases for which simply transforming the data will not be adequate and a more general specification may be required. Then the model we use is
 $$y=f(x)+\varepsilon$$
 where $f$ is a nonlinear function. In standard (linear) regression, $f(x)=\beta_{0} + \beta_{1} x$. In the specification of nonlinear regression that follows, we allow $f$ to be a more flexible nonlinear function of $x$, compared to simply a logarithmic or other transformation. 
 
-One of the simplest specifications is to make $f$ piecewise linear. That is, we introduce points where the slope of $f$ can change. These points are called "knots". This can be achieved by leting $x_{1,t}=x$ and introducing variable $x_{2,t}=x$ such that 
+One of the simplest specifications is to make $f$ **piecewise linear**. That is, we introduce points where the slope of $f$ can change. These points are called "knots". This can be achieved by letting $x_{1,t}=x$ and introducing variable $x_{2,t}$ such that 
 \begin{align*}
-  x_{1,t} & = x \\ 
   x_{2,t} = (x-c)_+ &= \left\{ 
              \begin{array}{ll} 
                0 & x < c\\ 
                (x-c) &  x \ge c
              \end{array}\right.
 \end{align*}
-The notation $(x-c)_+$ means the value $x-c$ if it is positive and 0 otherwise. This forces the slope to bend at point $c$. Additional bends can be included in the relationship by adding further variables of the above form. An example of this follows by considering $x=t$ and fitting a piecewise linear trend to a times series. 
+The notation $(x-c)_+$ means the value $x-c$, if it is positive and 0 otherwise. This forces the slope to bend at point $c$. Additional bends can be included in the relationship by adding further variables of the above form. 
 
-Piecewise linear relationships constructed in this way are a special case of *regression splines*. In general, a linear regression spline is obtained using
-$$ x_{1}= x \quad x_{2} = (x-c_{1})_+ \quad\ldots\quad x_{k} = (x-c_{k-1})_+$$
+An example of this follows by considering $x=t$ and fitting a piecewise linear trend to a times series. 
+
+Piecewise linear relationships constructed in this way are a special case of **regression splines**. In general, a linear regression spline is obtained using
+$$ x_{1}= x \quad x_{2} = (x-c_{1})_+ \quad\dots\quad x_{k} = (x-c_{k-1})_+$$
 where $c_{1},\dots,c_{k-1}$ are the knots (the points at which the line can bend). Selecting the number of knots ($k-1$) and where they should be positioned can be difficult and somewhat arbitrary. Some automatic knot selection algorithms are available in some software, but are not yet widely used.
 
 A smoother result is obtained using piecewise cubics rather than piecewise lines. These are constrained so they are continuous (they join up) and they are smooth (so there are no sudden changes of direction as we see with piecewise linear splines). In general, a cubic regression spline is written as
@@ -875,13 +876,13 @@ $$ x_{1}= x \quad x_{2}=x^2 \quad x_3=x^3 \quad x_4 = (x-c_{1})_+ \quad\dots\qua
 Cubic splines usually give a better fit to the data. However, forecasting values of $y$ when $x$ is outside the range of the historical data becomes very unreliable.  
 
 ### Forecasting with a nonlinear trend {-} 
-In Section \@ref(Regr-UsefulPredictors) fitting a linear trend to a time series by setting $x=t$ was introduced. However, there are many cases for which a non-linear trend may be more suitable. An example of a non-linear trend is using quadratic or higher order trends  obtained by specifying 
+In Section \@ref(Regr-UsefulPredictors) fitting a linear trend to a time series by setting $x=t$ was introduced. The simplest way of fitting a nonlinear trend is using quadratic or higher order trends obtained by specifying 
 \[
-  x_{1,t} =t,\quad x_{2,t}=t^2,\quad \dots
+  x_{1,t} =t,\quad x_{2,t}=t^2,\quad \ldots
 \]
 However, it is not recommended that quadratic or higher order trends are used in forecasting. When they are extrapolated, the resulting forecasts are often very unrealistic.
 
-A better approach is to use the piecewise specification introduced above and fit a piecwise linear trend which bends at some time. We can think of this as a nonlinear trend constructed of linear pieces. If the trend bends at time $\tau$, then it can be specified by simply replacing $x=t$ and $c=\tau$ above such that we include the predictors,
+A better approach is to use the piecewise specification introduced above and fit a piecwise linear trend which bends at some point in time. We can think of this as a nonlinear trend constructed of linear pieces. If the trend bends at time $\tau$, then it can be specified by simply replacing $x=t$ and $c=\tau$ above such that we include the predictors,
 \begin{align*}
   x_{1,t} & = t \\ 
   x_{2,t} = (t-\tau)_+ &= \left\{ 
@@ -904,7 +905,7 @@ fit.lin<-tslm(times~trend)
 
 p1<-autoplot(times)+
   autolayer(fitted(fit.lin),series = "Linear trend")+ 
-  xlab("Year") +  ylab("Finishing times in minutes")+
+  xlab("Year") +  ylab("Winning times in minutes")+
   guides(colour=guide_legend(title=" "))+ 
   theme(legend.position = "none")
 
@@ -919,11 +920,11 @@ gridExtra::grid.arrange(p1, p2, ncol = 2)
 
 Fitting an exponential trend to the data can be achieved by transforming the $y$ variable so that the model to be fitted is,
 $$\log y_t=\beta_0+\beta_1 t +\varepsilon_t.$$
-The fitted exponential trend and forward projections from this are shown in Figure \@ref(fig:marathonNonlinear) below. The plot shows that in comparison to the linear trend fitting an exponential trend seems to give a more sensible projection in that the winning times with decrease in the future but in an exponentially decaying rate rather than a linear non-changing rate. 
+The fitted exponential trend and forecasts are shown in Figure \@ref(fig:marathonNonlinear) below. Although the exponential trend does not seem to fit the data much better than the linear trend, it gives a more sensible projection in that the winning times will decrease in the future but at a decaying rate rather than a linear non-changing rate. 
 
-Simply eyeballing the winning times seems to reveal three very different periods. There seems a lot of volatility in the winning times from the beginning upto aobout 1940 with the winning times decreasing overall but with a significant increase in the decade of the 1920s.
+Simply eyeballing the winning times reveals three very different periods. There is a lot of volatility in the winning times from the beginning up to about 1940 with the winning times improving/decreasing overall but with significant increases in the decade of the 1920s. The almost linear decrease in times after 1940 is then followed by a flattening out after the 1980s with almost an upturn towards the end of the sample. Following these observations we specify as knots the years 1940 and 1980. We should warn here that subjectively identifying suitable knots in the data can lead to overfitting which can be detrimental to the forecast performance of a model and should be performed wihth caution.
 
-```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE}
+```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE, fig.cap="Projecting forecasts from a linear, exponential, piecewise linear trends and a cubic spline for the Boston marathon winning times"}
 setwd("C:/George/FPPLocalOnly")
 dat <- read.csv("Marathon.csv", header=TRUE, sep=",")
 times<-window(ts(dat[,2], freq=1,start=dat[1,1]))
@@ -935,108 +936,36 @@ fcasts.exp<-forecast(fit.exp,h=h)
 
 t.break1=1940
 t.break2=1980
-
 t<-ts(dat[,1],start=dat[1,1],freq=1)
 t1<-ts(pmax(0,t-t.break1),start=1897,freq=1)
 t2<-ts(pmax(0,t-t.break2),start=1897,freq=1)
-
 fit.pw=tslm(times~t+t1+t2)
-
 t.new<-t[length(t)]+seq(h)
 t1.new<-t1[length(t1)]+seq(h)
 t2.new<-t2[length(t2)]+seq(h)
-
 newdata<-data.frame(cbind(t=t.new,t1=t1.new,t2=t2.new))
 fcasts.pw<-forecast(fit.pw,newdata = newdata)
-
 fit.spline=tslm(times~t+I(t^2)+I(t^3)+I(t1^3)+I(t2^3))
 fcasts.spline<-forecast(fit.spline,newdata = newdata)
-
 autoplot(times)+
   autolayer(fitted(fit.lin),series = "Linear")+
   autolayer(fitted(fit.exp),series="Exponetial")+
-  autolayer(fitted(fit.pw),series = "Piece-wise")+
+  autolayer(fitted(fit.pw),series = "Piecewise")+
   autolayer(fitted(fit.spline),series = "Cubic spline")+
+  autolayer(fcasts.pw,series="Piecewise") +
   autolayer(fcasts.lin$mean,series = "Linear")+
   autolayer(fcasts.exp$mean,series="Exponetial") +
-  autolayer(fcasts.pw$mean,series="Piece-wise") +
   autolayer(fcasts.spline$mean,series="Cubic spline") +
-  xlab("Year") +  ylab("Finishing times in minutes")+
+  xlab("Year") +  ylab("Winning times in minutes")+
   ggtitle("Boston Marathon")+guides(colour=guide_legend(title=" "))
 
 ```
+Figure \@ref(fig:marathonNonlinear) above shows the fitted lines and forecasts from a linear and an exponential trend as well as a piecewise linear and a cubic spline. The cubic spline fits the data extremely well as expected, however the projection forward from this shows that it can be very unreliable when projecting outside the range of the historical data (as warned above) `make sure that this makes sense`. The piecewise linear trend fits the data better than both the exponential and linear trends and seems to return sensible forecasts. The residuals plotted in the Figure \@ref(fig:residPiecewise) below show that the model has mostly captured the trend well although there is some autocorrelation remaining (we will deal with this in Chapter \ref(ch-advanced)). We should however again warn here that the projection forward from the piecewise linear trend can be very sensitive to the choice of location of the knots, especially the ones located towards the end of the sample. For example moving the knot placed at 1980 even five years forward will reveal very different forecasts. The wide prediction interval associated with the forecasts form the piecewise linear trend reflects the volatility observed in the historical winning times.
 
-
-The plot shows that in the original scale the slope of the fitted regression line using a log-log functional form is non-constant. The slope depends on $x$ and can be calculated for each point (see Table \@ref(tbl-4-functionalforms)). In the logarithmic scale the slope of the line which is now interpreted as an elasticity is constant. So estimating a log-log functional form produces a constant elasticity estimate in contrast to the linear model which produces a constant slope estimate.
-
-Other useful forms are the log-linear form and the linear-log form. Table \@ref(tbl-4-functionalforms) summarises these.
-
-<span>llll</span> Model & Functional form & Slope & Elasticity\ linear &
-$y=\beta_0+\beta_1 x $ & $\beta_1$ & $\beta_1y/x$\ log-log & $\log
-y=\beta_0+\beta_1 \log x$ & $\beta_1y/x$ & $\beta_1$\ linear-log &
-$y=\beta_0+\beta_1 \log x $ & $\beta_1/x$ & $\beta_1/ y$\ log-linear & $\log
-y=\beta_0+\beta_1 x $ & $\beta_1y$ & $\beta_1x$\
-
-![The four non-linear forms shown in Table \@ref(tbl-4-functionalforms), for
-$\beta_1<0$.](fig_4_nlforms)
-
-Sometimes the relationship between the forecast variable and a predictor is not
-linear, and then the usual multiple regression equation needs modifying. In
-Section \@ref(sec-4-7-NonLinearFF), we discussed using log transformations to
-deal with a variety of non-linear forms, and in Section \@ref(sec-5-2-UsefulPredictors) we showed how to include a piecewise-linear
-trend in a model; that is a nonlinear trend constructed out of linear pieces.
-Allowing other variables to enter in a nonlinear manner can be handled in
-exactly the same way.
-
-To keep things simple, suppose we have only one predictor $x$. Then the model
-we use is $$y = f(x) + e,$$ where $f$ is a possibly nonlinear function. In
-standard (linear) regression, $f(x)=\beta_{0} + \beta_{1} x$, but in nonlinear
-regression, we allow $f$ to be a nonlinear function of $x$.
-
-One of the simplest ways to do nonlinear regression is to make $f$ piecewise
-linear. That is, we introduce points where the slope of $f$ can change. These
-points are called "knots".
-
-Additional bends can be included in the relationship by adding further
-variables of the form $(x-c)_+$ where $c$ is the "knot" or point at which the
-line should bend. As above, the notation $(x-c)_+$ means the value $x-c$ if it
-is positive and 0 otherwise.
-
-### Regression splines {-}
-
-Piecewise linear relationships constructed in this way are a special case of
-*regression splines*. In general, a linear regression spline is obtained using
-$$x_{1}= x \quad x_{2} = (x-c_{1})_+ \quad\dots\quad x_{k} = (x-c_{k-1})_+,$$
-where $c_{1},\dots,c_{k-1}$ are the knots (the points at which the line can
-bend). Selecting the number of knots ($k-1$) and where they should be
-positioned can be difficult and somewhat arbitrary. Automatic knot selection
-algorithms are available in some software, but are not yet widely used.
-
-A smoother result is obtained using piecewise cubics rather than piecewise
-lines. These are constrained so they are continuous (they join up) and they are
-smooth (so there are no sudden changes of direction as we see with piecewise
-linear splines). In general, a cubic regression spline is written as $$x_{1}= x
-\quad x_{2}=x^2 \quad x_3=x^3 \quad x_4 = (x-c_{1})^3_+ \quad\dots\quad x_{k} =
-(x-c_{k-3})^3_+.$$
-
-An example of a cubic regression spline fitted to the fuel economy data is
-shown below with a single knot at $c_{1}=25$.
-
-![Cubic regression spline fitted to the fuel economy data.](nlcarbon2)
-
-\@ref(fig-5-nlpulp3)
-
-fit3 \<- lm(Carbon   City + I(City^2^) + I(City^3^) + I(Cityp^3^), data=fuel)
-fcast3 \<- forecast(fit3,newdata=data.frame(City=x,Cityp=z))
-plot(jitter(Carbon)   jitter(City), data=fuel) lines(x,
-fcast3[["mean"]],col="red")
-
-This usually gives a better fit to the data, although forecasting values of
-Carbon when City is outside the range of the historical data becomes very
-unreliable.
-
-
-
+**change the label in the checkresiduals as these are from a nonlinear regression - I suggest simply removing the Linear - Residuals from a regression model.**
+```{r residPiecewise, fig.cap="Residuals from the piecewise trend.", message=FALSE, warning=FALSE}
+checkresiduals(fit.pw)
+```
 
 
 ## Correlation, causation and forecasting {#Regr-MultiCol}
@@ -1044,38 +973,17 @@ unreliable.
 
 ### Correlation is not causation {-}
 
-It is important not to confuse correlation with causation, or causation with
-forecasting. A variable $x$ may be useful for predicting a variable $y$, but
-that does not mean $x$ is causing $y$. It is possible that $x$ *is* causing
-$y$, but it may be that the relationship between them is more complicated than
-simple causality.
+It is important not to confuse correlation with causation, or causation with forecasting. A variable $x$ may be useful for predicting a variable $y$, but that does not mean $x$ is causing $y$. It is possible that $x$ *is* causing $y$, but it may be that the relationship between them is more complicated than simple causality.
 
-For example, it is possible to model the number of drownings at a beach resort
-each month with the number of ice-creams sold in the same period. The model can
-give reasonable forecasts, not because ice-creams cause drownings, but because
-people eat more ice-creams on hot days when they are also more likely to go
-swimming. So the two variables (ice-cream sales and drownings) are correlated,
-but one is not causing the other. It is important to understand that
-**correlations are useful for forecasting, even when there is no causal
-relationship between the two variables**.
+For example, it is possible to model the number of drownings at a beach resort each month with the number of ice-creams sold in the same period. The model can give reasonable forecasts, not because ice-creams cause drownings, but because people eat more ice-creams on hot days when they are also more likely to go swimming. So the two variables (ice-cream sales and drownings) are correlated, but one is not causing the other. It is important to understand that **correlations are useful for forecasting, even when there is no causal relationship between the two variables**.
 
-However, often a better model is possible if a causal mechanism can be
-determined. In this example, both ice-cream sales and drownings will be
-affected by the temperature and by the numbers of people visiting the beach
-resort. Again, high temperatures do not actually *cause* people to drown, but
-they are more directly related to why people are swimming. So a better model
-for drownings will probably include temperatures and visitor numbers and
-exclude ice-cream sales.
+However, often a better model is possible if a causal mechanism can be determined. In this example, both ice-cream sales and drownings will be
+affected by the temperature and by the numbers of people visiting the beach resort. Again, high temperatures do not actually *cause* people to drown, but they are more directly related to why people are swimming. So a better model
+for drownings will probably include temperatures and visitor numbers and exclude ice-cream sales.
 
 ### Confounded predictors {-}
 
-A related issue involves confounding variables. Suppose we are forecasting
-monthly sales of a company for 2012, using data from 2000--2011. In January 2008
-a new competitor came into the market and started taking some market share. At
-the same time, the economy began to decline. In your forecasting model, you
-include both competitor activity (measured using advertising time on a local
-television station) and the health of the economy (measured using GDP). It will
-not be possible to separate the effects of these two predictors because they
+A related issue involves confounding variables. Suppose we are forecasting monthly sales of a company for 2012, using data from 2000--2011. In January 2008 a new competitor came into the market and started taking some market share. At the same time, the economy began to decline. In your forecasting model, you include both competitor activity (measured using advertising time on a local television station) and the health of the economy (measured using GDP). It will not be possible to separate the effects of these two predictors because they
 are correlated. We say two variables are **confounded** when their effects on
 the forecast variable cannot be separated. Any pair of correlated predictors
 will have some level of confounding, but we would not normally describe them as
@@ -1151,52 +1059,46 @@ to worry about --- multicollinearity is not a problem.
 ## Exercises
 
 
-Electricity consumption was recorded for a small town on 12 randomly chosen days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day.
+1. Electricity consumption was recorded for a small town on 12 randomly chosen days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day.
 
+```{r, echo=FALSE, cache=TRUE}
+# Not sure how to print this in landscape. Have tried various things even using # rowsnames but kable needs colnames
 
-**Day & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 &
-11 & 12\ **Mwh & 16.3 & 16.8 & 15.5 & 18.2 & 15.2 & 17.5 & 19.8 & 19.0 &17.5 &
-16.0 & 19.6 & 18.0\ **temp & 29.3 & 21.7 & 23.7 & 10.4 & 29.7 & 11.9 & 9.0 &
-23.4 & 17.8 & 30.0 & 8.6 & 11.8\
-******
+day<-seq(1,nrow(econsumption),1)
+tbl<-cbind(day,econsumption)
+colnames(tbl)<-c("Day","Mwh","Temp")
 
-[(a)]
+knitr::kable(tbl, booktabs=TRUE,align = c(rep("c", 2)),caption="All 16 possible models for forecasting US consumption with 4 predictors.", floating.environment="sidewaystable")
 
-Plot the data and find the regression model for Mwh with temperature as an explanatory variable. Why is there a negative relationship?
+```
 
-Produce a residual plot. Is the model adequate? Are there any outliers or influential observations?
+a. Plot the data and find the regression model for Mwh with temperature as an explanatory variable. Why is there a negative relationship?
 
-Use the model to predict the electricity consumption that you would expect for a day with maximum temperature $10^\circ$ and a day with maximum temperature $35^\circ$. Do you believe these predictions?
+b. Produce a residual plot. Is the model adequate? Are there any outliers or influential observations?
 
-Give prediction intervals for your forecasts.
+c. Use the model to predict the electricity consumption that you would expect for a day with maximum temperature $10^\circ$ and a day with maximum temperature $35^\circ$. Do you believe these predictions?
+
+d. Give prediction intervals for your forecasts.
 
 The following R code will get you started:
 
+```{r, eval=FALSE, include=TRUE}
     plot(Mwh ~ temp, data=econsumption) fit <- lm(Mwh ~ temp,
     data=econsumption) plot(residuals(fit) ~ temp, data=econsumption)
     forecast(fit, newdata=data.frame(temp=c(10,35)))
+```
 
-The following table gives the winning times (in seconds) for the men’s 400 meters final in each Olympic Games from 1896 to 2012 (data set `olympic`).
+2. Data set `olympic` contains the winning times (in seconds) for the men’s 400 meters final in each Olympic Games from 1896 to 2012.
 
-<span>ll|ll|ll|ll</span> 1896 & 54.2 & 1928 & 47.8 & 1964 & 45.1 & 1992 &
-43.50\ 1900 & 49.4 & 1932 & 46.2 & 1968 & 43.8 & 1996 & 43.49\ 1904 & 49.2 &
-1936 & 46.5 & 1972 & 44.66 &\ 1908 & 50.0 & 1948 & 46.2 & 1976 & 44.27 &\ 1912
-& 48.2 & 1952 & 45.9 & 1980 & 44.60 &\ 1920 & 49.6 & 1956 & 46.7 & 1984 & 44.27
-&\ 1924 & 47.6 & 1960 & 44.9 & 1988 & 43.87\
+a. Plot the winning time against the year. Describe the main features of the scatterplot.
 
-[(a)]
+b. Fit a regression line to the data. Obviously the winning times have been decreasing, but at what *average* rate per year?
 
-Update the data set `olympic` to include the winning times from the last few Olympics.
+c. Plot the residuals against the year. What does this indicate about the suitability of the fitted line?
 
-Plot the winning time against the year. Describe the main features of the scatterplot.
+d. Predict the winning time for the men’s 400 meters final in the 2000, 2004, 2008 and 2012 Olympics. Give a prediction interval for each of your forecasts. What assumptions have you made in these calculations?
 
-Fit a regression line to the data. Obviously the winning times have been decreasing, but at what *average* rate per year?
-
-Plot the residuals against the year. What does this indicate about the suitability of the fitted line?
-
-Predict the winning time for the men’s 400 meters final in the 2000, 2004, 2008 and 2012 Olympics. Give a prediction interval for each of your forecasts. What assumptions have you made in these calculations?
-
-Find out the actual winning times for these Olympics (see [www.databaseolympics.com](www.databaseolympics.com)). How good were your forecasts and prediction intervals?
+e. Find out the actual winning times for these Olympics (see [www.databaseolympics.com](www.databaseolympics.com)). How good were your forecasts and prediction intervals?
 
 An elasticity coefficient is the ratio of the percentage change in the forecast variable ($y$) to the percentage change in the predictor variable ($x$). Mathematically, the elasticity is defined as $(dy/dx)\times(x/y)$. Consider the log-log model, $$\log y=\beta_0+\beta_1 \log x + \varepsilon.$$ Express $y$ as a function of $x$ and show that the coefficient $\beta_1$ is the elasticity coefficient.
 

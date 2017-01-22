@@ -54,7 +54,7 @@ Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (gro
   
 ```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US."}
 
-autoplot(uschange[,1:2], ylab="% change", xlab="Year")+
+autoplot(uschange[,1:2], ylab="% change", xlab="Year") +
 guides(colour=guide_legend(title=" "))
 
 
@@ -77,7 +77,7 @@ The slope coefficient shows that a one unit increase in $x$ (a 1% increase in pe
 
 ```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
 ggplot(as.data.frame(uschange), aes(x=Income, y=Consumption)) +
-  ylab("Consumption (quarterly % change)")+xlab("Income (quarterly % change)")+
+  ylab("Consumption (quarterly % change)") +xlab("Income (quarterly % change)") +
   geom_point() + geom_smooth(method="lm", se=FALSE)
 ```
 
@@ -106,15 +106,15 @@ Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful
 
 ```{r MultiPredictors, echo=FALSE, fig.cap="Quarterly percentage changes in industrial production and personal savings and quarterly changes in the unemployment rate for the US over the period 1960Q1 to 2016Q3.", cache=TRUE}
 
-autoplot(uschange[,3:5], ylab="", xlab="Year",facets = TRUE,colour=TRUE)+
-guides(colour=guide_legend(title=" "))+guides(colour="none")
+autoplot(uschange[,3:5], ylab="", xlab="Year",facets = TRUE,colour=TRUE) +
+guides(colour=guide_legend(title=" ")) +guides(colour="none")
 ```
 
 The first column of Figure \@ref(fig:ScatterMatrix) shows the relationships between consumption expenditure and each of the predictors. The fitted regression lines show positive relationships between consumption and each income and industrial production and negative relationships with each savings and unemployment. The strength of these relationships are shown by the correlation coefficients across the first row.
 
 ```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
 
-df<-as.data.frame(uschange)
+df <- as.data.frame(uschange)
 
 my_fn <- function(data, mapping, ...){
   p <- ggplot(data = df, mapping = mapping) + 
@@ -189,7 +189,7 @@ returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that
 ```{r usfitted1, echo=TRUE, cache=TRUE, fig.cap="Time plot of US consumtpion expenditure and predicted expenditure."}
 df <- cbind(Data=uschange[,"Consumption"], Fitted=fitted(fit.consMR))
 autoplot(df[,1:2]) + xlab("Year") + ylab("") +
-  ggtitle("Percentage change in US consumption expenditure")+
+  ggtitle("Percentage change in US consumption expenditure") +
   guides(colour=guide_legend(title=" "))
 ```
 
@@ -199,7 +199,7 @@ ggplot(df,aes(x=Data, y=Fitted)) +
   geom_point() +
   xlab("Fitted (predicted values)") + ylab("Data (actual values)") + 
   ggtitle("Percentage change in US consumption expenditure") +
-  scale_color_brewer(palette="Dark2", name="Quarter")+
+  scale_color_brewer(palette="Dark2", name="Quarter") +
   geom_smooth(method="lm", se=FALSE)
 ```
 
@@ -275,7 +275,7 @@ There is a strong downward trend of `r round(fit.beer$coef['trend'], 3)` megalit
 ```{r beerlm2, echo=TRUE, cache=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
 df <- cbind(Data=beer2, Fitted=fitted(fit.beer))
 autoplot(df[,1:2]) + xlab("Year") + ylab("") +
-  ggtitle("Quarterly Beer Production")+
+  ggtitle("Quarterly Beer Production") +
   guides(colour=guide_legend(title=" "))
 ```
 
@@ -422,7 +422,7 @@ fit <- tslm(elec ~ trend + season)
 df <- as.data.frame(cbind(fitd=fitted(fit), res=residuals(fit)))
 
 ggplot(df, aes(x=fitd, y=res)) +
-  ylab("residuals")+xlab("fitted")+
+  ylab("residuals") +xlab("fitted") +
   geom_point()  
 ```
 
@@ -446,21 +446,21 @@ Figure \@ref(fig:outlier) highlights the effect of a single outlier when regress
 yx <- as.data.frame(uschange[,1:2])
 fit1 <- lm(Consumption ~ Income, data=yx) 
 
-yx[1,]<-c(-4,1)
+yx[1,] <- c(-4,1)
 fit2 <- lm(Consumption ~ Income, data=yx) 
 p1 <- ggplot(yx, aes(x=Income, y=Consumption)) +
-  ylab("% change in consumption")+xlab("% change in income")+
-  geom_point()+ 
-  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+ 
-  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")+
+  ylab("% change in consumption") +xlab("% change in income") +
+  geom_point() + 
+  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2]) + 
+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red") +
   geom_point(x=1,y=-4, shape = 1, size = 7,col="blue")
 
-yx[1,]<-c(-4,6)
+yx[1,] <- c(-4,6)
 fit2 <- lm(Consumption ~ Income, data=yx) 
 p2 <- ggplot(yx, aes(x=Income, y=Consumption)) +
-  ylab("% change in consumption")+xlab("% change in income")+
-  geom_point()+ 
-  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2])+  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red")+
+  ylab("% change in consumption") +xlab("% change in income") +
+  geom_point() + 
+  geom_abline(intercept=fit1$coefficients[1],slope = fit1$coefficients[2]) +  geom_abline(intercept=fit2$coefficients[1],slope = fit2$coefficients[2],colour="red") +
   geom_point(x=6,y=-4, shape = 1, size = 7,col="blue")
 
 gridExtra::grid.arrange(p1, p2, nrow=1)
@@ -508,7 +508,7 @@ aussies=window(ausair,end=2011)
 df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,aussies))
 p1 <- autoplot(aussies) + xlab("Year") + ylab("Air Passengers in Australia")
 p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")
-p3<-ggplot(df,aes(x=GuineaRiceProduction, y=aussies)) + geom_point() + ylab("Air Passengers in Australia (millions)")+ xlab("Rice Production in Guinea (million tons)")
+p3 <- ggplot(df,aes(x=GuineaRiceProduction, y=aussies)) + geom_point() + ylab("Air Passengers in Australia (millions)") + xlab("Rice Production in Guinea (million tons)")
 gridExtra::grid.arrange(gridExtra::arrangeGrob(p1, p2),p3, ncol = 2)
 ```
 
@@ -518,7 +518,7 @@ Cases of spurious regression might appear to give reasonable short-term forecast
 
 
 ```{r, fig.cap="Residuals from a spurious regression.", echo=TRUE}
-fit<-tslm(aussies ~ guinearice)
+fit <- tslm(aussies ~ guinearice)
 summary(fit)
 checkresiduals(fit)
 ```
@@ -603,7 +603,7 @@ As with the AIC, the AIC$_\text{c}$ should be minimized.
 
 A related measure is Schwarz’s Bayesian Information Criterion (known as SBIC, BIC or SC), 
 $$
-\text{BIC} = T\log\left(\frac{\text{SSE}}{T}\right)+ (k+2)\log(T).
+\text{BIC} = T\log\left(\frac{\text{SSE}}{T}\right) + (k+2)\log(T).
 $$ 
 As with the AIC, minimizing the BIC is intended to give the best model. The model chosen by BIC is either the same as that chosen by AIC, or one with fewer terms. This is because the BIC penalizes the number of parameters more heavily than the AIC. For large values of $T$, minimizing BIC is similar to leave-$v$-out cross-validation when $v = T[1-1/(\log(T)-1)]$.`is this ok here?`
 
@@ -631,7 +631,7 @@ fit[[14]] <- lm(Consumption ~ Savings , data = uschange)
 fit[[15]] <- lm(Consumption ~ Unemployment, data = uschange)
 fit[[16]] <- lm(Consumption ~ 1, data = uschange)
 
-fit.consBest<-lm(Consumption ~ Income + Savings + Unemployment, data = uschange)
+fit.consBest <- lm(Consumption ~ Income + Savings + Unemployment, data = uschange)
 
 out <- matrix(0, ncol = 9, nrow = 16)
 colnames(out) <- c("Income", "Production", "Savings", "Unemployment", names(CV(fit[[1]])))
@@ -714,16 +714,16 @@ In this setting the forecaster assumes possible scenarios for the predictor vari
 
 ```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
 
-fit.consBest<-tslm(Consumption ~ Income + Savings + Unemployment, data = uschange)
+fit.consBest <- tslm(Consumption ~ Income + Savings + Unemployment, data = uschange)
 newdata=data.frame(cbind(Income=c(1,1,1,1),Savings=c(0.5,0.5,0.5,0.5),Unemployment=c(0,0,0,0)))
 fcast.up <- forecast(fit.consBest, newdata=newdata) 
 newdata=data.frame(cbind(Income=c(-1,-1,-1,-1),Savings=c(-0.5,-0.5,-0.5,-0.5),Unemployment=c(0,0,0,0)))
 fcast.down <- forecast(fit.consBest, newdata=newdata) 
 
 # autoplot is giving me trouble - 
-autoplot(uschange[,1])+ylab("% change in US consumption")+
-  autolayer(fcast.up, PI=TRUE, series="increase")+
-  autolayer(fcast.down, PI=TRUE, series="decrease")+
+autoplot(uschange[,1]) +ylab("% change in US consumption") +
+  autolayer(fcast.up, PI=TRUE, series="increase") +
+  autolayer(fcast.down, PI=TRUE, series="decrease") +
   guides(colour=guide_legend(title="Scenario"))
 
 ```
@@ -751,7 +751,7 @@ The estimated simple regression line in the US consumpion example is
 
 ```{r, ConsSimple, echo=TRUE, cache=TRUE, fig.cap="Prediction intervals for the mean and extreme increase."}
 
-avInc<-mean(uschange[,"Income"])
+avInc <- mean(uschange[,"Income"])
 
 fcast.up <- forecast(fit.cons, newdata=data.frame(Income=rep(avInc,8))) 
 fcast.down <- forecast(fit.cons, newdata=data.frame(Income=rep(10,8))) 
@@ -760,9 +760,9 @@ fcast.up$upper[1,2]-fcast.up$lower[1,2]
 fcast.down$upper[1,2]-fcast.down$lower[1,2]
 
 # autoplot is giving me trouble - 
-autoplot(uschange[,1])+ylab("% change in US consumption")+
-  autolayer(fcast.up, PI=TRUE, series="increase")+
-  autolayer(fcast.down, PI=TRUE, series="decrease")+
+autoplot(uschange[,1]) +ylab("% change in US consumption") +
+  autolayer(fcast.up, PI=TRUE, series="increase") +
+  autolayer(fcast.down, PI=TRUE, series="decrease") +
   guides(colour=guide_legend(title="Scenario"))
 
 ```
@@ -852,7 +852,7 @@ In this model, the slope $\beta_1$ is interpreted as an elasticity, $\beta_1$ is
 Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero. In the case that variable $x$ contains zeros we use the transformation $\log(x+1)$. That is, we add one to the value of the variable and then take logarithms. This has a similar effect to taking logarithms but avoids the problem of zeros. It also has the neat side-effect of zeros on the original scale remaining zeros on the transformed scale. 
 
 There are cases for which simply transforming the data will not be adequate and a more general specification may be required. Then the model we use is
-$$y=f(x)+\varepsilon$$
+$$y=f(x) +\varepsilon$$
 where $f$ is a nonlinear function. In standard (linear) regression, $f(x)=\beta_{0} + \beta_{1} x$. In the specification of nonlinear regression that follows, we allow $f$ to be a more flexible nonlinear function of $x$, compared to simply a logarithmic or other transformation. 
 
 One of the simplest specifications is to make $f$ **piecewise linear**. That is, we introduce points where the slope of $f$ can change. These points are called "knots". This can be achieved by letting $x_{1,t}=x$ and introducing variable $x_{2,t}$ such that 
@@ -898,25 +898,19 @@ in the model. If the associated coefficients of $x_{1,t}$ and $x_{2,t}$ are $\be
 Figure \@ref(fig:marathonLinear) below in the left panel shows the Boston marathon winning times (in minutes) since it started in 1897. The time series shows a general downward trend as the winning times have been improving over the years. The panel on the right shows the residuals from fitting a linear trend to the data. The plot shows an obvious nonlinear pattern which has not been captured by the linear trend. 
 
 ```{r marathonLinear, echo=FALSE, fig.cap="Fitting a linear trend to the Boston marathon winning times is inadequate", message=TRUE, warning=FALSE, cache=TRUE}
-setwd("C:/George/FPPLocalOnly")
-dat <- read.csv("Marathon.csv", header=TRUE, sep=",")
-times<-window(ts(dat[,2], freq=1,start=dat[1,1]))
-fit.lin<-tslm(times~trend)
+fit.lin <- tslm(marathon ~ trend)
 
-p1<-autoplot(times)+
-  autolayer(fitted(fit.lin),series = "Linear trend")+ 
-  xlab("Year") +  ylab("Winning times in minutes")+
-  guides(colour=guide_legend(title=" "))+ 
+p1 <- autoplot(marathon) +
+  autolayer(fitted(fit.lin), series = "Linear trend") + 
+  xlab("Year") +  ylab("Winning times in minutes") +
+  guides(colour=guide_legend(title=" ")) + 
   theme(legend.position = "none")
 
-p2<-autoplot(residuals(fit.lin))+
-    xlab("Year") +  ylab("Residuals from a linear trend")
-  
+p2 <- autoplot(residuals(fit.lin)) +
+    xlab("Year") + ylab("Residuals from a linear trend")
 
 gridExtra::grid.arrange(p1, p2, ncol = 2)
-
 ```
-
 
 Fitting an exponential trend to the data can be achieved by transforming the $y$ variable so that the model to be fitted is,
 $$\log y_t=\beta_0+\beta_1 t +\varepsilon_t.$$
@@ -925,41 +919,40 @@ The fitted exponential trend and forecasts are shown in Figure \@ref(fig:maratho
 Simply eyeballing the winning times reveals three very different periods. There is a lot of volatility in the winning times from the beginning up to about 1940 with the winning times improving/decreasing overall but with significant increases in the decade of the 1920s. The almost linear decrease in times after 1940 is then followed by a flattening out after the 1980s with almost an upturn towards the end of the sample. Following these observations we specify as knots the years 1940 and 1980. We should warn here that subjectively identifying suitable knots in the data can lead to overfitting which can be detrimental to the forecast performance of a model and should be performed wihth caution.
 
 ```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE, fig.cap="Projecting forecasts from a linear, exponential, piecewise linear trends and a cubic spline for the Boston marathon winning times"}
-setwd("C:/George/FPPLocalOnly")
-dat <- read.csv("Marathon.csv", header=TRUE, sep=",")
-times<-window(ts(dat[,2], freq=1,start=dat[1,1]))
-fit.lin<-tslm(times~trend)
-fit.exp<-tslm(times~trend,lambda = 0)
+
+fit.lin <- tslm(marathon ~ trend)
+fit.exp <- tslm(marathon ~ trend, lambda = 0)
 h=10
-fcasts.lin<-forecast(fit.lin,h=h)
-fcasts.exp<-forecast(fit.exp,h=h)
+fcasts.lin <- forecast(fit.lin,h=h)
+fcasts.exp <- forecast(fit.exp,h=h)
 
 t.break1=1940
 t.break2=1980
-t<-ts(dat[,1],start=dat[1,1],freq=1)
-t1<-ts(pmax(0,t-t.break1),start=1897,freq=1)
-t2<-ts(pmax(0,t-t.break2),start=1897,freq=1)
-fit.pw=tslm(times~t+t1+t2)
-t.new<-t[length(t)]+seq(h)
-t1.new<-t1[length(t1)]+seq(h)
-t2.new<-t2[length(t2)]+seq(h)
-newdata<-data.frame(cbind(t=t.new,t1=t1.new,t2=t2.new))
-fcasts.pw<-forecast(fit.pw,newdata = newdata)
-fit.spline=tslm(times~t+I(t^2)+I(t^3)+I(t1^3)+I(t2^3))
-fcasts.spline<-forecast(fit.spline,newdata = newdata)
-autoplot(times)+
-  autolayer(fitted(fit.lin),series = "Linear")+
-  autolayer(fitted(fit.exp),series="Exponetial")+
-  autolayer(fitted(fit.pw),series = "Piecewise")+
-  autolayer(fitted(fit.spline),series = "Cubic spline")+
-  autolayer(fcasts.pw,series="Piecewise") +
-  autolayer(fcasts.lin$mean,series = "Linear")+
-  autolayer(fcasts.exp$mean,series="Exponetial") +
-  autolayer(fcasts.spline$mean,series="Cubic spline") +
-  xlab("Year") +  ylab("Winning times in minutes")+
-  ggtitle("Boston Marathon")+guides(colour=guide_legend(title=" "))
+t <- time(marathon)
+t1 <- ts(pmax(0,t-t.break1),start=1897,freq=1)
+t2 <- ts(pmax(0,t-t.break2),start=1897,freq=1)
+fit.pw=tslm(marathon ~ t + t1 + t2)
+t.new <- t[length(t)]+seq(h)
+t1.new <- t1[length(t1)]+seq(h)
+t2.new <- t2[length(t2)]+seq(h)
+newdata <- data.frame(cbind(t=t.new,t1=t1.new,t2=t2.new))
+fcasts.pw <- forecast(fit.pw,newdata = newdata)
+fit.spline=tslm(marathon ~ t + I(t^2) + I(t^3) + I(t1^3) + I(t2^3))
+fcasts.spline <- forecast(fit.spline, newdata = newdata)
+autoplot(marathon) +
+  autolayer(fitted(fit.lin), series = "Linear") +
+  autolayer(fitted(fit.exp), series="Exponetial") +
+  autolayer(fitted(fit.pw), series = "Piecewise") +
+  autolayer(fitted(fit.spline), series = "Cubic spline") +
+  autolayer(fcasts.pw, series="Piecewise") +
+  autolayer(fcasts.lin$mean, series = "Linear") +
+  autolayer(fcasts.exp$mean, series="Exponetial") +
+  autolayer(fcasts.spline$mean, series="Cubic spline") +
+  xlab("Year") +  ylab("Winning times in minutes") +
+  ggtitle("Boston Marathon") +guides(colour=guide_legend(title=" "))
 
 ```
+
 Figure \@ref(fig:marathonNonlinear) above shows the fitted lines and forecasts from a linear and an exponential trend as well as a piecewise linear and a cubic spline. The cubic spline fits the data extremely well as expected, however the projection forward from this shows that it can be very unreliable when projecting outside the range of the historical data (as warned above) `make sure that this makes sense`. The piecewise linear trend fits the data better than both the exponential and linear trends and seems to return sensible forecasts. The residuals plotted in the Figure \@ref(fig:residPiecewise) below show that the model has mostly captured the trend well although there is some autocorrelation remaining (we will deal with this in Chapter \ref(ch-advanced)). We should however again warn here that the projection forward from the piecewise linear trend can be very sensitive to the choice of location of the knots, especially the ones located towards the end of the sample. For example moving the knot placed at 1980 even five years forward will reveal very different forecasts. The wide prediction interval associated with the forecasts form the piecewise linear trend reflects the volatility observed in the historical winning times.
 
 **change the label in the checkresiduals as these are from a nonlinear regression - I suggest simply removing the Linear - Residuals from a regression model.**
@@ -1064,9 +1057,9 @@ to worry about --- multicollinearity is not a problem.
 ```{r, echo=FALSE, cache=TRUE}
 # Not sure how to print this in landscape. Have tried various things even using # rowsnames but kable needs colnames
 
-day<-seq(1,nrow(econsumption),1)
-tbl<-cbind(day,econsumption)
-colnames(tbl)<-c("Day","Mwh","Temp")
+day <- seq(1,nrow(econsumption),1)
+tbl <- cbind(day,econsumption)
+colnames(tbl) <- c("Day","Mwh","Temp")
 
 knitr::kable(tbl, booktabs=TRUE,align = c(rep("c", 2)),caption="All 16 possible models for forecasting US consumption with 4 predictors.", floating.environment="sidewaystable")
 
@@ -1218,7 +1211,7 @@ shown.](fig_4_Tourism)
 
 \@ref(fig-4-Tourism)
 
-fit.ex4 \<- tslm(austa   trend) f \<- forecast(fit.ex4, h=5,level=c(80,95))
+fit.ex4 \ <-  tslm(austa   trend) f \ <-  forecast(fit.ex4, h=5,level=c(80,95))
 plot(f, ylab="International tourist arrivals to Australia (millions)",
 xlab="t") lines(fitted(fit.ex4),col="blue") summary(fit.ex4)
 

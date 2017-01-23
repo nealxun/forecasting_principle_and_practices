@@ -728,6 +728,28 @@ autoplot(uschange[,1]) +ylab("% change in US consumption") +
 
 Prediction intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
 
+### Building a predictive regression model {-}
+
+The advantage of the regression models we have so far considered is that they can be used to capture provide vitally important analysis of the relationships between tourism demand and economic variables such as prices, interest rates, and output, among others (see, e.g., Crouch 1992; Li, Song, and
+Witt 2005; Song and Li 2008). 
+
+A major challenge with the regression models we have so far considered is that to forecast $y$ the model requires future values of $x$. If scenario based forecasting is of interest then these models are extremely useful. 
+
+If this is not the case then forecasts of the predictors need to be generated and fed to the model. As mentioned above in this case forecasts for the predictors can be generated using pure times series models (introduced later). However, in many cases it can be more challening to produce forecasts for the predictors using a pure time series model than to directly predict the forecast variable. 
+
+
+the disadvantage with the usual econometric causal models when forecasting is that one has to first forecast the economic variables themselves before forecasting tourism demand, the variable of interest.
+
+In particular, we build what we refer to as “predictive regressions” that use as predictors lags of the commonly used economic variables
+and therefore forego the challenge of these needing to be
+forecast.
+
+Assuming that we are interested in forecasting $h$-steps ahead we can write
+$$y_{t+h}=f(x_t)+\varepsilon_{t+h}$$ for $h=1,2\ldots$.
+
+
+
+
 ### Predicition intervals {-}
 
 With each forecast for the change in consumption Figure \@ref(fig:ConsInc4) a 95% and an 80% prediction interval is also included. The general formulation of how to calculate prediction intervals for multiple regression models is presented in Section \@ref(Regr-MatrixEquations). As this involves some matrix algebra we present here the case for calculating prediction intervals for a simple regression where a forecast can be generated using the equation, 
@@ -768,11 +790,6 @@ autoplot(uschange[,1]) +ylab("% change in US consumption") +
 
 
 For the Chevrolet Aveo (the first car in the list) $x_1$=25 mpg and $y_1=6.6$ tons of CO$_2$ per year. The model returns a fitted value of $\hat{y}_1$=7.00, i.e., $e_1=-0.4$. For a car with City driving fuel economy $x=30$ mpg, the average footprint forecasted is $\hat{y}=5.90$ tons of CO$_2$ per year. The corresponding 95\% and 80\% forecast intervals are [4.95, 6.84] and [5.28, 6.51] respectively (calculated using R)\@.
-
-
-
-### Building a predictive regression model {-}
-
 
 ## Matrix formulation {#Regr-MatrixEquations}
 
@@ -839,7 +856,7 @@ be too narrow.
 
 Although the linear relationship assumed so far in this chapter is often adequate, there are many cases for which a nonlinear functional form is more suitable. To keep things simple in this section suppose we have only one predictor $x$. 
 
-Simply transforming the forecast variable $y$ and/or the predictor variable $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a nonlinear specification. The most commonly used transformation is the (natural) logarithmic (see Section \@ref(sec-transformations)).
+Simply transforming the forecast variable $y$ and/or the predictor variable $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a nonlinear specification. We should note that these specifications are still linear in the parameters. The most commonly used transformation is the (natural) logarithmic (see Section \@ref(sec-transformations)).
 
 A **log-log** functional form is specified as 
 $$

@@ -561,9 +561,7 @@ although it does tend to err on the side of selecting too many predictors.
 ### Cross-validation 
 ####Make sure that this CV is valid here / possibly manipulate cvTS code to do this properly?? {-}
 
-
-As discussed in Section \@ref(accuracy), cross-validation is a very
-useful way of determining the predictive ability of a model. In general, leave-one-out cross-validation for regression can be carried out using the following steps.
+As discussed in Section \@ref(accuracy), cross-validation is a very useful way of determining the predictive ability of a model. In general, leave-one-out cross-validation for regression can be carried out using the following steps.
 
 1. Remove observation $t$ from the data set, and fit the model using the remaining data. Then compute the error ($e_{t}^*=y_{t}-\hat{y}_{t}$) for the omitted observation. (This is not the same as the residual because the $t$th observation was not used in estimating the value of $\hat{y}_{t}$.)
 2. Repeat step 1 for $t=1,\dots,T$.

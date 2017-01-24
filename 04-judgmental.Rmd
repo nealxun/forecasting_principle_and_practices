@@ -1,7 +1,7 @@
 #Judgmental forecasts {#ch-judgmental}
 
 
-Forecasting using judgement is very common in practice. In many cases, judgmental forecasting is the only option, such as when there is a complete lack of historical data, or when a new product is being launched, or when a new competitor enters the market, or during completely new and unique market conditions. For example, in December 2012, the Australian government was the first in the world to pass legislation that banned the use of company logos on cigarette packets, and required all cigarette packets to be a dark green color. Judgement must be applied in order to forecast the effect of such a policy, as there are no historical precedents.
+Forecasting using judgement is very common in practice. In many cases, judgmental forecasting is the only option, such as when there is a complete lack of historical data, or when a new product is being launched, or when a new competitor enters the market, or during completely new and unique market conditions. For example, in December 2012, the Australian government was the first in the world to pass legislation that banned the use of company logos on cigarette packets, and required all cigarette packets to be a dark green colour. Judgement must be applied in order to forecast the effect of such a policy, as there are no historical precedents.
 
 There are also situations where the data are incomplete, or only become available after some delay. For example, central banks include judgement when forecasting the current level of economic activity, a procedure known as nowcasting, as GDP is only available on a quarterly basis.
 
@@ -223,7 +223,7 @@ colnames(tfcvn) <- c("Observed data",
     "ETS model forecasts")
 autoplot(tfcvn) + xlab("Year") + 
   ylab("Total visitor nights (thousands)") +
-  scale_color_manual(name="",
+  scale_colour_manual(name="",
     values=c("#000000","#E69F00", "#56B4E9", "#CC79A7"),
     breaks=colnames(tfcvn))
 ```

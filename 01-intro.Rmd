@@ -225,7 +225,7 @@ autoplot(df) +
   ylim(min(austa),10) +
   ylab("Millions of visitors") + xlab("Year") +
   ggtitle("Total international visitors to Australia") +
- scale_color_manual(values=c('#000000',rainbow(10)),
+ scale_colour_manual(values=c('#000000',rainbow(10)),
                      breaks=c("Data",paste("Future",1:10)),
                      name=" ")
 ```

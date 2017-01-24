@@ -199,7 +199,7 @@ ggplot(df,aes(x=Data, y=Fitted)) +
   geom_point() +
   xlab("Fitted (predicted values)") + ylab("Data (actual values)") + 
   ggtitle("Percentage change in US consumption expenditure") +
-  scale_color_brewer(palette="Dark2", name="Quarter") +
+  scale_colour_brewer(palette="Dark2", name="Quarter") +
   geom_smooth(method="lm", se=FALSE)
 ```
 
@@ -285,7 +285,7 @@ ggplot(df,aes(x=Data, y=Fitted, colour=as.factor(cycle(beer2)))) +
   geom_point() +
   xlab("Fitted") + ylab("Actual values") + 
   ggtitle("Quarterly beer production") +
-  scale_color_brewer(palette="Dark2", name="Quarter")
+  scale_colour_brewer(palette="Dark2", name="Quarter")
 ```
 
 

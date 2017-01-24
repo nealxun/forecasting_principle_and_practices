@@ -601,7 +601,7 @@ Prediction intervals are computed for you when using any of the benchmark foreca
 naive(dj2)
 ```
 
-When plotted, the prediction intervals are shown as shaded region, with the strength of color indicating the probability associated with the interval.
+When plotted, the prediction intervals are shown as shaded region, with the strength of colour indicating the probability associated with the interval.
 
 ```{r djforecasts2, echo=TRUE, cache=TRUE}
 autoplot(naive(dj2))

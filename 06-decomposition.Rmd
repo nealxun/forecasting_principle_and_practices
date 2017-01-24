@@ -36,7 +36,7 @@ autoplot(elecequip, series="Data") +
   autolayer(trendcycle(fit), series="Trend-cycle") +
 xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
-  scale_color_manual(values=c("Data"="gray","Trend-cycle"="red"),
+  scale_colour_manual(values=c("Data"="gray","Trend-cycle"="red"),
                      breaks=c("Data","Trend-cycle"))
 ```
 
@@ -65,7 +65,7 @@ autoplot(elecequip, series="Data") +
   autolayer(seasadj(fit), series="Seasonally Adjusted") +
   xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
-  scale_color_manual(values=c("gray","blue"),
+  scale_colour_manual(values=c("gray","blue"),
                      breaks=c("Data","Seasonally Adjusted"))
 ```
 
@@ -114,7 +114,7 @@ autoplot(elecsales, series="Data") +
   autolayer(ma(elecsales,5), series="5-MA") +
   xlab("Year") + ylab("GWh") +
   ggtitle("Annual electricity sales: South Australia") +
-  scale_color_manual(values=c("Data"="grey50","5-MA"="red"),
+  scale_colour_manual(values=c("Data"="grey50","5-MA"="red"),
                      breaks=c("Data","5-MA"))
 
 ```
@@ -129,7 +129,7 @@ for(m in seq(mak))
 {
   autoplot(elecsales, series="Data") +
     autolayer(ma(elecsales, mak[m]), series="MA") +
-    scale_color_manual(values=c("Data"="grey50","MA"="red")) +
+    scale_colour_manual(values=c("Data"="grey50","MA"="red")) +
     ggtitle(paste(mak[m],"-MA", sep="")) +
     xlab("Year") + ylab("GWh") +
     theme(legend.position='none') -> grobs[[m]]
@@ -203,7 +203,7 @@ autoplot(elecequip, series="Data") +
   autolayer(ma(elecequip, 12), series="12-MA") +
   xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
-  scale_color_manual(values=c("Data"="grey","12-MA"="red"),
+  scale_colour_manual(values=c("Data"="grey","12-MA"="red"),
     breaks=c("Data","12-MA"))
 ```
 
@@ -342,7 +342,7 @@ autoplot(elecequip, series="Data") +
   autolayer(seasadj(fit), series="Seasonally Adjusted") +
   xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
-  scale_color_manual(values=c("gray","blue","red"),
+  scale_colour_manual(values=c("gray","blue","red"),
                      breaks=c("Data","Seasonally Adjusted","Trend"))
 ```
 

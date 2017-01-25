@@ -730,10 +730,7 @@ Prediction intervals for scenario based forecasts do not include the uncertainty
 
 ### Building a predictive regression model {-}
 
-The advantage of the regression models we have so far considered is that they can be used to capture provide vitally important analysis of the relationships between tourism demand and economic variables such as prices, interest rates, and output, among others (see, e.g., Crouch 1992; Li, Song, and
-Witt 2005; Song and Li 2008). 
-
-A major challenge with the regression models we have so far considered is that to forecast $y$ the model requires future values of $x$. If scenario based forecasting is of interest then these models are extremely useful. 
+The advantage of the regression models we have so far considered is that they provide a way to capture and analyse  important relationships between the forecast variable $y$ and the predictors. A major challenge though is that in order to forecast $y$ the model requires future values of $x$ as these variables are contemporaneously related. If scenario based forecasting is of interest then these models are extremely useful. 
 
 If this is not the case then forecasts of the predictors need to be generated and fed to the model. As mentioned above in this case forecasts for the predictors can be generated using pure times series models (introduced later). However, in many cases it can be more challening to produce forecasts for the predictors using a pure time series model than to directly predict the forecast variable. 
 

@@ -1117,6 +1117,18 @@ for the raw data.
 
 j. How could you improve these predictions by modifying the model?
 
+5 . *(For advanved readers following from Section \@ref(Regr-MatrixEquations))*. Using matrix notation it was shown that if $\bm{y}=\bm{X}\bm{\beta}+\bm{\varepsilon}$, where $\bm{e}$ has mean $\bm{0}$ and variance matrix $\sigma^2\bm{I}$, then the estimated coefficients are given by $\hat{\bm{\beta}}=(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ 
+the forecasts are given by $\hat{y} = \bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y}$ where $\bm{x}^*$ is a row vector containing the values of the regressors for the
+forecasts (in the same format as X), and the forecast variances are given by
+$\sigma^2 \left[1 + \bm{x}^* (\bm{X}'\bm{X})^{-1} (\bm{x}^*)'\right].$ 
+
+In this exercise, you will derive specific forecast expressions for the simple time trend model where $Y_t = a + bt$. You will need the following results
+
+
+
+
+
+
 
 The data below (data set `texasgas`) shows the demand for natural gas and the
 price of natural gas for 20 towns in Texas in 1969.

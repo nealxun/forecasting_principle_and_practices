@@ -713,9 +713,10 @@ In this setting the forecaster assumes possible scenarios for the predictor vari
 ```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
 
 fit.consBest <- tslm(Consumption ~ Income + Savings + Unemployment, data = uschange)
+h=4
 newdata=data.frame(cbind(Income=c(1,1,1,1),Savings=c(0.5,0.5,0.5,0.5),Unemployment=c(0,0,0,0)))
 fcast.up <- forecast(fit.consBest, newdata=newdata) 
-newdata=data.frame(cbind(Income=c(-1,-1,-1,-1),Savings=c(-0.5,-0.5,-0.5,-0.5),Unemployment=c(0,0,0,0)))
+newdata=data.frame(cbind(Income=rep(-1,h),Savings=rep(-0.5,h),Unemployment=rep(0,h)))
 fcast.down <- forecast(fit.consBest, newdata=newdata) 
 
 # autoplot is giving me trouble - 
@@ -730,22 +731,13 @@ Prediction intervals for scenario based forecasts do not include the uncertainty
 
 ### Building a predictive regression model {-}
 
-The advantage of the regression models we have so far considered is that they provide a way to capture and analyse  important relationships between the forecast variable $y$ and the predictors. A major challenge though is that in order to forecast $y$ the model requires future values of $x$ as these variables are contemporaneously related. If scenario based forecasting is of interest then these models are extremely useful. 
+The great advantage of the regression models we have so far formulated is that they can be used to capture important relationships between the forecast variable of interest and the predictor variables. A major challenge however, is that in order to generate ex-ante forecasts the model requires future values of each predictor. If scenario based forecasting is of interest then these models are extremely useful. However, if simply ex-ante forecasts is the main focus, obtaining forecasts of the predictors can be challenging.
 
-If this is not the case then forecasts of the predictors need to be generated and fed to the model. As mentioned above in this case forecasts for the predictors can be generated using pure times series models (introduced later). However, in many cases it can be more challening to produce forecasts for the predictors using a pure time series model than to directly predict the forecast variable. 
+An alternative formulation is to use as predictors their lagged values. Assuming that we are interested in generating a $h$-step ahead forecast we write
+$$y_{t+h}=\beta_0+\beta_1x_{1,t}+\dots+\beta_kx_{k,t}+\varepsilon_{t+h}$$ 
+for $h=1,2\ldots$. The predictor set is formed by values of the $x$s that are observed $h$ time periods prior to observing $y$. Therefore when the estimated model is projected into the future, i.e., beyond the end of the sample $T$, all predictor values are available. 
 
-
-the disadvantage with the usual econometric causal models when forecasting is that one has to first forecast the economic variables themselves before forecasting tourism demand, the variable of interest.
-
-In particular, we build what we refer to as “predictive regressions” that use as predictors lags of the commonly used economic variables
-and therefore forego the challenge of these needing to be
-forecast.
-
-Assuming that we are interested in forecasting $h$-steps ahead we can write
-$$y_{t+h}=f(x_t)+\varepsilon_{t+h}$$ for $h=1,2\ldots$.
-
-
-
+Including lagged values of the predictors does not only make the model operational for easily generating forecasts is also makes it intuitively appealling. For example, the effect of a policy change with the aim of increasing production may not have an instantaneous effect on consumption expenditure. It is most likely that this will happend with a lagging effect. Several directions for generalising regression models to better incorporate the dynamics observed in time series are discussed in Section \@ref(ch-dynamic).
 
 ### Predicition intervals {-}
 
@@ -760,33 +752,30 @@ where $T$ is the total number of observations, $\bar{x}$ is the mean of the obse
 
 Equation \@ref(eq:Regr-pi) shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is,  we are more certain about our forecasts when considering values of the predictor variable close to its sample mean. 
 
-##### No need for the following I think {-}
-I was going to show the difference between a PI for the mean income in the next quarter v a PI for an extreme case. 
+#### Example: Is the extreme case useful?? possibly. If not remove. {-}
 The estimated simple regression line in the US consumption example is
 \[ \hat{y}_t=`r round(coef(fit.cons)[1],2)` + `r round(coef(fit.cons)[2],2)`x_t.
 \]
 
-```{r, ConsSimple, echo=TRUE, cache=TRUE, fig.cap="Prediction intervals for the mean and extreme increase."}
-
-avInc <- mean(uschange[,"Income"])
-
-fcast.up <- forecast(fit.cons, newdata=data.frame(Income=rep(avInc,8))) 
-fcast.down <- forecast(fit.cons, newdata=data.frame(Income=rep(10,8))) 
-
-fcast.up$upper[1,2]-fcast.up$lower[1,2]
-fcast.down$upper[1,2]-fcast.down$lower[1,2]
-
-# autoplot is giving me trouble - 
-autoplot(uschange[,1]) +ylab("% change in US consumption") +
-  autolayer(fcast.up, PI=TRUE, series="increase") +
-  autolayer(fcast.down, PI=TRUE, series="decrease") +
-  guides(colour=guide_legend(title="Scenario"))
+```{r, cache=TRUE, include=FALSE}
+h=4
+fcast.up <- forecast(fit.cons, newdata=data.frame(Income=rep(mean(uschange[,"Income"]),h))) 
+fcast.down <- forecast(fit.cons, newdata=data.frame(Income=rep(10,h))) 
+fcast.up$mean[1]
 
 ```
 
+Assuming that for the next four quarters personal income will increase by its historical mean value of $\bar{x}=`r round(mean(uschange[,"Income"]),2)`\%$, consumption is forecast to increase by $`r round(fcast.up$mean[1],2)`\%$ and 
+the corresponding $95\%$ and $80\%$ prediction intervals are $[`r round(fcast.up$lower[1,2],2)`,`r round(fcast.up$upper[1,2],2)`]$ and $[`r round(fcast.up$lower[1,1],2)`,`r round(fcast.up$upper[1,1],2)`]$ respectively (calcualted using R). If we assume an extreme increase of $10\%$ then the predcition intervals are much wider as shown in Figure \@ref(fig:ConsSimplePI).
 
+```{r, echo=FALSE, fig.cap="Prediction intervals if inomce increased by its historical mean and an extreme increase.", cache=TRUE, ConsSimplePI, echo=TRUE}
+# autoplot is giving me trouble - 
+autoplot(uschange[,1]) +ylab("% change in US consumption") +
+  autolayer(fcast.up, PI=TRUE, series="Average increase") +
+  autolayer(fcast.down, PI=TRUE, series="Extreme increase") +
+  guides(colour=guide_legend(title="Scenario"))
 
-For the Chevrolet Aveo (the first car in the list) $x_1$=25 mpg and $y_1=6.6$ tons of CO$_2$ per year. The model returns a fitted value of $\hat{y}_1$=7.00, i.e., $e_1=-0.4$. For a car with City driving fuel economy $x=30$ mpg, the average footprint forecasted is $\hat{y}=5.90$ tons of CO$_2$ per year. The corresponding 95\% and 80\% forecast intervals are [4.95, 6.84] and [5.28, 6.51] respectively (calculated using R)\@.
+```
 
 ## Matrix formulation {#Regr-MatrixEquations}
 
@@ -972,9 +961,7 @@ Figure \@ref(fig:marathonNonlinear) above shows the fitted lines and forecasts f
 checkresiduals(fit.pw)
 ```
 
-
 ## Correlation, causation and forecasting {#Regr-MultiCol}
-
 
 ### Correlation is not causation {-}
 
@@ -1019,9 +1006,9 @@ of predictors tells you a lot about the value of the second group of
 predictors. Hence, they are providing similar information.
 
 The dummy variable trap is a special case of multicollinearity. Suppose you
-have quarterly data and use four dummy variables, $D_1,D_2,D_3$ and $D_4$. Then
-$D_4=1-D_1-D_2-D_3$, so there is perfect correlation between $D_4$ and
-$D_1+D_2+D_3$.
+have quarterly data and use four dummy variables, $d_1,d_2,d_3$ and $d_4$. Then
+$d_4=1-d_1-d_2-d_3$, so there is perfect correlation between $d_4$ and
+$d_1+d_2+d_3$.
 
 When multicollinearity occurs in a multiple regression model, there are several
 consequences that you need to be aware of.
@@ -1047,10 +1034,9 @@ predictor to the forecast.
 
 Forecasts will be unreliable if the values of the future predictors are outside
 the range of the historical values of the predictors. For example, suppose you
-have fitted a regression model with predictors $X$ and $Z$ which are highly
-correlated with each other, and suppose that the values of $X$ in the fitting
-data ranged between 0 and 100. Then forecasts based on $X>100$ or $X<0$ will be
-unreliable. It is always a little dangerous when future values of the
+have fitted a regression model with predictors $x_1$ and $x_2$ which are highly
+correlated with each other, and suppose that the values of $x_1$ in the fitting
+data ranged between 0 and 100. Then forecasts based on $x_1>100$ or $x_1<0$ will be unreliable. It is always a little dangerous when future values of the
 predictors lie much outside the historical range, but it is especially
 problematic when multicollinearity is present.
 

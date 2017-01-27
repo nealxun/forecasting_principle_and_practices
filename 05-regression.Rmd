@@ -53,11 +53,8 @@ Notice that the observations do not lie on the straight line but are scattered a
 Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US from 1960Q1 to 2016Q3.
   
 ```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US."}
-
 autoplot(uschange[,1:2], ylab="% change", xlab="Year") +
-guides(colour=guide_legend(title=" "))
-
-
+  guides(colour=guide_legend(title=" "))
 ```
 
 ```{r, cache=TRUE, include=FALSE}
@@ -77,7 +74,8 @@ The slope coefficient shows that a one unit increase in $x$ (a 1% increase in pe
 
 ```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
 ggplot(as.data.frame(uschange), aes(x=Income, y=Consumption)) +
-  ylab("Consumption (quarterly % change)") +xlab("Income (quarterly % change)") +
+  ylab("Consumption (quarterly % change)") +
+  xlab("Income (quarterly % change)") +
   geom_point() + geom_smooth(method="lm", se=FALSE)
 ```
 
@@ -105,26 +103,22 @@ Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful
 
 
 ```{r MultiPredictors, echo=FALSE, fig.cap="Quarterly percentage changes in industrial production and personal savings and quarterly changes in the unemployment rate for the US over the period 1960Q1 to 2016Q3.", cache=TRUE}
-
-autoplot(uschange[,3:5], ylab="", xlab="Year",facets = TRUE,colour=TRUE) +
-guides(colour=guide_legend(title=" ")) +guides(colour="none")
+autoplot(uschange[,3:5], facets = TRUE, colour=TRUE) +
+  ylab("") + xlab("Year") + 
+  guides(colour="none")
 ```
 
 The first column of Figure \@ref(fig:ScatterMatrix) shows the relationships between consumption expenditure and each of the predictors. The fitted regression lines show positive relationships between consumption and each income and industrial production and negative relationships with each savings and unemployment. The strength of these relationships are shown by the correlation coefficients across the first row.
 
 ```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
-
-df <- as.data.frame(uschange)
-
 my_fn <- function(data, mapping, ...){
-  p <- ggplot(data = df, mapping = mapping) + 
+  p <- ggplot(data = data, mapping = mapping) + 
     geom_point() + 
     geom_smooth(method=lm, se=FALSE)
   p
 }
-
-GGally::ggpairs(df, lower = list(continuous = my_fn))
-
+GGally::ggpairs(as.data.frame(uschange), 
+  lower = list(continuous = my_fn))
 ```
 
 The multiple linear regression model we will try to fit is
@@ -172,7 +166,8 @@ The following is estimation output from fitting the multiple linear regression m
 For forecasting purposes, the final two columns are of limited interest. The "t value" is the ratio of an estimated $\beta$ coefficient to its standard error and the last column gives the p-value: the probability of the estimated $\beta$ coefficient being as large as it is if there was no real relationship between the credit score and the predictor. This is useful when studying the effect of each predictor, but is not particularly useful when forecasting.
 
 ```{r usestim, echo=TRUE, fig.cap="Multiple regression output from least squares estimation.", cache=TRUE}
-fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings, data=uschange)
+fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings,
+  data=uschange)
 summary(fit.consMR)
 ```
 
@@ -187,19 +182,19 @@ returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that
 
 
 ```{r usfitted1, echo=TRUE, cache=TRUE, fig.cap="Time plot of US consumtpion expenditure and predicted expenditure."}
-df <- cbind(Data=uschange[,"Consumption"], Fitted=fitted(fit.consMR))
-autoplot(df[,1:2]) + xlab("Year") + ylab("") +
+autoplot(uschange[,'Consumption'], series="Data") +
+  autolayer(fitted(fit.consMR), series="Fitted") +
+  xlab("Year") + ylab("") +
   ggtitle("Percentage change in US consumption expenditure") +
   guides(colour=guide_legend(title=" "))
 ```
 
-```{r usfitted2, echo=TRUE, cache=TRUE, fig.cap="Actual US consumtpion expenditure plotted against predicted US consumtpion expenditure."}
-df <- as.data.frame(df)
-ggplot(df,aes(x=Data, y=Fitted)) + 
+```{r usfitted2, echo=TRUE, cache=TRUE, fig.cap="Actual US consumtpion expenditure plotted against predicted US consumtpion expenditure.", message=FALSE, warning=FALSE}
+df <- as.data.frame(cbind(Data=uschange[,"Consumption"], Fitted=fitted(fit.consMR)))
+ggplot(df, aes(x=Data, y=Fitted)) + 
   geom_point() +
   xlab("Fitted (predicted values)") + ylab("Data (actual values)") + 
   ggtitle("Percentage change in US consumption expenditure") +
-  scale_colour_brewer(palette="Dark2", name="Quarter") +
   geom_smooth(method="lm", se=FALSE)
 ```
 
@@ -273,17 +268,18 @@ There is a strong downward trend of `r round(fit.beer$coef['trend'], 3)` megalit
 
 
 ```{r beerlm2, echo=TRUE, cache=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
-df <- cbind(Data=beer2, Fitted=fitted(fit.beer))
-autoplot(df[,1:2]) + xlab("Year") + ylab("") +
+autoplot(beer2, series="Data") +
+  autolayer(fitted(fit.beer), series="Fitted") +
+  xlab("Year") + ylab("") +
   ggtitle("Quarterly Beer Production") +
   guides(colour=guide_legend(title=" "))
 ```
 
 ```{r beerlm3, echo=TRUE, cache=TRUE, fig.cap="Actual beer production plotted against predicted beer production."}
-df <- as.data.frame(df)
-ggplot(df,aes(x=Data, y=Fitted, colour=as.factor(cycle(beer2)))) + 
+df <- as.data.frame(cbind(Data=beer2, Fitted=fitted(fit.beer)))
+ggplot(df, aes(x=Data, y=Fitted, colour=as.factor(cycle(beer2)))) + 
   geom_point() +
-  xlab("Fitted") + ylab("Actual values") + 
+  ylab("Fitted") + xlab("Actual values") + 
   ggtitle("Quarterly beer production") +
   scale_colour_brewer(palette="Dark2", name="Quarter")
 ```
@@ -400,14 +396,15 @@ It is also necessary to plot the residuals against any predictors *not* in the m
 The residuals from the multiple regression model for forecasting US consumption plotted against each predictor in Figure \@ref(fig:resids) seem to be randomly scattered and therefore we would be satisfied with these in this case.
 
 ```{r resids, echo=TRUE, cache=TRUE, fig.cap="Scatterplots of residuals versus each predictor."}
-df <- as.data.frame(cbind(res=residuals(fit.consMR),Income=uschange[,"Income"],Production=uschange[,"Production"],Savings=uschange[,"Savings"],Unemployment=uschange[,"Unemployment"]))
-p1 <- ggplot(df, aes(x=Income, y=res)) + geom_point() + ylab("Residuals")
-p2 <- ggplot(df, aes(x=Production, y=res)) + geom_point() + ylab("Residuals")
-p3 <- ggplot(df, aes(x=Savings, y=res)) + geom_point() + ylab("Residuals")
-p4 <- ggplot(df, aes(x=Unemployment, y=res)) + geom_point() + ylab("Residuals")
+df <- as.data.frame(uschange)
+df$Residuals <- c(residuals(fit.consMR))
+
+p1 <- ggplot(df, aes(x=Income, y=Residuals)) + geom_point()
+p2 <- ggplot(df, aes(x=Production, y=Residuals)) + geom_point()
+p3 <- ggplot(df, aes(x=Savings, y=Residuals)) + geom_point()
+p4 <- ggplot(df, aes(x=Unemployment, y=Residuals)) + geom_point()
 
 gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
-
 ```
 
 ### Residual plots against fitted values {-}
@@ -419,11 +416,8 @@ Figure \@ref(fig:electrendseas) shows the residuals against the fitted values fr
 
 ```{r electrendseas, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of residuals versus fitted."}
 fit <- tslm(elec ~ trend + season) 
-df <- as.data.frame(cbind(fitd=fitted(fit), res=residuals(fit)))
-
-ggplot(df, aes(x=fitd, y=res)) +
-  ylab("residuals") +xlab("fitted") +
-  geom_point()  
+df <- as.data.frame(cbind(Fitted=fitted(fit), Residuals=residuals(fit)))
+ggplot(df, aes(x=Fitted, y=Residuals)) + geom_point()  
 ```
 
 
@@ -442,7 +436,6 @@ Figure \@ref(fig:outlier) highlights the effect of a single outlier when regress
 
 
 ```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, cache=TRUE, message=FALSE,warning=FALSE}
-
 yx <- as.data.frame(uschange[,1:2])
 fit1 <- lm(Consumption ~ Income, data=yx) 
 
@@ -504,7 +497,7 @@ For example consider the two variables plotted below in Figure \@ref(fig:spuriou
 
 
 ```{r spurious, echo=FALSE, fig.height=5, warning=FALSE, fig.cap="Trending time series data can appear to be related as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE, cache=TRUE}
-aussies=window(ausair,end=2011)
+aussies=window(ausair, end=2011)
 df <- as.data.frame(cbind(GuineaRiceProduction=guinearice,aussies))
 p1 <- autoplot(aussies) + xlab("Year") + ylab("Air Passengers in Australia")
 p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")

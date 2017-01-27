@@ -468,7 +468,7 @@ gridExtra::grid.arrange(p1, p2, nrow=1)
 
 ### Goodness-of-fit {-}
 
-A common way to summarize how well a linear regression model fits the data is via the coefficient of determination or $R^2$. This can be calculated as the square of the correlation between the observed $y$ values and the predicted $\hat{y}$ values. Alternatively, it can also be calculated as, 
+A common way to summarise how well a linear regression model fits the data is via the coefficient of determination or $R^2$. This can be calculated as the square of the correlation between the observed $y$ values and the predicted $\hat{y}$ values. Alternatively, it can also be calculated as, 
 $$
   R^2 = \frac{\sum(\hat{y}_{t} - \bar{y})^2}{\sum(y_{t}-\bar{y})^2},
 $$ 

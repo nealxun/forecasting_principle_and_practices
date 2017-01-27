@@ -339,7 +339,7 @@ $$
 $$
 where the training data is given by $\{y_1,\dots,y_T\}$ and the test data is given by $\{y_{T+1},y_{T+2},\dots\}$. Unlike residuals, forecast errors on the test set involve multi-step forecasts.
 
-We measure forecast accuracy by summarizing the forecast errors in different ways.
+We measure forecast accuracy by summarising the forecast errors in different ways.
 
 ### Scale-dependent errors {-}
 
@@ -610,7 +610,7 @@ autoplot(naive(dj2))
 
 ## The forecast package in R
 
-This book uses the facilities in the `forecast` package in R (which is loaded automatically whenever you load the `fpp` package). This appendix briefly summarizes some of the features of the package. Please refer to the help files for individual functions to learn more, and to see some examples of their use.
+This book uses the facilities in the `forecast` package in R (which is loaded automatically whenever you load the `fpp` package). This appendix briefly summarises some of the features of the package. Please refer to the help files for individual functions to learn more, and to see some examples of their use.
 
 ### Functions that output a forecast object: {-}
 

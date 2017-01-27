@@ -534,7 +534,7 @@ When fitting an ARIMA model to a set of (non-seasonal) time series data, the fol
 
 The automated algorithm only takes care of steps 3--5. So even if you use it, you will still need to take care of the other steps yourself.
 
-The process is summarized in Figure \@ref(fig:arimaflowchart).
+The process is summarised in Figure \@ref(fig:arimaflowchart).
 
 
 ```{r arimaflowchart, echo=FALSE, cache=TRUE, fig.cap="General process for forecasting using an ARIMA model."}

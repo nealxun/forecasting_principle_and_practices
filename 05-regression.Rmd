@@ -1117,60 +1117,44 @@ for the raw data.
 
 j. How could you improve these predictions by modifying the model?
 
-5 . *(For advanved readers following from Section \@ref(Regr-MatrixEquations))*. Using matrix notation it was shown that if $\bm{y}=\bm{X}\bm{\beta}+\bm{\varepsilon}$, where $\bm{e}$ has mean $\bm{0}$ and variance matrix $\sigma^2\bm{I}$, then the estimated coefficients are given by $\hat{\bm{\beta}}=(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ 
-the forecasts are given by $\hat{y} = \bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y}$ where $\bm{x}^*$ is a row vector containing the values of the regressors for the
-forecasts (in the same format as X), and the forecast variances are given by
-$\sigma^2 \left[1 + \bm{x}^* (\bm{X}'\bm{X})^{-1} (\bm{x}^*)'\right].$ 
+5 . *(For advanced readers following on from Section \@ref(Regr-MatrixEquations))*. Using matrix notation it was shown that if $\bm{y}=\bm{X}\bm{\beta}+\bm{\varepsilon}$, where $\bm{e}$ has mean $\bm{0}$ and variance matrix $\sigma^2\bm{I}$, the estimated coefficients are given by $\hat{\bm{\beta}}=(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ and a forecast is given by $\hat{y}=\bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ where $\bm{x}^*$ is a row vector containing the values of the regressors for the
+forecast (in the same format as $\bm{X}$), and the forecast variance is given by
+$var(\hat{y})=\sigma^2 \left[1+\bm{x}^*(\bm{X}'\bm{X})^{-1}(\bm{x}^*)'\right].$ 
 
-In this exercise, you will derive specific forecast expressions for the simple time trend model where $Y_t = a + bt$. You will need the following results
+Consider the simple time trend model where $y_t = \beta_0 + \beta_1t$. Using
+the following results,
+$$\sum^{T}_{t=1}{t}=\frac{1}{2}T(T+1),\quad \sum^{T}_{t=1}{t^2}=\frac{1}{6}T(T+1)(2T+1) $$
+derive following expressions:
 
+a.
 
+$$\bm{X}'\bm{X}=\frac{1}{6}\left[
+  \begin{array}{cc} 
+    6T      & 3T(T+1) \\
+    3T(T+1) & T(T+1)(2T+1) \\
+  \end{array}
+\right]$$
 
+b.
 
+$$(\bm{X}'\bm{X})^{-1}=\frac{2}{T(T^2-1)}\left[
+  \begin{array}{cc} 
+    (T+1)(2T+1)   & -3(T+1) \\
+    -3(T+1)       & 6 \\
+  \end{array}
+\right]$$
 
+c.
 
+$$\hat{\beta}_0=\frac{2}{T(T-1)}\left[(2T+1)\sum^T_{t=1}y_t-3\sum^T_{t=1}ty_t  
+  \right]$$
 
-The data below (data set `texasgas`) shows the demand for natural gas and the
-price of natural gas for 20 towns in Texas in 1969.
+$$\hat{\beta}_1=\frac{6}{T(T^2-1)}\left[2\sum^T_{t=1}ty_t-(T+1)\sum^T_{t=1}y_t  
+  \right]$$
+d.
 
-<span>lcc</span> **<span>City</span> & **<span>Average price</span> $P$ &
-**<span>Consumption per customer</span> $C$\ & **<span>(cents per thousand
-cubic feet)</span> & **<span>(thousand cubic feet)</span>\ Amarillo & 30 & 134\
-Borger & 31 & 112\ Dalhart & 37 & 136\ Shamrock & 42 & 109\ Royalty & 43 & 105\
-Texarkana & 45 & 87\ Corpus Christi & 50 & 56\ Palestine & 54 & 43\ Marshall &
-54 & 77\ Iowa Park & 57 & 35\ Palo Pinto & 58 & 65\ Millsap & 58 & 56\ Memphis
-& 60 & 58\ Granger & 73 & 55\ Llano & 88 & 49\ Brownsville & 89 & 39\ Mercedes
-& 92 & 36\ Karnes City & 97 & 46\ Mathis & 100 & 40\ La Pryor & 102 & 42\
-**********
+$$var(\hat{y}_{t})=\hat{\sigma}^2\left[1+\frac{2}{T(T-1)}\left(1-4T-6h+6\frac{(T+h)^2}{T+1}\right)\right]$$
 
-[(a)]=0.16cm
-
-Do a scatterplot of consumption against price. The data are clearly not linear. Three possible nonlinear models for the data are given below
-\begin{align*} 
-  C_i &= \exp(a + bP_i+e_i) \\ 
-  C_i &= \left\{
-    \begin{array}{ll}
-          a_1 + b_1P_i + e_i & \mbox{when $P_i \le 60$} \\ 
-          a_2 + b_2P_i + e_i & \mbox{when $P_i > 60$;}
-    \end{array}\right.\\
-  C_i &= a + b_{1}P + b_{2}P^{2}.
-\end{align*}
-
-The second model divides the data into two sections, depending on whether the price is above or below 60 cents per 1,000 cubic feet.
-
-Can you explain why the slope of the fitted line should change with $P$?
-
-Fit the three models and find the coefficients, and residual variance in each case.
-
-For the second model, the parameters $a_1$, $a_2$, $b_1$, $b_2$ can be estimated by simply fitting a regression with four regressors but no constant: (i) a dummy taking value 1 when $P\le60$ and 0 otherwise; (ii) $\text{P1} = P$ when $P\le60$ and 0 otherwise; (iii) a dummy taking value 0 when $P\le60$ and 1 otherwise; (iv) $\text{P2}=P$ when $P>60$ and 0 otherwise.
-
-For each model, find the value of $R^2$ and AIC, and produce a residual plot. Comment on the adequacy of the three models.
-
-For prices 40, 60, 80, 100, and 120 cents per 1,000 cubic feet, compute the forecasted per capita demand using the best model of the three above.
-
-Compute 95% prediction intervals. Make a graph of these prediction intervals and discuss their interpretation.
-
-What is the correlation between $P$ and $P^{2}$? Does this suggest any general problem to be considered in dealing with polynomial regressions---especially of higher orders? 
 
 ## Further reading
 

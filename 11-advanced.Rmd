@@ -4,17 +4,22 @@ In this chapter, we briefly discuss four more advanced forecasting methods that 
 
 ##Complex seasonality {}
 
-hourly data
+So far, we have considered relatively simple seasonal patterns such as quarterly and monthly data. However, higher frequency data often exhibits more complicated seasonal patterns. For example, daily data may have a weekly pattern as well as an annual pattern.  Hourly data usually has three types of seasonality: a daily pattern, a weekly pattern, and an annual pattern. Even weekly data can be difficult as it typically has an annual pattern with seasonal period of $365.25/7\approx 52.179$ on average.
 
-daily data
+Such multiple seasonal patterns are becoming more common with high frequency data recording. Further examples where multiple seasonal patterns can occur include call volume in call centres, daily hospital admissions, requests for cash at ATMs, electricity and water usage, and access to computer web sites.
 
-weekly data
+Most of the methods we have considered so far are unable to deal with these seasonal complexities. Even the `ts` class in R can only handle one type of seasonality, which is usually assumed to take integer values.
 
-
-
-An alternative is to use a `msts` object which handles multiple seasonality time series. Then you can specify all the frequencies that might be relevant. It is also flexible enough to handle non-integer frequencies.
+To deal with such series, we will use the `msts` class which handles multiple seasonality time series. Then you can specify all of the frequencies that might be relevant. It is also flexible enough to handle non-integer frequencies.
 
 You won't necessarily want to include all of these frequencies --- just the ones that are likely to be present in the data. For example, if you have only 180 days of data, you can probably ignore the annual seasonality. If the data are measurements of a natural phenomenon (e.g., temperature), you might also be able to ignore the weekly seasonality.
+
+Figure \@ref(fig:calls) shows the number of retail banking call arrivals per 5-minute interval between 7:00am and 9:05pm each weekday.  There is a daily seasonal pattern with frequency 169 and a weekly seasonal pattern with frequency $169\times5=845$. If a longer series of data were available, there may also be an annual seasonal pattern.
+
+```{r calls, echo=TRUE, fig.cap="Call volume at retail bank in 5 minute intervals between 7:00am and 9:05pm each weekday."}
+autoplot(calls)
+```
+
 
 With multiple seasonalities, you could use a TBATS model, or Fourier terms in a regression or ARIMA model. The `fourier` function from the forecast package will handle `msts` objects.
 
@@ -37,7 +42,7 @@ Other intermittent demand models
 
 ##Vector autoregressions {#sec-9-2-VAR}
 
-One limitation with the models we have considered so far is that they impose a unidirectional relationship --- the forecast variable is influenced by the predictor variables, but not vice versa. However, there are many cases where the reverse should also be allowed for --- where all variables affect each other. Consider the series in Example \@ref(ex-9-1-USconsumption). The changes in personal consumption expenditure ($C_t$) are forecast based on the changes in personal disposable income ($I_t$). In this case a bi-directional relationship may be more suitable: an increase in $I_t$ will lead to an increase in $C_t$ and vice versa.
+One limitation with the models we have considered so far is that they impose a unidirectional relationship --- the forecast variable is influenced by the predictor variables, but not vice versa. However, there are many cases where the reverse should also be allowed for --- where all variables affect each other. In Chapter 9, the changes in personal consumption expenditure ($C_t$) were forecast based on the changes in personal disposable income ($I_t$). However, in this case a bi-directional relationship may be more suitable: an increase in $I_t$ will lead to an increase in $C_t$ and vice versa.
 
 An example of such a situation occurred in Australia during the Global Financial Crisis of 2008--2009. The Australian government issued stimulus packages that included cash payments in December 2008, just in time for Christmas spending. As a result, retailers reported strong sales and the economy was stimulated. Consequently, incomes increased.
 
@@ -96,7 +101,7 @@ serial.test(var, lags.pt=10, type="PT.asymptotic")
 summary(var)
 ```
 
-The R output on the following page shows the lag length selected by each of the information criteria available in the **vars** package. There is a large discrepancy between a VAR(5) selected by the AIC and a VAR(1) selected by the BIC. This is not unusual. As a result we first fit a VAR(1), selected by the BIC. In similar fashion to the univariate ARIMA methodology we test that the residuals are uncorrelated using a Portmanteau test^[The tests for serial correlation in the "vars" package are multivariate generalisations of the tests presented in Section \@ref(sec-2-residualdiagnostics).] The null hypothesis of no serial correlation in the residuals is rejected for both a VAR(1) and a VAR(2) and therefore we fit a VAR(3) as now the null is not rejected. The forecasts generated by the VAR(3) are plotted in Figure \@ref(fig-9-2-VARforecasts).
+The R output on the following page shows the lag length selected by each of the information criteria available in the **vars** package. There is a large discrepancy between a VAR(5) selected by the AIC and a VAR(1) selected by the BIC. This is not unusual. As a result we first fit a VAR(1), selected by the BIC. In similar fashion to the univariate ARIMA methodology we test that the residuals are uncorrelated using a Portmanteau test^[The tests for serial correlation in the "vars" package are multivariate generalisations of the tests presented in Section \@ref(toolbox-resids}).] The null hypothesis of no serial correlation in the residuals is rejected for both a VAR(1) and a VAR(2) and therefore we fit a VAR(3) as now the null is not rejected. The forecasts generated by the VAR(3) are plotted in Figure \@ref(fig-9-2-VARforecasts).
 
 
 ```{r VAR3, fig.cap="Forecasts for US consumption and income generated from a VAR(3).", cache=TRUE}
@@ -183,11 +188,11 @@ With seasonal data, it is useful to also add the last observed values from the s
 
 The `nnetar()` function fits an NNAR($p,P,k$)$_m$ model. If the values of $p$ and $P$ are not specified, they are automatically selected. For non-seasonal time series, the default is the optimal number of lags (according to the AIC) for a linear AR($p$) model. For seasonal time series, the default values are $P=1$ and $p$ is chosen from the optimal linear model fitted to the seasonally adjusted data. If $k$ is not specified, it is set to $k=(p+P+1)/2$ (rounded to the nearest integer).
 
-\@ref(Sunspots) The surface of the sun contains magnetic regions that appear
+The surface of the sun contains magnetic regions that appear
 as dark spots. These affect the propagation of radio waves and so
 telecommunication companies like to predict sunspot activity in order to
 plan for any future difficulties. Sunspots follow a cycle of length
-between 9 and 14 years. In Figure \@ref(fig-10-sunspot-nnetar), forecasts
+between 9 and 14 years. In Figure \@ref(fig:sunspotnnetar), forecasts
 from an NNAR(9,5) are shown for the next 20 years.
 
 ```{r sunspotnnetar, fig.cap="Forecasts from a neural network with nine lagged inputs and one hidden layer containing five neurons.", cache=TRUE}

@@ -63,7 +63,6 @@ The AICc is calculated for the final model, and this value can be used to determ
 
 ###Example: US Personal Consumption and Income {-}
 
-
 Figure \@ref(fig:usconsump) shows the quarterly changes in personal consumption expenditure and personal disposable income from 1970 to 2010. We would like to forecast changes in expenditure based on changes in income. A change in income does not necessarily translate to an instant change in consumption (e.g., after the loss of a job, it may take a few months for expenses to be reduced to allow for the new circumstances). However, we will ignore this complexity in this example and try to measure the instantaneous effect of the average change of income on the average change of consumption expenditure.
 
 
@@ -347,8 +346,8 @@ autoplot(fc8) + ylab("Quotes") +
     | $b_1$       | 0.0077     | 0.0015     | 4.98       | 0.000      |
     | $b_2$       | 0.0208     | 0.0023     | 9.23       | 0.000      |
     | $\theta_1$  | 0.5830     | 0.0720     | 8.10       | 0.000      |
-    | $\phi_{12}$ | $-0.5373$  | 0.0856     | -6.27      | 0.000      |
-    | $\phi_{24}$ | $-0.4667$  | 0.0862     | -5.41      | 0.000      |
+    | $\phi_{12}$ | -0.5373    | 0.0856     | -6.27      | 0.000      |
+    | $\phi_{24}$ | -0.4667    | 0.0862     | -5.41      | 0.000      |
 
     Explain what the estimates of $b_1$ and $b_2$ tell us about electricity consumption.
 

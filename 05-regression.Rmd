@@ -566,17 +566,15 @@ the variance of the forecast errors: $$\hat{\sigma}^2 =
 Maximizing $\bar{R}^2$ works quite well as a method of selecting predictors,
 although it does tend to err on the side of selecting too many predictors.
 
-### Cross-validation
-####Make sure that this CV is valid here / possibly manipulate cvTS code to do this properly?? {-}
+### Cross-validation {-}
 
-As discussed in Section \@ref(accuracy), cross-validation is a very useful way of determining the predictive ability of a model. In general, leave-one-out cross-validation for regression can be carried out using the following steps.
+Section \@ref(accuracy) introduced time series cross-validation as a general and useful tool for determining the predictive ability of a model. Based on Bergmeir, Hyndman, Koo (2015 - need to find the publication of this) in this section we apply classical leave-one-out cross-validation to select predictors for regression models using the following steps:
 
 1. Remove observation $t$ from the data set, and fit the model using the remaining data. Then compute the error ($e_{t}^*=y_{t}-\hat{y}_{t}$) for the omitted observation. (This is not the same as the residual because the $t$th observation was not used in estimating the value of $\hat{y}_{t}$.)
 2. Repeat step 1 for $t=1,\dots,T$.
 3. Compute the MSE from $e_{1}^*,\dots,e_{T}^*$. We shall call this the CV.
 
-For many forecasting models, this is a time-consuming procedure, but for
-regression there are very fast methods of calculating CV so it takes no longer than fitting one model to the full data set. The equation for computing CV is given in Section \@ref(Regr-MatrixEquations).
+Although this looks this looks like a  time-consuming procedure there are very fast methods of calculating CV so it takes no longer than fitting one model to the full data set. The equation for computing CV is given in Section \@ref(Regr-MatrixEquations).
 
 Under this criterion, the best model is the one with the smallest value of CV.
 

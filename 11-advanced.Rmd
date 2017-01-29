@@ -14,10 +14,16 @@ To deal with such series, we will use the `msts` class which handles multiple se
 
 You won't necessarily want to include all of these frequencies --- just the ones that are likely to be present in the data. For example, if you have only 180 days of data, you can probably ignore the annual seasonality. If the data are measurements of a natural phenomenon (e.g., temperature), you might also be able to ignore the weekly seasonality.
 
-Figure \@ref(fig:calls) shows the number of retail banking call arrivals per 5-minute interval between 7:00am and 9:05pm each weekday.  There is a daily seasonal pattern with frequency 169 and a weekly seasonal pattern with frequency $169\times5=845$. If a longer series of data were available, there may also be an annual seasonal pattern.
+Figure \@ref(fig:calls) shows the number of retail banking call arrivals per 5-minute interval between 7:00am and 9:05pm each weekday over a 33 week period.  There is a strong daily seasonal pattern with frequency 169, and a weak weekly seasonal pattern with frequency $169\times5=845$. (Call volumes on Mondays tend to be higher than the rest of the week.) If a longer series of data were available, there may also be an annual seasonal pattern.
 
-```{r calls, echo=TRUE, fig.cap="Call volume at retail bank in 5 minute intervals between 7:00am and 9:05pm each weekday."}
-autoplot(calls)
+```{r calls, echo=TRUE, fig.cap="Five-minute call volume handled on weekdays between 7am and 9:05pm in a large North American commercial bank. Top panel shows data from 3 March 2003 to 23 May 2003. Bottom panel shows only the first three weeks.", message=FALSE, warning=FALSE}
+p1 <- autoplot(calls) +
+  ylab("Call volume") + xlab("Weeks") +
+  scale_x_continuous(breaks=seq(1,33,by=2))
+p2 <- autoplot(window(calls, end=4)) +
+  ylab("Call volume") + xlab("Weeks") +
+  scale_x_continuous(minor_breaks = seq(1,4,by=0.2))
+gridExtra::grid.arrange(p1,p2)
 ```
 
 

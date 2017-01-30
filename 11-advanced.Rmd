@@ -14,7 +14,7 @@ To deal with such series, we will use the `msts` class which handles multiple se
 
 You won't necessarily want to include all of these frequencies --- just the ones that are likely to be present in the data. For example, if you have only 180 days of data, you can probably ignore the annual seasonality. If the data are measurements of a natural phenomenon (e.g., temperature), you might also be able to ignore the weekly seasonality.
 
-Figure \@ref(fig:calls) shows the number of retail banking call arrivals per 5-minute interval between 7:00am and 9:05pm each weekday over a 33 week period.  There is a strong daily seasonal pattern with frequency 169, and a weak weekly seasonal pattern with frequency $169\times5=845$. (Call volumes on Mondays tend to be higher than the rest of the week.) If a longer series of data were available, there may also be an annual seasonal pattern.
+Figure \@ref(fig:calls) shows the number of retail banking call arrivals per 5-minute interval between 7:00am and 9:05pm each weekday over a 33 week period.  There is a strong daily seasonal pattern with frequency 169, and a weak weekly seasonal pattern with frequency $169 \times 5=845$. (Call volumes on Mondays tend to be higher than the rest of the week.) If a longer series of data were available, there may also be an annual seasonal pattern.
 
 ```{r calls, echo=TRUE, fig.cap="Five-minute call volume handled on weekdays between 7am and 9:05pm in a large North American commercial bank. Top panel shows data from 3 March 2003 to 23 May 2003. Bottom panel shows only the first three weeks.", message=FALSE, warning=FALSE}
 p1 <- autoplot(calls) +
@@ -26,11 +26,39 @@ p2 <- autoplot(window(calls, end=4)) +
 gridExtra::grid.arrange(p1,p2)
 ```
 
+### Dynamic harmonic regression with multiple seasonal periods {-}
 
-With multiple seasonalities, you could use a TBATS model, or Fourier terms in a regression or ARIMA model. The `fourier` function from the forecast package will handle `msts` objects.
+With multiple seasonalities, we can use Fourier terms as we did in earlier chapters. Because there are multiple seasonalities, we need to add Fourier terms for each seasonal period. In this case, the seasonal periods are 169 and 845, so the Fourier terms are of the form
+$$
+  \sin\left(\frac{2\pi kt}{169}\right), \qquad
+  \cos\left(\frac{2\pi kt}{169}\right), \qquad
+  \sin\left(\frac{2\pi kt}{845}\right), \qquad  \text{and}
+  \cos\left(\frac{2\pi kt}{845}\right),
+$$
+for $k=1,2,\dots$. The `fourier` function can generate these for you.
 
+We will fit a dynamic regression model with an ARMA error structure. The total number of Fourier terms for each seasonal period have been chosen to minimize the AICc. 
 
-multiple seasonality
+```{r callstbats, echo=TRUE, cache=TRUE}
+fit <- auto.arima(calls, seasonal=FALSE, 
+         xreg=fourier(calls, K=c(1,1)))
+fc <- forecast(fit, xreg=fourier(calls, K=c(1,1), h=2*169))
+autoplot(fc, include=5*169) +
+  ylab("Call volume") + xlab("Weeks")
+```
+
+### TBATS models {-}
+
+An alternative approach developed by \@cite(DHS11) uses a combination of Fourier terms with an exponential smoothing state space model and a Box-Cox transformation, in a completed automated manner. As with any automated modelling framework, it does not always work, but it can be a useful approach in some circumstances.
+
+A TBATS model differs from dynamic harmonic regression in that the seasonality is allowed to change slowly over time in a TBATS model, while harmonic regression terms force the seasonal patterns to repeat periodically without changing.
+
+```{r callsharmonic, echo=TRUE, cache=TRUE}
+fit2 <- tbats(calls)
+fc2 <- forecast(fit2, h=2*169))
+autoplot(fc2, include=5*169) +
+  ylab("Call volume") + xlab("Weeks") +
+```
 
 tbats
 
@@ -214,3 +242,17 @@ autoplot(forecast(fit,h=20))
 
 ```
 
+## Exercises
+
+1. Use the tbats function to model your retail time series.
+    a. Check the residuals and produce forecasts.
+    b. Does this completely automated approach work for these data?
+    c. Have you saved any degrees of freedom by using Fourier terms rather than seasonal differencing?
+
+2. Consider the weekly data on US finished motor gasoline products supplied (thousands of barrels per day) (series `gasoline`):
+
+    a. Fit a tbats model to these data.
+    b. Check the residuals and produce forecasts.
+    c. Could you model these data using any of the other methods we have considered in this book?
+
+3. Experiment with using `nnetar()` on your retail data and other data we have considered in previous chapters.

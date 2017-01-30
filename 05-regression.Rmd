@@ -1089,113 +1089,89 @@ to worry about --- multicollinearity is not a problem.
 ## Exercises
 
 
-1 . Electricity consumption was recorded for a small town on 12 randomly chosen days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day.
+1. Electricity consumption was recorded for a small town on 12 randomly chosen days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day.
 
-```{r, echo=FALSE, cache=TRUE}
-# Not sure how to print this in landscape. Have tried various things even using # rowsnames but kable needs colnames
-day <- seq(1,nrow(econsumption),1)
-tbl <- cbind(day,econsumption)
-colnames(tbl) <- c("Day","Mwh","Temp")
+  ```{r, echo=FALSE, cache=TRUE}
+  day <- seq(1,nrow(econsumption),1)
+  tbl <- t(econsumption)
+  rownames(tbl) <- c("Mwh","Temp")
+  colnames(tbl) <- day
 
-knitr::kable(tbl, booktabs=TRUE,align = c(rep("c", 2)),caption="All 16 possible models for forecasting US consumption with 4 predictors.", floating.environment="sidewaystable")
+  knitr::kable(tbl, booktabs=TRUE)
+  ```
 
-```
+    a. Plot the data and find the regression model for Mwh with temperature as an explanatory variable. Why is there a negative relationship?
+    b. Produce a residual plot. Is the model adequate? Are there any outliers or influential observations?
+    c. Use the model to predict the electricity consumption that you would expect for a day with maximum temperature $10^\circ$ and a day with maximum temperature $35^\circ$. Do you believe these predictions?
+    d. Give prediction intervals for your forecasts. The following R code will get you started:
 
-a. Plot the data and find the regression model for Mwh with temperature as an explanatory variable. Why is there a negative relationship?
+        ```{r, eval=FALSE, include=TRUE, cache=TRUE}
+        plot(Mwh ~ temp, data=econsumption) 
+        fit <- lm(Mwh ~ temp, data=econsumption) 
+        plot(residuals(fit) ~ temp, data=econsumption)
+        forecast(fit, newdata=data.frame(temp=c(10,35)))
+        ```
 
-b. Produce a residual plot. Is the model adequate? Are there any outliers or influential observations?
+2. Data set `olympic` contains the winning times (in seconds) for the men’s 400 meters final in each Olympic Games from 1896 to 2012.
 
-c. Use the model to predict the electricity consumption that you would expect for a day with maximum temperature $10^\circ$ and a day with maximum temperature $35^\circ$. Do you believe these predictions?
+    a. Plot the winning time against the year. Describe the main features of the scatterplot.
+    b. Fit a regression line to the data. Obviously the winning times have been decreasing, but at what *average* rate per year?
+    c. Plot the residuals against the year. What does this indicate about the suitability of the fitted line?
+    d. Predict the winning time for the men’s 400 meters final in the 2000, 2004, 2008 and 2012 Olympics. Give a prediction interval for each of your forecasts. What assumptions have you made in these calculations?
+    e. Find out the actual winning times for these Olympics (see [www.databaseolympics.com](www.databaseolympics.com)). How good were your forecasts and prediction intervals?
 
-d. Give prediction intervals for your forecasts.
-
-The following R code will get you started:
-
-```{r, eval=FALSE, include=TRUE, cache=TRUE}
-    plot(Mwh ~ temp, data=econsumption) fit <- lm(Mwh ~ temp,
-    data=econsumption) plot(residuals(fit) ~ temp, data=econsumption)
-    forecast(fit, newdata=data.frame(temp=c(10,35)))
-```
-
-
-1. Type `easter(ausbeer)` and interpret what you see.
+3. Type `easter(ausbeer)` and interpret what you see.
 
 
-2 . Data set `olympic` contains the winning times (in seconds) for the men’s 400 meters final in each Olympic Games from 1896 to 2012.
+4. An elasticity coefficient is the ratio of the percentage change in the forecast variable ($y$) to the percentage change in the predictor variable ($x$). Mathematically, the elasticity is defined as $(dy/dx)\times(x/y)$. Consider the log-log model, $$\log y=\beta_0+\beta_1 \log x + \varepsilon.$$ Express $y$ as a function of $x$ and show that the coefficient $\beta_1$ is the elasticity coefficient.
 
-a. Plot the winning time against the year. Describe the main features of the scatterplot.
+5. The data set `fancy` concerns the monthly sales figures of a shop which opened in January 1987 and sells gifts, souvenirs, and novelties. The shop is situated on the wharf at a beach resort town in Queensland, Australia. The sales volume varies with the seasonal population of tourists. There is a large influx of visitors to the town at Christmas and for the local surfing festival, held every March since 1988. Over time, the shop has expanded its premises, range of products, and staff.
 
-b. Fit a regression line to the data. Obviously the winning times have been decreasing, but at what *average* rate per year?
+    a. Produce a time plot of the data and describe the patterns in the graph. Identify any unusual or unexpected fluctuations in the time series.
+    b. Explain why it is necessary to take logarithms of these data before fitting a model.
+    c. Use R to fit a regression model to the logarithms of these sales data with a linear trend, seasonal dummies and a "surfing festival" dummy variable.
+    d. Plot the residuals against time and against the fitted values. Do these plots reveal any problems with the model?
+    e. Do boxplots of the residuals for each month. Does this reveal any problems with the model?
+    f. What do the values of the coefficients tell you about each variable?
+    g. What does the Breusch-Godfrey test tell you about your model?
+    h. Regardless of your answers to the above questions, use your regression model to predict the monthly sales for 1994, 1995, and 1996. Produce prediction intervals for each of your forecasts.
+    i. Transform your predictions and intervals to obtain predictions and intervals for the raw data.
+    j. How could you improve these predictions by modifying the model?
 
-c. Plot the residuals against the year. What does this indicate about the suitability of the fitted line?
+6. *(For advanced readers following on from Section \@ref(Regr-MatrixEquations))*. 
 
-d. Predict the winning time for the men’s 400 meters final in the 2000, 2004, 2008 and 2012 Olympics. Give a prediction interval for each of your forecasts. What assumptions have you made in these calculations?
+    Using matrix notation it was shown that if $\bm{y}=\bm{X}\bm{\beta}+\bm{\varepsilon}$, where $\bm{e}$ has mean $\bm{0}$ and variance matrix $\sigma^2\bm{I}$, the estimated coefficients are given by $\hat{\bm{\beta}}=(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ and a forecast is given by $\hat{y}=\bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ where $\bm{x}^*$ is a row vector containing the values of the regressors for the forecast (in the same format as $\bm{X}$), and the forecast variance is given by $var(\hat{y})=\sigma^2 \left[1+\bm{x}^*(\bm{X}'\bm{X})^{-1}(\bm{x}^*)'\right].$ 
 
-e. Find out the actual winning times for these Olympics (see [www.databaseolympics.com](www.databaseolympics.com)). How good were your forecasts and prediction intervals?
+    Consider the simple time trend model where $y_t = \beta_0 + \beta_1t$. Using the following results,
+    $$
+      \sum^{T}_{t=1}{t}=\frac{1}{2}T(T+1),\quad \sum^{T}_{t=1}{t^2}=\frac{1}{6}T(T+1)(2T+1) 
+    $$
+    derive the following expressions:
 
-3 . An elasticity coefficient is the ratio of the percentage change in the forecast variable ($y$) to the percentage change in the predictor variable ($x$). Mathematically, the elasticity is defined as $(dy/dx)\times(x/y)$. Consider the log-log model, $$\log y=\beta_0+\beta_1 \log x + \varepsilon.$$ Express $y$ as a function of $x$ and show that the coefficient $\beta_1$ is the elasticity coefficient.
+    a.
+      $\displaystyle\bm{X}'\bm{X}=\frac{1}{6}\left[
+      \begin{array}{cc} 
+        6T      & 3T(T+1) \\
+        3T(T+1) & T(T+1)(2T+1) \\
+      \end{array}
+      \right]$
 
-4 . The data set `fancy` concerns the monthly sales figures of a shop which opened in January 1987 and sells gifts, souvenirs, and novelties. The shop is situated on the wharf at a beach resort town in Queensland, Australia. The sales volume varies with the seasonal population of tourists. There is a large influx of visitors to the town at Christmas and for the local surfing festival, held every March since 1988. Over time, the shop has expanded its premises, range of products, and staff.
+    b.
+      $\displaystyle(\bm{X}'\bm{X})^{-1}=\frac{2}{T(T^2-1)}\left[
+      \begin{array}{cc} 
+        (T+1)(2T+1)   & -3(T+1) \\
+        -3(T+1)       & 6 \\
+      \end{array}
+      \right]$
 
-a. Produce a time plot of the data and describe the patterns in the graph. Identify any unusual or unexpected fluctuations in the time series.
+    c.
+      $\displaystyle\hat{\beta}_0=\frac{2}{T(T-1)}\left[(2T+1)\sum^T_{t=1}y_t-3\sum^T_{t=1}ty_t  
+      \right]$
 
-b. Explain why it is necessary to take logarithms of these data before fitting a model.
-
-c. Use R to fit a regression model to the logarithms of these sales data with a linear trend, seasonal dummies and a "surfing festival" dummy variable.
-
-d. Plot the residuals against time and against the fitted values. Do these plots reveal any problems with the model?
-
-e. Do boxplots of the residuals for each month. Does this reveal any problems with the model?
-
-f. What do the values of the coefficients tell you about each variable?
-
-g. What does the Durbin-Watson statistic tell you about your model?
-
-h. Regardless of your answers to the above questions, use your regression model to predict the monthly sales for 1994, 1995, and 1996. Produce prediction
-intervals for each of your forecasts.
-
-i. Transform your predictions and intervals to obtain predictions and intervals
-for the raw data.
-
-j. How could you improve these predictions by modifying the model?
-
-5 . *(For advanced readers following on from Section \@ref(Regr-MatrixEquations))*. Using matrix notation it was shown that if $\bm{y}=\bm{X}\bm{\beta}+\bm{\varepsilon}$, where $\bm{e}$ has mean $\bm{0}$ and variance matrix $\sigma^2\bm{I}$, the estimated coefficients are given by $\hat{\bm{\beta}}=(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ and a forecast is given by $\hat{y}=\bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ where $\bm{x}^*$ is a row vector containing the values of the regressors for the
-forecast (in the same format as $\bm{X}$), and the forecast variance is given by
-$var(\hat{y})=\sigma^2 \left[1+\bm{x}^*(\bm{X}'\bm{X})^{-1}(\bm{x}^*)'\right].$ 
-
-Consider the simple time trend model where $y_t = \beta_0 + \beta_1t$. Using
-the following results,
-$$\sum^{T}_{t=1}{t}=\frac{1}{2}T(T+1),\quad \sum^{T}_{t=1}{t^2}=\frac{1}{6}T(T+1)(2T+1) $$
-derive following expressions:
-
-a.
-
-$$\bm{X}'\bm{X}=\frac{1}{6}\left[
-  \begin{array}{cc} 
-    6T      & 3T(T+1) \\
-    3T(T+1) & T(T+1)(2T+1) \\
-  \end{array}
-\right]$$
-
-b.
-
-$$(\bm{X}'\bm{X})^{-1}=\frac{2}{T(T^2-1)}\left[
-  \begin{array}{cc} 
-    (T+1)(2T+1)   & -3(T+1) \\
-    -3(T+1)       & 6 \\
-  \end{array}
-\right]$$
-
-c.
-
-$$\hat{\beta}_0=\frac{2}{T(T-1)}\left[(2T+1)\sum^T_{t=1}y_t-3\sum^T_{t=1}ty_t  
-  \right]$$
-
-$$\hat{\beta}_1=\frac{6}{T(T^2-1)}\left[2\sum^T_{t=1}ty_t-(T+1)\sum^T_{t=1}y_t  
-  \right]$$
-d.
-
-$$var(\hat{y}_{t})=\hat{\sigma}^2\left[1+\frac{2}{T(T-1)}\left(1-4T-6h+6\frac{(T+h)^2}{T+1}\right)\right]$$
+        $\displaystyle\hat{\beta}_1=\frac{6}{T(T^2-1)}\left[2\sum^T_{t=1}ty_t-(T+1)\sum^T_{t=1}y_t \right]$
+        
+    d.
+      $\displaystyle\text{Var}(\hat{y}_{t})=\hat{\sigma}^2\left[1+\frac{2}{T(T-1)}\left(1-4T-6h+6\frac{(T+h)^2}{T+1}\right)\right]$
 
 
 ## Further reading

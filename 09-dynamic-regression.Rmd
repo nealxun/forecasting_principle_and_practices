@@ -355,9 +355,10 @@ autoplot(fc8) + ylab("Quotes") +
     d. Describe how this model could be used to forecast electricity demand for the next 12 months.
     e. Explain why the $N_t$ term should be modelled with an ARIMA model rather than modeling the data using a standard regression package.  In your discussion, comment on the properties of the estimates, the validity of the standard regression results, and the importance of the $N_t$ model in producing forecasts.
 
-
-
-
+5. For the retail time series considered in earlier chapters:
+    a. Develop an appropriate dynamic regression model with Fourier terms for the seasonality. Use the AIC to select the number of Fourier terms to include in the model. (You will probably need to use the same Box-Cox transformation you identified previously.)
+    b. Check the residuals of the fitted model. Does the residual series look like white noise?
+    c. Compare the forecasts with those you obtained earlier using alternative models.
 
 ## Further reading
 

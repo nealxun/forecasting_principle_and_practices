@@ -528,7 +528,7 @@ Regressing non-stationary time series can lead to spurious regressions. The outp
 Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
 
 
-```{r, fig.cap="Residuals from a spurious regression.", echo=TRUE}
+```{r, fig.cap="Residuals from a spurious regression.", echo=TRUE, cache=TRUE}
 fit <- tslm(aussies ~ guinearice)
 summary(fit)
 checkresiduals(fit)
@@ -929,7 +929,7 @@ The fitted exponential trend and forecasts are shown in Figure \@ref(fig:maratho
 
 Simply eyeballing the winning times reveals three very different periods. There is a lot of volatility in the winning times from the beginning up to about 1940 with the winning times improving/decreasing overall but with significant increases in the decade of the 1920s. The almost linear decrease in times after 1940 is then followed by a flattening out after the 1980s with almost an upturn towards the end of the sample. Following these observations we specify as knots the years 1940 and 1980. We should warn here that subjectively identifying suitable knots in the data can lead to overfitting which can be detrimental to the forecast performance of a model and should be performed with caution.
 
-```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE, fig.cap="Projecting forecasts from a linear, exponential, piecewise linear trends and a cubic spline for the Boston marathon winning times"}
+```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE, fig.cap="Projecting forecasts from a linear, exponential, piecewise linear trends and a cubic spline for the Boston marathon winning times", cache=TRUE}
 fit.lin <- tslm(marathon ~ trend)
 fit.exp <- tslm(marathon ~ trend, lambda = 0)
 h <- 10
@@ -966,7 +966,8 @@ autoplot(marathon) +
 Figure \@ref(fig:marathonNonlinear) above shows the fitted lines and forecasts from a linear and an exponential trend as well as a piecewise linear and a cubic spline. The cubic spline fits the data extremely well as expected, however the projection forward from this shows that it can be very unreliable when projecting outside the range of the historical data (as warned above) `make sure that this makes sense`. The piecewise linear trend fits the data better than both the exponential and linear trends and seems to return sensible forecasts. The residuals plotted in the Figure \@ref(fig:residPiecewise) below show that the model has mostly captured the trend well although there is some autocorrelation remaining (we will deal with this in Chapter \ref(ch-advanced)). We should however again warn here that the projection forward from the piecewise linear trend can be very sensitive to the choice of location of the knots, especially the ones located towards the end of the sample. For example moving the knot placed at 1980 even five years forward will reveal very different forecasts. The wide prediction interval associated with the forecasts form the piecewise linear trend reflects the volatility observed in the historical winning times.
 
 **change the label in the checkresiduals as these are from a nonlinear regression - I suggest simply removing the Linear - Residuals from a regression model.**
-```{r residPiecewise, fig.cap="Residuals from the piecewise trend.", message=FALSE, warning=FALSE}
+
+```{r residPiecewise, fig.cap="Residuals from the piecewise trend.",  message=FALSE, warning=FALSE, cache=TRUE}
 checkresiduals(fit.pw)
 ```
 
@@ -1081,7 +1082,7 @@ d. Give prediction intervals for your forecasts.
 
 The following R code will get you started:
 
-```{r, eval=FALSE, include=TRUE}
+```{r, eval=FALSE, include=TRUE, cache=TRUE}
     plot(Mwh ~ temp, data=econsumption) fit <- lm(Mwh ~ temp,
     data=econsumption) plot(residuals(fit) ~ temp, data=econsumption)
     forecast(fit, newdata=data.frame(temp=c(10,35)))

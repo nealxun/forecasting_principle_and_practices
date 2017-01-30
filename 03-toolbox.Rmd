@@ -155,14 +155,12 @@ Often a small adjustment is made to the back-transformed forecasts to correct fo
 
 ###Calendar adjustments {-}
 
-Some of the variation seen in seasonal data may be due to simple calendar effects. In such cases, it is usually much easier to remove the variation before fitting a forecasting model.
+Some of the variation seen in seasonal data may be due to simple calendar effects. In such cases, it is usually much easier to remove the variation before fitting a forecasting model. The `monthdays` function will compute the number of days in each month or quarter.
 
 For example, if you are studying the monthly milk production on a farm, there will be variation between the months simply because of the different numbers of days in each month, in addition to the seasonal variation across the year.
 
 ```{r cowmilk, fig.cap="Monthly milk production per cow. Source: @Cryer2008.", cache=TRUE}
-monthdays <- rep(c(31,28,31,30,31,30,31,31,30,31,30,31),14)
-monthdays[26 + (4*12)*(0:2)] <- 29
-cbind(Monthly = milk, DailyAverage=milk/monthdays) %>%
+cbind(Monthly = milk, DailyAverage=milk/monthdays(milk)) %>%
   autoplot(facet=TRUE) + xlab("Years") + ylab("Pounds") +
     ggtitle("Milk production per cow")
 ```

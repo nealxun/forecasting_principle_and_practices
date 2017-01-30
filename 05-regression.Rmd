@@ -286,7 +286,7 @@ There is a downward trend of `r round(fit.beer$coef['trend'], 3)` megalitres per
 ```{r beerlm2, echo=TRUE, cache=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
 autoplot(beer2, series="Data") +
   autolayer(fitted(fit.beer), series="Fitted") +
-  xlab("Year") + ylab("") +
+  xlab("Year") + ylab("Megalitres") +
   ggtitle("Quarterly Beer Production")
 ```
 
@@ -351,7 +351,7 @@ The `easter` function will compute the dummy variable for you.
 
 ## Evaluating the regression model {#Regr-EvaluatingSLR}
 
-The difference between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the training-set errors or "residuals"
+The differences between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the training-set errors or "residuals":
 \begin{align*}
   e_t &= y_t - \hat{y}_t \\
       &= y_t - \hat\beta_{0} - \hat\beta_{1} x_{1,t} - \hat\beta_{2} x_{2,t} - \cdots - \hat\beta_{k} x_{k,t}.
@@ -360,11 +360,9 @@ Each residual is the unpredictable component of the associated observation.
 
 The residuals have some useful properties including the following two:
 $$
-  \sum_{t=1}^{T}{e_t}=0 \quad\text{and}\quad \sum_{t=1}^{T}{x_{k,t}e_t}=0.
+  \sum_{t=1}^{T}{e_t}=0 \quad\text{and}\quad \sum_{t=1}^{T}{x_{k,t}e_t}=0\qquad\text{for all $k$}.
 $$
-As a result of these properties, it is clear that the average of the residuals is zero, and that the correlation between the residuals and the observations for the predictor variable is also zero.
-
-`comment on regression through the origin not necessarily having sum zero resids`
+As a result of these properties, it is clear that the average of the residuals is zero, and that the correlation between the residuals and the observations for the predictor variable is also zero. (This is not true when the intercept is omitted from the model.)
 
 After selecting the regression variables and fitting a regression model, it is necessary to plot the residuals to check that the assumptions of the model have been satisfied. There are a series of plots that should be produced in order to check different aspects of the fitted model and the underlying assumptions.
 
@@ -420,7 +418,7 @@ If these scatterplots show a pattern, then the relationship may be nonlinear and
 
 It is also necessary to plot the residuals against any predictors *not* in the model. If these show a pattern, then the predictor may need to be added to the model (possibly in a nonlinear form).
 
-The residuals from the multiple regression model for forecasting US consumption plotted against each predictor in Figure \@ref(fig:resids) seem to be randomly scattered and therefore we would be satisfied with these in this case.
+The residuals from the multiple regression model for forecasting US consumption plotted against each predictor in Figure \@ref(fig:resids) seem to be randomly scattered and therefore we are satisfied with these in this case.
 
 ```{r resids, echo=TRUE, cache=TRUE, fig.cap="Scatterplots of residuals versus each predictor."}
 df <- as.data.frame(uschange)
@@ -435,7 +433,7 @@ gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
 
 ### Residual plots against fitted values {-}
 
-A plot of the residuals against the fitted values should also show no pattern. If a pattern is observed, there may be "heteroscedasticity" in the errors. That is, the variance of the residuals may not be constant. To overcome this problem, a transformation of the forecast variable (such as a logarithm or square root) may be required.
+A plot of the residuals against the fitted values should also show no pattern. If a pattern is observed, there may be "heteroscedasticity" in the errors. That is, the variance of the residuals may not be constant. If this problem occurs, a transformation of the forecast variable (such as a logarithm or square root) may be required.
 
 Figure \@ref(fig:electrendseas) shows the residuals against the fitted values from fitting a linear trend and seasonal dummies to the electricity data we first encountered in Section \@ref(sec-transformations). The plot shows that the trend in the data is nonlinear and that the forecast variable requires a transformation as we observe a heteroscedastic pattern with variation increasing along the x-axis.
 
@@ -445,6 +443,8 @@ fit <- tslm(elec ~ trend + season)
 cbind(Fitted=fitted(fit), Residuals=residuals(fit)) %>%
   as.data.frame %>%
   ggplot(aes(x=Fitted, y=Residuals)) + geom_point()
+##TODO
+## A little too obvious. Can we find something more subtle?
 ```
 
 
@@ -456,9 +456,10 @@ There are formal methods for detecting outliers and influential observations tha
 
 One source for an outlier occurring is an incorrect data entry. Simple descriptive statistics of your data can identify minima and maxima that are not sensible. If such an observation is identified, and it has been incorrectly recorded, it should be immediately removed from the sample.
 
-Outliers also occur when some observations are simply different. In this case it may not be wise for these observations to be removed. If an observation has been identified as a likely outlier it is important to study it and analyze the possible reasons behind it. The decision of removing or retaining such an observation can be a challenging one (especially when outliers are influential observations). It is wise to report results both with and without the removal of such observations.
+Outliers also occur when some observations are simply different. In this case it may not be wise for these observations to be removed. If an observation has been identified as a likely outlier, it is important to study it and analyze the possible reasons behind it. The decision of removing or retaining such an observation can be a challenging one (especially when outliers are influential observations). It is wise to report results both with and without the removal of such observations.
 
 #### Example {-}
+
 Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US consumption on income (the example introduced in Section \@ref(Regr-Intro)). In the left panel the outlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which is the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
 
 
@@ -495,31 +496,45 @@ $$
 $$
 where the summations are over all observations. Thus, it reflects the proportion of variation in the forecast variable that is accounted for (or explained) by the regression model.
 
-If the predictions are close to the actual values, we would expect $R^2$ to be close to 1. On the other hand, if the predictions are unrelated to the actual values, then $R^2=0$. In all cases, $R^2$ lies between 0 and 1. `as long as we have an intercept`
+In simple linear regression, the value of $R^2$ is also equal to the square of the correlation between $y$ and $x$ (provided an intercept has been included).
 
-In simple linear regression, the value of $R^2$ is also equal to the square of the correlation between $y$ and $x$.
+If the predictions are close to the actual values, we would expect $R^2$ to be close to 1. On the other hand, if the predictions are unrelated to the actual values, then $R^2=0$ (again, assuming there is an intercept). In all cases, $R^2$ lies between 0 and 1. 
 
-The $R^2$ value is commonly used, often incorrectly, in forecasting. $R^2$ will never decrease when adding an extra predictor to the model and this can lead to overfitting. There are no set rules of what a good $R^2$ value is and typical values of $R^2$ depend on the type of data used. Validating a model’s forecasting performance on the test data is much better than measuring the $R^2$ value on the training data.
+The $R^2$ value is commonly used, often incorrectly, in forecasting. $R^2$ will never decrease when adding an extra predictor to the model and this can lead to over-fitting. There are no set rules for what is a good $R^2$ value, and typical values of $R^2$ depend on the type of data used. Validating a model’s forecasting performance on the test data is much better than measuring the $R^2$ value on the training data.
 
-Figure \@ref(fig:beerlm3) plots the actual monthly beer production versus the fitted values. The correlation between these variables is $r=`r round(cor(fit.beer$fitted.values,beer2)[1],2)`$ hence $R^2= `r round(cor(fit.beer$fitted.values,beer2)[1]^2,2)`$.  In this case model does an excellent job as it explains most of the variation in the beer production data. `add here something about the R2 of the SR v MR if it the model selection works out`.
+Recall the example of US consumption data discussed in Section \@ref(Regr-LSprinciple). The output for the estimated model is reproduced here for convenience:
+
+```{r, echo=TRUE, cache=TRUE}
+fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings,
+  data=uschange)
+summary(fit.consMR)
+```
+
+```{r, echo=FALSE, cache=TRUE}
+r <- cor(fit.consMR$fitted.values,uschange[,"Consumption"])
+```
+
+Figure \@ref(fig:usfitted2) plots the actual consumption expenditure values versus the fitted values. The correlation between these variables is $r=`r round(r,3)`$ hence $R^2= `r round(r^2,3)*100`$% (shown in the output above).  In this case model does an excellent job as it explains most of the variation in the consumption data.  Compare that to the $R^2$ value of `r round(cor(fit.cons$fitted.values,uschange[,"Consumption"])^2,2)*100`% obtained from the simple regression with the same data set in Section \@ref(Regr-Intro). Adding the three extra predictors has allowed a lot more of the variance in the consumption data to be explained.
+
 
 ### Standard error of the regression {-}
 
-Another measure of how well the model has fitted the data is the standard deviation of the residuals, which is often known as the "standard error of the regression" and is calculated by
+Another measure of how well the model has fitted the data is the standard deviation of the residuals, which is often known as the "Residual standard error". This is shown in the above output with the value `r round(summary(fit.consMR)$sigma,4)`.
+
+It is calculated by
 \begin{equation}
   s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.
   (\#eq:Regr-se)
 \end{equation}
-
 Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation. Here, we divide by $T−k−1$ because we have estimated $k+1$ parameters (the intercept and a coefficient for each predictor variable) in computing the residuals.
 
-The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. In Section \@ref(Regr-LSprinciple) $s_e$ is part of the R estimation output labeled  "Residual standard error" and takes the value `r round(summary(fit.consMR)$sigma,2)`%.
+The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. 
 
 We should warn here that the evaluation of the standard error can be highly subjective as it is scale dependent. The main reason we introduce it here is that it is required when generating forecast intervals, discussed in Section \@ref(Regr-ForeWithRegr).
 
 ### Spurious regression {-}
 
-More often than not, time series data are "non-stationary"; that is, the values of the time series do not fluctuate around a constant mean or with a constant variance. We will deal with time series stationarity in more detail in Chapter \@ref(ch-arima), but here we need to address the effect non-stationary data can have on regression models.
+More often than not, time series data are "non-stationary"; that is, the values of the time series do not fluctuate around a constant mean or with a constant variance. We will deal with time series stationarity in more detail in Chapter \@ref(ch-arima), but here we need to address the effect that non-stationary data can have on regression models.
 
 For example consider the two variables plotted below in Figure \@ref(fig:spurious). These appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea.
 

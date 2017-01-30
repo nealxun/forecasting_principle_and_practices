@@ -344,7 +344,7 @@ It is common to require the coefficients to decrease as the lag increases. In Ch
 Easter is different from most holidays because it is not held on the same date each year and the effect can last for several days. In this case, a dummy variable can be used with value one where any part of the holiday falls in the particular time period and zero otherwise.
 
 For example, with monthly data, when Easter falls in March then the dummy variable takes value 1 in March, when it falls in April, the dummy variable
-takes value 1 in April, and when it starts in March and finishes in April, the dummy variable takes value 1 for both months.
+takes value 1 in April, and when it starts in March and finishes in April, the dummy variable is split proportionally between months.
 
 The `easter` function will compute the dummy variable for you.
 

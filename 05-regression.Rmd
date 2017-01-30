@@ -67,7 +67,7 @@ A scatter plot of consumption against income is shown in Figure \@ref(fig:ConsIn
 $$
   \hat{y}_t=`r round(coef(fit.cons)[1],2)` + `r round(coef(fit.cons)[2],2)`x_t.
 $$
-
+(We put a "hat" above the $y$ to indicate this is an estimate or prediction.)
 
 ```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
 uschange %>%
@@ -167,11 +167,9 @@ This is called "least squares" estimation because it gives the least value for t
 
 When we refer to the *estimated* coefficients, we will use the notation $\hat\beta_0, \dots, \hat\beta_k$. The equations for these will be given in Section \@ref(Regr-MatrixEquations).
 
+The `tslm` function fits a linear regression model to time series data. It is very similar to the `lm` function which is widely used for linear models, but does not handle time series particularly well.
+
 #### Example: US consumption expenditure (revisited) {-}
-
-The following is estimation output from fitting the multiple linear regression model of equation \@ref(eq:usMLR) for forecasting US consumption expenditure. The first column gives the estimates of each $\beta$ coefficient and the second column gives its standard error (i.e., the standard deviation which would be obtained from repeatedly estimating the $\beta$ coefficients on similar data sets). The standard error gives a measure of the uncertainty in the estimated $\beta$ coefficient.
-
-For forecasting purposes, the final two columns are of limited interest. The "t value" is the ratio of an estimated $\beta$ coefficient to its standard error and the last column gives the p-value: the probability of the estimated $\beta$ coefficient being as large as it is if there was no real relationship between the credit score and the predictor. This is useful when studying the effect of each predictor, but is not particularly useful when forecasting.
 
 ```{r usestim, echo=TRUE, fig.cap="Multiple regression output from least squares estimation.", cache=TRUE}
 fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings,
@@ -179,17 +177,24 @@ fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings,
 summary(fit.consMR)
 ```
 
+The estimation output above shows the estimated multiple linear regression model of equation \@ref(eq:usMLR), for forecasting US consumption expenditure. The first column of `Coefficients` gives the estimates of each $\beta$ coefficient and the second column gives its standard error (i.e., the standard deviation which would be obtained from repeatedly estimating the $\beta$ coefficients on similar data sets). The standard error gives a measure of the uncertainty in the estimated $\beta$ coefficient.
+
+For forecasting purposes, the final two columns are of limited interest. The "t value" is the ratio of an estimated $\beta$ coefficient to its standard error and the last column gives the p-value: the probability of the estimated $\beta$ coefficient being as large as it is if there was no real relationship between the consumption and the corresponding predictor. This is useful when studying the effect of each predictor, but is not particularly useful when forecasting.
+
+
 ### Fitted values {-}
 
-Predictions of $y_t$ can be obtained by ignoring the error in the regression equation and using the estimated coefficients. Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ into the regression equation
+Predictions of $y_t$ can be obtained by ignoring the error in the regression equation and using the estimated coefficients. Plugging in the values of $x_{1,t},\dots,x_{k,t}$ for $t=1,\dots,T$ into the regression equation 
 \begin{equation}
-  \hat{y_t} = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}
+  \hat{y}_t = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}
   (\#eq:prediction)
 \end{equation}
-returns in-sample predictions of $y_t$ referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. The following plots show the actual values compared to the fitted (i.e.,predicted) values for the percentage change in the US consumption expenditure series. The time plot shows that the fitted values follow the actual data fairly closely. This is verified by the strong positive relationship shown by the scatterplot.
+returns "predictions" of $y_t$ referred to as *fitted values*. Note that these are predictions of the training data used to estimate the model, not genuine forecasts of future values of $y$. 
+
+The following plots show the actual values compared to the fitted values for the percentage change in the US consumption expenditure series. The time plot shows that the fitted values follow the actual data fairly closely. This is verified by the strong positive relationships shown by the scatterplots in Figure \@ref(fig:ScatterMatrix)
 
 
-```{r usfitted1, echo=TRUE, cache=TRUE, fig.cap="Time plot of US consumtpion expenditure and predicted expenditure."}
+```{r usfitted1, echo=TRUE, cache=TRUE, fig.cap="Time plot of US consumption expenditure and predicted expenditure."}
 autoplot(uschange[,'Consumption'], series="Data") +
   autolayer(fitted(fit.consMR), series="Fitted") +
   xlab("Year") + ylab("") +
@@ -197,7 +202,7 @@ autoplot(uschange[,'Consumption'], series="Data") +
   guides(colour=guide_legend(title=" "))
 ```
 
-```{r usfitted2, echo=TRUE, cache=TRUE, fig.cap="Actual US consumtpion expenditure plotted against predicted US consumtpion expenditure.", message=FALSE, warning=FALSE}
+```{r usfitted2, echo=TRUE, cache=TRUE, fig.cap="Actual US consumption expenditure plotted against predicted US consumption expenditure.", message=FALSE, warning=FALSE}
 cbind(Data=uschange[,"Consumption"], Fitted=fitted(fit.consMR)) %>%
   as.data.frame %>%
   ggplot(aes(x=Data, y=Fitted)) +
@@ -207,8 +212,6 @@ cbind(Data=uschange[,"Consumption"], Fitted=fitted(fit.consMR)) %>%
     ggtitle("Percentage change in US consumption expenditure") +
     geom_abline(intercept=0, slope=1)
 ```
-
-
 
 ## Some useful predictors {#Regr-UsefulPredictors}
 
@@ -221,7 +224,7 @@ It is very common for time series data to be trending. A linear trend can be mod
 $$
   y_{t}= \beta_0+\beta_1t+\varepsilon_t,
 $$
-where $t=1,\ldots,T$.
+where $t=1,\dots,T$.
 
 ### Dummy variables {-}
 
@@ -337,7 +340,7 @@ May be add this as an exercise try `easter(ausbeer)` and interpret what you see.
 
 ## Evaluating the regression model {#Regr-EvaluatingSLR}
 
-The difference between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the in-sample forecast errors or "residuals"
+The difference between the observed $y$ values and the corresponding fitted $\hat{y}$ values are the training-set errors or "residuals"
 \begin{align*}
   e_t &= y_t - \hat{y}_t \\
       &= y_t - \hat\beta_{0} - \hat\beta_{1} x_{1,t} - \hat\beta_{2} x_{2,t} - \cdots - \hat\beta_{k} x_{k,t}.

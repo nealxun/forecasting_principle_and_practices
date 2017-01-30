@@ -220,11 +220,10 @@ There are several very useful predictors that occur frequently when using regres
 ### Trend {-}
 
 It is very common for time series data to be trending. A linear trend can be modelled by simply using $x_{1,t}=t$ as a predictor,
-
 $$
   y_{t}= \beta_0+\beta_1t+\varepsilon_t,
 $$
-where $t=1,\dots,T$.
+where $t=1,\dots,T$. A trend variable can be specified in the `tslm` function using the `trend` predictor.
 
 ### Dummy variables {-}
 
@@ -234,7 +233,7 @@ This situation can still be handled within the framework of multiple regression 
 
 A dummy variable can also be used to account for an outlier in the data. Rather than omit the outlier, a dummy variable removes its effect. In this case, the dummy variable takes value 1 for that observation and 1 everywhere else. An example is the case where a special event has occurred. For example when forecasting tourist arrivals to Sydney Australia we will need to account for the effect of the Sydney summer Olympics in 2000.
 
-If there are more than two categories, then the variable can be coded using several dummy variables (one fewer than the total number of categories).
+If there are more than two categories, then the variable can be coded using several dummy variables (one fewer than the total number of categories). `tslm` will automatically handle this case if you specify a factor variable as a predictor. There is usually no need to manually create the corresponding dummy variables.
 
 ### Seasonal dummy variables {-}
 
@@ -257,6 +256,8 @@ Many beginners will try to add a seventh dummy variable for the seventh category
 
 The interpretation of each of the coefficients associated with the dummy variables is that it is *a measure of the effect of that category relative to the omitted category*. In the above example, the coefficient of $x_{1,t}$ associated with Monday will measure the effect of Monday compared to Sunday on the forecast variable. An example of interpreting estimated dummy variable coefficients capturing the quarterly seasonality of Australian beer production follows.
 
+The `tslm` function will automatically handle this situation if you specify the predictor `season`.
+
 #### Example: Australian quarterly beer production {-}
 
 Recall the Australian quarterly beer production data shown below in Figure \@ref(fig:beeragain).
@@ -277,15 +278,16 @@ fit.beer <- tslm(beer2 ~ trend + season)
 summary(fit.beer)
 ```
 
-There is a strong downward trend of `r round(fit.beer$coef['trend'], 3)` megalitres per quarter. On average, the second quarter has production of `r -round(fit.beer$coef['season2'], 1)` megalitres lower than the first quarter, the third quarter has production of `r -round(fit.beer$coef['season3'], 1)` megalitres lower than the first quarter, and the fourth quarter has production of `r round(fit.beer$coef['season4'], 1)` megalitres higher than the first quarter.
+Note that `trend` and `season` are not objects in the R workspace; they are created automatically by `tslm` when specified in this way.
+
+There is a downward trend of `r round(fit.beer$coef['trend'], 3)` megalitres per quarter. On average, the second quarter has production of `r -round(fit.beer$coef['season2'], 1)` megalitres lower than the first quarter, the third quarter has production of `r -round(fit.beer$coef['season3'], 1)` megalitres lower than the first quarter, and the fourth quarter has production of `r round(fit.beer$coef['season4'], 1)` megalitres higher than the first quarter.
 
 
 ```{r beerlm2, echo=TRUE, cache=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
 autoplot(beer2, series="Data") +
   autolayer(fitted(fit.beer), series="Fitted") +
   xlab("Year") + ylab("") +
-  ggtitle("Quarterly Beer Production") +
-  guides(colour=guide_legend(title=" "))
+  ggtitle("Quarterly Beer Production")
 ```
 
 ```{r beerlm3, echo=TRUE, cache=TRUE, fig.cap="Actual beer production plotted against predicted beer production."}
@@ -295,7 +297,8 @@ cbind(Data=beer2, Fitted=fitted(fit.beer)) %>%
     geom_point() +
     ylab("Fitted") + xlab("Actual values") +
     ggtitle("Quarterly beer production") +
-    scale_colour_brewer(palette="Dark2", name="Quarter")
+    scale_colour_brewer(palette="Dark2", name="Quarter") +
+    geom_abline(intercept=0, slope=1)
 ```
 
 
@@ -312,19 +315,27 @@ Another form of permanent effect is a change of slope. Here the intervention is 
 
 ### Trading days {-}
 
-The number of trading days in a month can vary considerably and can have a substantial effect on sales data. To allow for this, the number of trading days in each month can be included as a predictor. An alternative that allows for the effects of different days of the week has the following predictors:
+The number of trading days in a month can vary considerably and can have a substantial effect on sales data. To allow for this, the number of trading days in each month can be included as a predictor. 
 
-$$\begin{aligned} x_{1} &= \text{\# Mondays in month;} \\ x_{2} &= \text{\#
-Tuesdays in month;} \\ & \vdots \\ x_{7} &= \text{\# Sundays in
-month.}\end{aligned}$$
+For monthly or quarterly data, the `bizdays` function will compute the number of trading days in each period.
+
+An alternative that allows for the effects of different days of the week has the following predictors:
+\begin{align*}
+  x_{1} &= \text{# Mondays in month;} \\ 
+  x_{2} &= \text{# Tuesdays in month;} \\ 
+        & \vdots \\ 
+  x_{7} &= \text{# Sundays in month.}
+\end{align*}
 
 ### Distributed lags {-}
 
 It is often useful to include advertising expenditure as a predictor. However, since the effect of advertising can last beyond the actual campaign, we need to include lagged values of advertising expenditure. So the following predictors may be used.
-
-$$\begin{aligned} x_{1} &= \text{advertising for previous month;} \\ x_{2} &=
-\text{advertising for two months previously;} \\ &\vdots \\ x_{m} &=
-\text{advertising for $m$ months previously.}\end{aligned}$$
+\begin{align*}
+  x_{1} &= \text{advertising for previous month;} \\ 
+  x_{2} &= \text{advertising for two months previously;} \\ 
+        & \vdots \\ 
+  x_{m} &= \text{advertising for $m$ months previously.}
+\end{align*}
 
 It is common to require the coefficients to decrease as the lag increases. In Chapter \@ref(ch-dynamic) we discuss methods to allow this constraint to be implemented.
 
@@ -335,7 +346,7 @@ Easter is different from most holidays because it is not held on the same date e
 For example, with monthly data, when Easter falls in March then the dummy variable takes value 1 in March, when it falls in April, the dummy variable
 takes value 1 in April, and when it starts in March and finishes in April, the dummy variable takes value 1 for both months.
 
-May be add this as an exercise try `easter(ausbeer)` and interpret what you see.
+The `easter` function will compute the dummy variable for you.
 
 
 ## Evaluating the regression model {#Regr-EvaluatingSLR}
@@ -1090,6 +1101,10 @@ The following R code will get you started:
     data=econsumption) plot(residuals(fit) ~ temp, data=econsumption)
     forecast(fit, newdata=data.frame(temp=c(10,35)))
 ```
+
+
+1. Type `easter(ausbeer)` and interpret what you see.
+
 
 2 . Data set `olympic` contains the winning times (in seconds) for the men’s 400 meters final in each Olympic Games from 1896 to 2012.
 

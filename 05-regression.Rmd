@@ -293,6 +293,35 @@ cbind(Data=beer2, Fitted=fitted(fit.beer)) %>%
     geom_abline(intercept=0, slope=1)
 ```
 
+### Fourier series {-}
+
+An alternative to using seasonal dummy variables, especially for long seasonal periods, is to use Fourier terms. Jean-Baptiste Fourier was a French mathematician, born in the 1700s, who showed that a series of sine and cosine terms of the right frequencies can approximate any periodic function. We can use them for seasonal patterns.
+
+If $m$ is the seasonal period, then the first few Fourier terms are given by
+$$
+  x_{1,t} = \sin\left(\textstyle\frac{2\pi t}{m}\right), 
+  x_{2,t} = \cos\left(\textstyle\frac{2\pi t}{m}\right), 
+  x_{3,t} = \sin\left(\textstyle\frac{4\pi t}{m}\right), 
+  x_{4,t} = \cos\left(\textstyle\frac{4\pi t}{m}\right), 
+  x_{5,t} = \sin\left(\textstyle\frac{6\pi t}{m}\right), 
+  x_{6,t} = \cos\left(\textstyle\frac{6\pi t}{m}\right), 
+$$
+and so on. If we have monthly seasonality, and we use the first 11 of these predictor variables, then we will get exactly the same forecasts as using 11 dummy variables. 
+
+The advantage of using Fourier terms is that we can often use fewer predictor variables than we need to with dummy variables, especially when $m$ is large. This makes them useful for weekly data, for example, where $m\approx 52$. For short seasonal periods such as with quarterly data, there is little advantage in using Fourier series over seasonal dummy variables.
+
+In R, these Fourier terms are produced using the `fourier` function. For example, the Australian beer data can be modelled like this.
+
+```{r fourierbeer, echo=TRUE, cache=TRUE}
+fourier.beer <- tslm(beer2 ~ trend + fourier(beer2, K=2))
+summary(fourier.beer)
+```
+
+The first argument to `fourier` just allows it to identify the seasonal period $m$ and the length of the predictors to return. The second `K` argument  specifies how many pairs of sin and cos terms to include. The maximum number allowed is $K=m/2$ where $m$ is the seasonal period. Because we have used the maximum here, the results are identical to those obtained when using seasonal dummy variables.
+
+If only the first two Fourier terms are used ($x_{1,t}$ and $x_{2,t}$), the seasonal pattern will follow a simple sine wave. A regression model containing Fourier terms is often called a **harmonic regression** because the successive Fourier terms represent harmonics of the first two Fourier terms.
+
+
 ### Intervention variables {-}
 
 It is often necessary to model interventions that may have affected the variable to be forecast. For example, competitor activity, advertising expenditure, industrial action, and so on, can all have an effect.
@@ -338,7 +367,6 @@ For example, with monthly data, when Easter falls in March then the dummy variab
 takes value 1 in April, and when it starts in March and finishes in April, the dummy variable is split proportionally between months.
 
 The `easter` function will compute the dummy variable for you.
-
 
 
 ## Evaluating the regression model {#Regr-EvaluatingSLR}
@@ -1094,6 +1122,19 @@ to worry about --- multicollinearity is not a problem.
 
 3. Type `easter(ausbeer)` and interpret what you see.
 
+4. The `gasoline` series consists of weekly data for supplies of US finished motor gasoline product, from 2 February 1991 to 20 January 2017. The units are in "thousand barrels per day". Consider only the data to the end of 2004.
+    a. Fit a harmonic regression with trend to the data. Select the appropriate number of Fourier terms to include by minimizing the AICc or CV value. 
+    b. Check the residuals of the final model using the `checkresiduals()` function. Even though the residuals fail the correlation tests, the results are probably not severe enough to make much difference to the forecasts and forecast intervals. (Note that the correlations are relatively small, even though they are significant.)
+    c. To forecast using harmonic regression, you will need to generate the future values of the Fourier terms. This can be done as follows.
+
+        ```r
+        fc <- forecast(fit, fourier(x, K, h))
+        ```
+
+        where `fit` is the fitted model using `tslm`, `K` is the number of Fourier terms used in creating `fit`, and `h` is the forecast horizon required.
+
+        Forecast the next year of data. 
+    d. Plot the forecasts along with the actual data for 2005. What do you find?
 
 4. An elasticity coefficient is the ratio of the percentage change in the forecast variable ($y$) to the percentage change in the predictor variable ($x$). Mathematically, the elasticity is defined as $(dy/dx)\times(x/y)$. Consider the log-log model, $$\log y=\beta_0+\beta_1 \log x + \varepsilon.$$ Express $y$ as a function of $x$ and show that the coefficient $\beta_1$ is the elasticity coefficient.
 

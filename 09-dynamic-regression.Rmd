@@ -214,6 +214,31 @@ autoplot(austa) +
 
 There is an implicit assumption with deterministic trends that the slope of the trend is not going to change over time. On the other hand, stochastic trends can change, and the estimated growth is only assumed to be the average growth over the historical period, not necessarily the rate of growth that will be observed into the future. Consequently, it is safer to forecast with stochastic trends, especially for longer forecast horizons, as the prediction intervals allow for greater uncertainty in future growth.
 
+## Dynamic harmonic regression
+
+When there are long seasonal periods, a dynamic regression with Fourier terms is often better than other models we have considered in this book.
+
+For example, daily data can have annual seasonality of length 365, weekly data has seasonal period of approximately 52, while half-hourly data can have several seasonal periods, the shortest of which is the daily pattern of period 48.
+
+Seasonal versions of ARIMA and ETS models are designed for shorter periods such as 12 for monthly data or 4 for quarterly data. The `ets()` function restricts seasonality to be a maximum period of 24 to allow hourly data but not data with a larger seasonal frequency. The problem is that there are $m-1$ parameters to be estimated for the initial seasonal states where $m$ is the seasonal period. So for large $m$, the estimation becomes almost impossible.
+
+The `Arima()` and `auto.arima()` functions will allow a seasonal period up to $m=350$, but in practice will usually run out of memory whenever the seasonal period is more than about 200. In any case, seasonal differencing of very high order does not make a lot of sense --- for daily data it involves comparing what happened today with what happened exactly a year ago and there is no constraint that the seasonal pattern is smooth.
+
+So for such time series, we prefer a harmonic regression approach where the seasonal pattern is modelled using Fourier terms with short-term time series dynamics handled by an ARMA error. 
+
+The advantages of this approach are:
+
+   * it allows any length seasonality;
+   * for data with more than one seasonal period, you can include Fourier terms of different frequencies;
+   * the seasonal pattern is smooth for small values of $K$ (but more wiggly seasonality can be handled by increasing $K$);
+   * the short-term dynamics are easily handled with a simple ARMA error.
+
+
+The only real disadvantage (compared to a seasonal ARIMA model) is that the seasonality is assumed to be fixed --- the pattern is not allowed to change over time. But in practice, seasonality is usually remarkably constant so this is not a big disadvantage except for very long time series.
+
+NEED TO ADD EXAMPLE
+
+
 ## Lagged predictors
 
 Sometimes, the impact of a predictor which is included in a regression model will not be simple and immediate. For example, an advertising campaign may impact sales for some time beyond the end of the campaign, and sales in one month will depend on the advertising expenditure in each of the past few months. Similarly, a change in a company's safety policy may reduce accidents immediately, but have a diminishing effect over time as employees take less care when they become familiar with the new working conditions.

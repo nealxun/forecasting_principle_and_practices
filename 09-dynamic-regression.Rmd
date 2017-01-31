@@ -326,7 +326,13 @@ autoplot(fc8) + ylab("Quotes") +
     d. Fit an appropriate regression model with ARIMA errors. Explain your reasoning in arriving at the final model.
     e. Forecast the average price per room for the next twelve months using your fitted model. (Hint: You will need to produce forecasts of the CPI figures first.)
 
-4. Electricity consumption is often modelled as a function of temperature. Temperature is measured by daily heating degrees  and cooling degrees. Heating degrees is $18^\circ$C minus the average daily temperature when the daily average is below $18^\circ$C; otherwise it is zero.  This provides a measure of our need to heat ourselves as temperature falls.  Cooling degrees measures our need to cool ourselves as the temperature rises.  It is defined as the average daily temperature minus $18^\circ$C when the daily average is above $18^\circ$C; otherwise it is zero.  Let $y_t$ denote the monthly total of kilowatt-hours of electricity used, let $x_{1,t}$ denote the monthly total of heating degrees, and let $x_{2,t}$ denote the monthly total of cooling degrees.
+4. We fitted a harmonic regression model to part of the `gasoline` series in Exercise 6 in Section \@ref(Regr-exercises). We will now revisit this model, and extend it to include more data and ARMA errors.
+    a. Using `tslm`, fit a harmonic regression with a piecewise linear time trend to the full `gasoline` series. Select the position of the knots in the trend and the appropriate number of Fourier terms to include by minimizing the AICc or CV value. 
+    b. Now refit the model using `auto.arima` to allow for correlated errors, keeping the same predictor variables as you used with `tslm`.
+    c. Check the residuals of the final model using the `checkresiduals()` function. Do they look sufficiently like white noise to continue? If not, try modifying your model, or removing the first few years of data.
+    d. Once you have a model with white noise residuals, produce forecasts for the next year.
+
+5. Electricity consumption is often modelled as a function of temperature. Temperature is measured by daily heating degrees  and cooling degrees. Heating degrees is $18^\circ$C minus the average daily temperature when the daily average is below $18^\circ$C; otherwise it is zero.  This provides a measure of our need to heat ourselves as temperature falls.  Cooling degrees measures our need to cool ourselves as the temperature rises.  It is defined as the average daily temperature minus $18^\circ$C when the daily average is above $18^\circ$C; otherwise it is zero.  Let $y_t$ denote the monthly total of kilowatt-hours of electricity used, let $x_{1,t}$ denote the monthly total of heating degrees, and let $x_{2,t}$ denote the monthly total of cooling degrees.
 
     An analyst fits the following model to a set of such data:
     $$y^*_t = b_1x^*_{1,t} + b_2x^*_{2,t} + n_t,$$
@@ -355,7 +361,7 @@ autoplot(fc8) + ylab("Quotes") +
     d. Describe how this model could be used to forecast electricity demand for the next 12 months.
     e. Explain why the $N_t$ term should be modelled with an ARIMA model rather than modeling the data using a standard regression package.  In your discussion, comment on the properties of the estimates, the validity of the standard regression results, and the importance of the $N_t$ model in producing forecasts.
 
-5. For the retail time series considered in earlier chapters:
+6. For the retail time series considered in earlier chapters:
     a. Develop an appropriate dynamic regression model with Fourier terms for the seasonality. Use the AIC to select the number of Fourier terms to include in the model. (You will probably need to use the same Box-Cox transformation you identified previously.)
     b. Check the residuals of the fitted model. Does the residual series look like white noise?
     c. Compare the forecasts with those you obtained earlier using alternative models.

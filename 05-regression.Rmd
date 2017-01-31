@@ -1086,7 +1086,7 @@ to worry about --- multicollinearity is not a problem.
 
 
 
-## Exercises
+## Exercises {#Regr-exercises}
 
 
 1. Electricity consumption was recorded for a small town on 12 randomly chosen days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day.
@@ -1122,19 +1122,6 @@ to worry about --- multicollinearity is not a problem.
 
 3. Type `easter(ausbeer)` and interpret what you see.
 
-4. The `gasoline` series consists of weekly data for supplies of US finished motor gasoline product, from 2 February 1991 to 20 January 2017. The units are in "thousand barrels per day". Consider only the data to the end of 2004.
-    a. Fit a harmonic regression with trend to the data. Select the appropriate number of Fourier terms to include by minimizing the AICc or CV value. 
-    b. Check the residuals of the final model using the `checkresiduals()` function. Even though the residuals fail the correlation tests, the results are probably not severe enough to make much difference to the forecasts and forecast intervals. (Note that the correlations are relatively small, even though they are significant.)
-    c. To forecast using harmonic regression, you will need to generate the future values of the Fourier terms. This can be done as follows.
-
-        ```r
-        fc <- forecast(fit, fourier(x, K, h))
-        ```
-
-        where `fit` is the fitted model using `tslm`, `K` is the number of Fourier terms used in creating `fit`, and `h` is the forecast horizon required.
-
-        Forecast the next year of data. 
-    d. Plot the forecasts along with the actual data for 2005. What do you find?
 
 4. An elasticity coefficient is the ratio of the percentage change in the forecast variable ($y$) to the percentage change in the predictor variable ($x$). Mathematically, the elasticity is defined as $(dy/dx)\times(x/y)$. Consider the log-log model, $$\log y=\beta_0+\beta_1 \log x + \varepsilon.$$ Express $y$ as a function of $x$ and show that the coefficient $\beta_1$ is the elasticity coefficient.
 
@@ -1150,6 +1137,20 @@ to worry about --- multicollinearity is not a problem.
     h. Regardless of your answers to the above questions, use your regression model to predict the monthly sales for 1994, 1995, and 1996. Produce prediction intervals for each of your forecasts.
     i. Transform your predictions and intervals to obtain predictions and intervals for the raw data.
     j. How could you improve these predictions by modifying the model?
+
+5. The `gasoline` series consists of weekly data for supplies of US finished motor gasoline product, from 2 February 1991 to 20 January 2017. The units are in "thousand barrels per day". Consider only the data to the end of 2004.
+    a. Fit a harmonic regression with trend to the data. Select the appropriate number of Fourier terms to include by minimizing the AICc or CV value. 
+    b. Check the residuals of the final model using the `checkresiduals()` function. Even though the residuals fail the correlation tests, the results are probably not severe enough to make much difference to the forecasts and forecast intervals. (Note that the correlations are relatively small, even though they are significant.)
+    c. To forecast using harmonic regression, you will need to generate the future values of the Fourier terms. This can be done as follows.
+
+        ```r
+        fc <- forecast(fit, fourier(x, K, h))
+        ```
+
+        where `fit` is the fitted model using `tslm`, `K` is the number of Fourier terms used in creating `fit`, and `h` is the forecast horizon required.
+
+        Forecast the next year of data. 
+    d. Plot the forecasts along with the actual data for 2005. What do you find?
 
 6. *(For advanced readers following on from Section \@ref(Regr-MatrixEquations))*. 
 

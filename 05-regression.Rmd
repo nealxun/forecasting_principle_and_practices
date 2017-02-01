@@ -1,6 +1,6 @@
 # Linear regression models {#ch-regression}
 
-In this chapter we discuss linear regression models. The basic concept is that we forecast the time series of interest $y$ assuming it has a linear relationship with other time series $x$ we observe.
+In this chapter we discuss linear regression models. The basic concept is that we forecast the time series of interest $y$ assuming that it has a linear relationship with other time series $x$.
 
 For example, we might wish to forecast monthly sales $y$ with total advertising spend $x$ as the predictor. Or we might forecast daily electricity demand $y$ using temperature $x_1$ and the day of week $x_2$ as predictors.
 
@@ -11,8 +11,8 @@ The forecast variable $y$ is sometimes also called the regressand, dependent or 
 ### Simple linear regression {-}
 
 In the simplest case,  there is a linear relationship between the forecast variable and a single predictor variable,
-$$  
-  y_t = \beta_0 + \beta_1 x_t + \varepsilon_t. 
+$$
+  y_t = \beta_0 + \beta_1 x_t + \varepsilon_t.
 $$
 An example of data from such a model is shown in Figure \@ref(fig:SLRpop1). The parameters $\beta_0$ and $\beta_1$ denote the intercept and the slope of the line respectively. The intercept $\beta_0$ represents the predicted value of $y$ when $x=0$. The slope $\beta_1$ represents the average predicted change in $y$ resulting from a one unit increase in $x$.
 
@@ -82,9 +82,9 @@ This equation is estimated in R using the `tslm` function:
 tslm(Consumption ~ Income, data=uschange)
 ```
 
-We will discuss how `tslm` computes the coefficients in Section \@ref(Regr-LSprinciple). 
+We will discuss how `tslm` computes the coefficients in Section \@ref(Regr-LSprinciple).
 
-The fitted line has a positive slope, reflecting the positive relationship between income and consumption. The slope coefficient shows that a one unit increase in $x$ (a 1% increase in personal disposable income) results on average in `r round(coef(fit.cons)[2], 2)` units increase in $y$ (an average `r round(coef(fit.cons)[2], 2)`% increase in personal consumption expenditure). Alternatively the estimated equation shows that a value of 1 for $x$ (the percentage increase in personal disposable income) will result in a forecast value of $`r round(coef(fit.cons)[1], 2)` + `r  round(coef(fit.cons)[2], 2)`\times1 = `r round(sum(coef(fit.cons)), 2)`$ for $y$ (the percentage increase in personal consumption expenditure).
+The fitted line has a positive slope, reflecting the positive relationship between income and consumption. The slope coefficient shows that a one unit increase in $x$ (a 1% increase in personal disposable income) results on average in `r round(coef(fit.cons)[2], 2)` units increase in $y$ (an average `r round(coef(fit.cons)[2], 2)`% increase in personal consumption expenditure). Alternatively the estimated equation shows that a value of 1 for $x$ (the percentage increase in personal disposable income) will result in a forecast value of $`r round(coef(fit.cons)[1], 2)` + `r  round(coef(fit.cons)[2], 2)` \times 1 = `r round(sum(coef(fit.cons)), 2)`$ for $y$ (the percentage increase in personal consumption expenditure).
 
 The interpretation of the intercept requires that a value of $x=0$ makes sense. In this case when $x=0$ (i.e., when there is no change in personal disposable income since the last quarter) the predicted value of $y$ is `r round(coef(fit.cons)[1], 2)` (i.e., an average increase in personal consumption expenditure of `r round(coef(fit.cons)[1], 2)`%). Even when $x=0$ does not make sense, the intercept is an important part of the model. Without it, the slope coefficient can be distorted unnecessarily. The intercept should always be included unless the requirement is to force the regression line "through the origin". In what follows we assume that an intercept is always included in the model.
 
@@ -181,7 +181,7 @@ Predictions of $y$ can be obtained by using the estimated coefficients in the re
   \hat{y}_t = \hat\beta_{0} + \hat\beta_{1} x_{1,t} + \hat\beta_{2} x_{2,t} + \cdots + \hat\beta_{k} x_{k,t}.
   (\#eq:prediction)
 \end{equation}
-Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ returns predictions of $y$ within the training-sample, referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$. 
+Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ returns predictions of $y$ within the training-sample, referred to as *fitted values*. Note that these are predictions of the data used to estimate the model not genuine forecasts of future values of $y$.
 
 The following plots show the actual values compared to the fitted values for the percentage change in the US consumption expenditure series. The time plot in Figure \@ref(fig:usfitted1) shows that the fitted values follow the actual data fairly closely. This is verified by the strong positive relationship shown by the scatterplot in Figure \@ref(fig:usfitted2).
 
@@ -299,14 +299,14 @@ An alternative to using seasonal dummy variables, especially for long seasonal p
 
 If $m$ is the seasonal period, then the first few Fourier terms are given by
 $$
-  x_{1,t} = \sin\left(\textstyle\frac{2\pi t}{m}\right), 
-  x_{2,t} = \cos\left(\textstyle\frac{2\pi t}{m}\right), 
-  x_{3,t} = \sin\left(\textstyle\frac{4\pi t}{m}\right), 
-  x_{4,t} = \cos\left(\textstyle\frac{4\pi t}{m}\right), 
-  x_{5,t} = \sin\left(\textstyle\frac{6\pi t}{m}\right), 
-  x_{6,t} = \cos\left(\textstyle\frac{6\pi t}{m}\right), 
+  x_{1,t} = \sin\left(\textstyle\frac{2\pi t}{m}\right),
+  x_{2,t} = \cos\left(\textstyle\frac{2\pi t}{m}\right),
+  x_{3,t} = \sin\left(\textstyle\frac{4\pi t}{m}\right),
+  x_{4,t} = \cos\left(\textstyle\frac{4\pi t}{m}\right),
+  x_{5,t} = \sin\left(\textstyle\frac{6\pi t}{m}\right),
+  x_{6,t} = \cos\left(\textstyle\frac{6\pi t}{m}\right),
 $$
-and so on. If we have monthly seasonality, and we use the first 11 of these predictor variables, then we will get exactly the same forecasts as using 11 dummy variables. 
+and so on. If we have monthly seasonality, and we use the first 11 of these predictor variables, then we will get exactly the same forecasts as using 11 dummy variables.
 
 The advantage of using Fourier terms is that we can often use fewer predictor variables than we need to with dummy variables, especially when $m$ is large. This makes them useful for weekly data, for example, where $m\approx 52$. For short seasonal periods such as with quarterly data, there is little advantage in using Fourier series over seasonal dummy variables.
 
@@ -335,15 +335,15 @@ Another form of permanent effect is a change of slope. Here the intervention is 
 
 ### Trading days {-}
 
-The number of trading days in a month can vary considerably and can have a substantial effect on sales data. To allow for this, the number of trading days in each month can be included as a predictor. 
+The number of trading days in a month can vary considerably and can have a substantial effect on sales data. To allow for this, the number of trading days in each month can be included as a predictor.
 
 For monthly or quarterly data, the `bizdays` function will compute the number of trading days in each period.
 
 An alternative that allows for the effects of different days of the week has the following predictors:
 \begin{align*}
-  x_{1} &= \text{# Mondays in month;} \\ 
-  x_{2} &= \text{# Tuesdays in month;} \\ 
-        & \vdots \\ 
+  x_{1} &= \text{# Mondays in month;} \\
+  x_{2} &= \text{# Tuesdays in month;} \\
+        & \vdots \\
   x_{7} &= \text{# Sundays in month.}
 \end{align*}
 
@@ -351,9 +351,9 @@ An alternative that allows for the effects of different days of the week has the
 
 It is often useful to include advertising expenditure as a predictor. However, since the effect of advertising can last beyond the actual campaign, we need to include lagged values of advertising expenditure. So the following predictors may be used.
 \begin{align*}
-  x_{1} &= \text{advertising for previous month;} \\ 
-  x_{2} &= \text{advertising for two months previously;} \\ 
-        & \vdots \\ 
+  x_{1} &= \text{advertising for previous month;} \\
+  x_{2} &= \text{advertising for two months previously;} \\
+        & \vdots \\
   x_{m} &= \text{advertising for $m$ months previously.}
 \end{align*}
 
@@ -390,17 +390,17 @@ After selecting the regression variables and fitting a regression model, it is n
 
 With time series data we are considering in this book it is highly likely that the value of a variable observed in the current time period will be influenced by its value in the previous period, or even the period before that, and so on. Therefore when fitting a regression model to time series data, it is very common to find autocorrelation in the residuals. In this case, the estimated model violates the assumption of no autocorrelation in the errors, and our forecasts may be inefficient --- there is some information left over which should be accounted for in the model in order to obtain better forecasts. The forecasts from a model with autocorrelated errors are still unbiased, and so are not "wrong", but they will usually have larger prediction intervals than they need to. Therefore we should always look at an ACF plot of the residuals.
 
-Another useful test of autocorrelation in the residuals designed to take account for the regression model is the **Breusch-Godfrey** test, also referred to as the LM (Lagrange Multiplier) test for serial correlation. It is used to test the joint hypothesis that there is no autocorrelation in the residuals up to a certain specified order. A small p-value indicates there is significant autocorrelation remaining in the residuals. 
+Another useful test of autocorrelation in the residuals designed to take account for the regression model is the **Breusch-Godfrey** test, also referred to as the LM (Lagrange Multiplier) test for serial correlation. It is used to test the joint hypothesis that there is no autocorrelation in the residuals up to a certain specified order. A small p-value indicates there is significant autocorrelation remaining in the residuals.
 
 ### Histogram of residuals {-}
 
-It is always a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier. 
+It is always a good idea to check if the residuals are normally distributed. As explained earlier, this is not essential for forecasting, but it does make the calculation of prediction intervals much easier.
 
 #### Example {-}
 
 Using the `checkresiduals` function introduced in Section \@ref(toolbox-resids) we can obtain all the useful residual diagnostics mentioned above. Figure \@ref(fig:beerresidcheck) shows a time plot, the ACF and the histogram of the residuals from the model fitted to the beer production data as well as the  Breusch-Godfrey test for testing up to 8th order autocorrelation.
 
-The time plot shows an outlier in the residuals at 2004Q4 which suggests that  something unusual happened in that quarter. It would be worth investigating that outlier to see if there were any unusual circumstances or events that may have significanlty reduced beer production for that quarter. 
+The time plot shows an outlier in the residuals at 2004Q4 which suggests that  something unusual happened in that quarter. It would be worth investigating that outlier to see if there were any unusual circumstances or events that may have significanlty reduced beer production for that quarter.
 
 The remaining residuals show that the model has captured the patterns in the data quite well. However, there is a small amount of autocorrelation left in the residuals, seen in the significant spike in the ACF plot but not detected to be significant by the Breusch-Godfrey test. This suggests that there may be some information remaining in the residuals and the model can be slightly improved to capture this. However, it is unlikely that it will make much difference to the resulting forecasts. The forecasts from the current model are still unbiased, but will have larger prediction intervals than they need to. In Chapter \@ref(ch-dynamic) we discuss dynamic regression models used for better capturing information left in the rediduals.
 
@@ -498,7 +498,7 @@ where the summations are over all observations. Thus, it reflects the proportion
 
 In simple linear regression, the value of $R^2$ is also equal to the square of the correlation between $y$ and $x$ (provided an intercept has been included).
 
-If the predictions are close to the actual values, we would expect $R^2$ to be close to 1. On the other hand, if the predictions are unrelated to the actual values, then $R^2=0$ (again, assuming there is an intercept). In all cases, $R^2$ lies between 0 and 1. 
+If the predictions are close to the actual values, we would expect $R^2$ to be close to 1. On the other hand, if the predictions are unrelated to the actual values, then $R^2=0$ (again, assuming there is an intercept). In all cases, $R^2$ lies between 0 and 1.
 
 The $R^2$ value is commonly used, often incorrectly, in forecasting. $R^2$ will never decrease when adding an extra predictor to the model and this can lead to over-fitting. There are no set rules for what is a good $R^2$ value, and typical values of $R^2$ depend on the type of data used. Validating a model’s forecasting performance on the test data is much better than measuring the $R^2$ value on the training data.
 
@@ -528,7 +528,7 @@ It is calculated by
 \end{equation}
 Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation. Here, we divide by $T−k−1$ because we have estimated $k+1$ parameters (the intercept and a coefficient for each predictor variable) in computing the residuals.
 
-The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model. 
+The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model.
 
 We should warn here that the evaluation of the standard error can be highly subjective as it is scale dependent. The main reason we introduce it here is that it is required when generating forecast intervals, discussed in Section \@ref(Regr-ForeWithRegr).
 
@@ -646,7 +646,7 @@ Many statisticians like to use BIC because it has the feature that if there is a
 
 #### Example: US consumption {-}
 
-To obtain all these measures in R, use `CV(fit)`. In the multiple regression example for forecasting US consumption we considered four predictors. With four predictors, there are $2^4=16$ possible models. Now we can check if all four predictors are actually useful, or whether we can drop one or more of them. All 16 models were fitted and the results are summarised below in Table \@ref(tab:tblusMR). A "1" indicates that the predctor was included in the model, and a "0" means that the predictor was not included in the model. Hence the first row shows the measures of predictive accuracy for a model including all four predictors. 
+To obtain all these measures in R, use `CV(fit)`. In the multiple regression example for forecasting US consumption we considered four predictors. With four predictors, there are $2^4=16$ possible models. Now we can check if all four predictors are actually useful, or whether we can drop one or more of them. All 16 models were fitted and the results are summarised below in Table \@ref(tab:tblusMR). A "1" indicates that the predctor was included in the model, and a "0" means that the predictor was not included in the model. Hence the first row shows the measures of predictive accuracy for a model including all four predictors.
 
 The results have been sorted according to the AICc and therefore the best models are given at the top of the table, and the worst at the bottom of the table. There is clear separation between the models in the first four rows and the ones below. This indicates that Income and Savings should both be included in the model. However we would probably only include one of Production and Unemployment as these two variables are highly (negatively) correlated, as shown in Figure \@ref(fig:ScatterMatrix). All criteria point towards including Unemployment.
 
@@ -703,7 +703,7 @@ models to be explored.
 An approach that works quite well is *backwards stepwise regression*:
 
 * Start with the model containing all potential predictors.
-* Remove one predictor at a time. Keep the model that mostly improves the measure of predictive accuracy. 
+* Remove one predictor at a time. Keep the model that mostly improves the measure of predictive accuracy.
 * Iterate until no further improvement.
 
 If the number of potential predictors is too large, then the backwards stepwise regression will not work and the *forward stepwise regression* can be used instead. This procedure starts with a model that includes only the intercept. Predictors are added one at a time, and the one that most improves the measure of predictive accuracy is retained in the model. The procedure is repeated until no further improvement can be achieved.
@@ -790,7 +790,7 @@ where $T$ is the total number of observations, $\bar{x}$ is the mean of the obse
 
 Equation \@ref(eq:Regr-pi) shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is,  we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
 #### Example {-}
-`TODO: This is to higligh the extreme case. If not useful just remove`. 
+`TODO: This is to higligh the extreme case. If not useful just remove`.
 
 The estimated simple regression line in the US consumption example is
 \[ \hat{y}_t=`r round(coef(fit.cons)[1],2)` + `r round(coef(fit.cons)[2],2)`x_t.
@@ -825,7 +825,7 @@ matrix algebra.*
 Recall that multiple regression model can be written  as   $$y_{t} = \beta_{0} + \beta_{1}
 x_{1,t} + \beta_{2} x_{2,t} + \cdots + \beta_{k} x_{k,t} + \varepsilon_{t}$$
 where $\varepsilon_{t}$ has mean zero and variance $\sigma^2$. This expresses the relationship between a single value of the forecast variable
-and the predictors. 
+and the predictors.
 
 It can be convenient to write this in matrix form where all
 the values of the forecast variable are given in a single equation. Let
@@ -883,7 +883,7 @@ be too narrow.
 
 ## Nonlinear regression {#Regr-NonLinear}
 
-Although the linear relationship assumed so far in this chapter is often adequate, there are many cases for which a nonlinear functional form is more suitable. To keep things simple in this section we assume that we only have one predictor $x$. 
+Although the linear relationship assumed so far in this chapter is often adequate, there are many cases for which a nonlinear functional form is more suitable. To keep things simple in this section we assume that we only have one predictor $x$.
 
 Simply transforming the forecast variable $y$ and/or the predictor variable $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a nonlinear specification. We should note that these specifications and the specification that follow are still linear in the parameters. The most commonly used transformation is the (natural) logarithmic (see Section \@ref(sec-transformations)).
 
@@ -1042,9 +1042,9 @@ The dummy variable trap is a special case of multicollinearity. Suppose you have
 
 `TODO: I have changed this below - change back if not improved`
 
-The dummy variable trap is a special case of multicollinearity, referred to as perfect multicollinearity. Suppose you have quarterly data and use four dummy variables, $d_1,~d_2,~d_3$ and $d_4$. Then $d_1+d_2+d_3+d_4=1$ and therefore there is perfect correlation between the column of ones represetning the constant and the linear combination, in this case the sum, of the dummies. 
+The dummy variable trap is a special case of multicollinearity, referred to as perfect multicollinearity. Suppose you have quarterly data and use four dummy variables, $d_1,~d_2,~d_3$ and $d_4$. Then $d_1+d_2+d_3+d_4=1$ and therefore there is perfect correlation between the column of ones represetning the constant and the linear combination, in this case the sum, of the dummies.
 
-In the case of perfect correlation (i.e., a correlation of +1 or -1, such as in the dummy variable trap), it is not possible to estimate the regression model. If there is high correlation (close to but not equal to +1 or -1), then the estimation of the regression coefficients is computationally difficult. In fact, some software (notably Microsoft Excel) may give highly inaccurate estimates of the coefficients. Most reputable statistical software will use algorithms to limit the effect of multicollinearity on the coefficient estimates, but you do need to be careful. The major software packages such as R, SPSS, SAS and Stata all use estimation algorithms to avoid the problem as much as possible. 
+In the case of perfect correlation (i.e., a correlation of +1 or -1, such as in the dummy variable trap), it is not possible to estimate the regression model. If there is high correlation (close to but not equal to +1 or -1), then the estimation of the regression coefficients is computationally difficult. In fact, some software (notably Microsoft Excel) may give highly inaccurate estimates of the coefficients. Most reputable statistical software will use algorithms to limit the effect of multicollinearity on the coefficient estimates, but you do need to be careful. The major software packages such as R, SPSS, SAS and Stata all use estimation algorithms to avoid the problem as much as possible.
 
 The uncertainty associated with individual regression coefficients will be large. This is because they are difficult to estimate. Consequently, statistical tests (e.g., t-tests) on regression coefficients are unreliable. (In forecasting we are rarely interested in such tests.) Also, it will not be possible to make accurate statements about the contribution of each separate predictor to the forecast.
 
@@ -1071,8 +1071,8 @@ knitr::kable(tbl, booktabs=TRUE, align='c')
     d. Give prediction intervals for your forecasts. The following R code will get you started:
 
         ```{r, eval=FALSE, include=TRUE, cache=TRUE}
-        plot(Mwh ~ temp, data=econsumption) 
-        fit <- lm(Mwh ~ temp, data=econsumption) 
+        plot(Mwh ~ temp, data=econsumption)
+        fit <- lm(Mwh ~ temp, data=econsumption)
         plot(residuals(fit) ~ temp, data=econsumption)
         forecast(fit, newdata=data.frame(temp=c(10,35)))
         ```
@@ -1104,7 +1104,7 @@ knitr::kable(tbl, booktabs=TRUE, align='c')
     j. How could you improve these predictions by modifying the model?
 
 5. `TODO: you got to this before me ;-)` The `gasoline` series consists of weekly data for supplies of US finished motor gasoline product, from 2 February 1991 to 20 January 2017. The units are in "thousand barrels per day". Consider only the data to the end of 2004.
-    a. Fit a harmonic regression with trend to the data. Select the appropriate number of Fourier terms to include by minimizing the AICc or CV value. 
+    a. Fit a harmonic regression with trend to the data. Select the appropriate number of Fourier terms to include by minimizing the AICc or CV value.
     b. Check the residuals of the final model using the `checkresiduals()` function. Even though the residuals fail the correlation tests, the results are probably not severe enough to make much difference to the forecasts and forecast intervals. (Note that the correlations are relatively small, even though they are significant.)
     c. To forecast using harmonic regression, you will need to generate the future values of the Fourier terms. This can be done as follows.
 
@@ -1114,22 +1114,22 @@ knitr::kable(tbl, booktabs=TRUE, align='c')
 
         where `fit` is the fitted model using `tslm`, `K` is the number of Fourier terms used in creating `fit`, and `h` is the forecast horizon required.
 
-        Forecast the next year of data. 
+        Forecast the next year of data.
     d. Plot the forecasts along with the actual data for 2005. What do you find?
 
-6. *(For advanced readers following on from Section \@ref(Regr-MatrixEquations))*. 
+6. *(For advanced readers following on from Section \@ref(Regr-MatrixEquations))*.
 
-    Using matrix notation it was shown that if $\bm{y}=\bm{X}\bm{\beta}+\bm{\varepsilon}$, where $\bm{e}$ has mean $\bm{0}$ and variance matrix $\sigma^2\bm{I}$, the estimated coefficients are given by $\hat{\bm{\beta}}=(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ and a forecast is given by $\hat{y}=\bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ where $\bm{x}^*$ is a row vector containing the values of the regressors for the forecast (in the same format as $\bm{X}$), and the forecast variance is given by $var(\hat{y})=\sigma^2 \left[1+\bm{x}^*(\bm{X}'\bm{X})^{-1}(\bm{x}^*)'\right].$ 
+    Using matrix notation it was shown that if $\bm{y}=\bm{X}\bm{\beta}+\bm{\varepsilon}$, where $\bm{e}$ has mean $\bm{0}$ and variance matrix $\sigma^2\bm{I}$, the estimated coefficients are given by $\hat{\bm{\beta}}=(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ and a forecast is given by $\hat{y}=\bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$ where $\bm{x}^*$ is a row vector containing the values of the regressors for the forecast (in the same format as $\bm{X}$), and the forecast variance is given by $var(\hat{y})=\sigma^2 \left[1+\bm{x}^*(\bm{X}'\bm{X})^{-1}(\bm{x}^*)'\right].$
 
     Consider the simple time trend model where $y_t = \beta_0 + \beta_1t$. Using the following results,
     $$
-      \sum^{T}_{t=1}{t}=\frac{1}{2}T(T+1),\quad \sum^{T}_{t=1}{t^2}=\frac{1}{6}T(T+1)(2T+1) 
+      \sum^{T}_{t=1}{t}=\frac{1}{2}T(T+1),\quad \sum^{T}_{t=1}{t^2}=\frac{1}{6}T(T+1)(2T+1)
     $$
     derive the following expressions:
 
     a.
       $\displaystyle\bm{X}'\bm{X}=\frac{1}{6}\left[
-      \begin{array}{cc} 
+      \begin{array}{cc}
         6T      & 3T(T+1) \\
         3T(T+1) & T(T+1)(2T+1) \\
       \end{array}
@@ -1137,18 +1137,18 @@ knitr::kable(tbl, booktabs=TRUE, align='c')
 
     b.
       $\displaystyle(\bm{X}'\bm{X})^{-1}=\frac{2}{T(T^2-1)}\left[
-      \begin{array}{cc} 
+      \begin{array}{cc}
         (T+1)(2T+1)   & -3(T+1) \\
         -3(T+1)       & 6 \\
       \end{array}
       \right]$
 
     c.
-      $\displaystyle\hat{\beta}_0=\frac{2}{T(T-1)}\left[(2T+1)\sum^T_{t=1}y_t-3\sum^T_{t=1}ty_t  
+      $\displaystyle\hat{\beta}_0=\frac{2}{T(T-1)}\left[(2T+1)\sum^T_{t=1}y_t-3\sum^T_{t=1}ty_t
       \right]$
 
         $\displaystyle\hat{\beta}_1=\frac{6}{T(T^2-1)}\left[2\sum^T_{t=1}ty_t-(T+1)\sum^T_{t=1}y_t \right]$
-        
+
     d.
       $\displaystyle\text{Var}(\hat{y}_{t})=\hat{\sigma}^2\left[1+\frac{2}{T(T-1)}\left(1-4T-6h+6\frac{(T+h)^2}{T+1}\right)\right]$
 

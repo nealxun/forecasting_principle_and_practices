@@ -41,13 +41,13 @@ We will fit a dynamic regression model with an ARMA error structure. The total n
 
 ```{r callsharmonics, echo=TRUE, cache=TRUE}
 fit <- auto.arima(calls, seasonal=FALSE, lambda=0,
-         xreg=fourier(calls, K=c(15,10)))
-fc <- forecast(fit, xreg=fourier(calls, K=c(15,10), h=2*169))
+         xreg=fourier(calls, K=c(30,30)))
+fc <- forecast(fit, xreg=fourier(calls, K=c(30,30), h=2*169))
 autoplot(fc, include=5*169) +
   ylab("Call volume") + xlab("Weeks")
 ```
 
-This is a very large model (containing )
+This is a very large model (containing 120+??=`r length(coef(fit))` parameters).
 
 ### TBATS models {-}
 

@@ -136,7 +136,7 @@ Second, we make the following assumptions about the errors $(\varepsilon_{1},\do
   * they are not autocorrelated; otherwise the forecasts will be inefficient as there is more information to be exploited in the data.
   * they are unrelated to the predictor variables; otherwise there would be more information that should be included in the systematic part of the model.
 
-It is also useful to have the errors that are normally distributed with constant variance in order to easily produce prediction intervals.
+It is also useful to have the errors that are normally distributed with constant variance $\sigma^2$ in order to easily produce prediction intervals.
 
 Another important assumption in the linear regression model is that each predictor $x$ is not a random variable. If we were performing a controlled experiment in a laboratory, we could control the values of each $x$ (so they would not be random) and observe the resulting values of $y$. With observational data (including most data in business and economics) it is not possible to control the value of $x$, and hence we make this an assumption.
 
@@ -519,11 +519,11 @@ Figure \@ref(fig:usfitted2) plots the actual consumption expenditure values vers
 
 ### Standard error of the regression {-}
 
-Another measure of how well the model has fitted the data is the standard deviation of the residuals, which is often known as the "Residual standard error". This is shown in the above output with the value `r round(summary(fit.consMR)$sigma,4)`.
+Another measure of how well the model has fitted the data is the standard deviation of the residuals, which is often known as the "residual standard error". This is shown in the above output with the value `r round(summary(fit.consMR)$sigma,4)`.
 
 It is calculated by
 \begin{equation}
-  s_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.
+  \hat{\sigma}_e=\sqrt{\frac{1}{T-k-1}\sum_{t=1}^{T}{e_t^2}}.
   (\#eq:Regr-se)
 \end{equation}
 Notice that here we divide by $T-k-1$ in order to account for the number of estimated parameters in computing the residuals. Normally, we only need to estimate the mean (i.e., one parameter) when computing a standard deviation. The divisor is always $T$ minus the number of parameters estimated in the calculation. Here, we divide by $T−k−1$ because we have estimated $k+1$ parameters (the intercept and a coefficient for each predictor variable) in computing the residuals.
@@ -746,7 +746,8 @@ autoplot(fcast) +
 
 ### Scenario based forecasting {-}
 
-In this setting the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the predicted change in consumption when there is a constant growth of 1% and 0.5% respectively for income and savings wiht no change in the employment rate, versus a respective decline of 1% and 0.5%, for each of the four quarters following the end of the sample. The resulting forecasts are calculated and shown in Figure \@ref(fig:ConsInc4).
+In this setting the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the predicted change in consumption when there is a constant growth of 1% and 0.5% respectively for income and savings with no change in the employment rate, versus a respective decline of 1% and 0.5%, for each of the four quarters following the end of the sample. The resulting forecasts are calculated below and shown in Figure \@ref(fig:ConsInc4). We should not that prediction intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume that the values of the predictors are known in advance.
+
 
 ```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
 fit.consBest <- tslm(Consumption ~ Income + Savings + Unemployment, data = uschange)
@@ -766,34 +767,31 @@ autoplot(uschange[,1]) + ylab("% change in US consumption") +
   guides(colour=guide_legend(title="Scenario"))
 ```
 
-Prediction intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
-
 ### Building a predictive regression model {-}
 
-The great advantage of the regression models we have so far formulated is that they can be used to capture important relationships between the forecast variable of interest and the predictor variables. 
-
-A major challenge with the models however, is that in order to generate ex-ante forecasts the model requires future values of each predictor. If scenario based forecasting is of interest then these models are extremely useful. However, if simply ex-ante forecasts is the main focus, obtaining forecasts of the predictors can be challenging.
+The great advantage of regression models is that they can be used to capture important relationships between the forecast variable of interest and the predictor variables. A major challenge however, is that in order to generate ex-ante forecasts the model requires future values of each predictor. If scenario based forecasting is of interest then these models are extremely useful. However, if ex-ante forecasting is the main focus, obtaining forecasts of the predictors can be very challenging (in many cases generating forecasts for the predictor variables can be more challenging than forecasting directly the forecast variable without using predictors).
 
 An alternative formulation is to use as predictors their lagged values. Assuming that we are interested in generating a $h$-step ahead forecast we write
 $$y_{t+h}=\beta_0+\beta_1x_{1,t}+\dots+\beta_kx_{k,t}+\varepsilon_{t+h}$$
 for $h=1,2\ldots$. The predictor set is formed by values of the $x$s that are observed $h$ time periods prior to observing $y$. Therefore when the estimated model is projected into the future, i.e., beyond the end of the sample $T$, all predictor values are available.
 
-Including lagged values of the predictors does not only make the model operational for easily generating forecasts is also makes it intuitively appealling. For example, the effect of a policy change with the aim of increasing production may not have an instantaneous effect on consumption expenditure. It is most likely that this will happend with a lagging effect. Several directions for generalising regression models to better incorporate the dynamics observed in time series are discussed in Section \@ref(ch-dynamic).
+Including lagged values of the predictors does not only make the model operational for easily generating forecasts, it also makes it intuitively appealling. For example, the effect of a policy change with the aim of increasing production may not have an instantaneous effect on consumption expenditure. It is most likely that this will happend with a lagging effect. We touched upon this in Section \@ref(Regr-UsefulPredictors) when briefly introducing distributed lags as predictors. Several directions for generalising regression models to better incorporate the rich dynamics observed in time series are discussed In Section \@ref(ch-dynamic).
 
 ### Predicition intervals {-}
 
-With each forecast for the change in consumption Figure \@ref(fig:ConsInc4) a 95% and an 80% prediction interval is also included. The general formulation of how to calculate prediction intervals for multiple regression models is presented in Section \@ref(Regr-MatrixEquations). As this involves some matrix algebra we present here the case for calculating prediction intervals for a simple regression where a forecast can be generated using the equation,
+With each forecast for the change in consumption Figure \@ref(fig:ConsInc4) 95% and 80% prediction intervals are also included. The general formulation of how to calculate prediction intervals for multiple regression models is presented in Section \@ref(Regr-MatrixEquations). As this involves some advanced matrix algebra we present here the case for calculating prediction intervals for a simple regression, where a forecast can be generated using the equation,
 $$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x.$$
 Assuming that the regression errors are normally distributed, an approximate 95% prediction interval (also called a forecast interval) associated with this forecast is given by
 \begin{equation}
-  \hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
+  \hat{y} \pm 1.96 \hat{\sigma}_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
   (\#eq:Regr-pi)
 \end{equation}
-where $T$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $s_e$ is the standard error of the regression given by Equation \@ref(eq:Regr-se). Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28. Other prediction intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by Equation \@ref(eq:Regr-pi).
+where $T$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $\hat{\sigma}_e$ is the standard error of the regression given by Equation \@ref(eq:Regr-se). Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28. Other prediction intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by Equation \@ref(eq:Regr-pi).
 
 Equation \@ref(eq:Regr-pi) shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is,  we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
+#### Example {-}
+`TODO: This is to higligh the extreme case. If not useful just remove`. 
 
-#### Example: Is the extreme case useful?? possibly. If not remove. {-}
 The estimated simple regression line in the US consumption example is
 \[ \hat{y}_t=`r round(coef(fit.cons)[1],2)` + `r round(coef(fit.cons)[2],2)`x_t.
 \]
@@ -808,11 +806,11 @@ fcast.up$mean[1]
 ```
 
 Assuming that for the next four quarters personal income will increase by its historical mean value of $\bar{x}=`r round(mean(uschange[,"Income"]),2)`\%$, consumption is forecast to increase by $`r round(fcast.up$mean[1],2)`\%$ and
-the corresponding $95\%$ and $80\%$ prediction intervals are $[`r round(fcast.up$lower[1,2],2)`,`r round(fcast.up$upper[1,2],2)`]$ and $[`r round(fcast.up$lower[1,1],2)`,`r round(fcast.up$upper[1,1],2)`]$ respectively (calcualted using R). If we assume an extreme increase of $10\%$ then the predcition intervals are much wider as shown in Figure \@ref(fig:ConsSimplePI).
+the corresponding $95\%$ and $80\%$ prediction intervals are $[`r round(fcast.up$lower[1,2],2)`,`r round(fcast.up$upper[1,2],2)`]$ and $[`r round(fcast.up$lower[1,1],2)`,`r round(fcast.up$upper[1,1],2)`]$ respectively (calcualted using R). If we assume an extreme increase of $10\%$ in income then the predcition intervals are considerably wider as shown in Figure \@ref(fig:ConsSimplePI).
 
-```{r, echo=FALSE, fig.cap="Prediction intervals if inomce increased by its historical mean and an extreme increase.", cache=TRUE, ConsSimplePI, echo=TRUE}
-# autoplot is giving me trouble -
-autoplot(uschange[,1]) +
+```{r, echo=FALSE, fig.cap="Prediction intervals if inomce increased by its historical mean versus an extreme increase of 10%.", cache=TRUE, ConsSimplePI, echo=TRUE}
+
+autoplot(uschange[,"Consumption"]) +
   ylab("% change in US consumption") +
   autolayer(fcast.up, PI=TRUE, series="Average increase") +
   autolayer(fcast.down, PI=TRUE, series="Extreme increase") +
@@ -825,9 +823,11 @@ autoplot(uschange[,1]) +
 matrix algebra.*
 
 Recall that multiple regression model can be written  as   $$y_{t} = \beta_{0} + \beta_{1}
-x_{1,t} + \beta_{2} x_{2,t} + \cdots + \beta_{k} x_{k,t} + \varepsilon_{t}.$$
-This expresses the relationship between a single value of the forecast variable
-and the predictors. It can be convenient to write this in matrix form where all
+x_{1,t} + \beta_{2} x_{2,t} + \cdots + \beta_{k} x_{k,t} + \varepsilon_{t}$$
+where $\varepsilon_{t}$ has mean zero and variance $\sigma^2$. This expresses the relationship between a single value of the forecast variable
+and the predictors. 
+
+It can be convenient to write this in matrix form where all
 the values of the forecast variable are given in a single equation. Let
 $\bm{y} = (y_{1},\dots,y_{T})'$,
 $\bm{\varepsilon} = (\varepsilon_{1},\dots,\varepsilon_{T})'$,
@@ -843,7 +843,8 @@ $$
 Then
 $$\bm{y} = \bm{X}\bm{\beta} + \bm{\varepsilon}.$$
 
-Note that the $\bm{X}$ matrix has $T$ rows reflecting the number of observations and $k+1$ columns reflecting the number of predictors and the intercept which is represented by the column of ones.
+where $\bm{\varepsilon}$ has mean $\bm{0}$ and variance $\sigma^2\bm{I}$.
+Note that the $\bm{X}$ matrix has $T$ rows reflecting the number of observations and $k+1$ columns reflecting the intercept which is represented by the column of ones plus the number of predictors.
 
 ### Least squares estimation {-}
 
@@ -854,7 +855,7 @@ takes the value $$\hat{\bm{\beta}} = (\bm{X}'\bm{X})^{-1}\bm{X}'\bm{y}$$
 This is sometimes known as the "normal equation". The estimated coefficients
 require the inversion of the matrix $\bm{X}'\bm{X}$. If $\bm{X}$ is not of full column rank then matrix $\bm{X}'\bm{X}$ is singular and the model cannot be estimated. This will occur, for example, if you fall for the "dummy variable trap", i.e., having the same number of dummy variables as there are categories of a categorical predictor, as discussed in Section \@ref(Regr-UsefulPredictors).
 
-The residual variance is estimated using $$\hat{\sigma}^2 =
+The residual variance is estimated using $$\hat{\sigma}_e^2 =
 \frac{1}{T-k-1}(\bm{y} - \bm{X}\hat{\bm{\beta}})'(\bm{y} -
 \bm{X}\hat{\bm{\beta}}).$$
 
@@ -875,7 +876,7 @@ necessary to actually fit $T$ separate models when computing the CV statistic.
 ### Forecasts and prediction intervals {-}
 
 Let $\bm{x}^*$ be a row vector containing the values of the predictors (in the same format as $\bm{X}$) for which we want to generate a forecast . Then the forecast is given by
-$$\hat{y} = \bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y}$$ and its variance is given by $$\sigma^2 \left[1 + \bm{x}^* (\bm{X}'\bm{X})^{-1} (\bm{x}^*)'\right].$$ A 95% prediction interval can be calculated (assuming normally distributed errors) as $$\hat{y} \pm 1.96 \hat{\sigma} \sqrt{1 + \bm{x}^* (\bm{X}'\bm{X})^{-1} (\bm{x}^*)'}.$$ This takes account of the uncertainty due to the error term $\varepsilon$ and the uncertainty in the coefficient estimates. However, it
+$$\hat{y} = \bm{x}^*\hat{\bm{\beta}}=\bm{x}^*(\bm{X}'\bm{X})^{-1}\bm{X}'\bm{Y}$$ and its variance is given by $$\sigma^2 \left[1 + \bm{x}^* (\bm{X}'\bm{X})^{-1} (\bm{x}^*)'\right].$$ A 95% prediction interval can be calculated (assuming normally distributed errors) as $$\hat{y} \pm 1.96 \hat{\sigma}_e \sqrt{1 + \bm{x}^* (\bm{X}'\bm{X})^{-1} (\bm{x}^*)'}.$$ This takes account of the uncertainty due to the error term $\varepsilon$ and the uncertainty in the coefficient estimates. However, it
 ignores any errors in $\bm{x}^*$. So if the future values of the predictors are
 uncertain, then the prediction interval calculated using this expression will
 be too narrow.

@@ -19,3 +19,6 @@ bookdown/*
 test/*
 fpp.sublime*
 Makefile
+fpp_cache/*
+fpp_files/*
+fpp.Rmd

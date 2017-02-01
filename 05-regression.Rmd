@@ -883,17 +883,17 @@ be too narrow.
 
 ## Nonlinear regression {#Regr-NonLinear}
 
-Although the linear relationship assumed so far in this chapter is often adequate, there are many cases for which a nonlinear functional form is more suitable. To keep things simple in this section suppose we have only one predictor $x$.
+Although the linear relationship assumed so far in this chapter is often adequate, there are many cases for which a nonlinear functional form is more suitable. To keep things simple in this section we assume that we only have one predictor $x$. 
 
-Simply transforming the forecast variable $y$ and/or the predictor variable $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a nonlinear specification. We should note that these specifications are still linear in the parameters. The most commonly used transformation is the (natural) logarithmic (see Section \@ref(sec-transformations)).
+Simply transforming the forecast variable $y$ and/or the predictor variable $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a nonlinear specification. We should note that these specifications and the specification that follow are still linear in the parameters. The most commonly used transformation is the (natural) logarithmic (see Section \@ref(sec-transformations)).
 
 A **log-log** functional form is specified as
 $$
   \log y=\beta_0+\beta_1 \log x +\varepsilon.
 $$
-In this model, the slope $\beta_1$ is interpreted as an elasticity, $\beta_1$ is the average percentage change in $y$ resulting from a $1\%$ change in $x$. Other useful forms can also be specified. The **log-linear** form is specified by only transforming the forecast variable and the **linear-log** form is obtained by transforming the predictor.
+In this model, the slope $\beta_1$ is interpreted as an elasticity, $\beta_1$ is the average percentage change in $y$ resulting from a $1\%$ increase in $x$. Other useful forms can also be specified. The **log-linear** form is specified by only transforming the forecast variable and the **linear-log** form is obtained by transforming the predictor.
 
-Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero. In the case that variable $x$ contains zeros we use the transformation $\log(x+1)$. That is, we add one to the value of the variable and then take logarithms. This has a similar effect to taking logarithms but avoids the problem of zeros. It also has the neat side-effect of zeros on the original scale remaining zeros on the transformed scale.
+Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero. In the case that variable $x$ contains zeros we use the transformation $\log(x+1)$, i.e., we add one to the value of the variable and then take logarithms. This has a similar effect to taking logarithms but avoids the problem of zeros. It also has the neat side-effect of zeros on the original scale remaining zeros on the transformed scale.
 
 There are cases for which simply transforming the data will not be adequate and a more general specification may be required. Then the model we use is
 $$y=f(x) +\varepsilon$$
@@ -922,7 +922,7 @@ Cubic splines usually give a better fit to the data. However, forecasting values
 ### Forecasting with a nonlinear trend {-}
 In Section \@ref(Regr-UsefulPredictors) fitting a linear trend to a time series by setting $x=t$ was introduced. The simplest way of fitting a nonlinear trend is using quadratic or higher order trends obtained by specifying
 \[
-  x_{1,t} =t,\quad x_{2,t}=t^2,\quad \ldots
+  x_{1,t} =t,\quad x_{2,t}=t^2,\quad \ldots.
 \]
 However, it is not recommended that quadratic or higher order trends are used in forecasting. When they are extrapolated, the resulting forecasts are often very unrealistic.
 
@@ -957,45 +957,46 @@ Fitting an exponential trend to the data can be achieved by transforming the $y$
 $$\log y_t=\beta_0+\beta_1 t +\varepsilon_t.$$
 The fitted exponential trend and forecasts are shown in Figure \@ref(fig:marathonNonlinear) below. Although the exponential trend does not seem to fit the data much better than the linear trend, it gives a more sensible projection in that the winning times will decrease in the future but at a decaying rate rather than a linear non-changing rate.
 
-Simply eyeballing the winning times reveals three very different periods. There is a lot of volatility in the winning times from the beginning up to about 1940 with the winning times improving/decreasing overall but with significant increases in the decade of the 1920s. The almost linear decrease in times after 1940 is then followed by a flattening out after the 1980s with almost an upturn towards the end of the sample. Following these observations we specify as knots the years 1940 and 1980. We should warn here that subjectively identifying suitable knots in the data can lead to overfitting which can be detrimental to the forecast performance of a model and should be performed with caution.
+Simply eyeballing the winning times reveals three very different periods. There is a lot of volatility in the winning times from the beginning up to about 1940 with the winning times decreasing overall but with significant increases in the decade of the 1920s. The almost linear decrease in times after 1940 is then followed by a flattening out after the 1980s with almost an upturn towards the end of the sample. Following these observations we specify as knots the years 1940 and 1980. We should warn here that subjectively identifying suitable knots in the data can lead to overfitting which can be detrimental to the forecast performance of a model and should be performed with caution.
 
 ```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE, fig.cap="Projecting forecasts from a linear, exponential, piecewise linear trends and a cubic spline for the Boston marathon winning times", cache=TRUE}
-fit.lin <- tslm(marathon ~ trend)
-fit.exp <- tslm(marathon ~ trend, lambda = 0)
+
 h <- 10
+
+fit.lin <- tslm(marathon ~ trend)
 fcasts.lin <- forecast(fit.lin, h=h)
+
+fit.exp <- tslm(marathon ~ trend, lambda = 0)
 fcasts.exp <- forecast(fit.exp, h=h)
 
 t.break1 <- 1940
 t.break2 <- 1980
+
 t <- time(marathon)
 t1 <- ts(pmax(0,t-t.break1), start=1897)
 t2 <- ts(pmax(0,t-t.break2), start=1897)
+
 fit.pw <- tslm(marathon ~ t + t1 + t2)
-t.new <- t[length(t)]+seq(h)
-t1.new <- t1[length(t1)]+seq(h)
-t2.new <- t2[length(t2)]+seq(h)
-newdata <- data.frame(cbind(t=t.new,t1=t1.new,t2=t2.new))
+  t.new <- t[length(t)]+seq(h)
+  t1.new <- t1[length(t1)]+seq(h)
+  t2.new <- t2[length(t2)]+seq(h)
+
+newdata <- cbind(t=t.new,t1=t1.new,t2=t2.new)%>%as.data.frame
 fcasts.pw <- forecast(fit.pw,newdata = newdata)
-fit.spline <- tslm(marathon ~ t + I(t^2) + I(t^3) + I(t1^3) + I(t2^3))
-fcasts.spline <- forecast(fit.spline, newdata = newdata)
+
 autoplot(marathon) +
   autolayer(fitted(fit.lin), series = "Linear") +
-  autolayer(fitted(fit.exp), series="Exponetial") +
+  autolayer(fitted(fit.exp), series="Exponential") +
   autolayer(fitted(fit.pw), series = "Piecewise") +
-  autolayer(fitted(fit.spline), series = "Cubic spline") +
   autolayer(fcasts.pw, series="Piecewise") +
   autolayer(fcasts.lin$mean, series = "Linear") +
-  autolayer(fcasts.exp$mean, series="Exponetial") +
-  autolayer(fcasts.spline$mean, series="Cubic spline") +
+  autolayer(fcasts.exp$mean, series="Exponential") +
   xlab("Year") +  ylab("Winning times in minutes") +
   ggtitle("Boston Marathon") +
   guides(colour=guide_legend(title=" "))
 ```
 
-Figure \@ref(fig:marathonNonlinear) above shows the fitted lines and forecasts from a linear and an exponential trend as well as a piecewise linear and a cubic spline. The cubic spline fits the data extremely well as expected, however the projection forward from this shows that it can be very unreliable when projecting outside the range of the historical data (as warned above) `make sure that this makes sense`. The piecewise linear trend fits the data better than both the exponential and linear trends and seems to return sensible forecasts. The residuals plotted in the Figure \@ref(fig:residPiecewise) below show that the model has mostly captured the trend well although there is some autocorrelation remaining (we will deal with this in Chapter \ref(ch-advanced)). We should however again warn here that the projection forward from the piecewise linear trend can be very sensitive to the choice of location of the knots, especially the ones located towards the end of the sample. For example moving the knot placed at 1980 even five years forward will reveal very different forecasts. The wide prediction interval associated with the forecasts form the piecewise linear trend reflects the volatility observed in the historical winning times.
-
-**change the label in the checkresiduals as these are from a nonlinear regression - I suggest simply removing the Linear - Residuals from a regression model.**
+Figure \@ref(fig:marathonNonlinear) above shows the fitted lines and forecasts from linear, exponential and piecewise linear trends. The piecewise linear trend fits the data better than both the exponential and linear trends and seems to return sensible forecasts. The residuals plotted in the Figure \@ref(fig:residPiecewise) below show that the model has mostly captured the trend well although there is some autocorrelation remaining (we will deal with this in Chapter \ref(ch-advanced)). We should however again warn here that the projection forward from the piecewise linear trend can be very sensitive to the choice of location of the knots, especially the ones located towards the end of the sample. For example moving the knot placed at 1980 even five years forward will reveal very different forecasts. The wide prediction interval associated with the forecasts form the piecewise linear trend reflects the volatility observed in the historical winning times.
 
 ```{r residPiecewise, fig.cap="Residuals from the piecewise trend.",  message=FALSE, warning=FALSE, cache=TRUE}
 checkresiduals(fit.pw)

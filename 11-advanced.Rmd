@@ -37,33 +37,77 @@ $$
 $$
 for $k=1,2,\dots$. The `fourier` function can generate these for you.
 
-We will fit a dynamic regression model with an ARMA error structure. The total number of Fourier terms for each seasonal period have been chosen to minimize the AICc. 
+We will fit a dynamic regression model with an ARMA error structure. The total number of Fourier terms for each seasonal period have been chosen to minimize the AICc. We will use a log transformation (`lambda=0`) to ensure the forecasts and prediction intervals remain positive.
 
-```{r callstbats, echo=TRUE, cache=TRUE}
-fit <- auto.arima(calls, seasonal=FALSE, 
-         xreg=fourier(calls, K=c(1,1)))
-fc <- forecast(fit, xreg=fourier(calls, K=c(1,1), h=2*169))
+```{r callsharmonics, echo=TRUE, cache=TRUE}
+fit <- auto.arima(calls, seasonal=FALSE, lambda=0,
+         xreg=fourier(calls, K=c(30,30)))
+fc <- forecast(fit, xreg=fourier(calls, K=c(30,30), h=2*169))
 autoplot(fc, include=5*169) +
   ylab("Call volume") + xlab("Weeks")
 ```
 
+This is a very large model (containing 120+??=`r length(coef(fit))` parameters).
+
 ### TBATS models {-}
 
-An alternative approach developed by \@cite(DHS11) uses a combination of Fourier terms with an exponential smoothing state space model and a Box-Cox transformation, in a completed automated manner. As with any automated modelling framework, it does not always work, but it can be a useful approach in some circumstances.
+An alternative approach developed by @DHS11 uses a combination of Fourier terms with an exponential smoothing state space model and a Box-Cox transformation, in a completed automated manner. As with any automated modelling framework, it does not always work, but it can be a useful approach in some circumstances.
 
 A TBATS model differs from dynamic harmonic regression in that the seasonality is allowed to change slowly over time in a TBATS model, while harmonic regression terms force the seasonal patterns to repeat periodically without changing.
 
-```{r callsharmonic, echo=TRUE, cache=TRUE}
+```{r callstbats, echo=TRUE, cache=TRUE}
 fit2 <- tbats(calls)
 fc2 <- forecast(fit2, h=2*169)
 autoplot(fc2, include=5*169) +
-  ylab("Call volume") + xlab("Weeks") 
+  ylab("Call volume") + xlab("Weeks")
 ```
 
-tbats
+### Complex seasonality with covariates {-}
 
-electricity demand
+TBATS models do not allow for covariates, although they can be included in dynamic harmonic regression models. One common application of such models is electricity demand modelling.
 
+Figure \@ref(fig:elecdemand) shows half-hourly electricity demand in Victoria, Australia, during 2014, along with temperatures in the same period.
+
+```{r elecdemand, cache=TRUE, echo=TRUE}
+autoplot(elecdemand[,c("Demand","Temperature")], facet=TRUE) +
+  scale_x_continuous(minor_breaks=NULL,
+    breaks=2014+cumsum(c(0,31,28,31,30,31,30,31,31,30,31,30))/365,
+    labels=month.abb) +
+  xlab("Time") + ylab("")
+```
+
+Plotting electricity demand against temperature shows that there is a nonlinear relationship between the two, with demand increasing for low temperatures (due to heating) and increasing for high temperatures (due to cooling).
+
+```{r elecdemand2, cache=TRUE, echo=TRUE}
+elecdemand %>%
+  as.data.frame %>%
+  ggplot(aes(x=Temperature, y=Demand)) + geom_point() +
+    xlab("Temperature (degrees Celsius)") +
+    ylab("Demand (GW)")
+```
+
+We will fit a regression model with a piecewise linear function of temperature (containing a knot at 18 degrees), and harmonic regression terms to allow for the daily seasonal pattern.
+
+```{r elecdemand3, cache=TRUE, echo=TRUE}
+cooling <- pmax(elecdemand[,"Temperature"], 18)
+fit <- auto.arima(elecdemand[,"Demand"],
+         xreg = cbind(fourier(elecdemand, c(10,10,0)),
+               heating=elecdemand[,"Temperature"],
+               cooling=cooling))
+```
+
+Forecasting with such models is difficult because we require future values of the predictor variables. Future values of the Fourier terms are easy to compute, but future temperatures are, of course, unknown. We could use temperature forecasts obtain from a meteorological model if we are only interested in forecasting up to a week ahead. Alternatively, we could use scenario forecasting and plug in possible temperature patterns. In the following example, we have used a repeat of the last week of temperatures to generate future possible demand values.
+
+```{r elecdemand4, cache=TRUE, echo=TRUE}
+temps <- subset(elecdemand[,"Temperature"], start=NROW(elecdemand)-7*48-1)
+fc <- forecast(fit, xreg=cbind(fourier(temps, c(10,10,0)),
+                           heating=temps, cooling=pmax(temps,18)))
+autoplot(fc)
+```
+
+```{r elecdemand5, cache=TRUE, echo=TRUE}
+checkresiduals(fc)
+```
 
 ##Forecasting counts
 

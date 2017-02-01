@@ -55,9 +55,9 @@ A TBATS model differs from dynamic harmonic regression in that the seasonality i
 
 ```{r callsharmonic, echo=TRUE, cache=TRUE}
 fit2 <- tbats(calls)
-fc2 <- forecast(fit2, h=2*169))
+fc2 <- forecast(fit2, h=2*169)
 autoplot(fc2, include=5*169) +
-  ylab("Call volume") + xlab("Weeks") +
+  ylab("Call volume") + xlab("Weeks") 
 ```
 
 tbats

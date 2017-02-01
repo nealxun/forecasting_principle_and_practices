@@ -390,7 +390,7 @@ After selecting the regression variables and fitting a regression model, it is n
 
 With time series data we are considering in this book it is highly likely that the value of a variable observed in the current time period will be influenced by its value in the previous period, or even the period before that, and so on. Therefore when fitting a regression model to time series data, it is very common to find autocorrelation in the residuals. In this case, the estimated model violates the assumption of no autocorrelation in the errors, and our forecasts may be inefficient --- there is some information left over which should be accounted for in the model in order to obtain better forecasts. The forecasts from a model with autocorrelated errors are still unbiased, and so are not "wrong", but they will usually have larger prediction intervals than they need to. Therefore we should always look at an ACF plot of the residuals.
 
-Another useful test of autocorrelation in the residuals designed to take account for the regression model is the **Breusch-Godfrey** test, also referred to as the LM (Lagrange Multiplier) test for serial correlation. It is used to test the joint hypothesis that there is no autocorrelation in the residuals upto a certain specified order. A small p-value indicates there is significant autocorrelation remaining in the residuals. 
+Another useful test of autocorrelation in the residuals designed to take account for the regression model is the **Breusch-Godfrey** test, also referred to as the LM (Lagrange Multiplier) test for serial correlation. It is used to test the joint hypothesis that there is no autocorrelation in the residuals up to a certain specified order. A small p-value indicates there is significant autocorrelation remaining in the residuals. 
 
 ### Histogram of residuals {-}
 
@@ -398,7 +398,7 @@ It is always a good idea to check if the residuals are normally distributed. As 
 
 #### Example {-}
 
-Using the `checkresiduals` function introduced in Section \@ref(toolbox-resids) we can obtain all the useful residual diagnostics mentioned above. Figure \@ref(fig:beerresidcheck) shows a time plot, the ACF and the histogram of the residuals from the model fitted to the beer production data as well as the  Breusch-Godfrey test for testing upto 8th order autocorrelation.
+Using the `checkresiduals` function introduced in Section \@ref(toolbox-resids) we can obtain all the useful residual diagnostics mentioned above. Figure \@ref(fig:beerresidcheck) shows a time plot, the ACF and the histogram of the residuals from the model fitted to the beer production data as well as the  Breusch-Godfrey test for testing up to 8th order autocorrelation.
 
 The time plot shows an outlier in the residuals at 2004Q4 which suggests that  something unusual happened in that quarter. It would be worth investigating that outlier to see if there were any unusual circumstances or events that may have significanlty reduced beer production for that quarter. 
 
@@ -726,7 +726,7 @@ which comprises the estimated coefficients and ignores the error in the regressi
 
 When using regression models for time series data, we need to distinguish between the different types of forecasts that can be produced, depending on what is assumed to be known when the forecasts are computed.
 
-*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex-ante forecasts for the percentage change in US consumption for quarters following the end of the sample, should only use information that was available *upto and including* 2016Q3. These are genuine forecasts, made in advance using whatever information is available at the time. Therefore in order to generate ex-ante forecasts the model requires future values (forecasts) of the predictors. To obtain these we can use one of the simple methods introduced in Section \@ref(sec-2-methods) or more sophisticated pure time series approaches that follow in Chapters \@ref(ch-expsmooth) and \@ref(ch-arima). Alternatively forecasts by some other source, such as a government agency may be available and can be used.
+*Ex ante forecasts* are those that are made using only the information that is available in advance. For example, ex-ante forecasts for the percentage change in US consumption for quarters following the end of the sample, should only use information that was available *up to and including* 2016Q3. These are genuine forecasts, made in advance using whatever information is available at the time. Therefore in order to generate ex-ante forecasts the model requires future values (forecasts) of the predictors. To obtain these we can use one of the simple methods introduced in Section \@ref(sec-2-methods) or more sophisticated pure time series approaches that follow in Chapters \@ref(ch-expsmooth) and \@ref(ch-arima). Alternatively forecasts by some other source, such as a government agency may be available and can be used.
 
 *Ex post forecasts* are those that are made using later information on the predictors. For example, ex post forecasts of consumption may use the actual observations of the predictors, once these have been observed. These are not genuine forecasts, but are useful for studying the behaviour of forecasting models.
 
@@ -1032,79 +1032,42 @@ required.
 
 ### Multicollinearity and forecasting {-}
 
-A closely related issue is **multicollinearity** which occurs when similar
-information is provided by two or more of the predictor variables in a multiple
-regression. It can occur in a number of ways.
+A closely related issue is **multicollinearity** which occurs when similar information is provided by two or more of the predictor variables in a multiple regression. It can occur in a number of ways.
 
-Two predictors are highly correlated with each other (that is, they have a
-correlation coefficient close to +1 or -1). In this case, knowing the value of
-one of the variables tells you a lot about the value of the other variable.
-Hence, they are providing similar information.
+Two predictors are highly correlated with each other (that is, they have a correlation coefficient close to +1 or -1). In this case, knowing the value of one of the variables tells you a lot about the value of the other variable. Hence, they are providing similar information.
 
-A linear combination of predictors is highly correlated with another linear
-combination of predictors. In this case, knowing the value of the first group
-of predictors tells you a lot about the value of the second group of
-predictors. Hence, they are providing similar information.
+A linear combination of predictors is highly correlated with another linear combination of predictors. In this case, knowing the value of the first group of predictors tells you a lot about the value of the second group of predictors. Hence, they are providing similar information.
 
-The dummy variable trap is a special case of multicollinearity. Suppose you
-have quarterly data and use four dummy variables, $d_1,d_2,d_3$ and $d_4$. Then
-$d_4=1-d_1-d_2-d_3$, so there is perfect correlation between $d_4$ and
-$d_1+d_2+d_3$.
+The dummy variable trap is a special case of multicollinearity. Suppose you have quarterly data and use four dummy variables, $d_1,d_2,d_3$ and $d_4$. Then $d_4=1-d_1-d_2-d_3$, so there is perfect correlation between $d_4$ and $d_1+d_2+d_3$.
 
-When multicollinearity occurs in a multiple regression model, there are several
-consequences that you need to be aware of.
+`TODO: I have changed this below - change back if not improved`
 
-If there is perfect correlation (i.e., a correlation of +1 or -1, such as in
-the dummy variable trap), it is not possible to estimate the regression model.
+The dummy variable trap is a special case of multicollinearity, referred to as perfect multicollinearity. Suppose you have quarterly data and use four dummy variables, $d_1,~d_2,~d_3$ and $d_4$. Then $d_1+d_2+d_3+d_4=1$ and therefore there is perfect correlation between the column of ones represetning the constant and the linear combination, in this case the sum, of the dummies. 
 
-If there is high correlation (close to but not equal to +1 or -1), then the
-estimation of the regression coefficients is computationally difficult. In
-fact, some software (notably Microsoft Excel) may give highly inaccurate
-estimates of the coefficients. Most reputable statistical software will use
-algorithms to limit the effect of multicollinearity on the coefficient
-estimates, but you do need to be careful. The major software packages such as
-R, SPSS, SAS and Stata all use estimation algorithms to avoid the problem as
-much as possible.
+In the case of perfect correlation (i.e., a correlation of +1 or -1, such as in the dummy variable trap), it is not possible to estimate the regression model. If there is high correlation (close to but not equal to +1 or -1), then the estimation of the regression coefficients is computationally difficult. In fact, some software (notably Microsoft Excel) may give highly inaccurate estimates of the coefficients. Most reputable statistical software will use algorithms to limit the effect of multicollinearity on the coefficient estimates, but you do need to be careful. The major software packages such as R, SPSS, SAS and Stata all use estimation algorithms to avoid the problem as much as possible. 
 
-The uncertainty associated with individual regression coefficients will be
-large. This is because they are difficult to estimate. Consequently,
-statistical tests (e.g., t-tests) on regression coefficients are unreliable.
-(In forecasting we are rarely interested in such tests.) Also, it will not be
-possible to make accurate statements about the contribution of each separate
-predictor to the forecast.
+The uncertainty associated with individual regression coefficients will be large. This is because they are difficult to estimate. Consequently, statistical tests (e.g., t-tests) on regression coefficients are unreliable. (In forecasting we are rarely interested in such tests.) Also, it will not be possible to make accurate statements about the contribution of each separate predictor to the forecast.
 
-Forecasts will be unreliable if the values of the future predictors are outside
-the range of the historical values of the predictors. For example, suppose you
-have fitted a regression model with predictors $x_1$ and $x_2$ which are highly
-correlated with each other, and suppose that the values of $x_1$ in the fitting
-data ranged between 0 and 100. Then forecasts based on $x_1>100$ or $x_1<0$ will be unreliable. It is always a little dangerous when future values of the
-predictors lie much outside the historical range, but it is especially
-problematic when multicollinearity is present.
+Forecasts will be unreliable if the values of the future predictors are outside the range of the historical values of the predictors. For example, suppose you have fitted a regression model with predictors $x_1$ and $x_2$ which are highly correlated with each other, and suppose that the values of $x_1$ in the fitting data ranged between 0 and 100. Then forecasts based on $x_1>100$ or $x_1<0$ will be unreliable. It is always a little dangerous when future values of the predictors lie much outside the historical range, but it is especially problematic when multicollinearity is present.
 
-Note that if you are using good statistical software, if you are not interested
-in the specific contributions of each predictor, and if the future values of
-your predictor variables are within their historical ranges, there is nothing
-to worry about --- multicollinearity is not a problem.
-
-
+Note that if you are using good statistical software, if you are not interested in the specific contributions of each predictor, and if the future values of your predictor variables are within their historical ranges, there is nothing to worry about --- multicollinearity is not a problem.
 
 ## Exercises {#Regr-exercises}
 
+1. Electricity consumption was recorded for a small town on 12 consecutive  days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day. `TODO: change the econsumption to a ts of 12 concecutive days - change the lm to tslm below`
 
-1. Electricity consumption was recorded for a small town on 12 randomly chosen days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day.
-
-  ```{r, echo=FALSE, cache=TRUE}
+```{r, echo=FALSE, cache=TRUE}
   day <- seq(1,nrow(econsumption),1)
   tbl <- t(econsumption)
   rownames(tbl) <- c("Mwh","Temp")
   colnames(tbl) <- day
 
-  knitr::kable(tbl, booktabs=TRUE)
-  ```
+knitr::kable(tbl, booktabs=TRUE, align='c')
+```
 
     a. Plot the data and find the regression model for Mwh with temperature as an explanatory variable. Why is there a negative relationship?
     b. Produce a residual plot. Is the model adequate? Are there any outliers or influential observations?
-    c. Use the model to predict the electricity consumption that you would expect for a day with maximum temperature $10^\circ$ and a day with maximum temperature $35^\circ$. Do you believe these predictions?
+    c. Use the model to predict the electricity consumption that you would expect for the next day if the maximum temperature was $10^\circ$ and compare it with the forecast if the with maximum temperature was $35^\circ$. Do you believe these predictions?
     d. Give prediction intervals for your forecasts. The following R code will get you started:
 
         ```{r, eval=FALSE, include=TRUE, cache=TRUE}
@@ -1140,7 +1103,7 @@ to worry about --- multicollinearity is not a problem.
     i. Transform your predictions and intervals to obtain predictions and intervals for the raw data.
     j. How could you improve these predictions by modifying the model?
 
-5. The `gasoline` series consists of weekly data for supplies of US finished motor gasoline product, from 2 February 1991 to 20 January 2017. The units are in "thousand barrels per day". Consider only the data to the end of 2004.
+5. `TODO: you got to this before me ;-)` The `gasoline` series consists of weekly data for supplies of US finished motor gasoline product, from 2 February 1991 to 20 January 2017. The units are in "thousand barrels per day". Consider only the data to the end of 2004.
     a. Fit a harmonic regression with trend to the data. Select the appropriate number of Fourier terms to include by minimizing the AICc or CV value. 
     b. Check the residuals of the final model using the `checkresiduals()` function. Even though the residuals fail the correlation tests, the results are probably not severe enough to make much difference to the forecasts and forecast intervals. (Note that the correlations are relatively small, even though they are significant.)
     c. To forecast using harmonic regression, you will need to generate the future values of the Fourier terms. This can be done as follows.

@@ -99,14 +99,14 @@ fit <- auto.arima(elecdemand[,"Demand"],
 Forecasting with such models is difficult because we require future values of the predictor variables. Future values of the Fourier terms are easy to compute, but future temperatures are, of course, unknown. We could use temperature forecasts obtain from a meteorological model if we are only interested in forecasting up to a week ahead. Alternatively, we could use scenario forecasting and plug in possible temperature patterns. In the following example, we have used a repeat of the last week of temperatures to generate future possible demand values.
 
 ```{r elecdemand4, cache=TRUE, echo=TRUE}
-temps <- subset(elecdemand[,"Temperature"], start=NROW(elecdemand)-7*48-1)
-fc <- forecast(fit, xreg=cbind(fourier(temps, c(10,10,0)),
-                           heating=temps, cooling=pmax(temps,18)))
-autoplot(fc)
+#temps <- subset(elecdemand[,"Temperature"], start=NROW(elecdemand)-7*48-1)
+#fc <- forecast(fit, xreg=cbind(fourier(temps, c(10,10,0)),
+#                           heating=temps, cooling=pmax(temps,18)))
+#autoplot(fc)
 ```
 
 ```{r elecdemand5, cache=TRUE, echo=TRUE}
-checkresiduals(fc)
+#checkresiduals(fc)
 ```
 
 ##Forecasting counts

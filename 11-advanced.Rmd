@@ -40,14 +40,14 @@ for $k=1,2,\dots$. The `fourier` function can generate these for you.
 We will fit a dynamic regression model with an ARMA error structure. The total number of Fourier terms for each seasonal period have been chosen to minimize the AICc. We will use a log transformation (`lambda=0`) to ensure the forecasts and prediction intervals remain positive.
 
 ```{r callsharmonics, echo=TRUE, cache=TRUE}
-fit <- auto.arima(calls, seasonal=FALSE, lambda=0,
-         xreg=fourier(calls, K=c(30,30)))
-fc <- forecast(fit, xreg=fourier(calls, K=c(30,30), h=2*169))
-autoplot(fc, include=5*169) +
-  ylab("Call volume") + xlab("Weeks")
+#fit <- auto.arima(calls, seasonal=FALSE, lambda=0,
+#         xreg=fourier(calls, K=c(10,10)))
+#fc <- forecast(fit, xreg=fourier(calls, K=c(10,10), h=2*169))
+#autoplot(fc, include=5*169) +
+#  ylab("Call volume") + xlab("Weeks")
 ```
 
-This is a very large model (containing 120+??=`r length(coef(fit))` parameters).
+This is a very large model (containing 120+??=?? parameters).
 
 ### TBATS models {-}
 

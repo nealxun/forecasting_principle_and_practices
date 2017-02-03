@@ -15,7 +15,8 @@ In this section we present alternative approaches for forecasting time series da
 
 
 
-```{r HierTree, echo=FALSE, fig.cap="A two level hierarchical tree diagram.", message=FALSE, warning=FALSE, cache=TRUE}
+```{r HierTree, out.width="85%", echo=FALSE, fig.cap="A two level hierarchical tree diagram.", message=FALSE, warning=FALSE, cache=TRUE}
+# Not sure how else to do this
 library(data.tree)
 Total <- Node$new("Total")
 A <- Total$AddChild("A")
@@ -37,7 +38,7 @@ plot(Total,center=TRUE)
 
 ```
 
-For any time $t$, the observations of the bottom level series will aggregate to the observations of the series above. This can be effectively represented using matrix notation. We construct an $n\times n_K$ matrix referred to as the "summing" matrix $\boldsymbol{S}$ which dictates how the bottom level series are aggregated, consistent with the hierarchical structure. For the hierarchy in Figure \@ref(fig-9-4-hier) we can write
+For any time $t$, the observations of the bottom level series will aggregate to the observations of the series above. This can be effectively represented using matrix notation. We construct an $n\times n_K$ matrix referred to as the "summing" matrix $\boldsymbol{S}$ which dictates how the bottom level series are aggregated, consistent with the hierarchical structure. For the hierarchy in Figure \@ref(fig:HierTree) we can write
 $$
   \begin{bmatrix}
     y_{t} \\

@@ -14,37 +14,15 @@ The "Total" is disaggregated into 2 series at level 1 and each of these into 3 a
 
 The Total number of series in a hierarchy is given by $n=1+n_1+\dots+n_K$ where $n_i$ is the number of series at level $i$ of the hierarchy. In this case $n=1+2+5=8$.
 
-```{r HierTree, fig.width=6, fig.height=2.5, echo=FALSE, fig.cap="A two level hierarchical tree diagram.", message=FALSE, warning=FALSE, cache=TRUE}
-# Not sure how else to do this
-library(data.tree)
-Total <- Node$new("Total")
-A <- Total$AddChild("A")
-AA <- A$AddChild("AA")
-AB <- A$AddChild("AB")
-AC <- A$AddChild("AC")
-B <- Total$AddChild("B")
-BA <- B$AddChild("BA")
-BB <- B$AddChild("BB")
+```{r HierTree, echo=FALSE, fig.cap="A two level hierarchical tree diagram.", message=FALSE, warning=FALSE, cache=TRUE, fig.show = "hold",fig.height=8,fig.width=12}
 
+g <- igraph::graph_from_literal(Total--A:B, A--AA:AB:AC, B--BA:BB)
+layout <- igraph::layout_as_tree(g, root = "Total")
+igraph::V(g)$color <- c("Thistle", "GreenYellow", "LightBlue",
+  rep("GreenYellow", 3), rep("LightBlue", 2))
+igraph::V(g)$label.cex<-2
 
-SetEdgeStyle(Total, arrowhead = "none")
-SetNodeStyle(Total, style = "filled",fillcolor = "Thistle", 
-             fillcolor = "GreenYellow")
-SetNodeStyle(Total$A, style = "filled", 
-             fillcolor = "GreenYellow")
-SetNodeStyle(Total$B, style = "filled", 
-             fillcolor = "LightBlue")
-plot(Total)
-
-## I am sure we can do much more with igraph but needs work
-#library(igraph)
-#g <- graph_from_literal(Total-A:B, A-AA:AB:AC, B-BA:BB)
-#plot(g)
-#dtree <- dominator_tree(g, root = "Total")
-#layout <- layout_as_tree(dtree$domtree, root = "Total")
-#V(dtree$domtree)$color <- c("Thistle", "GreenYellow", "LightBlue",
-#  rep("GreenYellow", 3), rep("LightBlue", 2))
-#plot(dtree$domtree, layout = layout)
+plot(g, layout = layout,vertex.size=40)
 ```
 
 For any time $t$, the observations at the bottom level of the structure will aggregate to the observations of the series above. For example, 
@@ -112,53 +90,27 @@ Another possibility is that series can be naturally grouped together based on at
 We can also get a similar effect when we combine two hierarchical structures. For example the bicyle manufacturer may disaggregate sales by product and also by geographical location. In this case we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. We can disaggregate by product type and then geographical location but also vice versa. 
 Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the structure hierarchy, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes. 
 
-```{r GroupTree, fig.width=6, fig.height=2.4, echo=FALSE, cache=TRUE, fig.cap="Alternative representations of a two level grouped structure."}
+```{r GroupTree, echo=FALSE, cache=TRUE, fig.cap="Alternative representations of a two level grouped structure.", out.width="49.9%", fig.show = "hold",fig.height=14,fig.width=12}
 
-# I cannot get layout to work
-layout(t(0:1))
+#,fig.width=20
 
-Total <- Node$new("Total")
-A <- Total$AddChild("A")
-AX <- A$AddChild("AX")
-AY <- A$AddChild("AY")
-B <- Total$AddChild("B")
-BX <- B$AddChild("BX")
-BY <- B$AddChild("BY")
+g <- igraph::graph_from_literal(Total--A:B, A--AX:AY, B--BX:BY)
+layout <- igraph::layout_as_tree(g, root = "Total")
+igraph::V(g)$color <- c("Thistle", "GreenYellow", "LightBlue",
+  rep("GreenYellow", 2), rep("LightBlue", 2))
+igraph::V(g)$label.cex<-3.5
+plot(g, layout = layout,vertex.size=44)
 
-SetEdgeStyle(Total, arrowhead = "none")
-SetNodeStyle(Total, style = "filled",fillcolor = "Thistle", 
-             fillcolor = "GreenYellow")
-SetNodeStyle(Total$A, style = "filled", fillcolor = "GreenYellow")
-SetNodeStyle(Total$B, style = "filled", fillcolor = "LightBlue")
-
-Total1 <- Node$new("Total")
-X <- Total1$AddChild("X")
-AX <- X$AddChild("AX")
-BX <- X$AddChild("BX")
-Y <- Total1$AddChild("Y")
-AY <- Y$AddChild("AY")
-BY <- Y$AddChild("BY")
-
-SetEdgeStyle(Total1, arrowhead = "none")
-SetNodeStyle(Total1, style = "filled",fillcolor = "Thistle", 
-             fillcolor = "GreenYellow")
-SetNodeStyle(Total1$X, style = "filled", fillcolor = "GreenYellow")
-SetNodeStyle(Total1$Y, style = "filled", fillcolor = "LightBlue")
-
-plot(Total)
-plot(Total1)
+g2 <- igraph::graph_from_literal(Total--X:Y, X--AX:BX, Y--AY:BY)
+layout2 <- igraph::layout_as_tree(g2, root = "Total")
+igraph::V(g2)$color <- c("Thistle", "GreenYellow", "LightBlue",
+  rep("GreenYellow", 2), rep("LightBlue", 2))
+igraph::V(g2)$label.cex<-3.5
+plot(g2, layout = layout,vertex.size=44)
 
 
-## I am sure we can do much more with igraph but needs work
-#library(igraph)
-#g <- graph_from_literal(Total-A:B, A-AA:AB:AC, B-BA:BB)
-#plot(g)
-#dtree <- dominator_tree(g, root = "Total")
-#layout <- layout_as_tree(dtree$domtree, root = "Total")
-#V(dtree$domtree)$color <- c("Thistle", "GreenYellow", "LightBlue",
-#  rep("GreenYellow", 3), rep("LightBlue", 2))
-#plot(dtree$domtree, layout = layout)
 ```
+
 This example shows that there are alternative aggregation paths for grouped structures. For any time $t$, as with the hierarchical structure, 
 \begin{equation*} 
 y_{t}=\y{AX}{t}+\y{AY}{t}+\y{BX}{t}+\y{BY}{t}.

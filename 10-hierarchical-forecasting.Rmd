@@ -115,7 +115,7 @@ This example shows that there are alternative aggregation paths for grouped stru
 \begin{equation*} 
 y_{t}=\y{AX}{t}+\y{AY}{t}+\y{BX}{t}+\y{BY}{t}.
 \end{equation*} 
-However for level 1 of the grouped structure,
+However, for the first level of the grouped structure,
 \begin{equation} \y{A}{t}=\y{AX}{t}+\y{AY}{t}\quad \quad \y{B}{t}=\y{BX}{t}+\y{BY}{t}
 (\#eq:middlelevelAB)
 \end{equation} but also
@@ -159,13 +159,15 @@ where now the second and third rows of $\bm{S}$ represent \@ref(eq:middlelevelAB
 
 Grouped time series can be thought of as hierarchical time series that do not impose a unique hierarchical structure in the sense that the order by which the series can be grouped is not unique.
 
-We are interested in generating forecasts for each series in hierarchical or grouped structures. We denote as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to observation $T$ and as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.] We refer to these as **base forecasts**. They are independent forecasts generated for the series in the hierarchy using a suitable forecasting method presented in earlier sections of this book. 
+## Base and revised forecasts
 
-These base forecasts are then combined to produce forecasts for the whole hierarchy that aggregate in a manner that is consistent with the structure of the hierarchy. We refer to these as **revised forecasts** and denote them as $\ytilde{j}{h}$ and $\tilde{y}_{h}$ respectively. There are a number of ways of combining base forecasts in order to obtain revised forecasts. The following sections discuss some of the possible combining approaches that can be used for forecasting time series data that possess hierarchical or grouped structures.
+We are interested in generating forecasts for each series belonging to a hierarchical or a grouped structure. We denote as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to observation $T$ and as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.] We refer to these as *base forecasts*. They are independent forecasts generated for the a series in the hierarchical or grouped  structure using a suitable forecasting method presented in earlier sections of this book.
+
+These base forecasts are then combined to produce forecasts for all the series that aggregate in a manner that is consistent with the hierarchical or grouped structure. We refer to these as *revised forecasts* and denote them as $\ytilde{j}{h}$ and $\tilde{y}_{h}$ respectively. There are a number of ways of combining base forecasts in order to obtain revised forecasts. The following sections discuss some of the possible combining approaches that can be used for forecasting time series data that possess hierarchical or grouped structures.
 
 ## The bottom-up approach 
 
-A commonly applied method for hierarchical forecasting is the bottom-up approach. This approach involves first generating independent base forecasts for each series at the bottom level of the hierarchy and then aggregating these upwards to produce forecasts for the whole hierarchy.
+A commonly applied method is the bottom-up approach. This approach involves first generating independent base forecasts for each series at the bottom level and then aggregating these upwards to produce forecasts for all the series in the structure.
 
 For example, for the hierarchy of Figure \@ref(fig:HierTree) we generate $h$-step-ahead base forecasts for each of the bottom level series: $$\yhat{AA}{h},~~\yhat{AB}{h},~~\yhat{AC}{h},~~ \yhat{BA}{h}~~\text{and}~~\yhat{BB}{h}.$$
 

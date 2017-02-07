@@ -1,6 +1,6 @@
 #Forecasting hierarchical or grouped time series {#ch-hierarchical}
 
-*Warning: this is a more advanced section and assumes knowledge of matrix algebra.*
+*Warning: this is a more advanced section and assumes knowledge of some basic matrix algebra. We have however tried to simplify and explain in as much as detail as possible all the notation used.*
 
 ## Hierarchical time series 
 
@@ -167,26 +167,27 @@ These base forecasts are then combined to produce forecasts for all the series t
 
 ## The bottom-up approach 
 
-A commonly applied method is the bottom-up approach. This approach involves first generating independent base forecasts for each series at the bottom level and then aggregating these upwards to produce forecasts for all the series in the structure.
+A commonly applied method is the bottom-up approach. This approach involves first generating independent base forecasts for each series at the bottom level. Then aggregating these upwards to produce forecasts for all the series in the structure.
 
-For example, for the hierarchy of Figure \@ref(fig:HierTree) we generate $h$-step-ahead base forecasts for each of the bottom level series: $$\yhat{AA}{h},~~\yhat{AB}{h},~~\yhat{AC}{h},~~ \yhat{BA}{h}~~\text{and}~~\yhat{BB}{h}.$$
+For example, for the hierarchy of Figure \@ref(fig:HierTree) we first generate $h$-step-ahead base forecasts for each of the bottom level series: $$\yhat{AA}{h},~~\yhat{AB}{h},~~\yhat{AC}{h},~~ \yhat{BA}{h}~~\text{and}~~\yhat{BB}{h}.$$
 
-Aggregating these up the hierarchy we get $h$-step-ahead forecasts for the rest of the series: $$\tilde{y}_{h}=\yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}+\yhat{BA}{h}+\yhat{BB}{h},~~~\ytilde{A}{h}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}~~~\text{and}~~~\ytilde{B}{h}= \yhat{BA}{h}+\yhat{BB}{h}.$$ 
+Aggregating these up the hierarchy we get $h$-step-ahead revised forecasts for the rest of the series: $$\tilde{y}_{h}=\yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}+\yhat{BA}{h}+\yhat{BB}{h},~~~\ytilde{A}{h}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}~~~\text{and}~~~\ytilde{B}{h}= \yhat{BA}{h}+\yhat{BB}{h}.$$ 
 As we did with the data itself we can employ the summing matrix and write
 $$
   \tilde{\boldsymbol{y}}_{h}=\boldsymbol{S}\hat{\boldsymbol{y}}_{K,h}.
 $$ 
 The greatest advantage of this approach is that we are forecastig at the bottom level of a structure andf therefore no information is lost due to aggregation. On the other hand bottom level data can be quite noisy and more challenging to model and forecast. 
 
-`Note that for the bottom-up approach the revised forecasts for the bottom level series are equal to the base forecasts.`
+Note that for the bottom-up approach the revised forecasts for the bottom level series are equal to the base forecasts, i.e., $\tilde{\bm{y}}_{K,t}=\hat{\bm{y}}_{K,t}$.
 
 ## Top-down approaches 
 
-Top-down approaches involve first generating forecasts for the "Total" series $y_t$ on the top of the hierarchy and then disaggregating these downwards. We let $p_1,\ldots,p_{n_K}$ be a set of proportions which dictate how the forecasts of the "Total" series are to be distributed for each series at the bottom level of the hierarchy. For example for the hierarchy of Figure \@ref(fig:HierTree) $$\yhat{AA}{t}=p_1\hat{y}_t,~~~\yhat{AB}{t}=p_2\hat{y}_t,~~~\yhat{AC}{t}=p_3\hat{y}_t,~~~\yhat{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\yhat{BB}{t}=p_5\hat{y}_t.$$
+Top-down approaches involve first generating forecasts for the "Total" series $y_t$ on the top of the hierarchy and then disaggregating these downwards. We let $p_1,\ldots,p_{n_K}$ be a set of proportions which dictate how the base forecasts of the "Total" series are to be distributed to revised forecasts for each series at the bottom level of the hierarchy. For example for the hierarchy of Figure \@ref(fig:HierTree) $$\ytilde{AA}{t}=p_1\hat{y}_t,~~~\ytilde{AB}{t}=p_2\hat{y}_t,~~~\ytilde{AC}{t}=p_3\hat{y}_t,~~~\ytilde{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\ytilde{BB}{t}=p_5\hat{y}_t.$$
 Using matrix notation we can stack the set of proportions in a $n_K$-dimensional column vector $\bm{p}=(p_1,\ldots,p_{n_K})'$ and write
-$$\hat{\bm{y}}_{K,t}=\bm{p}\hat{y}_t$$
-Once the bottom level forecasts have been generated we can use the summing matrix to generate forecasts for the rest of the series in the hierarchy. In general for top-down approaches, 
-$$\hat{\bm{y}}_h=\bm{S}\bm{p}\hat{y}_t.$$
+$$\tilde{\bm{y}}_{K,t}=\bm{p}\hat{y}_t$$
+Once the bottom level revised forecasts have been generated we can aggregate these up the hierarchy to generate revised forecasts for the rest of the series. Using the summing matrix we can in general write for top-down approaches, 
+$$\tilde{\bm{y}}_h=\bm{S}\bm{p}\hat{y}_t.$$
+Note that for all top-down approaches the top level revised forecasts are equal to the top level base forecasts, i.e., $\tilde{y}_{h}=\hat{y}_{h}$.
 
 The most common top-down approaches specify proportions based on the historical proportions of the data. The two most common versions follow.
 
@@ -222,7 +223,7 @@ $$
 $$
 for $j=1,2,\dots,n_K$. These forecasted proportions disaggregate the $h$-step-ahead base forecast of the "Total" series to $h$-step-ahead revised forecasts of the bottom level series. $\hat{y}_{j,h}^{(\ell)}$ is the $h$-step-ahead base forecast of the series that corresponds to the node which is $\ell$ levels above $j$. $\hat{S}_{j,h}^{(\ell)}$ is the sum of the $h$-step-ahead base forecasts below the node that is $\ell$ levels above node $j$ and are directly connected to that node.
 
-We will use the hierarchy of Figure \@ref(fig-9-4-hier) to explain this notation and to demonstrate how this general rule is reached. Assume we have generated independent base forecasts for each series in the hierarchy. Remember that for the top level "Total" series, $\tilde{y}_{h}=\hat{y}_{h}$. Here are some example using the above notation:
+We will use the hierarchy of Figure \@ref(fig:HierTree) to explain this notation and to demonstrate how this general rule is reached. Assume we have generated independent base forecasts for each series in the hierarchy. Remember that for the top level "Total" series, $\tilde{y}_{h}=\hat{y}_{h}$. Here are some example using the above notation:
 
   * $\hat{y}_{\text{A},h}^{(1)}=\hat{y}_{\text{B},h}^{(1)}= \tilde{y}_{h}$
   * $\hat{y}_{\text{BA},h}^{(1)}=\hat{y}_{\text{BB},h}^{(1)}= \hat{y}_{\text{B},h}$
@@ -277,7 +278,7 @@ Assuming that the errors approximately satisfy the hierarchical aggregation stru
 
 Hierarchical time series forecasting is implemented in the **hts** package in R.
 
-The `hts` function creates a hierarchical time series. The required inputs are the bottom level time series obsverations, and information about the hierarchical structure. For example, the structure shown in Figure \@ref(fig-9-4-hier) is specified as follows:
+The `hts` function creates a hierarchical time series. The required inputs are the bottom level time series obsverations, and information about the hierarchical structure. For example, the structure shown in Figure \@ref(fig:HierTree) is specified as follows:
 
 ```
 # bts is a time series matrix containing the bottom level series 

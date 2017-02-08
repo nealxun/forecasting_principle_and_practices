@@ -209,29 +209,27 @@ The greatest attribute of such top-down approaches is their simplicity to apply.
 
 In the example on forecasting Australian domestic tourism demand that follows, the data are highly seasonal. The seasonal pattern of tourist arrivals may vary across series depending on the tourism destination. An area with beaches as its main tourist attractions will have a very different seasonal pattern to an area with skiing as its main tourist attraction. This will not be captured by disaggregating the Total of these destinations based on historical proportions. Finally, with these methods the disaggregation of the "Total" series forecasts depends on historical and static proportions, and these proportions may be distorted by trends in the data.
 
-### Forecasted proportions {-}
+### Forecast proportions {-}
 
-An alternative approach that improves on the historical and static nature of the proportions specified above is to use forecasted proportions.
+An alternative approach that improves on the historical and static nature of the proportions specified above is to use forecast proportions.
 
-To demonstrate the intuition of this method, consider 
+To demonstrate the intuition of this method, consider a one level hierarchy. We first generate $h$-step-ahead base forecasts for all the series independently. At level 1 we calculate the proportion of each $h$-step-ahead base forecast to the aggregate of all the $h$-step-ahead base forecasts at this level. We refer to these as the forecast proportions and we use these to disaggregate the top level forecast and generate revised forecasts for the whole of the hierarchy.
 
-a one level hierarchy. We first generate $h$-step-ahead base forecasts for all the series independently. At level 1 we calculate the proportion of each $h$-step-ahead base forecast to the aggregate of all the $h$-step-ahead base forecasts at this level. We refer to these as the forecasted proportions and we use these to disaggregate the top level forecast and generate revised forecasts for the whole of the hierarchy.
-
-For a $K$-level hierarchy this process is repeated for each node going from the top to the very bottom level. Applying this process leads to the following general rule for obtaining the forecasted proportions
+For a $K$-level hierarchy this process is repeated for each node going from the top to the very bottom level. Applying this process leads to the following general rule for obtaining the forecast proportions
 $$
   p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}
 $$
-for $j=1,2,\dots,n_K$. These forecasted proportions disaggregate the $h$-step-ahead base forecast of the "Total" series to $h$-step-ahead revised forecasts of the bottom level series. $\hat{y}_{j,h}^{(\ell)}$ is the $h$-step-ahead base forecast of the series that corresponds to the node which is $\ell$ levels above $j$. $\hat{S}_{j,h}^{(\ell)}$ is the sum of the $h$-step-ahead base forecasts below the node that is $\ell$ levels above node $j$ and are directly connected to that node.
+for $j=1,2,\dots,n_K$. These forecast proportions disaggregate the $h$-step-ahead base forecast of the "Total" series to $h$-step-ahead revised forecasts of the bottom level series. $\hat{y}_{j,h}^{(\ell)}$ is the $h$-step-ahead base forecast of the series that corresponds to the node which is $\ell$ levels above $j$. $\hat{S}_{j,h}^{(\ell)}$ is the sum of the $h$-step-ahead base forecasts below the node that is $\ell$ levels above node $j$ and are directly connected to that node.
 
-We will use the hierarchy of Figure \@ref(fig:HierTree) to explain this notation and to demonstrate how this general rule is reached. Assume we have generated independent base forecasts for each series in the hierarchy. Remember that for the top level "Total" series, $\tilde{y}_{h}=\hat{y}_{h}$. Here are some example using the above notation:
+We will use the hierarchy of Figure \@ref(fig:HierTree) to explain this notation and to demonstrate how this general rule is reached. Assume we have generated independent base forecasts for each series in the hierarchy. Remember that for the top level "Total" series, $\tilde{y}_{h}=\hat{y}_{h}$, for any top-down approach. Here are some examples using the above notation:
 
-  * $\hat{y}_{\text{A},h}^{(1)}=\hat{y}_{\text{B},h}^{(1)}= \tilde{y}_{h}$
-  * $\hat{y}_{\text{BA},h}^{(1)}=\hat{y}_{\text{BB},h}^{(1)}= \hat{y}_{\text{B},h}$
-  * $\hat{y}_{\text{AA},h}^{(2)}=\hat{y}_{\text{AB},h}^{(2)}= \hat{y}_{\text{AC},h}^{(2)}=\hat{y}_{\text{BA},h}^{(2)}= \hat{y}_{\text{BB},h}^{(2)}= \tilde{y}_{h}$
-  * $\Shat{BA}{h}{1} = \Shat{BB}{h}{1}= \yhat{BA}{h}+\yhat{BB}{h}$
-  * $\Shat{BA}{h}{2} = \Shat{BB}{h}{2}= \Shat{A}{h}{1} = \Shat{B}{h}{1}= \hat{S}_{h}= \yhat{A}{h}+\yhat{B}{h}$
+  * $\hat{y}_{\text{A},h}^{(1)}=\hat{y}_{\text{B},h}^{(1)}=\hat{y}_{h}= \tilde{y}_{h}$
+  * $\hat{y}_{\text{AA},h}^{(1)}=\hat{y}_{\text{AB},h}^{(1)}=\hat{y}_{\text{AC},h}^{(1)}= \hat{y}_{\text{A},h}$
+  * $\hat{y}_{\text{AA},h}^{(2)}=\hat{y}_{\text{AB},h}^{(2)}= \hat{y}_{\text{AC},h}^{(2)}=\hat{y}_{\text{BA},h}^{(2)}= \hat{y}_{\text{BB},h}^{(2)}=\hat{y}_{h}= \tilde{y}_{h}$
+  * $\Shat{AA}{h}{1} = \Shat{AB}{h}{1}= \Shat{AC}{h}{1}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}$
+  * $\Shat{AA}{h}{2} = \Shat{AB}{h}{2}= \Shat{AC}{h}{2}= \Shat{A}{h}{1} = \Shat{B}{h}{1}= \hat{S}_{h}= \yhat{A}{h}+\yhat{B}{h}$
 
-Moving down the farthest left branch of the hierarchy the final revised forecasts are
+Moving down the farthest left branch of the hierarchy the revised forecasts are given by
 $$
   \ytilde{A}{h} = \Bigg(\frac{\yhat{A}{h}}{\Shat{A}{h}{1}}\Bigg) \tilde{y}_{h} =
   \Bigg(\frac{\yhat{AA}{h}^{(1)}}{\Shat{AA}{h}{2}}\Bigg) \tilde{y}_{h}
@@ -245,7 +243,7 @@ Consequently,
 $$
   p_1=\Bigg(\frac{\yhat{AA}{h}}{\Shat{AA}{h}{1}}\Bigg) \Bigg(\frac{\yhat{AA}{h}^{(1)}}{\Shat{AA}{h}{2}}\Bigg)
 $$
-The other proportions can be similarly obtained. The greatest disadvantage of the top-down forecasted proportions approach, which is a disadvantage of any top-down approach, is that they do not produce unbiased revised forecasts even if the base forecasts are unbiased.
+The other proportions can be similarly obtained. The greatest disadvantage of the top-down forecast proportions approach, which is a disadvantage of any top-down approach, is that they do not produce unbiased revised forecasts even if the base forecasts are unbiased.
 
 
 `Note that for top-down approaches the top level revised forecasts are equal to the top level base forecasts, i.e., $\tilde{y}_{h}=\hat{y}_{h}$.`

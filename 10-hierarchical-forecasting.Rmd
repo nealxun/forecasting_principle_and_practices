@@ -249,9 +249,13 @@ The other proportions can be similarly obtained. The greatest disadvantage of th
 
 The middle-out approach combines bottom-up and top-down approaches. First the "middle level" is chosen and base forecasts are generated for all the series of this level and the ones below. For the series above the middle level, revised forecasts are generated using the bottom-up approach by aggregating the "middle-level" base forecasts upwards. For the series below the "middle level", revised forecasts are generated using a top-down approach by disaggregating the "middle level" base forecasts downwards.
 
-## The optimal combination approach 
+## Optimal combination forecasts  
 
-This approach involves first generating independent base forecast for each series in the hierarchy. As these base forecasts are independently generated they will not be "aggregate consistent" (i.e., they will not add up according to the hierarchical structure). The optimal combination approach optimally combines the independent base forecasts and generates a set of revised forecasts that are as close as possible to the univariate forecasts but also aggregate consistently with the hierarchical structure.
+
+This approach involves first generating independent base forecast for each series in the hierarchy. As these base forecasts are independently generated they will not be "aggregate consistent" (i.e., they will not add up according to the hierarchical structure). 
+
+
+The optimal combination approach optimally combines the independent base forecasts and generates a set of revised forecasts that are as close as possible to the univariate forecasts but also aggregate consistently with the hierarchical structure.
 
 Unlike any other existing method, this approach uses all the information available within a hierarchy. It allows for correlations and interactions between series at each level of the hierarchy, it accounts for ad hoc adjustments of forecasts at any level, and, provided the base forecasts are unbiased, it produces unbiased revised forecasts.
 

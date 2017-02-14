@@ -253,7 +253,7 @@ The middle-out approach combines bottom-up and top-down approaches. First the "m
 
 ## Optimal combination forecasts  
 
-Assume that $\bm{\hat{y}}_h$ is a set of $h$-step ahead base forecasts generated independently for each series in a structure and stacked the same way as the data. For example for the hierarchy of Figure \@ref(fig:HierTree)
+Denote as $\bm{\hat{y}}_h$ a set of $h$-step ahead base forecasts generated independently for each series in a structure and stacked the same way as the data. For example for the hierarchy of Figure \@ref(fig:HierTree)
 $$
 \bm{\hat{y}}_h=\begin{bmatrix}
     \hat{y}_h \\
@@ -267,13 +267,13 @@ $$
   \end{bmatrix}.
 $$
 
-In general all approaches for forecasting hierarchical or grouped strcutures can be represented by 
+Then in general all forecasting approaches for either hierarchical or grouped strcutures can be represented as 
 \begin{equation}
   \bm{\tilde{y}}_h=\bm{S}\bm{P}\bm{\hat{y}}_h
 \end{equation}
 where reading from right to left, $\bm{\hat{y}}_h$ is the set of independent base $h$-step ahead forecasts as defined above, $\bm{P}$ is a matrix that projects the independent base forecasts into the bottom level, the summing matrix $\bm{S}$ adds these up the structure to produce a set of revised forecasts $\bm{\tilde{y}}_h$.
 
-The $\bm{P}$ matrix is defined according to the approach implemented. For example if the bottom-up approach is used to forecast the hierarchy of Figure \@ref(fig:HierTree)
+The $\bm{P}$ matrix is defined according to the approach implemented. For example if the bottom-up approach is used to forecast the hierarchy of Figure \@ref(fig:HierTree),
 $$\bm{P}=
   \begin{bmatrix}
     0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
@@ -298,14 +298,22 @@ so that the first column includes the set of proportions that distribute the ind
 
 All the approaches we have considered so far in this chapter involve choosing a particular of disaggregation, generating base forecasts for this level, and then combining these to generate revised forecasts for the whole structure. The above examples clearly reflect this.
 
-
 In this section we inctroduce an approach that instead involves generating independent base forecast for each series in the structure. As these base forecasts are independently generated they will not add up according to the hierarchical or grouped structure i.e., they will not be "aggregate consistent". These are then combined to generate a set of revised forecasts that are as close as possible to the univariate independent base forecasts but also aggregate consistently with the structure.
 
-Unlike any other existing approach, this approach uses all the information available within a hierarchical or a grouped structure. This is important as particular aggregation levels or grousp in a strcture may reveal information, trends blah blah blah 
+Unlike any other existing approach, this approach uses all the information available within a hierarchical or a grouped structure. This is important as particular aggregation levels or groupings may reveal attributes of the data that are of interest to the user and may not be revealed or easily identifiable at other levels. For example  differences between genders in a grouped structure will be smoothed out at the very top level, due to aggregation, but may make the data very noisy at the very bottom level, due to disaggregation. 
 
-It allows for correlations and interactions between series at each level of the hierarchy, it accounts for ad hoc adjustments of forecasts at any level, and, provided the base forecasts are unbiased, it produces unbiased revised forecasts.
+`TODO: expand on this` Optimally combining forecast allows for correlations and interactions between series at each level of the hierarchy, it accounts for ad hoc adjustments of forecasts at any level, and, provided the base forecasts are unbiased, it produces revised forecasts which are unbiased if the base forecasts are also unbiased.
 
-The general idea is derived from the representation of the $h$-step-ahead base forecasts for the whole of the hierarchy by the linear regression model. We write
+In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed to give a good flavour of the approach. These unfortunately complicate the presentation of the method however following these through the end result is shown in Equations \@ref() to \@ref() shown below. For further details and discussion please refer to `WickEtAl2015`. 
+
+The general idea is derived from wanting to find a $\bm{P}$ matrix, as defined above, that minimises the forecast error of the revised forecasts from forecasting each time series in a hierarchial or grouped structure. The forecast error is defined the usual way as in Section \@ref(Section 3.4) but using vector notation,  $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$
+which are the forecast errors after having produced revised forecasts across the whole structure, stacked in the same way as the data. 
+
+It can be easily shown that if a set of independent base forecasts $\bm{\hat{y}}_h$ are unbiased, which are the usual forecasts generated in all the previous chapters of this book, then for a $\bm{P}$ matrix such that $\bm{S}\bm{P}\bm{S}=\bm{P}$ the revised forecasts $\bm{\tilde{y}}_h$ are also unbiased.
+
+
+
+the representation of the $h$-step-ahead base forecasts for the whole of the hierarchy by the linear regression model. We write
 $$
   \label{eqn:regression}
   \hat{\boldsymbol{y}}_h= \boldsymbol{S}\boldsymbol{\beta}_{h}+\boldsymbol{\varepsilon}_{h}

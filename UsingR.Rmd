@@ -1,0 +1,30 @@
+# Using R {-}
+
+This book uses R and is designed to be used with [R](http://www.r-project.org/). R is free, available on almost every operating system, and there are thousands of add-on packages to do almost anything you could ever want to do. We recommend you use [R](http://www.r-project.org/) with [RStudio](http://rstudio.org/).
+
+### Installing R and RStudio {-}
+
+  1. [Download and install R.](http://cran.r-project.org/)
+  2. [Download and install RStudio.](https://www.rstudio.com/products/rstudio/download/#download)
+  3. Run RStudio. On the "Packages" tab, click on "Install packages" and install the package `fpp2` (make sure "install dependencies" is checked).
+
+That's it! You should now be ready to go.
+
+### R examples in this book {-}
+
+We provide R code for most examples in shaded boxes like this:
+
+```r
+autoplot(a10)
+h02 %>% ets %>% forecast %>% summary
+```
+
+These examples assume that you have the `fpp2` package loaded. So you should use the command `library(fpp2)` before you try any examples provided here. (This needs to be done at the start of every R session.) Sometimes we also assume that the R code that appears earlier in the same section of the book has also been run; so it is best to work through the R code in the order provided within each section.
+
+### Getting started with R {-}
+
+If you have never previously used R, please first do the free online course ["Introduction to R"](https://www.datacamp.com/courses/free-introduction-to-r) from [DataCamp](http://datacamp.com).
+
+While this course does not cover time series or forecasting, it will get you used to the basics of the R language. Other [DataCamp courses for R](https://www.datacamp.com/courses/tech:r) may also be useful. The [Coursera R Programming](https://www.coursera.org/learn/r-programming) course is also highly recommended.
+
+You will learn how to use R for forecasting using the exercises in this book.

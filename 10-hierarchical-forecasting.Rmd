@@ -4,7 +4,7 @@
 
 ## Hierarchical time series 
 
-Time series can often be naturally disaggregated in a hierarchical structure using attributes such as geographical location, product type, etc. For example, the Total number of bicycles sold by a cycling warehouse can be disaggregated into a hierarchy of bicycle types. Such a warehouse will sell road bikes, mountain bikes, children bikes or hybrids. Each of these can be disaggregated into finer categories. Children’s bikes can be divided into balance bikes for children under 4 years old, single speed bikes for children between 4 and 6 and bikes for children over the age of 6. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such disaggregation imposes a hierarchical structure. We refer to these as *hierarchical time series*.
+Time series can often be naturally disaggregated in a hierarchical structure using attributes such as geographical location, product type, etc. For example, the total number of bicycles sold by a cycling warehouse can be disaggregated into a hierarchy of bicycle types. Such a warehouse will sell road bikes, mountain bikes, children bikes or hybrids. Each of these can be disaggregated into finer categories. Children’s bikes can be divided into balance bikes for children under 4 years old, single speed bikes for children between 4 and 6 and bikes for children over the age of 6. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such disaggregation imposes a hierarchical structure. We refer to these as *hierarchical time series*.
 
 To take another example, a manufacturing company may track sales by country, and within each country by region, and within each region by sales outlet. Such geographical structures are commonly found in business, economics and other areas. Again, this is a hierarchical structure, and the complete collection of sales data can be thought of as hierarchical time series. An important feature of hierarchical time series is that the they have a uinique structure with which they disaggregate or aggregate.
 
@@ -271,7 +271,7 @@ Then in general all forecasting approaches for either hierarchical or grouped st
 \begin{equation}
   \bm{\tilde{y}}_h=\bm{S}\bm{P}\bm{\hat{y}}_h
 \end{equation}
-where reading from right to left, $\bm{\hat{y}}_h$ is the set of independent base $h$-step ahead forecasts as defined above, $\bm{P}$ is a matrix that projects the independent base forecasts into the bottom level, the summing matrix $\bm{S}$ adds these up the structure to produce a set of revised forecasts $\bm{\tilde{y}}_h$.
+where reading from right to left, $\bm{\hat{y}}_h$ is the set of independent $h$-step ahead base forecasts as defined above, $\bm{P}$ is a matrix that projects the independent base forecasts into the bottom level, the summing matrix $\bm{S}$ sums these up the aggregation structure to produce a set of revised forecasts $\bm{\tilde{y}}_h$.
 
 The $\bm{P}$ matrix is defined according to the approach implemented. For example if the bottom-up approach is used to forecast the hierarchy of Figure \@ref(fig:HierTree),
 $$\bm{P}=
@@ -283,7 +283,7 @@ $$\bm{P}=
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
   \end{bmatrix}.
   $$
-Notice that the first three columns zero out the independent base forecasts for the series above the bottom level and the $n_K$-dimensional identity matrix picks only the independent base forecasts of the bottom level to then be summed up the hierarchy by the $\bm{S}$ matrix.
+Notice that the $\bm{P}$ comprises two partitions. The first three columns which zero out the independent base forecasts for the series above the bottom level and the $n_K$-dimensional identity matrix which picks only the independent base forecasts of the bottom level, to then be summed up the hierarchy by the $\bm{S}$ matrix.
 
 If any of the top-down approaches were used then $$\bm{P}=
   \begin{bmatrix}
@@ -294,19 +294,22 @@ If any of the top-down approaches were used then $$\bm{P}=
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
   \end{bmatrix},
   $$
-so that the first column includes the set of proportions that distribute the independent base forecasts of the top level to the bottom level and the rest of the columns zero out the independent base forecast below the very top level of aggregation. For the middle out approach the $\bm{P}$ matrix will be a combination of the above two; using a set of proportions the independent base forecats of some pre-chosen level will be dissagregated to the bottom level to then be summed up the hierarchy with the summing matrix with all other independent base forecasts being zeroed out.
+so that the first column includes the set of proportions that distribute the independent base forecasts of the top level to the bottom level and the rest of the columns zero out the independent base forecasts below the very top level of aggregation. 
 
-All the approaches we have considered so far in this chapter involve choosing a particular of disaggregation, generating base forecasts for this level, and then combining these to generate revised forecasts for the whole structure. The above examples clearly reflect this.
+For a middle out approach the $\bm{P}$ matrix will be a combination of the above two. Using a set of proportions the independent base forecats of some pre-chosen level will be dissagregated to the bottom level to then be summed up the hierarchy with the summing matrix, with all other independent base forecasts being zeroed out.
 
-In this section we inctroduce an approach that instead involves generating independent base forecast for each series in the structure. As these base forecasts are independently generated they will not add up according to the hierarchical or grouped structure i.e., they will not be "aggregate consistent". These are then combined to generate a set of revised forecasts that are as close as possible to the univariate independent base forecasts but also aggregate consistently with the structure.
+All the approaches we have so far considered in this chapter involve choosing a particular of disaggregation, generating independent base forecasts for this level, and then either aggregating these or disaggregating these to generate revised forecasts for the whole structure. The above examples clearly reflect this through the $\bm{P}$ matrix.
 
-Unlike any other existing approach, this approach uses all the information available within a hierarchical or a grouped structure. This is important as particular aggregation levels or groupings may reveal attributes of the data that are of interest to the user and may not be revealed or easily identifiable at other levels. For example  differences between genders in a grouped structure will be smoothed out at the very top level, due to aggregation, but may make the data very noisy at the very bottom level, due to disaggregation. 
+In this section we inctroduce an approach that instead involves generating independent base forecast for each series. As these base forecasts are independently generated they will not add up according to the hierarchical or grouped structure i.e., they will not be "aggregate consistent". These are then combined to generate a set of revised forecasts that are as close as possible to the univariate independent base forecasts but also aggregate consistently with the structure.
 
-`TODO: expand on this` Optimally combining forecast allows for correlations and interactions between series at each level of the hierarchy, it accounts for ad hoc adjustments of forecasts at any level, and, provided the base forecasts are unbiased, it produces revised forecasts which are unbiased if the base forecasts are also unbiased.
+Unlike any other existing approach, this approach uses all the information available within a hierarchical or a grouped structure. This is important as particular aggregation levels or groupings may reveal features of the data that are of interest to the user and are important to be modelled. These features may be completely hidden or not easily identifiable at other levels. For example, consider a hierarchical structure reflecting the geographical division of a country into states, regions, down to a very fine grid of statistical local areas. There are significant differences between the seasonal patterns in the number of tourists visiting a state or a region that mainly caters for summer holidays versus a state or a region that caters for winter activities. These differences will be smoothed out at the country level due to aggregation and on the other hand it may be extremely challenging to identify at the very bottom level of a stastical local area due to noise. Another example for a grouped structure is the difference in the sales of clothes between genders. Such differences will be completely smoothed out at the very top level of aggregation considering total sales, or may be very challenging to idenitfy due to noise at the very bottom level.
 
-In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed to give a good flavour of the approach. These unfortunately complicate the presentation of the method however following these through the end result is shown in Equations \@ref() to \@ref() shown below. For further details and discussion please refer to `WickEtAl2015`. 
+Furthermore optimally combining forecast allows for correlations and interactions between series at each level of the hierarchy, it accounts for ad hoc adjustments of forecasts at any level, and, provided that the base independent forecasts are unbiased, it produces revised forecasts which are also unbiased.
 
-The general idea is derived from wanting to find a $\bm{P}$ matrix, as defined above, that minimises the forecast error of the revised forecasts from forecasting each time series in a hierarchial or grouped structure. The forecast error is defined the usual way as in Section \@ref(Section 3.4) but using vector notation,  $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$
+
+In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed to give a good flavour of the approach. These unfortunately complicate the presentation of the method. However, following these through the end result is shown in Equations \@ref() to \@ref() shown below. For further details and discussion please refer to `WickEtAl2015`. 
+
+The general idea is derived from wanting to find a $\bm{P}$ matrix, as defined above, i.e., a matrix that projects a set of independent base forecasts into bottom level forecasts, that minimises the forecast error of the revised forecasts from forecasting each time series in a hierarchial or grouped structure. The forecast error is defined the usual way as in Section \@ref(Section 3.4) but using vector notation,  $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$
 which are the forecast errors after having produced revised forecasts across the whole structure, stacked in the same way as the data. 
 
 It can be easily shown that if a set of independent base forecasts $\bm{\hat{y}}_h$ are unbiased, which are the usual forecasts generated in all the previous chapters of this book, then for a $\bm{P}$ matrix such that $\bm{S}\bm{P}\bm{S}=\bm{P}$ the revised forecasts $\bm{\tilde{y}}_h$ are also unbiased.

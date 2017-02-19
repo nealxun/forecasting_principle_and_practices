@@ -251,7 +251,7 @@ The other proportions can be similarly obtained. The greatest disadvantage of th
 
 The middle-out approach combines bottom-up and top-down approaches. First the "middle level" is chosen and base forecasts are generated for all the series of this level and the ones below. For the series above the middle level, revised forecasts are generated using the bottom-up approach by aggregating the "middle-level" base forecasts upwards. For the series below the "middle level", revised forecasts are generated using a top-down approach by disaggregating the "middle level" base forecasts downwards.
 
-## Optimal combination forecasts  
+## Optimal combination forecasts
 
 Denote as $\bm{\hat{y}}_h$ a set of $h$-step ahead base forecasts generated independently for each series in a structure and stacked the same way as the data. For example for the hierarchy of Figure \@ref(fig:HierTree)
 $$
@@ -270,6 +270,7 @@ $$
 Then in general all forecasting approaches for either hierarchical or grouped strcutures can be represented as 
 \begin{equation}
   \bm{\tilde{y}}_h=\bm{S}\bm{P}\bm{\hat{y}}_h
+  (\#eq:SP)
 \end{equation}
 where reading from right to left, $\bm{\hat{y}}_h$ is the set of independent $h$-step ahead base forecasts as defined above, $\bm{P}$ is a matrix that projects the independent base forecasts into the bottom level, the summing matrix $\bm{S}$ sums these up the aggregation structure to produce a set of revised forecasts $\bm{\tilde{y}}_h$.
 
@@ -298,45 +299,39 @@ so that the first column includes the set of proportions that distribute the ind
 
 For a middle out approach the $\bm{P}$ matrix will be a combination of the above two. Using a set of proportions the independent base forecats of some pre-chosen level will be dissagregated to the bottom level to then be summed up the hierarchy with the summing matrix, with all other independent base forecasts being zeroed out.
 
-All the approaches we have so far considered in this chapter involve choosing a particular level of disaggregation, generating independent base forecasts for this level, and then either aggregating or disaggregating these base forecasts to generate revised forecasts for the whole structure. The above examples clearly reflect this through the $\bm{P}$ matrix.
+All the approaches we have considered so far in this chapter involve choosing a particular level in the aggregation structure, generating independent base forecasts for this level, and then either aggregating up or disaggregating down these base forecasts to generate revised forecasts for the rest of the series. The above examples clearly reflect this through the $\bm{P}$ matrix.
 
-In this section we inctroduce an approach that instead involves generating independent base forecast for each series. As these base forecasts are independently generated they will not add up according to the hierarchical or grouped structure, i.e., they will not be "aggregate consistent". These are then combined to generate a set of revised forecasts that are as close as possible to the univariate independent base forecasts but also aggregate consistently with the structure. The general idea is derived from wanting to find a $\bm{P}$ matrix that minimises the forecast error of the revised forecasts from forecasting each time series in the structure. 
+In this section we inctroduce an approach that instead involves generating independent base forecast for each series. As these base forecasts are independently generated they will not add up according to the hierarchical or grouped structure, i.e., they will not be "aggregate consistent". The base forecasts are then combined to generate a set of revised forecasts that are as close as possible to the base forecasts but also aggregate consistently with the structure.
 
-In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed to give a good flavour of the approach. These unfortunately complicate the presentation. `fix this` However, following these through the end result is shown in Equations \@ref() to \@ref() shown below. For further details and discussion please refer to `WickEtAl2015`. 
-ld for any top-down or bottom-up approach. `set this as an exercise`.
+The general idea is derived from wanting to find a $\bm{P}$ matrix that minimises the forecast error of the revised forecasts from forecasting each time series in the structure. In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed in order to get a good flavour of the approach. These unfortunately complicate the presentation. However following through these steps we get to the specification of $\bm{P}$ in equation \@ref(eq:MinT) which is labelled the **MinT** estimator as it **Min**imises the **T**race of the forecast errors of the revised forecasts across the whole structure. For further details and discussion please refer to @WicEtAl2015.
 
-Let $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$ be the forecast errors after having produced revised forecasts across the whole structure, stacked in the same order as the data. Note that this expression is a generalisation of forecast errors as defined in Section \@ref(Section 3.4) using matrix notation. It can be easily shown through Equation \@ref(eq:1) above that for a set of independent base forecasts that are unbiased, which will be the case for all base forecasts generated using methods introduced in this book, using a $\bm{P}$ matrix such that $\bm{S}\bm{P}\bm{S}=\bm{P}$, generates a set of revised forecasts $\bm{\tilde{y}}_h$ that are also unbiased. Note that this will not ho
-In Lemma of Wick et al it is shown that 
+Let $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$ be the forecast errors after having produced a set of revised forecasts across the whole structure, stacked in the same order as the data. Note that this expression is a generalisation of a forecast error as defined in Section \@ref(accuracy) using matrix notation. It can be easily shown through Equation \@ref(eq:SP) above that for a set of independent base forecasts that are unbiased, which will be the case for all base forecasts generated using methods introduced in this book, using a $\bm{P}$ matrix such that $\bm{S}\bm{P}\bm{S}=\bm{S}$, generates a set of revised forecasts $\bm{\tilde{y}}_h$ that are also unbiased. Note that this will not hold for any top-down or bottom-up approach.^[TODO: See Exercise 10.1 - possibly set this as an exercise.]
+
+@WicEtAl2015 show in Lemma 1 that 
 \begin{equation*}
 \text{Var}[\bm{y}_{T+h}-\tilde{\bm{y}}_h]=\bm{S}\bm{P}\bm{W}_h\bm{P}'\bm{S}'
 \end{equation*}
-where $\bm{W}_h=E[(\bm{y}_{T+h}-\hat{\bm{y}}_h)(\bm{y}_{T+h}-\hat{\bm{y}}_h)']$ is the variance-covariance matrix of the $h-$step ahead base forecast errors. Then in Theorem 1 the optimal matrix $\bm{P}$ that minimises the $tr[\bm{S}\bm{P}\bm{W}_h\bm{P}'\bm{S}']$   such that $\bm{S}\bm{P}\bm{S}=\bm{P}$ is given by
+where $\bm{W}_h=E[(\bm{y}_{T+h}-\hat{\bm{y}}_h)(\bm{y}_{T+h}-\hat{\bm{y}}_h)']$ is the variance-covariance matrix of the $h-$step ahead base forecast errors. This is a very important result as it shows that the forecast error variance of the revised forecasts is a function of the error variance of base forecasts $\bm{W}_h$. The objective is to find a matrix $\bm{P}$ that minimises the error variance of the revised forecasts. @WicEtAl2015 show in Theorem 1 that the optimal matrix $\bm{P}$ that minimises the $tr[\bm{S}\bm{P}\bm{W}_h\bm{P}'\bm{S}']$ such that $\bm{S}\bm{P}\bm{S}=\bm{S}$ is given by
 \begin{equation}
-\bm{P}=(\bm{S}'\bm{W}_h^{-1}\bm{S})^{-1}\bm{S}'\bm{W}_h^{-1}.
+\bm{P}=(\bm{S}'\bm{W}_h^{-1}\bm{S})^{-1}\bm{S}'\bm{W}_h^{-1},
+(\#eq:MinT)
 \end{equation}
+referred to as the MinT estimator, as explained above. 
 
-$\bm{P}$ minimises the trace of the errors of the reconciled forecasts hence referred to as the *MinT* estimator. Note that the MinT estimator involves $\bm{W}_h$ which needs to be estimated. As this can be challenging we provide below some simplifying specifications which have been shown to work well in both simulations and in practice. 
+Note that the MinT estimator involves $\bm{W}_h$ the forecast error variance of the $h-$step ahead base forecasts. As this is challenging to estimate we provide below three simplifying specifications which have been shown to work well in both simulations and in practice. 
 
-1. Set $\bm{W}_h=k_h\bm{I}$ $\forall h$ where $k_{h} > 0$. This is the most simplifying assumption to make. NOte that in this case $\bm{P}$ is independent of the data and no further estimation is required. 
+1. Set $\bm{W}_h=k_h\bm{I}$ $\forall h$ where $k_{h} > 0$. This is the most simplifying assumption to make. Note that in this case $\bm{P}$ is independent of the data and no further estimation is required. The disadvantage is however that this specification does not account for the differences in the scale between the levels of the structure which naturally exist due to aggregation. The two specifications that follow do account for this. 
 
 2. Set $\bm{W}_{h} = k_{h}\text{diag}(\hat{\bm{W}}_{1})$ $\forall h$ where $k_{h} > 0$ and
     \[
         \hat{\bm{W}}_{1} = \frac{1}{T}\sum_{t=1}^{T}\hat{\bm{e}}_{t}\hat{\bm{e}}_{t}'
     \]
-where $\hat{\bm{e}}_{t}$ are the residuals of the model that generated the base forecasts as defined in Secion \@ref(). This estimate 
+where $\hat{\bm{e}}_{t}$ are the residuals of the model that generated the base forecasts as defined in Section \@ref(toolbox-resids). This specification scales the base forecasts using the variance of the residuals and it is therefore referred to as the *variance scaling* specification.
 
-3. Set $\bm{W}_{h}=k_{h}\bm{\Lambda}$, $\forall h$ where $k_{h} > 0$ and $\bm{\Lambda}=\text{diag}(\bm{S}\bm{1})$ where $\bm{1}$ is a unit column vector of dimension $n$. This specification assumes that the bottom level base forecast errors each have variance $k_{h}$ and are uncorrelated between nodes. Hence each element of the diagonal $\bm{\Lambda}$ matrix contains the number of forecast error variances contributing to that aggregation level. This estimator only depends on the structure of the hierarchy or the group and therefore it is referred as an estimator that applies structural scaling.  and we denote it as WLS$_s$. This estimator was proposed by \citet{Athana2015} for temporal hierarchies. Its advantage over OLS is that it assumes equivariant forecast errors only within levels of the hierarchy and not across levels which is unrealistically assumed by OLS\@. It is particularly useful in cases where forecast errors are not available. For example, in cases where the base forecasts are generated by judgemental forecasting.
-
-
+3. Set $\bm{W}_{h}=k_{h}\bm{\Lambda}$, $\forall h$ where $k_{h} > 0$ and $\bm{\Lambda}=\text{diag}(\bm{S}\bm{1})$ where $\bm{1}$ is a unit column vector of dimension $n$. This specification assumes that the bottom level base forecast errors each have variance $k_{h}$ and are uncorrelated between nodes. Hence each element of the diagonal $\bm{\Lambda}$ matrix contains the number of forecast error variances contributing to that aggregation level. This estimator only depends on the structure of the hierarchy or the grouped time series. Is is therefore referred to as the specification that applies *structural scaling*. Notice that the strcutural scaling assumes equivariant forecast errors only within levels of the structure and not across levels which is unrealistically assumed by the first specification. Furthermore, applying the structural scaling specification is particularly useful in cases where residuals are not available and therefore variance scaling cannot be applied. For example, in cases where the base forecasts are generated by judgemental forecasting introduced in Chapter \@ref(ch-judgmental).
 
 
-
-
-Unlike any other existing approach, this approach uses all the information available within a hierarchical or a grouped structure. This is important as particular aggregation levels or groupings may reveal features of the data that are of interest to the user and are important to be modelled. These features may be completely hidden or not easily identifiable at other levels. For example, consider a hierarchical structure reflecting the geographical division of a country into states, regions, down to a very fine grid of statistical local areas. There are significant differences between the seasonal patterns in the number of tourists visiting a state or a region that mainly caters for summer holidays versus a state or a region that caters for winter activities. These differences will be smoothed out at the country level due to aggregation and on the other hand it may be extremely challenging to identify at the very bottom level of a stastical local area due to noise. Another example for a grouped structure is the difference in the sales of clothes between genders. Such differences will be completely smoothed out at the very top level of aggregation considering total sales, or may be very challenging to idenitfy due to noise at the very bottom level.
-
-Furthermore optimally combining forecast allows for correlations and interactions between series at each level of the hierarchy, it accounts for ad hoc adjustments of forecasts at any level, and, provided that the base independent forecasts are unbiased, it produces revised forecasts which are also unbiased.
-
-
+In summary, unlike any other existing approach, the optimal combination forecasts are generated using all the information available within a hierarchical or a grouped structure. This is very important as particular aggregation levels or groupings may reveal features of the data that are of interest to the user and are important to be modelled. These features may be completely hidden or not easily identifiable at other levels. For example, consider a hierarchical structure reflecting the geographical division of a country into states, regions, down to a very fine grid of statistical local areas. There are significant differences between the seasonal patterns in the number of tourists visiting a state or a region that is mainly seen as a summer destination versus a state or a region that caters for winter activities. These differences will be smoothed at the country level due to aggregation and on the other hand it may be extremely challenging to identify at the very bottom level of a stastical local area due to noise. Another example for a grouped structure is the difference in the sales of clothes between genders. Such differences will be completely smoothed out at the very top level of aggregation considering total sales, or may be very challenging to idenitfy due to noise at the very bottom level.
 
 ## The hts package 
 
@@ -344,11 +339,13 @@ Hierarchical time series forecasting is implemented in the **hts** package in R.
 
 The `hts` function creates a hierarchical time series. The required inputs are the bottom level time series obsverations, and information about the hierarchical structure. For example, the structure shown in Figure \@ref(fig:HierTree) is specified as follows:
 
-```
-# bts is a time series matrix containing the bottom level series 
-# The first three series belong to one group, and the last two series 
-# belong to a different group 
-y <- hts(bts, nodes=list(2, c(3,2)))
+```{r}
+# vn is a time series matrix containing the bottom level series 
+
+y <- hts(vn, nodes=list(4,c(2,2,2,2)))
+allf <- forecast(y, h=8)
+plot(allf)
+
 ```
 
 For a grouped but non-hierarchical time series, the `gts` function can be used. If there are more levels, the `g` argument should be a matrix where each row contains the grouping structure for each level.

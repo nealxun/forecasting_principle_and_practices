@@ -2,15 +2,15 @@
 
 *Warning: this is a more advanced section and assumes knowledge of some basic matrix algebra. We have however tried to simplify and explain in as much as detail as possible all the notation used.*
 
-## Hierarchical time series 
+## Hierarchical time series
 
 Time series can often be naturally disaggregated in a hierarchical structure using attributes such as geographical location, product type, etc. For example, the total number of bicycles sold by a cycling warehouse can be disaggregated into a hierarchy of bicycle types. Such a warehouse will sell road bikes, mountain bikes, children bikes or hybrids. Each of these can be disaggregated into finer categories. Children’s bikes can be divided into balance bikes for children under 4 years old, single speed bikes for children between 4 and 6 and bikes for children over the age of 6. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such disaggregation imposes a hierarchical structure. We refer to these as *hierarchical time series*.
 
 To take another example, a manufacturing company may track sales by country, and within each country by region, and within each region by sales outlet. Such geographical structures are commonly found in business, economics and other areas. Again, this is a hierarchical structure, and the complete collection of sales data can be thought of as hierarchical time series. An important feature of hierarchical time series is that the they have a uinique structure with which they disaggregate or aggregate.
 
-Figure \@ref(fig:HierTree) below shows a $K=2$-level hierarchical structure.^[We will use this hierarchical structure in order to introduce the methods for forecasting hierarchical time series that follow.] At the top of the hierarchy, level 0, is the "Total", the most aggregate level of the data. We denote as $y_t$ the $t$th observation of the "Total" series for $t=1,\dots,T$. 
+Figure \@ref(fig:HierTree) below shows a $K=2$-level hierarchical structure.^[We will use this hierarchical structure in order to introduce the methods for forecasting hierarchical time series that follow.] At the top of the hierarchy, level 0, is the "Total", the most aggregate level of the data. We denote as $y_t$ the $t$th observation of the "Total" series for $t=1,\dots,T$.
 
-The "Total" is disaggregated into 2 series at level 1 and each of these into 3 and 2 series respectively at the bottom level of the hierarchy, level 2. Below the top most aggregate level we denote as $\y{j}{t}$ the $t$th observation of the series which corresponds to node $j$. For example $y_{A,t}$ denotes the $t$th observation of the series corresponding to node A at level 1, $y_{AB,t}$ denotes the $t$th observation of the series corresponding to node AB at level 2, and so on. 
+The "Total" is disaggregated into 2 series at level 1 and each of these into 3 and 2 series respectively at the bottom level of the hierarchy, level 2. Below the top most aggregate level we denote as $\y{j}{t}$ the $t$th observation of the series which corresponds to node $j$. For example $y_{A,t}$ denotes the $t$th observation of the series corresponding to node A at level 1, $y_{AB,t}$ denotes the $t$th observation of the series corresponding to node AB at level 2, and so on.
 
 The Total number of series in a hierarchy is given by $n=1+n_1+\dots+n_K$ where $n_i$ is the number of series at level $i$ of the hierarchy. In this case $n=1+2+5=8$.
 
@@ -25,14 +25,14 @@ igraph::V(g)$label.cex<-2
 plot(g, layout = layout,vertex.size=40)
 ```
 
-For any time $t$, the observations at the bottom level of the structure will aggregate to the observations of the series above. For example, 
-\begin{equation} 
+For any time $t$, the observations at the bottom level of the structure will aggregate to the observations of the series above. For example,
+\begin{equation}
 y_{t}=\y{AA}{t}+\y{AB}{t}+\y{AC}{t}+\y{BA}{t}+\y{BB}{t}
   (\#eq:toplevel)
-\end{equation} and 
+\end{equation} and
 \begin{equation} \y{A}{t}=\y{AA}{t}+\y{AB}{t}+\y{AC}{t}\quad \text{and} \quad  \y{B}{t}=\y{BA}{t}+\y{BB}{t}.
 (\#eq:middlelevel)
-\end{equation} 
+\end{equation}
 Substituting \@ref(eq:middlelevel) into \@ref(eq:toplevel) we also get $y_{t}=\y{A}{t}+\y{B}{t}$. These can be thought of as aggregation constraints or summing equalities and can be effectively represented using matrix notation. We construct an $n\times n_K$ matrix referred to as the "summing" matrix $\boldsymbol{S}$ which dictates how the bottom level series are aggregated, consistent with the structure. For the structure in Figure \@ref(fig:HierTree) we can write
 $$
   \begin{bmatrix}
@@ -64,7 +64,7 @@ $$
     \y{BB}{t}
   \end{bmatrix}
 $$
-or in more compact notation 
+or in more compact notation
 $$
   \boldsymbol{y}_t=\boldsymbol{S}\boldsymbol{y}_{K,t},
 $$
@@ -72,7 +72,7 @@ where $\boldsymbol{y}_t$ is a vector of all the observations in the hierarchy at
 
 ` I would like to add example here using hts`
 
-```{r, eval=FALSE, include=FALSE}
+```{r, eval=FALSE, include=FALSE, cache=TRUE}
 abc <- ts(5 + matrix(sort(rnorm(1000)), ncol = 10, nrow = 100))
 colnames(abc) <- c("A10A", "A10B", "A10C", "A20A", "A20B",
                    "B30A", "B30B", "B30C", "B40A", "B40B")
@@ -84,11 +84,11 @@ attributes(y)
 
 ```
 
-## Grouped time series 
+## Grouped time series
 Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. Frames can be carbon, aluminium or steel. They can be single speed or have multiple gears. We refer to these as *grouped time series*.
 
-We can also get a similar effect when we combine two hierarchical structures. For example the bicyle manufacturer may disaggregate sales by product and also by geographical location. In this case we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. We can disaggregate by product type and then geographical location but also vice versa. 
-Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the structure hierarchy, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes. 
+We can also get a similar effect when we combine two hierarchical structures. For example the bicyle manufacturer may disaggregate sales by product and also by geographical location. In this case we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. We can disaggregate by product type and then geographical location but also vice versa.
+Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the structure hierarchy, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes.
 
 ```{r GroupTree, echo=FALSE, cache=TRUE, fig.cap="Alternative representations of a two level grouped structure.", out.width="49.9%", fig.show = "hold",fig.height=14,fig.width=12}
 
@@ -111,17 +111,17 @@ plot(g2, layout = layout,vertex.size=44)
 
 ```
 
-This example shows that there are alternative aggregation paths for grouped structures. For any time $t$, as with the hierarchical structure, 
-\begin{equation*} 
+This example shows that there are alternative aggregation paths for grouped structures. For any time $t$, as with the hierarchical structure,
+\begin{equation*}
 y_{t}=\y{AX}{t}+\y{AY}{t}+\y{BX}{t}+\y{BY}{t}.
-\end{equation*} 
+\end{equation*}
 However, for the first level of the grouped structure,
 \begin{equation} \y{A}{t}=\y{AX}{t}+\y{AY}{t}\quad \quad \y{B}{t}=\y{BX}{t}+\y{BY}{t}
 (\#eq:middlelevelAB)
 \end{equation} but also
 \begin{equation} \y{X}{t}=\y{AX}{t}+\y{BX}{t}\quad \quad \y{Y}{t}=\y{AY}{t}+\y{BY}{t}
 (\#eq:middlelevelXY).
-\end{equation} 
+\end{equation}
 
 These equalities can again be captured by the summing matrix $\bm{S}$ which recall is of dimension $n\times n_K$. The total number of series is $n=9$ with $n_K=4$ series at the bottom level. For the structure in Figure \@ref(fig:GroupTree) we write
 $$
@@ -146,7 +146,7 @@ $$
     1 & 0 & 0 & 0 \\
     0 & 1 & 0 & 0 \\
     0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 1 
+    0 & 0 & 0 & 1
   \end{bmatrix}
   \begin{bmatrix}
     \y{AX}{t} \\
@@ -155,7 +155,7 @@ $$
     \y{BY}{t}
   \end{bmatrix}
 $$
-where now the second and third rows of $\bm{S}$ represent \@ref(eq:middlelevelAB) and the fourth and fifth rows represent \@ref(eq:middlelevelXY). 
+where now the second and third rows of $\bm{S}$ represent \@ref(eq:middlelevelAB) and the fourth and fifth rows represent \@ref(eq:middlelevelXY).
 
 Grouped time series can be thought of as hierarchical time series that do not impose a unique hierarchical structure in the sense that the order by which the series can be grouped is not unique.
 
@@ -165,29 +165,29 @@ We are interested in generating forecasts for each series belonging to a hierarc
 
 These base forecasts are then combined to produce forecasts for all the series that aggregate in a manner that is consistent with the hierarchical or grouped structure. We refer to these as *revised forecasts* and denote them as $\ytilde{j}{h}$ and $\tilde{y}_{h}$ respectively. There are a number of ways of combining base forecasts in order to obtain revised forecasts. The following sections discuss some of the possible combining approaches that can be used for forecasting time series data that possess hierarchical or grouped structures.
 
-## The bottom-up approach 
+## The bottom-up approach
 
 A commonly applied method is the bottom-up approach. This approach involves first generating independent base forecasts for each series at the bottom level. Then aggregating these upwards to produce forecasts for all the series in the structure.
 
 For example, for the hierarchy of Figure \@ref(fig:HierTree) we first generate $h$-step-ahead base forecasts for each of the bottom level series: $$\yhat{AA}{h},~~\yhat{AB}{h},~~\yhat{AC}{h},~~ \yhat{BA}{h}~~\text{and}~~\yhat{BB}{h}.$$
 
-Aggregating these up the hierarchy we get $h$-step-ahead revised forecasts for the rest of the series:  $$\tilde{y}_{h}=\yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}+\yhat{BA}{h}+\yhat{BB}{h},~~~\ytilde{A}{h}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}~~~\text{and}~~~\ytilde{B}{h}= \yhat{BA}{h}+\yhat{BB}{h}.$$ 
+Aggregating these up the hierarchy we get $h$-step-ahead revised forecasts for the rest of the series:  $$\tilde{y}_{h}=\yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}+\yhat{BA}{h}+\yhat{BB}{h},~~~\ytilde{A}{h}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}~~~\text{and}~~~\ytilde{B}{h}= \yhat{BA}{h}+\yhat{BB}{h}.$$
 As we did with the data itself we can employ the summing matrix here and write
 $$
   \tilde{\boldsymbol{y}}_{h}=\boldsymbol{S}\hat{\boldsymbol{y}}_{K,h}.
-$$ 
-where $\bm{\tilde{y}}_{h}$ is a set of revised forecasts for the whole of the hierarchy stacked in the same way as the data. 
+$$
+where $\bm{\tilde{y}}_{h}$ is a set of revised forecasts for the whole of the hierarchy stacked in the same way as the data.
 
-The greatest advantage of this approach is that we are forecastig at the bottom level of a structure andf therefore no information is lost due to aggregation. On the other hand bottom level data can be quite noisy and more challenging to model and forecast. 
+The greatest advantage of this approach is that we are forecastig at the bottom level of a structure andf therefore no information is lost due to aggregation. On the other hand bottom level data can be quite noisy and more challenging to model and forecast.
 
 Note that for the bottom-up approach the revised forecasts for the bottom level series are equal to the base forecasts, i.e., $\tilde{\bm{y}}_{K,t}=\hat{\bm{y}}_{K,t}$.
 
-## Top-down approaches 
+## Top-down approaches
 
 Top-down approaches involve first generating forecasts for the "Total" series $y_t$ on the top of the hierarchy and then disaggregating these downwards. We let $p_1,\ldots,p_{n_K}$ be a set of proportions which dictate how the base forecasts of the "Total" series are to be distributed to revised forecasts for each series at the bottom level of the hierarchy. For example for the hierarchy of Figure \@ref(fig:HierTree) $$\ytilde{AA}{t}=p_1\hat{y}_t,~~~\ytilde{AB}{t}=p_2\hat{y}_t,~~~\ytilde{AC}{t}=p_3\hat{y}_t,~~~\ytilde{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\ytilde{BB}{t}=p_5\hat{y}_t.$$
 Using matrix notation we can stack the set of proportions in a $n_K$-dimensional column vector $\bm{p}=(p_1,\ldots,p_{n_K})'$ and write
 $$\tilde{\bm{y}}_{K,t}=\bm{p}\hat{y}_t$$
-Once the bottom level forecasts have been generated we can aggregate these up the hierarchy to generate revised forecasts for the rest of the series. Using the summing matrix we can in general write for top-down approaches, 
+Once the bottom level forecasts have been generated we can aggregate these up the hierarchy to generate revised forecasts for the rest of the series. Using the summing matrix we can in general write for top-down approaches,
 $$\tilde{\bm{y}}_h=\bm{S}\bm{p}\hat{y}_t.$$
 Note that for all top-down approaches the top level revised forecasts are equal to the top level base forecasts, i.e., $\tilde{y}_{h}=\hat{y}_{h}$.
 
@@ -197,7 +197,7 @@ The most common top-down approaches specify proportions based on the historical 
 
 $$
   p_j=\frac{1}{T}\sum_{t=1}^{T}\frac{y_{j,t}}{{y_t}}
-$$ 
+$$
 for $j=1,\dots,n_K$. Each proportion $p_j$ reflects the average of the historical proportions of the bottom level series $y_{j,t}$ over the period $t=1,\dots,T$ relative to the Total aggregate $y_t$.
 
 ### Proportions of the historical averages {-}
@@ -247,7 +247,7 @@ $$
 $$
 The other proportions can be similarly obtained. The greatest disadvantage of the top-down forecast proportions approach, which is a disadvantage of any top-down approach, is that they do not produce unbiased revised forecasts even if the base forecasts are unbiased.
 
-## Middle-out approach 
+## Middle-out approach
 
 The middle-out approach combines bottom-up and top-down approaches. First the "middle level" is chosen and base forecasts are generated for all the series of this level and the ones below. For the series above the middle level, revised forecasts are generated using the bottom-up approach by aggregating the "middle-level" base forecasts upwards. For the series below the "middle level", revised forecasts are generated using a top-down approach by disaggregating the "middle level" base forecasts downwards.
 
@@ -267,7 +267,7 @@ $$
   \end{bmatrix}.
 $$
 
-Then in general all forecasting approaches for either hierarchical or grouped strcutures can be represented as 
+Then in general all forecasting approaches for either hierarchical or grouped strcutures can be represented as
 \begin{equation}
   \bm{\tilde{y}}_h=\bm{S}\bm{P}\bm{\hat{y}}_h
   (\#eq:SP)
@@ -295,7 +295,7 @@ If any of the top-down approaches were used then $$\bm{P}=
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
   \end{bmatrix},
   $$
-so that the first column includes the set of proportions that distribute the independent base forecasts of the top level to the bottom level and the rest of the columns zero out the independent base forecasts below the very top level of aggregation. 
+so that the first column includes the set of proportions that distribute the independent base forecasts of the top level to the bottom level and the rest of the columns zero out the independent base forecasts below the very top level of aggregation.
 
 For a middle out approach the $\bm{P}$ matrix will be a combination of the above two. Using a set of proportions the independent base forecats of some pre-chosen level will be dissagregated to the bottom level to then be summed up the hierarchy with the summing matrix, with all other independent base forecasts being zeroed out.
 
@@ -303,24 +303,24 @@ All the approaches we have considered so far in this chapter involve choosing a 
 
 In this section we inctroduce an approach that instead involves generating independent base forecast for each series. As these base forecasts are independently generated they will not add up according to the hierarchical or grouped structure, i.e., they will not be "aggregate consistent". The base forecasts are then combined to generate a set of revised forecasts that are as close as possible to the base forecasts but also aggregate consistently with the structure.
 
-The general idea is derived from wanting to find a $\bm{P}$ matrix that minimises the forecast error of the revised forecasts from forecasting each time series in the structure. In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed in order to get a good flavour of the approach. These unfortunately complicate the presentation. However following through these steps we get to the specification of $\bm{P}$ in equation \@ref(eq:MinT) which is labelled the **MinT** estimator as it **Min**imises the **T**race of the forecast errors of the revised forecasts across the whole structure. For further details and discussion please refer to @WicEtAl2015.
+The general idea is derived from wanting to find a $\bm{P}$ matrix that minimises the forecast error of the revised forecasts from forecasting each time series in the structure. In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed in order to get a good flavour of the approach. These unfortunately complicate the presentation. However following through these steps we get to the specification of $\bm{P}$ in equation \@ref(eq:MinT) which is labelled the **MinT** estimator as it **Min**imises the **T**race of the forecast errors of the revised forecasts across the whole structure. For further details and discussion please refer to @Mint.
 
 Let $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$ be the forecast errors after having produced a set of revised forecasts across the whole structure, stacked in the same order as the data. Note that this expression is a generalisation of a forecast error as defined in Section \@ref(accuracy) using matrix notation. It can be easily shown through Equation \@ref(eq:SP) above that for a set of independent base forecasts that are unbiased, which will be the case for all base forecasts generated using methods introduced in this book, using a $\bm{P}$ matrix such that $\bm{S}\bm{P}\bm{S}=\bm{S}$, generates a set of revised forecasts $\bm{\tilde{y}}_h$ that are also unbiased. Note that this will not hold for any top-down or bottom-up approach.^[TODO: See Exercise 10.1 - possibly set this as an exercise.]
 
-@WicEtAl2015 show in Lemma 1 that 
+@Mint show in Lemma 1 that
 \begin{equation*}
 \text{Var}[\bm{y}_{T+h}-\tilde{\bm{y}}_h]=\bm{S}\bm{P}\bm{W}_h\bm{P}'\bm{S}'
 \end{equation*}
-where $\bm{W}_h=E[(\bm{y}_{T+h}-\hat{\bm{y}}_h)(\bm{y}_{T+h}-\hat{\bm{y}}_h)']$ is the variance-covariance matrix of the $h-$step ahead base forecast errors. This is a very important result as it shows that the forecast error variance of the revised forecasts is a function of the error variance of base forecasts $\bm{W}_h$. The objective is to find a matrix $\bm{P}$ that minimises the error variance of the revised forecasts. @WicEtAl2015 show in Theorem 1 that the optimal matrix $\bm{P}$ that minimises the $tr[\bm{S}\bm{P}\bm{W}_h\bm{P}'\bm{S}']$ such that $\bm{S}\bm{P}\bm{S}=\bm{S}$ is given by
+where $\bm{W}_h=E[(\bm{y}_{T+h}-\hat{\bm{y}}_h)(\bm{y}_{T+h}-\hat{\bm{y}}_h)']$ is the variance-covariance matrix of the $h-$step ahead base forecast errors. This is a very important result as it shows that the forecast error variance of the revised forecasts is a function of the error variance of base forecasts $\bm{W}_h$. The objective is to find a matrix $\bm{P}$ that minimises the error variance of the revised forecasts. @Mint show in Theorem 1 that the optimal matrix $\bm{P}$ that minimises the $tr[\bm{S}\bm{P}\bm{W}_h\bm{P}'\bm{S}']$ such that $\bm{S}\bm{P}\bm{S}=\bm{S}$ is given by
 \begin{equation}
 \bm{P}=(\bm{S}'\bm{W}_h^{-1}\bm{S})^{-1}\bm{S}'\bm{W}_h^{-1},
 (\#eq:MinT)
 \end{equation}
-referred to as the MinT estimator, as explained above. 
+referred to as the MinT estimator, as explained above.
 
-Note that the MinT estimator involves $\bm{W}_h$ the forecast error variance of the $h-$step ahead base forecasts. As this is challenging to estimate we provide below three simplifying specifications which have been shown to work well in both simulations and in practice. 
+Note that the MinT estimator involves $\bm{W}_h$ the forecast error variance of the $h-$step ahead base forecasts. As this is challenging to estimate we provide below three simplifying specifications which have been shown to work well in both simulations and in practice.
 
-1. Set $\bm{W}_h=k_h\bm{I}$ $\forall h$ where $k_{h} > 0$. This is the most simplifying assumption to make. Note that in this case $\bm{P}$ is independent of the data and no further estimation is required. The disadvantage is however that this specification does not account for the differences in the scale between the levels of the structure which naturally exist due to aggregation. The two specifications that follow do account for this. 
+1. Set $\bm{W}_h=k_h\bm{I}$ $\forall h$ where $k_{h} > 0$. This is the most simplifying assumption to make. Note that in this case $\bm{P}$ is independent of the data and no further estimation is required. The disadvantage is however that this specification does not account for the differences in the scale between the levels of the structure which naturally exist due to aggregation. The two specifications that follow do account for this.
 
 2. Set $\bm{W}_{h} = k_{h}\text{diag}(\hat{\bm{W}}_{1})$ $\forall h$ where $k_{h} > 0$ and
     \[
@@ -333,14 +333,15 @@ where $\hat{\bm{e}}_{t}$ are the residuals of the model that generated the base 
 
 In summary, unlike any other existing approach, the optimal combination forecasts are generated using all the information available within a hierarchical or a grouped structure. This is very important as particular aggregation levels or groupings may reveal features of the data that are of interest to the user and are important to be modelled. These features may be completely hidden or not easily identifiable at other levels. For example, consider a hierarchical structure reflecting the geographical division of a country into states, regions, down to a very fine grid of statistical local areas. There are significant differences between the seasonal patterns in the number of tourists visiting a state or a region that is mainly seen as a summer destination versus a state or a region that caters for winter activities. These differences will be smoothed at the country level due to aggregation and on the other hand it may be extremely challenging to identify at the very bottom level of a stastical local area due to noise. Another example for a grouped structure is the difference in the sales of clothes between genders. Such differences will be completely smoothed out at the very top level of aggregation considering total sales, or may be very challenging to idenitfy due to noise at the very bottom level.
 
-## The hts package 
+## The hts package
 
 Hierarchical time series forecasting is implemented in the **hts** package in R.
 
 The `hts` function creates a hierarchical time series. The required inputs are the bottom level time series obsverations, and information about the hierarchical structure. For example, the structure shown in Figure \@ref(fig:HierTree) is specified as follows:
 
-```{r}
-# vn is a time series matrix containing the bottom level series 
+```{r, cache=TRUE}
+library(hts)
+# vn is a time series matrix containing the bottom level series
 
 y <- hts(vn, nodes=list(4,c(2,2,2,2)))
 allf <- forecast(y, h=8)
@@ -376,7 +377,7 @@ method
     tdfp
     :   Top-down forecasts using forecast proportions.
 
-##Example: Australian tourism hierarchy 
+##Example: Australian tourism hierarchy
 
 Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the three largest states of Australia, namely Victoria (VIC), New South Wales (NSW), Queensland (QLD) and other. For each of these we consider visitor nights for each respective capital city, namely, Melbourne (MEL), Sydney (SYD) and Brisbane (BGC).^[For the purpose of this example we include with Brisbane, visitor nights at the Gold Coast, a coastal city and a major tourism attraction near Brisbane.] The hierarchical structure is shown in Figure \@ref(fig-9-4-Aust). The CAP category in the bottom level includes visitor nights in all other five capital cities of the remaining states and territories.
 
@@ -400,8 +401,8 @@ child <span>node <span>NSW</span> child <span>node
 Figure \@ref(fig-9-4-forecasts) shows all the times series in the hierarchy which span the period 1998:Q1 to 2011:Q4. The dotted lines show the revised forecasts generated by the optimal combination approach. The base forecasts for each series are generated using the ETS methodology of Chapter \@ref(ch-expsmooth).
 
 ```{r htstourism, fig.cap="Hierarchical time series and 8-step-ahead revised forecasts for Australian domestic tourism generated by the optimal combination approach. The base forecasts for each series were generated using the ETS methodology of Chapter ??.", fig.height=6, cache=TRUE}
-require(hts) 
-y <- hts(vn, nodes=list(4,c(2,2,2,2))) 
-allf <- forecast(y, h=8) 
+require(hts)
+y <- hts(vn, nodes=list(4,c(2,2,2,2)))
+allf <- forecast(y, h=8)
 plot(allf)
 ```

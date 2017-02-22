@@ -50,9 +50,7 @@ autoplot(fit) + xlab("Year")
 
 The three components are shown separately in the bottom three panels of Figure \@ref(fig:elecequip-stl). These components can be added together to reconstruct the data shown in the top panel. Notice that the seasonal component changes very slowly over time, so that any two consecutive years have very similar patterns, but years far apart may have different seasonal patterns. The remainder component shown in the bottom panel is what is left over when the seasonal and trend-cycle components have been subtracted from the data.
 
-The components are plotted on different scales; so to compare the relative size of the components, it is important to check the vertical scales. In this case, the variation in the remainder component is small compared to the variation in the data. In other words, most of the variation in the data is due to the trend-cycle and seasonal variation.
-
-
+The grey bars to the right of each panel show the relative scales of the components. Each grey bar represents the same length but because the plots are on different scales, the bars vary in size. The large grey bar in the bottom panel shows that the variation in the remainder component is small compared to the variation in the data, which has a bar about one quarter the size. If we shrunk the bottom three panels until their bars became the same size as that in the data panel, then all the panels would be on the same scale.
 
 ### Seasonally adjusted data {-}
 

@@ -100,7 +100,7 @@ We can recover both the $n_t$ and $e_t$ series using the `residuals()` function.
 ```{r usconsumpres, fig.cap="Regression errors ($n_t$) and ARIMA errors ($e_t$) from the fitted model.", cache=TRUE}
 cbind("Regression Errors" = residuals(fit, type="regression"),
       "ARIMA errors" = residuals(fit, type="innovation")) %>%
-  autoplot(facets=TRUE) + fppcols()
+  autoplot(facets=TRUE)
 ```
 
 It is the ARIMA errors that should resemble a white noise series.
@@ -205,11 +205,11 @@ In this case, the estimated growth in visitor numbers is also `r format(drift, d
 fc1 <- forecast(fit1, xreg=data.frame(trend=length(austa)+1:10))
 fc2 <- forecast(fit2, h=10)
 autoplot(austa) +
-  geom_forecast(fc2, series="Stochastic trend") +
-  geom_forecast(fc1, series="Deterministic trend") +
+  autolayer(fc2, series="Stochastic trend") +
+  autolayer(fc1, series="Deterministic trend") +
   ggtitle("Forecasts from deterministic and stochastic trend models") +
   xlab("Year") + ylab("Visitors to Australia (millions)") +
-  guides(colour=guide_legend(title="Forecast")) + fppcols()
+  guides(colour=guide_legend(title="Forecast"))
 ```
 
 There is an implicit assumption with deterministic trends that the slope of the trend is not going to change over time. On the other hand, stochastic trends can change, and the estimated growth is only assumed to be the average growth over the historical period, not necessarily the rate of growth that will be observed into the future. Consequently, it is safer to forecast with stochastic trends, especially for longer forecast horizons, as the prediction intervals allow for greater uncertainty in future growth.

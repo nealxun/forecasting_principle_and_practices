@@ -46,7 +46,7 @@ Actually, there are not 52 weeks in a year, but 365.25/7 = `r format(365.25/7,di
 
 If the frequency of observations is greater than once per week, then there is usually more than one way of handling the frequency. For example, data with daily observations might have a weekly seasonality (frequency=7) or an annual seasonality (frequency=365.25). Similarly, data that are observed every minute might have an hourly seasonality (frequency=60), a daily seasonality (frequency=24x60=1440), a weekly seasonality (frequency=24x60x7=10080) and an annual seasonality (frequency=24x60x365.25=525960). If you want to use a `ts` object, then you need to decide which of these is the most important.
 
-In chapter ?? we will look at handling these types of multiple seasonality, without having to choose just one of the frequencies.
+In chapter \@ref(ch-advanced) we will look at handling these types of multiple seasonality, without having to choose just one of the frequencies.
 
 
 ##Time plots
@@ -102,8 +102,8 @@ Many time series include trend, cycles and seasonality. When choosing a forecast
 The following four examples show different combinations of the above components.
 
 ```{r 6-decomp1, echo=FALSE, cache=TRUE, fig.cap="Four examples of time series showing different patterns."}
-smallfonts <- theme(text = element_text(size = 7),
-            axis.text = element_text(size=6))
+smallfonts <- theme(text = element_text(size = 9),
+            axis.text = element_text(size=8))
 p1 <- autoplot(hsales) + smallfonts +
         xlab("Year") + ylab("millions") +
         ggtitle("Sales of new one-family houses, USA")
@@ -197,7 +197,7 @@ Figure \@ref(fig:beerlagplot) displays scatterplots of quarterly Australian beer
 
 ```{r beerlagplot, fig.cap="Lagged scatterplots for quarterly beer production.", fig.width=8, fig.height=8, cache=TRUE}
 beer2 <- window(ausbeer, start=1992)
-gglagplot(beer2, lags=9, do.lines=FALSE, continuous=FALSE)
+gglagplot(beer2)
 ```
 
 Here the colours indicate the quarter of the variable on the vertical axis.

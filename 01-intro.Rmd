@@ -110,10 +110,10 @@ Anything that is observed sequentially over time is a time series. In this book,
 When forecasting time series data, the aim is to estimate how the sequence of observations will continue into the future. Figure \@ref(fig:beer) shows the quarterly Australian beer production from 1992 to the second quarter of 2010.
 
 ```{r beer, fig.cap='Australian quarterly beer production: 1992Q1–2010Q2, with two years of forecasts.', echo=FALSE, cache=TRUE}
-ausbeer %>% 
+ausbeer %>%
   window(start = 1992) %>%
-  forecast %>% 
-  autoplot + xlab("Year") + ylab("megaliters") + ggtitle("")
+  forecast %>%
+  autoplot + xlab("Year") + ylab("megalitres") + ggtitle("")
 ```
 
 The blue lines show forecasts for the next two years. Notice how the forecasts have captured the seasonal pattern seen in the historical data and replicated it for the next two years. The dark shaded region shows 80% prediction intervals. That is, each future value is expected to lie in the dark shaded region with a probability of 80%. The light shaded region shows 95% prediction intervals. These prediction intervals are a very useful way of displaying the uncertainty in forecasts. In this case the forecasts are expected to be very accurate, and hence the prediction intervals are quite narrow.
@@ -221,7 +221,7 @@ df <- cbind(austa, simulate(fit,10))
 for(i in seq(9))
   df <- cbind(df, simulate(fit,10))
 colnames(df) <- c("Data", paste("Future",1:10))
-autoplot(df) + 
+autoplot(df) +
   ylim(min(austa),10) +
   ylab("Millions of visitors") + xlab("Year") +
   ggtitle("Total international visitors to Australia") +
@@ -235,7 +235,7 @@ When we obtain a forecast, we are estimating the *middle* of the range of possib
 Instead of plotting individual possible futures as shown in Figure \@ref(fig:austa1), we normally show these prediction intervals instead. The plot below shows 80% and 95% intervals for the future Australian international visitors. The blue line is the average of the possible future values, which we call the "point forecasts".
 
 ```{r austa2, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, fig.cap="Total international visitors to Australia (1980--2015) along with 10-year forecasts and 80% and 95% prediction intervals."}
-autoplot(forecast(fit)) + 
+autoplot(forecast(fit)) +
   ylab("Millions of visitors") + xlab("Year") +
   ggtitle("Forecasts of total international visitors to Australia")
 ```

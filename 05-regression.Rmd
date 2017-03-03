@@ -1069,21 +1069,18 @@ Note that if you are using good statistical software, if you are not interested 
 
 1. Electricity consumption was recorded for a small town on 12 consecutive  days. The following maximum temperatures (degrees Celsius) and consumption (megawatt-hours) were recorded for each day. `TODO: change the econsumption to a ts of 12 concecutive days - change the lm to tslm below`
 
-```{r, echo=FALSE, cache=TRUE}
-  day <- seq(1,nrow(econsumption),1)
-  tbl <- t(econsumption)
-  rownames(tbl) <- c("Mwh","Temp")
-  colnames(tbl) <- day
+    |     |  1   |  2   |  3   |  4   |  5   |  6   |  7   |  8   |  9   |  10  |  11  |  12  |
+    |:----|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+    |Mwh  | 16.3 | 16.8 | 15.5 | 18.2 | 15.2 | 17.5 | 19.8 | 19.0 | 17.5 | 16.0 | 19.6 | 18.0 |
+    |Temp | 29.3 | 21.7 | 23.7 | 10.4 | 29.7 | 11.9 | 9.0  | 23.4 | 17.8 | 30.0 | 8.6  | 11.8 |
 
-knitr::kable(tbl, booktabs=TRUE, align='c')
-```
 
     a. Plot the data and find the regression model for Mwh with temperature as an explanatory variable. Why is there a negative relationship?
     b. Produce a residual plot. Is the model adequate? Are there any outliers or influential observations?
     c. Use the model to predict the electricity consumption that you would expect for the next day if the maximum temperature was $10^\circ$ and compare it with the forecast if the with maximum temperature was $35^\circ$. Do you believe these predictions?
     d. Give prediction intervals for your forecasts. The following R code will get you started:
 
-        ```{r, eval=FALSE, include=TRUE, cache=TRUE}
+        ```r
         plot(Mwh ~ temp, data=econsumption)
         fit <- lm(Mwh ~ temp, data=econsumption)
         plot(residuals(fit) ~ temp, data=econsumption)

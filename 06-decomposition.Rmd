@@ -315,6 +315,28 @@ While classical decomposition is still widely used, it is not recommended, as th
 
 - Occasionally, the values of the time series in a small number of periods may be particularly unusual. For example, the monthly air passenger traffic may be affected by an industrial dispute, making the traffic during the dispute very different from usual. The classical method is not robust to these kinds of unusual values.
 
+## X11 decomposition
+
+Another popular method for decomposing quarterly and monthly data is the X11 method which originated in the US Census Bureau and Statistics Canada.
+
+This method is based on classical decomposition, but includes many extra steps and features in order to overcome the drawbacks of classical decomposition that were discussed in the previous section. In particular, trend-cycle estimates are available for all observations including the end points, and the seasonal component is allowed to vary slowly over time. X11 also has some sophisticated methods for handling trading day variation, holiday effects and the effects of known predictors. It handles both additive and multiplicative decomposition. The process is entirely automatic and tends to be highly robust to outliers and level shifts in the time series.
+
+The details of the X11 method are described in @Dagum2016. Here we will only demonstrate how to use the automatic procedure in R.
+
+The X11 method is also available using the `seas` function from the `seasonal` package for R.
+
+```{r x11, echo=TRUE, warning=FALSE, cache=TRUE, fig.width=8, fig.height=7, fig.cap="An X11 decomposition of the new orders index for electrical equipment."}
+library(seasonal)
+fit <- seas(elecequip, x11="")
+autoplot(fit) +
+  ggtitle("X11 decomposition of electrical equipment index")
+```
+
+This decomposition is relatively similar to the SEATS decomposition shown in Figure \@ref(fig:seats).
+
+The `seasonal` package has many options for handling variations of X11 and SEATS. See [the package website](http://www.seasonal.website/seasonal.html) for a detailed introduction to the options and features available.
+
+
 ## SEATS decomposition
 
 "SEATS" stands for "Seasonal Extraction in ARIMA Time Series" (ARIMA models are discussed in Chapter \@ref(ch-arima)). This procedure was developed at the Bank of Spain, and is now widely used by government agencies around the world. The procedure works only with quarterly and monthly data. So seasonality of other kinds, such as daily data, or hourly data, or weekly data, require an alternative approach.
@@ -350,28 +372,6 @@ It can be useful to use seasonal plots and seasonal sub-series plots of the seas
 ```{r elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the SEATS decomposition shown in Figure \\@ref(fig:seats).", echo=TRUE, cache=TRUE}
 ggsubseriesplot(seasonal(fit)) + ylab("Seasonal")
 ```
-
-## X11 decomposition
-
-Another popular method for decomposing quarterly and monthly data is the X11 method which originated in the US Census Bureau and Statistics Canada.
-
-This method is based on classical decomposition, but includes many extra steps and features in order to overcome the drawbacks of classical decomposition that were discussed in the previous section. In particular, trend-cycle estimates are available for all observations including the end points, and the seasonal component is allowed to vary slowly over time. X11 also has some sophisticated methods for handling trading day variation, holiday effects and the effects of known predictors. It handles both additive and multiplicative decomposition. The process is entirely automatic and tends to be highly robust to outliers and level shifts in the time series.
-
-The details of the X11 method are described in @Dagum2016. Here we will only demonstrate how to use the automatic procedure in R.
-
-The X11 method is also available using the `seas` function from the `seasonal` package for R.
-
-```{r x11, echo=TRUE, warning=FALSE, cache=TRUE, fig.width=8, fig.height=7, fig.cap="An X11 decomposition of the new orders index for electrical equipment."}
-library(seasonal)
-fit <- seas(elecequip, x11="")
-autoplot(fit) +
-  ggtitle("X11 decomposition of electrical equipment index")
-```
-
-This decomposition is relatively similar to the SEATS decomposition shown in Figure \@ref(fig:seats).
-
-The `seasonal` package has many options for handling variations of X11 and SEATS. See [the package website](http://www.seasonal.website/seasonal.html) for a detailed introduction to the options and features available.
-
 
 ## STL decomposition {#sec-6-stl}
 

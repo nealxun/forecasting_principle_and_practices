@@ -377,9 +377,9 @@ The `seasonal` package has many options for handling variations of X11 and SEATS
 
 STL is a very versatile and robust method for decomposing time series. STL is an acronym for “Seasonal and Trend decomposition using Loess”, while Loess is a method for estimating nonlinear relationships. The STL method was developed by @Cleveland1990.
 
-STL has several advantages over the classical decomposition method and X-12-ARIMA:
+STL has several advantages over the classical, SEATS and X-11 decomposition methods:
 
-- Unlike X-12-ARIMA, STL will handle any type of seasonality, not only monthly and quarterly data.
+- Unlike SEATS and X-11, STL will handle any type of seasonality, not only monthly and quarterly data.
 
 - The seasonal component is allowed to change over time, and the rate of change can be controlled by the user.
 
@@ -389,7 +389,7 @@ STL has several advantages over the classical decomposition method and X-12-ARIM
 
 On the other hand, STL has some disadvantages. In particular, it does not handle trading day or calendar variation automatically, and it only provides facilities for additive decompositions.
 
-It is possible to obtain a multiplicative decomposition by first taking logs of the data, then back-transforming the components. Decompositions between additive and multiplicative can be obtained using a Box-Cox transformation of the data with $0<\lambda<1$. A value of $\lambda=0$ corresponds to the multiplicative decomposition. while $\lambda=1$ is equivalent to an additive decomposition.
+It is possible to obtain a multiplicative decomposition by first taking logs of the data, then back-transforming the components. Decompositions between additive and multiplicative can be obtained using a Box-Cox transformation of the data with $0<\lambda<1$. A value of $\lambda=0$ corresponds to the multiplicative decomposition while $\lambda=1$ is equivalent to an additive decomposition.
 
 The best way to begin learning how to use STL is to see some examples and experiment with the settings. Figure \@ref(fig:elecequip-stl) showed an example of STL applied to the electrical equipment orders data. Figure \@ref(fig:elecequip-stl2) shows an alternative STL decomposition where the trend-cycle is more flexible, the seasonal component does not change over time, and the robust option has been used. Here, it is more obvious that there has been a down-turn at the end of the series, and that the orders in 2009 were unusually low (corresponding to some large negative values in the remainder component).
 

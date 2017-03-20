@@ -155,7 +155,7 @@ tab <- data.frame(Year=trunc(time(beer2)),
              Data=beer2,
              '4-MA'=ma4,
              '2x4-MA'=ma2x4)
-colnames(tab)[4:5] <- c("4-MA","2x4-MA")
+colnames(tab)[3:5] <- c("Observation","4-MA","2x4-MA")
 out <- knitr::kable(tab[1:20,],booktabs=TRUE,
         caption="A moving average of order 4 applied to the quarterly beer data, followed by a moving average of order 2.")
 out <- gsub('NA','  ', out)
@@ -475,7 +475,7 @@ As well as the naïve method, several other possible forecasting methods are ava
     autoplot(fit) + xlab("Year")
     ```
 
-    ```{r labour2, echo=FALSE, fig.cap="Seasonal component from the decomposition shown in Figure ??.", cache=TRUE}
+    ```{r labour2, echo=FALSE, fig.cap="Seasonal component from the decomposition shown in Figure 6.16.", cache=TRUE}
     ggsubseriesplot(seasonal(fit))
     ```
 

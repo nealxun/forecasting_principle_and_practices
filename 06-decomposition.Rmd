@@ -323,7 +323,7 @@ This method is based on classical decomposition, but includes many extra steps a
 
 The details of the X11 method are described in @Dagum2016. Here we will only demonstrate how to use the automatic procedure in R.
 
-The X11 method is also available using the `seas` function from the `seasonal` package for R.
+The X11 method is available using the `seas` function from the `seasonal` package for R.
 
 ```{r x11, echo=TRUE, warning=FALSE, cache=TRUE, fig.width=8, fig.height=7, fig.cap="An X11 decomposition of the new orders index for electrical equipment."}
 library(seasonal)
@@ -332,9 +332,30 @@ autoplot(fit) +
   ggtitle("X11 decomposition of electrical equipment index")
 ```
 
-This decomposition is relatively similar to the SEATS decomposition shown in Figure \@ref(fig:seats).
+Compare this decomposition with the STL decomposition shown in Figure \@ref(fig:elecequip-trend) and the classical decomposition shown in Figure \@ref(fig:classical-elecequip). The X11 trend-cycle has captured the sudden fall in the data in early 2009 better than either of the other two methods, and the unusual observation at the end of 2009 is now more clearly seen in the remainder component.
 
-The `seasonal` package has many options for handling variations of X11 and SEATS. See [the package website](http://www.seasonal.website/seasonal.html) for a detailed introduction to the options and features available.
+Given the output from the `seas` function, `seasonal()` will extract the seasonal component,  `trendcycle()` will extract the trend-cycle component, `remainder()` will extract the remainder component, and `seasadj()` will compute the seasonally adjusted time series.
+
+For example, Figure \@ref(fig:x11-seasadj) shows the trend-cycle component and the seasonally adjusted data, along with the original data.
+
+```{r x11-seasadj, echo=TRUE, warning=FALSE, cache=TRUE, fig.cap="Electrical equipment orders: the original data (grey), the trend-cycle component (red) and the seasonally adjusted data (blue)."}
+autoplot(elecequip, series="Data") +
+  autolayer(trendcycle(fit), series="Trend") +
+  autolayer(seasadj(fit), series="Seasonally Adjusted") +
+  xlab("Year") + ylab("New orders index") +
+  ggtitle("Electrical equipment manufacturing (Euro area)") +
+  scale_colour_manual(values=c("gray","blue","red"),
+                     breaks=c("Data","Seasonally Adjusted","Trend"))
+```
+
+It can be useful to use seasonal plots and seasonal sub-series plots of the seasonal component. These help us to visualize the variation in the seasonal component over time. Figure \@ref(fig:elecequip3) shows a seasonal sub-series plot of the seasonal component from Figure \@ref(fig:x11). In this case, there are only very small changes over time.
+
+
+```{r elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the X11 decomposition shown in Figure \\@ref(fig:x11).", echo=TRUE, cache=TRUE}
+ggsubseriesplot(seasonal(fit)) + ylab("Seasonal")
+```
+
+
 
 
 ## SEATS decomposition
@@ -350,28 +371,11 @@ autoplot(fit) +
   ggtitle("SEATS decomposition of electrical equipment index")
 ```
 
-Compare this decomposition with the STL decomposition shown in Figure \@ref(fig:elecequip-trend) and the classical decomposition shown in Figure \@ref(fig:classical-elecequip). The SEATS trend-cycle has captured the sudden fall in the data in early 2009 better than either of the other two methods, and the unusual observation at the end of 2009 is now more clearly seen in the remainder component.
+The result is quite similar to the X11 decompsotion shown in Figure \@ref(fig:x11).
 
-Given the output from the `seas` function, `seasonal()` will extract the seasonal component,  `trendcycle()` will extract the trend-cycle component, `remainder()` will extract the remainder component, and `seasadj()` will compute the seasonally adjusted time series.
+As with the X11 method, we  can use the  `seasonal()`,  `trendcycle()` and `remainder()` functions to extract the individual components, and `seasadj()` to compute the seasonally adjusted time series.
 
-For example, Figure \@ref(fig:seats-seasadj) shows the trend-cycle component and the seasonally adjusted data, along with the original data.
-
-```{r seats-seasadj, echo=TRUE, warning=FALSE, cache=TRUE, fig.cap="Electrical equipment orders: the original data (grey), the trend-cycle component (red) and the seasonally adjusted data (blue)."}
-autoplot(elecequip, series="Data") +
-  autolayer(trendcycle(fit), series="Trend") +
-  autolayer(seasadj(fit), series="Seasonally Adjusted") +
-  xlab("Year") + ylab("New orders index") +
-  ggtitle("Electrical equipment manufacturing (Euro area)") +
-  scale_colour_manual(values=c("gray","blue","red"),
-                     breaks=c("Data","Seasonally Adjusted","Trend"))
-```
-
-It can be useful to use seasonal plots and seasonal sub-series plots of the seasonal component. These help us to visualize the variation in the seasonal component over time. Figure \@ref(fig:elecequip3) shows a seasonal sub-series plot of the seasonal component from Figure \@ref(fig:seats). In this case, there are only very small changes over time.
-
-
-```{r elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the SEATS decomposition shown in Figure \\@ref(fig:seats).", echo=TRUE, cache=TRUE}
-ggsubseriesplot(seasonal(fit)) + ylab("Seasonal")
-```
+The `seasonal` package has many options for handling variations of X11 and SEATS. See [the package website](http://www.seasonal.website/seasonal.html) for a detailed introduction to the options and features available.
 
 ## STL decomposition {#sec-6-stl}
 

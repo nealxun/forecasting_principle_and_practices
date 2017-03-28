@@ -338,7 +338,7 @@ The component form for the additive method is:
   b_{t} &= \beta^*(\ell_{t} - \ell_{t-1}) + (1 - \beta^*)b_{t-1}\\
   s_{t} &= \gamma (y_{t}-\ell_{t-1}-b_{t-1}) + (1-\gamma)s_{t-m},
 \end{align*}
-where $h_{m}^{+}=\lfloor(h-1)\mod~m\rfloor+1$,^[The notation $\lfloor u \rfloor$ means the largest integer not greater than $u$.] which ensures that the estimates of the seasonal indices used for forecasting come from the final year of the sample. The level equation shows a weighted average between the seasonally adjusted observation $(y_{t} - s_{t-m})$ and the non-seasonal forecast $(\ell_{t-1}+b_{t-1})$ for time $t$. The trend equation is identical to Holt’s linear method. The seasonal equation shows a weighted average between the current seasonal index, $(y_{t}-\ell_{t-1}-b_{t-1})$, and the seasonal index of the same season last year (i.e., $m$ time periods ago).
+where $h_{m}^{+}=\lfloor(h-1)/m\rfloor+1$,^[The notation $\lfloor u \rfloor$ means the largest integer not greater than $u$.] which ensures that the estimates of the seasonal indices used for forecasting come from the final year of the sample. The level equation shows a weighted average between the seasonally adjusted observation $(y_{t} - s_{t-m})$ and the non-seasonal forecast $(\ell_{t-1}+b_{t-1})$ for time $t$. The trend equation is identical to Holt’s linear method. The seasonal equation shows a weighted average between the current seasonal index, $(y_{t}-\ell_{t-1}-b_{t-1})$, and the seasonal index of the same season last year (i.e., $m$ time periods ago).
 
 The equation for the seasonal component is often expressed as
 $$
@@ -509,7 +509,7 @@ This type of classification was first proposed by @Pegels1969, who also included
 
 Table \@ref(tab:pegels) gives the recursive formulae for applying the nine exponential smoothing methods in Table \@ref(tab:taxonomy). Each cell includes the forecast equation for generating $h$-step-ahead forecasts, and the smoothing equations for applying the method.
 
-Table: (\#tab:pegels) Formulae for recursive calculations and point forecasts. In each case, $\ell_t$ denotes the series level at time $t$, $b_t$ denotes the slope at time $t$, $s_t$ denotes the seasonal component of the series at time $t$, and $m$ denotes the number of seasons in a year; $\alpha$, $\beta^*$, $\gamma$ and $\phi$ are smoothing parameters, $\phi_h = \phi+\phi^2+\dots+\phi^{h}$ and $h_m^+ = \lfloor(h-1) \text{ mod } m\rfloor + 1$.
+Table: (\#tab:pegels) Formulae for recursive calculations and point forecasts. In each case, $\ell_t$ denotes the series level at time $t$, $b_t$ denotes the slope at time $t$, $s_t$ denotes the seasonal component of the series at time $t$, and $m$ denotes the number of seasons in a year; $\alpha$, $\beta^*$, $\gamma$ and $\phi$ are smoothing parameters, $\phi_h = \phi+\phi^2+\dots+\phi^{h}$ and $h_m^+ = \lfloor(h-1) / m\rfloor + 1$.
 
 ------------------------------------
 ```{r pegelstable, echo=FALSE, cache=TRUE}

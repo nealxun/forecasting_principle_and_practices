@@ -171,7 +171,7 @@ autoplot(motel[,2:1]/1000, facet=TRUE) +
   ggtitle("Total monthly accommodation: Victoria, Australia")
 ```
 
-We can study how relationship between takings and roomnights by plotting one series against the other.
+We can study the relationship between takings and room nights by plotting one series against the other.
 
 ```{r motel2, fig.cap="Monthly takings plotted against room nights for accommodation in Victoria, Australia.", cache=TRUE}
 qplot(Roomnights/1000, Takings/1000, data=as.data.frame(motel)) +

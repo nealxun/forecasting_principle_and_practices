@@ -1115,7 +1115,7 @@ where $y_t$ is the coal production in year $t$ and $e_t$ is a white noise series
         ```r
         install.packages("rdatamarket")
         ```
-    b. Select a time series from <http://datamarket.com/data/list/?q=pricing:free>. Then copy it's short URL and import the data using
+    b. Select a time series from <http://datamarket.com/data/list/?q=pricing:free>. Then copy its short URL and import the data using
         ```r
         x <- ts(rdatamarket::dmseries("shorturl")[,1], start=??, frequency=??)
         ```

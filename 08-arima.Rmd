@@ -374,6 +374,11 @@ coef <- coefficients(fit)
 intercept <- coef['intercept'] * (1-coef['ar1'] - coef['ar2'])
 ```
 
+```{r, include=FALSE}
+if(!identical(arimaorder(fit),c(2,0,2)))
+  stop("Different model from expected")
+```
+
 This is an ARIMA(2,0,2) model:
 $$
   y_t = c + `r format(coef['ar1'], nsmall=3, digits=3)`y_{t-1}

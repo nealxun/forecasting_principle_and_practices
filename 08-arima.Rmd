@@ -375,7 +375,7 @@ intercept <- coef['intercept'] * (1-coef['ar1'] - coef['ar2'])
 ```
 
 ```{r, include=FALSE}
-if(!identical(arimaorder(fit),c(2,0,2)))
+if(!identical(arimaorder(fit),c(2L,0L,2L)))
   stop("Different model from expected")
 ```
 

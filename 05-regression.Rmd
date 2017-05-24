@@ -759,7 +759,7 @@ autoplot(fcast) +
 
 ### Scenario based forecasting {-}
 
-In this setting, the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the predicted change in consumption when there is a constant growth of 1% and 0.5% respectively for income and savings with no change in the employment rate, versus a respective decline of 1% and 0.5%, for each of the four quarters following the end of the sample. The resulting forecasts are calculated below and shown in Figure \@ref(fig:ConsInc4). We should not that prediction intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume that the values of the predictors are known in advance.
+In this setting, the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the predicted change in consumption when there is a constant growth of 1% and 0.5% respectively for income and savings with no change in the employment rate, versus a respective decline of 1% and 0.5%, for each of the four quarters following the end of the sample. The resulting forecasts are calculated below and shown in Figure \@ref(fig:ConsInc4). We should note that prediction intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume that the values of the predictors are known in advance.
 
 
 ```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
@@ -790,7 +790,7 @@ for $h=1,2\ldots$. The predictor set is formed by values of the $x$s that are ob
 
 Including lagged values of the predictors does not only make the model operational for easily generating forecasts, it also makes it intuitively appealling. For example, the effect of a policy change with the aim of increasing production may not have an instantaneous effect on consumption expenditure. It is most likely that this will happend with a lagging effect. We touched upon this in Section \@ref(Regr-UsefulPredictors) when briefly introducing distributed lags as predictors. Several directions for generalising regression models to better incorporate the rich dynamics observed in time series are discussed In Section \@ref(ch-dynamic).
 
-### Predicition intervals {-}
+### Prediction intervals {-}
 
 With each forecast for the change in consumption Figure \@ref(fig:ConsInc4) 95% and 80% prediction intervals are also included. The general formulation of how to calculate prediction intervals for multiple regression models is presented in Section \@ref(Regr-MatrixEquations). As this involves some advanced matrix algebra we present here the case for calculating prediction intervals for a simple regression, where a forecast can be generated using the equation,
 $$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x.$$
@@ -1007,6 +1007,8 @@ autoplot(marathon) +
   xlab("Year") +  ylab("Winning times in minutes") +
   ggtitle("Boston Marathon") +
   guides(colour=guide_legend(title=" "))
+
+  ## TODO: Add cubic spline
 ```
 
 Figure \@ref(fig:marathonNonlinear) above shows the fitted lines and forecasts from linear, exponential and piecewise linear trends. The piecewise linear trend fits the data better than both the exponential and linear trends and seems to return sensible forecasts. The residuals plotted in the Figure \@ref(fig:residPiecewise) below show that the model has mostly captured the trend well although there is some autocorrelation remaining (we will deal with this in Chapter \ref(ch-advanced)). We should however again warn here that the projection forward from the piecewise linear trend can be very sensitive to the choice of location of the knots, especially the ones located towards the end of the sample. For example moving the knot placed at 1980 even five years forward will reveal very different forecasts. The wide prediction interval associated with the forecasts form the piecewise linear trend reflects the volatility observed in the historical winning times.

@@ -118,11 +118,12 @@ The logarithm in a Box-Cox transformation is always a natural logarithm (i.e., t
 
 If $\lambda=1$, then $w_t = y_t-1$, so the transformed data is shifted downwards but there is no change in the shape of the time series. But for all other values of $\lambda$, the time series will change shape.
 
-Use the slider below to see the effect of varying $\lambda$ to transform Australian monthly electricity demand:
+```{r choosechild, echo=FALSE}
+childdoc <- ifelse(knitr:::pandoc_to()=="html",
+   "03-BoxCox-Shiny.Rmd", "03-donothing.Rmd")
+```
 
-```{r BoxCoxShiny, echo=FALSE}
-knitr::include_app("https://robjhyndman.shinyapps.io/BoxCox/",
-  height = "650px")
+```{r BoxCoxShiny, child=childdoc}
 ```
 
 A good value of $\lambda$ is one which makes the size of the seasonal variation about the same across the whole series, as that makes the forecasting model simpler. In this case, $\lambda=0.30$ works quite well, although any value of $\lambda$ between 0 and 0.5 would give similar results.

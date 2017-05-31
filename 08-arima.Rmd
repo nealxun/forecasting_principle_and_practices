@@ -358,7 +358,7 @@ Selecting appropriate values for $p$, $d$ and $q$ can be difficult. However, the
 ### US consumption expenditure {-}
 
 ```{r usconsumption, fig.cap="Quarterly percentage change in US consumption expenditure.", cache=TRUE}
-autoplot(uschange[,1]) +
+autoplot(uschange[,"Consumption"]) +
   xlab("Year") + ylab("Quarterly percentage change")
 ```
 
@@ -367,7 +367,7 @@ Figure \@ref(fig:usconsumption) shows quarterly percentage changes in US consump
 The following R code was used to select a model automatically. (We use the argument `seasonal=FALSE` for now, but we will consider seasonal ARIMA models in Section \@ref(sec-seasonal-arima) )
 
 ```{r usconsumptionauto, cache=TRUE}
-(fit <- auto.arima(uschange[,1], seasonal=FALSE))
+(fit <- auto.arima(uschange[,"Consumption"], seasonal=FALSE))
 ```
 ```{r usconsumptioncoefs, cache=TRUE, echo=FALSE}
 coef <- coefficients(fit)
@@ -427,11 +427,11 @@ To overcome this problem, we can use **partial autocorrelations**. These measure
 Figures \@ref(fig:usconsumptionacf) and \@ref(fig:usconsumptionpacf) shows the ACF and PACF plots for the US consumption data shown in Figure \@ref(fig:usconsumption). The partial autocorrelations have the same critical values of $\pm 1.96/\sqrt{T}$ as for ordinary autocorrelations, and these are typically shown on the plot as in Figure \@ref(fig:usconsumptionacf).
 
 ```{r usconsumptionacf, fig.cap="ACF of quarterly percentage change in US consumption. A convenient way to produce a time plot, ACF plot and PACF plot in one command is to use the `ggtsdisplay` function in R.", fig.height=3, cache=TRUE}
-ggAcf(uschange[,1],main="")
+ggAcf(uschange[,"Consumption"],main="")
 ```
 
 ```{r usconsumptionpacf, fig.cap="PACF of quarterly percentage change in US consumption.", fig.height=3, cache=TRUE}
-ggPacf(uschange[,1],main="")
+ggPacf(uschange[,"Consumption"],main="")
 ```
 
 If the data are from an ARIMA($p$,$d$,0) or ARIMA(0,$d$,$q$) model, then the ACF and PACF plots can be helpful in determining the value of $p$ or $q$. If $p$ and $q$ are both positive, then the plots do not help in finding suitable values of $p$ and $q$.
@@ -449,13 +449,13 @@ The data may follow an ARIMA(0,$d$,$q$) model if the ACF and PACF plots of the d
 In Figure \@ref(fig:usconsumptionacf), we see that there are three spikes in the ACF, followed by an almost significant spike at lag 4. In the PACF, there are three significant spikes, and then no significant spikes thereafter (apart from one just outside the bounds at lag 22). We can ignore one significant spike in each plot if it is just outside the limits, and not in the first few lags. After all, the probability of a spike being significant by chance is about one in twenty, and we are plotting 22 spikes in each plot. The pattern in the first three spikes is what we would expect from an ARIMA(3,0,0), as the PACF tends to decrease. So in this case, the ACF and PACF lead us to think an ARIMA(3,0,0) model might be appropriate.
 
 ```{r usconsumptionar, fig.cap="Quarterly percentage change in US consumption expenditure.", cache=TRUE}
-(fit2 <- Arima(uschange[,1], order=c(3,0,0)))
+(fit2 <- Arima(uschange[,"Consumption"], order=c(3,0,0)))
 ```
 
 This model is actually slightly better than the model identified by `auto.arima` (with an AICc value of `r round(fit2$aicc,2)` compared to `r round(fit$aicc,2)`). The `auto.arima` function did not find this model because it does not consider all possible models in its search. You can make it work harder by using the arguments `stepwise=FALSE` and `approximation=FALSE`:
 
 ```{r usconsumptiontryharder, fig.cap="Quarterly percentage change in US consumption expenditure.", cache=TRUE}
-(fit3 <- auto.arima(uschange[,1], seasonal=FALSE,
+(fit3 <- auto.arima(uschange[,"Consumption"], seasonal=FALSE,
   stepwise=FALSE, approximation=FALSE))
 ```
 

@@ -10,7 +10,7 @@ In the second part of the chapter (Section \@ref(sec-7-ETS)) we present the stat
 
 The simplest of the exponentially smoothing methods is naturally called "simple exponential smoothing" (SES)^[In some books it is called ``single exponential smoothing'']. This method is suitable for forecasting data with no clear trend or seasonal pattern. For example, the data in Figure \@ref(fig:7-oil) do not display any clear trending behaviour or any seasonality. (There is a rise in the last few years, which might suggest a trend. We will consider whether a trended method would be better for this series later in this chapter.) We have already considered the naïve and the average as possible methods for forecasting such data (Section \@ref(sec-2-methods)).
 
-```{r 7-oil, fig.cap="Oil production in Saudi Arabia from 1980 to 2013.", echo=TRUE, cache=TRUE}
+```{r 7-oil, fig.cap="Oil production in Saudi Arabia from 1980 to 2013.", echo=TRUE}
 oildata <- window(oil, start=1996)
 autoplot(oildata) +
   ylab("Oil (millions of tonnes)") + xlab("Year")
@@ -36,7 +36,7 @@ where $0 \le \alpha \le 1$ is the smoothing parameter. The one-step-ahead foreca
 
 Table \@ref(tab:alpha) shows the weights attached to observations for four different values of $\alpha$ when forecasting using simple exponential smoothing. Note that the sum of the weights even for a small value of $\alpha$ will be approximately one for any reasonable sample size.
 
-```{r alpha, echo=FALSE, cache=TRUE}
+```{r alpha, echo=FALSE}
 tab <- as.data.frame(matrix(NA,nrow=6,ncol=4))
 rownames(tab) <- c("$y_{T}$", paste("$y_{T-",1:5,"}$",sep=''))
 alpha <- c(0.2,0.4,0.6,0.8)
@@ -119,7 +119,7 @@ Unlike the regression case (where we have formulas which return the values of th
 
 In this example, simple exponential smoothing is applied to forecast oil production in Saudi Arabia.
 
-```{r sesfit, echo=TRUE, cache=TRUE}
+```{r sesfit, echo=TRUE}
 oildata <- window(oil, start=1996)
 # Estimate parameters
 fc <- ses(oildata, h=5)
@@ -127,7 +127,7 @@ fc <- ses(oildata, h=5)
 round(accuracy(fc),2)
 ```
 
-```{r sesparam, echo=FALSE, cache=TRUE}
+```{r sesparam, echo=FALSE}
 #tmp <- accuracy(fc)
 #print(round(c(tmp[,c("MAE","RMSE","MAPE")],SSE=sum(residuals(fc)^2)),1))
 alpha <- fc$model$par[1]
@@ -140,7 +140,7 @@ $\ell_0=`r format(l0,digits=1,nsmall=1)`$, obtained by minimizing SSE (equivalen
 In Table \@ref(tab:oilses) we demonstrate the calculation using these parameters. The second last column shows the estimated level for times $t=0$ to $t=12$; the last few rows of the last column show the forecasts for $h=1,2,3$.
 
 
-```{r oilses, echo=FALSE, cache=TRUE}
+```{r oilses, echo=FALSE}
 # Data set for table
 x <- oildata
 # Generate forecasts
@@ -176,7 +176,7 @@ knitr::kable(tab, caption="Forecasting the total oil production in millions of t
 The black line in Figure \@ref(fig:ses) is a plot of the data, which shows a changing level over time.
 
 
-```{r ses, fig.cap="Simple exponential smoothing applied to oil production in Saudi Arabia (1996--2013).", echo=TRUE, cache=TRUE}
+```{r ses, fig.cap="Simple exponential smoothing applied to oil production in Saudi Arabia (1996--2013).", echo=TRUE}
 autoplot(fc) +
   autolayer(fitted(fc), series="Fitted") +
   ylab("Oil (millions of tonnes)") + xlab("Year")
@@ -204,7 +204,7 @@ The forecast function is no longer flat but trending. The $h$-step-ahead forecas
 
 ### Example: Air Passengers {-}
 
-```{r airholt0, echo=TRUE, cache=TRUE, fig.cap="Total annual passengers of air carriers registered in Australia. 1990-2014."}
+```{r airholt0, echo=TRUE, fig.cap="Total annual passengers of air carriers registered in Australia. 1990-2014."}
 air <- window(ausair, start=1990)
 autoplot(air) +
  ggtitle("Air passengers in Australia") +
@@ -213,11 +213,11 @@ autoplot(air) +
 
 Figure \@ref(fig:airholt0) shows annual passenger numbers for Australian airlines. In Table \@ref(tab:airholt) we demonstrate the application of Holt’s method to these data. The smoothing parameters, $\alpha$ and $\beta$, and the initial values $\ell_0$ and $b_0$ are estimated by minimizing the SSE for the one-step training errors as in Section \@ref(sec-7-1-SES).
 
-```{r airholt1, echo=TRUE, cache=TRUE}
+```{r airholt1, echo=TRUE}
 fc <- holt(air, h=5)
 ```
 
-```{r airholt, echo=FALSE, cache=TRUE}
+```{r airholt, echo=FALSE}
 # Now set up table
 tmp <- cbind(air, fc$model$state, fitted(fc))
 tsp(tmp) <- NULL
@@ -241,7 +241,7 @@ knitr::kable(tmp, booktabs=TRUE,
              caption="Applying Holt's linear method with $\\alpha=0.8317$ and $\\beta^*=0.0001$ to Australian air passenger data (millions of passengers).")
 ```
 
-```{r checkholt, echo=FALSE, cache=TRUE}
+```{r checkholt, echo=FALSE}
 if(sum(abs(fc$model$par[1:2] - c(0.8317,0.0001))) > 1e-4)
   stop("Parameter error")
 ```
@@ -266,7 +266,7 @@ In practice, $\phi$ is rarely less than 0.8 as the damping has a very strong eff
 
 Figure \@ref(fig:dampedtrend) shows the forecasts for years 2014--2018 generated from Holt’s linear trend method and the damped trend method.
 
-```{r dampedtrend, fig.cap="Forecasting Air Passengers in Australia (millions of passengers). For the damped trend method, $\\phi=0.90$.", echo=TRUE, cache=TRUE}
+```{r dampedtrend, fig.cap="Forecasting Air Passengers in Australia (millions of passengers). For the damped trend method, $\\phi=0.90$.", echo=TRUE}
 fc <- holt(air, h=15)
 fc2 <- holt(air, damped=TRUE, phi = 0.9, h=15)
 autoplot(air) +
@@ -283,14 +283,14 @@ We have set the damping parameter to a relatively low number $(\phi=0.90)$ to ex
 
 In this example, we compare the forecasting performance of the three exponential smoothing methods that we have considered so far in forecasting the sheep livestock population in Asia. The data spans the period 1970--2007 and is shown in Figure \@ref(fig:sheep).
 
-```{r sheep, fig.cap="Annual sheep livestock numbers in Asia (in million head)", echo=TRUE, cache=TRUE}
+```{r sheep, fig.cap="Annual sheep livestock numbers in Asia (in million head)", echo=TRUE}
 autoplot(livestock) +
   xlab("Year") + ylab("Livestock, sheep in Asia (millions)")
 ```
 
 We will use time series cross-validation to compare the one-step forecast accuracy of the three methods.
 
-```{r expsmoothcv, echo=TRUE, cache=TRUE}
+```{r expsmoothcv, echo=TRUE}
 e1 <- tsCV(livestock, ses, h=1)
 e2 <- tsCV(livestock, holt, h=1)
 e3 <- tsCV(livestock, holt, damped=TRUE, h=1)
@@ -307,7 +307,7 @@ mean(abs(e3), na.rm=TRUE)
 Based on MSE, Holt's method is best. But based on MAE, simple exponential smoothing is best. Conflicts such as this are common in forecasting comparisons. As forecasting tasks can vary by many dimensions (length of forecast horizon, size of test set, forecast error measures, frequency of data, etc.), it is unlikely that one method will be better than all others for all forecasting scenarios. What we require from a forecasting method are consistently sensible forecasts, and these should be frequently evaluated against the task at hand. In this case, the data are clearly trended, so we will prefer Holt's method, and apply it to the whole data set to get forecasts for future years.
 
 
-```{r holtmodel, echo=TRUE, cache=TRUE}
+```{r holtmodel, echo=TRUE}
 fc <- holt(livestock)
 # Estimated parameters:
 fc[["model"]]
@@ -315,7 +315,7 @@ fc[["model"]]
 
 The smoothing parameter for the slope parameter is estimated to be essentially zero, indicating that the trend is not changing over time.  The value of $\alpha$ is very close to one, showing that the level reacts strongly to each new observation.
 
-```{r fig-7-comp, fig.cap="Forecasting livestock, sheep in Asia: comparing forecasting performance of non-seasonal method.", echo=TRUE, cache=TRUE}
+```{r fig-7-comp, fig.cap="Forecasting livestock, sheep in Asia: comparing forecasting performance of non-seasonal method.", echo=TRUE}
 autoplot(fc) +
   xlab("Year") + ylab("Livestock, sheep in Asia (millions)")
 ```
@@ -364,7 +364,7 @@ The component form for the multiplicative method is:
 
 In this example we employ the Holt-Winters method with both additive and multiplicative seasonality to forecast quarterly visitor nights in Australia spent by international tourists. Figure \@ref(fig:7-HW) shows the data from 2005, and the forecasts for 2016--2017. The data show an obvious seasonal pattern, with peaks observed in the March quarter of each year, corresponding to the Australian summer.
 
-```{r 7-HW, fig.cap="Forecasting international visitor nights in Australia using the Holt-Winters method with both additive and multiplicative seasonality.", echo=TRUE, cache=TRUE}
+```{r 7-HW, fig.cap="Forecasting international visitor nights in Australia using the Holt-Winters method with both additive and multiplicative seasonality.", echo=TRUE}
 aust <- window(austourists,start=2005)
 fit1 <- hw(aust,seasonal="additive")
 fit2 <- hw(aust,seasonal="multiplicative")
@@ -375,7 +375,7 @@ autoplot(aust) +
   guides(colour=guide_legend(title="Forecast"))
 ```
 
-```{r tab75, echo=FALSE, cache=TRUE}
+```{r tab75, echo=FALSE}
 # Set up matrix
 tab <- matrix(NA_real_, ncol=6, nrow=length(aust) + 4 + 8)
 # Add historical content
@@ -409,7 +409,7 @@ ctab <- rbind(head(ctab,length(aust)+4),
 knitr::kable(ctab, booktabs=TRUE, caption="Applying Holt-Winters' method with additive seasonality for forecasting international visitor nights in Australia. Notice that the additive seasonal component sums to approximately zero. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.250$, $\\beta^*=0.0069$, $\\gamma=0.456$ and RMSE$=1.786$).")
 ```
 
-```{r tab76, echo=FALSE, cache=TRUE}
+```{r tab76, echo=FALSE}
 # Add historical content
 tab[1:NROW(fit2$model$states) + 3,3:5] <- fit2$model$states[,1:3]
 tab[1:3,5] <- fit2$model$states[1,4:6]
@@ -430,7 +430,7 @@ ctab <- rbind(head(ctab,length(aust)+4),
 knitr::kable(ctab,digits=2, booktabs=TRUE, caption="Applying Holt-Winters' method with multiplicative seasonality for forecasting international visitor nights in Australia. Notice that the multiplicative seasonal component sums to approximately $m=4$. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.479$, $\\beta^*=0.055$, $\\gamma=0.0001$ and RMSE$=1.590$).")
 ```
 
-```{r checkhw, echo=FALSE, cache=TRUE}
+```{r checkhw, echo=FALSE}
 # Check numbers in table captions above
 if(sum(abs(fit1[["model"]][["par"]][1:3] - c(0.250, 0.0069*0.250, 0.456))) > 1e-3)
   stop("HW additive parameters are wrong")
@@ -446,7 +446,7 @@ The applications of both methods (with additive and multiplicative seasonality) 
 
 The estimated states for both models are plotted in Figure \@ref(fig:fig-7-LevelTrendSeas). The small value of $\gamma$ for the multiplicative model means that the seasonal component hardly changes over time. The small value of $\beta^*$ for the additive model means the slope component hardly changes over time (check the vertical scale).
 
-```{r fig-7-LevelTrendSeas, fig.cap="Estimated components for the Holt-Winters method with additive and multiplicative seasonal components.", echo=FALSE, cache=TRUE}
+```{r fig-7-LevelTrendSeas, fig.cap="Estimated components for the Holt-Winters method with additive and multiplicative seasonal components.", echo=FALSE}
 addstates <- fit1$model$states[,1:3]
 multstates <- fit2$model$states[,1:3]
 colnames(addstates) <- colnames(multstates) <-
@@ -512,7 +512,7 @@ Table \@ref(tab:pegels) gives the recursive formulae for applying the nine expon
 Table: (\#tab:pegels) Formulae for recursive calculations and point forecasts. In each case, $\ell_t$ denotes the series level at time $t$, $b_t$ denotes the slope at time $t$, $s_t$ denotes the seasonal component of the series at time $t$, and $m$ denotes the number of seasons in a year; $\alpha$, $\beta^*$, $\gamma$ and $\phi$ are smoothing parameters, $\phi_h = \phi+\phi^2+\dots+\phi^{h}$ and $h_m^+ = \lfloor(h-1) / m\rfloor + 1$.
 
 ------------------------------------
-```{r pegelstable, echo=FALSE, cache=TRUE}
+```{r pegelstable, echo=FALSE}
 knitr::include_graphics("pegelstable.png")
 ```
 ------------------------------------
@@ -605,7 +605,7 @@ In a similar fashion, we can write an innovations state space model for each of 
 Table: (\#tab:ssm) State space equations for each of the models in the ETS framework.
 
 ------------------------------------
-```{r ssm, echo=FALSE, cache=TRUE}
+```{r ssm, echo=FALSE}
 knitr::include_graphics("statespacemodels.png")
 ```
 ------------------------------------
@@ -715,7 +715,7 @@ The `ets()` function will return an object of class `ets`. There are many R func
 
 We now employ the ETS statistical framework to forecast tourist visitor nights in Australia by international arrivals over the period 2016--2019. We let the `ets()` function select the model by minimizing the AICc.
 
-```{r austouristsets, echo=TRUE, cache=TRUE}
+```{r austouristsets, echo=TRUE}
 aust <- window(austourists, start=2005)
 fit <- ets(aust)
 summary(fit)
@@ -734,13 +734,13 @@ The parameter estimates are $\alpha=`r format(fit$par[1],nsmall=4,digits=4)`$, $
 
 Figure \@ref(fig:MAMstates) shows the states over time, while Figure \@ref(fig:MAMforecasts) shows point forecasts and prediction intervals generated from the model. The small values of $\beta$ and $\gamma$ mean that the slope and seasonal components change very little over time. The narrow prediction intervals indicate that the series is relatively easy to forecast due to the strong trend and seasonality.
 
-```{r MAMstates, fig.cap="Graphical representation of the estimated states over time.", echo=TRUE, cache=TRUE}
+```{r MAMstates, fig.cap="Graphical representation of the estimated states over time.", echo=TRUE}
 autoplot(fit)
 ```
 
 Because this model has multiplicative errors, the residuals are not equivalent to the one-step forecast errors. The residuals are given by $\hat{\varepsilon}_t$, while the one-step forecast errors are defined as $y_t - \hat{y}_{t|t-1}$. We can obtain both using the `residuals` function.
 
-```{r MAMresiduals, fig.cap="Residuals and one-step forecast errors from the ETS(M,A,M) model.", cache=TRUE}
+```{r MAMresiduals, fig.cap="Residuals and one-step forecast errors from the ETS(M,A,M) model."}
 cbind('Residuals' = residuals(fit),
       'Forecast errors' = residuals(fit, type='response')) %>%
   autoplot(facet=TRUE) + xlab("Year") + ylab("")
@@ -807,7 +807,7 @@ PI=TRUE, lambda=object$lambda, biasadj=NULL, ...)
 :   If `lambda` is not `NULL`, the backtransformed forecasts (and prediction intervals) are bias-adjusted.
 
 
-```{r MAMforecasts, fig.cap="Forecasting international visitor nights in Australia using an ETS(M,A,M) model.", echo=TRUE, cache=TRUE}
+```{r MAMforecasts, fig.cap="Forecasting international visitor nights in Australia using an ETS(M,A,M) model.", echo=TRUE}
 fit %>% forecast(h=8) %>%
   autoplot() +
   ylab("International visitor night in Australia (millions)")

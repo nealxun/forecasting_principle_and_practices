@@ -66,17 +66,17 @@ The AICc is calculated for the final model, and this value can be used to determ
 Figure \@ref(fig:usconsump) shows the quarterly changes in personal consumption expenditure and personal disposable income from 1970 to 2010. We would like to forecast changes in expenditure based on changes in income. A change in income does not necessarily translate to an instant change in consumption (e.g., after the loss of a job, it may take a few months for expenses to be reduced to allow for the new circumstances). However, we will ignore this complexity in this example and try to measure the instantaneous effect of the average change of income on the average change of consumption expenditure.
 
 
-```{r usconsump, fig.cap="Percentage changes in quarterly personal consumption expenditure and personal disposable income for the USA, 1970 to 2010.", cache=TRUE}
+```{r usconsump, fig.cap="Percentage changes in quarterly personal consumption expenditure and personal disposable income for the USA, 1970 to 2010."}
 autoplot(uschange[,1:2], facets=TRUE) +
   xlab("Year") + ylab("") +
   ggtitle("Quarterly changes in US consumption and personal income")
 ```
 
-```{r usconsump2, fig.cap="Residuals ($e_t$) obtained from a regression of change in consumption expenditure on change in disposable income, assuming an ARIMA(1,0,2) error model.", cache=TRUE}
+```{r usconsump2, fig.cap="Residuals ($e_t$) obtained from a regression of change in consumption expenditure on change in disposable income, assuming an ARIMA(1,0,2) error model."}
 (fit <- auto.arima(uschange[,"Consumption"], xreg=uschange[,"Income"]))
 ```
 
-```{r usconsumpparam, echo=FALSE, cache=TRUE}
+```{r usconsumpparam, echo=FALSE}
 phi1 <- coef(fit)['ar1']
 theta1 <- coef(fit)['ma1']
 theta2 <- coef(fit)['ma2']
@@ -97,7 +97,7 @@ The data are clearly already stationary (as we are considering percentage change
 
 We can recover both the $n_t$ and $e_t$ series using the `residuals()` function.
 
-```{r usconsumpres, fig.cap="Regression errors ($n_t$) and ARIMA errors ($e_t$) from the fitted model.", cache=TRUE}
+```{r usconsumpres, fig.cap="Regression errors ($n_t$) and ARIMA errors ($e_t$) from the fitted model."}
 cbind("Regression Errors" = residuals(fit, type="regression"),
       "ARIMA errors" = residuals(fit, type="innovation")) %>%
   autoplot(facets=TRUE)
@@ -105,7 +105,7 @@ cbind("Regression Errors" = residuals(fit, type="regression"),
 
 It is the ARIMA errors that should resemble a white noise series.
 
-```{r usconsumpres2, fig.cap="The residuals (i.e., the ARIMA errors) are not significantly different from white noise.", cache=TRUE}
+```{r usconsumpres2, fig.cap="The residuals (i.e., the ARIMA errors) are not significantly different from white noise."}
 checkresiduals(fit)
 ```
 
@@ -115,7 +115,7 @@ To forecast a regression model with ARIMA errors, we need to forecast the regres
 
 To continue the previous example, we will calculate forecasts for the next eight quarters assuming that the future percentage changes in personal disposable income will be equal to the mean percentage change from the last forty years.
 
-```{r usconsump3, fig.cap="Forecasts obtained from regressing the percentage change in consumption expenditure on the percentage change in disposable income, with an ARIMA(1,0,2) error model.", cache=TRUE}
+```{r usconsump3, fig.cap="Forecasts obtained from regressing the percentage change in consumption expenditure on the percentage change in disposable income, with an ARIMA(1,0,2) error model."}
 fcast <- forecast(fit, xreg=rep(mean(uschange[,2]),8))
 autoplot(fcast) + xlab("Year") +
   ylab("Percentage change")
@@ -146,7 +146,7 @@ Although these models appear quite similar (they only differ in the number of di
 
 ###Example: International visitors to Australia {-}
 
-```{r austa, fig.cap="Annual international visitors to Australia, 1980--2010.", cache=TRUE}
+```{r austa, fig.cap="Annual international visitors to Australia, 1980--2010."}
 autoplot(austa) + xlab("Year") +
   ylab("millions of people") +
   ggtitle("Total annual international visitors to Australia")
@@ -156,12 +156,12 @@ Figure \@ref(fig:austa) shows the total number of international visitors to Aust
 
 The deterministic trend model is obtained as follows:
 
-```{r deterministictrend, cache=TRUE}
+```{r deterministictrend}
 trend <- seq_along(austa)
 (fit1 <- auto.arima(austa, d=0, xreg=trend))
 ```
 
-```{r austaparams, cache=TRUE, echo=FALSE}
+```{r austaparams, echo=FALSE}
 phi1 <- coef(fit1)['ar1']
 phi2 <- coef(fit1)['ar2']
 intercept <- coef(fit1)['intercept']
@@ -181,11 +181,11 @@ The estimated growth in visitor numbers is `r format(slope, digits=2)` million p
 
 Alternatively, the stochastic trend model can be estimated.
 
-```{r stochastictrend, cache=TRUE}
+```{r stochastictrend}
 (fit2 <- auto.arima(austa, d=1))
 ```
 
-```{r austaparams2, cache=TRUE, echo=FALSE}
+```{r austaparams2, echo=FALSE}
 drift <- coef(fit2)['drift']
 theta1 <- coef(fit2)['ma1']
 sigma2 <- fit2$sigma2
@@ -201,7 +201,7 @@ This model can be written as $y_t-y_{t-1} = 0.15 + e_t$, or equivalently
 In this case, the estimated growth in visitor numbers is also `r format(drift, digits=2)` million people per year. Although the growth estimates are similar, the prediction intervals are not, as Figure \@ref(fig:austaf) shows. In particular, stochastic trends have much wider prediction intervals because the errors are non-stationary.
 
 
-```{r austaf, fig.cap="Forecasts of annual international visitors to Australia using a deterministic trend model and a stochastic trend model.", cache=TRUE, message=FALSE}
+```{r austaf, fig.cap="Forecasts of annual international visitors to Australia using a deterministic trend model and a stochastic trend model.", message=FALSE}
 fc1 <- forecast(fit1, xreg=data.frame(trend=length(austa)+1:10))
 fc2 <- forecast(fit2, h=10)
 autoplot(austa) +
@@ -254,7 +254,7 @@ where $n_t$ is an ARIMA process. The value of $k$ can be selected using the AICc
 
 A US insurance company advertises on national television in an attempt to increase the number of insurance quotations provided (and consequently the number of new policies). Figure \@ref(fig:tvadvert) shows the number of quotations and the expenditure on television advertising for the company each month from January 2002 to April 2005.
 
-```{r tvadvert, fig.cap="Numbers of insurance quotations provided per month and the expenditure on advertising per month.", cache=TRUE}
+```{r tvadvert, fig.cap="Numbers of insurance quotations provided per month and the expenditure on advertising per month."}
 autoplot(insurance, facets=TRUE) +
   xlab("Year") + ylab("") +
   ggtitle("Insurance advertising and quotations")
@@ -262,7 +262,7 @@ autoplot(insurance, facets=TRUE) +
 
 We will consider including advertising expenditure for up to four months; that is, the model may include advertising expenditure in the current month, and the three months before that. When comparing models, it is important that they all use the same training set. In the following code, we exclude the first three months in order to make fair comparisons. The best model is the one with the smallest AICc value.
 
-```{r tvadvert2, fig.cap="ARIMA models for insurance quotations with advertising as a predictor variable.", cache=TRUE}
+```{r tvadvert2, fig.cap="ARIMA models for insurance quotations with advertising as a predictor variable."}
 # Lagged predictors. Test 0, 1, 2 or 3 lags.
 Advert <- cbind(
   AdLag0 = insurance[,"TV.advert"],
@@ -282,7 +282,7 @@ fit4 <- auto.arima(insurance[4:40,1], xreg=Advert[4:40,1:4], d=0)
 (fit <- auto.arima(insurance[,1], xreg=Advert[,1:2], d=0))
 ```
 
-```{r tvadvertparam, echo=FALSE, cache=TRUE}
+```{r tvadvertparam, echo=FALSE}
 # Check previous model
 if(fit1$aicc < fit2$aicc | fit3$aicc < fit2$aicc | fit4$aicc < fit2$aicc)
   stop("TV model not correct")
@@ -312,7 +312,7 @@ and $e_t$ is white noise.
 
 We can calculate forecasts using this model if we assume future values for the advertising variable. If we set the future monthly advertising to 8 units, we get the following forecasts.
 
-```{r tvadvertf8, fig.cap="Forecasts of monthly insurance quotes, assuming that the future advertising expenditure is 8 units in each future month.", cache=TRUE}
+```{r tvadvertf8, fig.cap="Forecasts of monthly insurance quotes, assuming that the future advertising expenditure is 8 units in each future month."}
 fc8 <- forecast(fit, h=20,
   xreg=cbind(AdLag0=rep(8,20), AdLag1=c(Advert[40,1],rep(8,19))))
 autoplot(fc8) + ylab("Quotes") +

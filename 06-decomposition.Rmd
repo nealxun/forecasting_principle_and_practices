@@ -30,7 +30,7 @@ $$
 
 We will look at several methods for obtaining the components $S_{t}$, $T_{t}$ and $R_{t}$ later in this chapter, but first, it is helpful to see an example. We will decompose the new orders index for electrical equipment shown in Figure \@ref(fig:elecequip-trend). These data show the numbers of new orders for electrical equipment (computer, electronic and optical products) in the Euro area (16 countries). The data have been adjusted by working days and normalized so that a value of 100 corresponds to 2005.
 
-```{r elecequip-trend,  fig.cap="Electrical equipment orders: the trend-cycle component (red) and the raw data (grey).", echo=FALSE, cache=TRUE}
+```{r elecequip-trend,  fig.cap="Electrical equipment orders: the trend-cycle component (red) and the raw data (grey).", echo=FALSE}
 fit <- stl(elecequip, s.window=7, t.window=13, robust=TRUE)
 autoplot(elecequip, series="Data") +
   autolayer(trendcycle(fit), series="Trend-cycle") +
@@ -44,7 +44,7 @@ Figure \@ref(fig:elecequip-trend) shows the trend-cycle component, $T_t$, in red
 
 Figure \@ref(fig:elecequip-stl) shows an additive decomposition of these data. The method used for estimating components in this example is STL, which is discussed in Section \@ref(sec-6-stl).
 
-```{r elecequip-stl, fig.cap="The electricial equipment orders (top) and its three additive components.", fig.width=8, fig.height=7, echo=FALSE, cache=TRUE}
+```{r elecequip-stl, fig.cap="The electricial equipment orders (top) and its three additive components.", fig.width=8, fig.height=7, echo=FALSE}
 autoplot(fit) + xlab("Year")
 ```
 
@@ -58,7 +58,7 @@ If the seasonal component is removed from the original data, the resulting value
 
 Figure \@ref(fig:elecequip-sa) shows the seasonally adjusted electrical equipment orders.
 
-```{r elecequip-sa, fig.cap="Seasonally adjusted electrical equipment orders (red) and the original data (grey).", echo=FALSE, cache=TRUE}
+```{r elecequip-sa, fig.cap="Seasonally adjusted electrical equipment orders (red) and the original data (grey).", echo=FALSE}
 autoplot(elecequip, series="Data") +
   autolayer(seasadj(fit), series="Seasonally Adjusted") +
   xlab("Year") + ylab("New orders index") +
@@ -83,17 +83,17 @@ $$
 $$
 where $m=2k+1$. That is, the estimate of the trend-cycle at time $t$ is obtained by averaging values of the time series within $k$ periods of $t$. Observations that are nearby in time are also likely to be close in value, and the average eliminates some of the randomness in the data, leaving a smooth trend-cycle component. We call this an “$m$-MA”, meaning a moving average of order $m$.
 
-```{r ressales1, fig.cap="Residential electricity sales (excluding hot water) for South Australia: 1989--2008.", echo=TRUE, cache=TRUE}
+```{r ressales1, fig.cap="Residential electricity sales (excluding hot water) for South Australia: 1989--2008.", echo=TRUE}
 autoplot(elecsales) + xlab("Year") + ylab("GWh") +
   ggtitle("Annual electricity sales: South Australia")
 ```
 
 For example, consider Figure \@ref(fig:ressales1) which shows the volume of electricity sold to residential customers in South Australia each year from 1989 to 2008 (hot water sales have been excluded). The data are also shown in Table \@ref(tab:elecsales).
 
-```{r elecma, echo=TRUE, cache=TRUE}
+```{r elecma, echo=TRUE}
 ma5 <- ma(elecsales, 5)
 ```
-```{r elecsales, echo=FALSE, cache=TRUE}
+```{r elecsales, echo=FALSE}
 tab <- cbind(Year=time(elecsales),
              "Sales (GWh)"=elecsales,
              "5-MA"=ma5)
@@ -107,7 +107,7 @@ out
 In the second column of this table, a moving average of order 5 is shown, providing an estimate of the trend-cycle. The first value in this column is the average of the first five observations (1989--1993); the second value in the 5-MA column is the average of the values for 1990--1994; and so on. Each value in the 5-MA column is the average of the observations in the five year period centered on the corresponding year. There are no values for either the first two years or the last two years, because we do not have two observations on either side. In the formula above, column
 5-MA contains the values of $\hat{T}_{t}$ with $k=2$. To see what the trend-cycle estimate looks like, we plot it along with the original data in Figure \@ref(fig:ressales2).
 
-```{r ressales2, fig.cap="Residential electricity sales (black) along with the 5-MA estimate of the trend-cycle (red).", echo=TRUE, cache=TRUE, warning=FALSE,message=FALSE}
+```{r ressales2, fig.cap="Residential electricity sales (black) along with the 5-MA estimate of the trend-cycle (red).", echo=TRUE, warning=FALSE,message=FALSE}
 autoplot(elecsales, series="Data") +
   autolayer(ma(elecsales,5), series="5-MA") +
   xlab("Year") + ylab("GWh") +
@@ -120,7 +120,7 @@ Notice that the trend-cycle (in red) is smoother than the original data and capt
 
 The order of the moving average determines the smoothness of the trend-cycle estimate. In general, a larger order means a smoother curve. Figure \@ref(fig:ressales3) shows the effect of changing the order of the moving average for the residential electricity sales data.
 
-```{r ressales3, fig.cap="Different moving averages applied to the residential electricity sales data.", echo=FALSE, cache=TRUE, warning=FALSE,message=FALSE}
+```{r ressales3, fig.cap="Different moving averages applied to the residential electricity sales data.", echo=FALSE, warning=FALSE,message=FALSE}
 grobs <- list()
 mak <- c(3,5,7,9)
 for(m in seq(mak))
@@ -143,13 +143,13 @@ It is possible to apply a moving average to a moving average. One reason for doi
 
 For example, we might take a moving average of order 4, and then apply another moving average of order 2 to the results. In the following table, this has been done for the first few years of the Australian quarterly beer production data.
 
-```{r beerma, echo=TRUE, cache=TRUE}
+```{r beerma, echo=TRUE}
 beer2 <- window(ausbeer,start=1992)
 ma4 <- ma(beer2, order=4, centre=FALSE)
 ma2x4 <- ma(beer2, order=4, centre=TRUE)
 ```
 
-```{r matable, echo=FALSE, cache=TRUE}
+```{r matable, echo=FALSE}
 tab <- data.frame(Year=trunc(time(beer2)),
              Quarter=paste("Q",cycle(beer2),sep=''),
              Data=beer2,
@@ -196,7 +196,7 @@ Other choices for the order of the MA will usually result in trend-cycle estimat
 
 ###Example: Electrical equipment manufacturing {-}
 
-```{r elecequip2, fig.cap="A 2x12-MA applied to the electrical equipment orders index.", echo=TRUE, cache=TRUE, warning=FALSE}
+```{r elecequip2, fig.cap="A 2x12-MA applied to the electrical equipment orders index.", echo=TRUE, warning=FALSE}
 autoplot(elecequip, series="Data") +
   autolayer(ma(elecequip, 12), series="12-MA") +
   xlab("Year") + ylab("New orders index") +
@@ -221,7 +221,7 @@ A major advantage of weighted moving averages is that they yield a smoother esti
 
 Some specific sets of weights are widely used due to their mathematical properties. Some of these are given in Table \@ref(tab:weights).
 
-```{r weights, echo=FALSE, cache=TRUE}
+```{r weights, echo=FALSE}
 weights <- matrix(NA,ncol=12,nrow=11)
 colnames(weights) <- paste("$a_{",0:11,"}$",sep="")
 rownames(weights) <- c("3-MA","5-MA","2x12-MA",
@@ -294,7 +294,7 @@ Step 4
 :   The remainder component is calculated by dividing out the estimated seasonal and trend-cycle components: $\hat{R}_{t} = y_t /( \hat{T}_t  \hat{S}_t)$.
 
 
-```{r classical-elecequip, cache=TRUE, echo=TRUE, fig.width=8, fig.height=7, fig.cap="A classical multiplicative decomposition of the new orders index for electrical equipment."}
+```{r classical-elecequip, echo=TRUE, fig.width=8, fig.height=7, fig.cap="A classical multiplicative decomposition of the new orders index for electrical equipment."}
 fit <- decompose(elecequip, type="multiplicative")
 autoplot(fit) + xlab("Year") +
   ggtitle("Classical multiplicative decomposition of electrical equipment index")
@@ -325,7 +325,7 @@ The details of the X11 method are described in @Dagum2016. Here we will only dem
 
 The X11 method is available using the `seas` function from the `seasonal` package for R.
 
-```{r x11, echo=TRUE, warning=FALSE, cache=TRUE, fig.width=8, fig.height=7, fig.cap="An X11 decomposition of the new orders index for electrical equipment."}
+```{r x11, echo=TRUE, warning=FALSE, fig.width=8, fig.height=7, fig.cap="An X11 decomposition of the new orders index for electrical equipment."}
 library(seasonal)
 fit <- seas(elecequip, x11="")
 autoplot(fit) +
@@ -338,7 +338,7 @@ Given the output from the `seas` function, `seasonal()` will extract the seasona
 
 For example, Figure \@ref(fig:x11-seasadj) shows the trend-cycle component and the seasonally adjusted data, along with the original data.
 
-```{r x11-seasadj, echo=TRUE, warning=FALSE, cache=TRUE, fig.cap="Electrical equipment orders: the original data (grey), the trend-cycle component (red) and the seasonally adjusted data (blue)."}
+```{r x11-seasadj, echo=TRUE, warning=FALSE, fig.cap="Electrical equipment orders: the original data (grey), the trend-cycle component (red) and the seasonally adjusted data (blue)."}
 autoplot(elecequip, series="Data") +
   autolayer(trendcycle(fit), series="Trend") +
   autolayer(seasadj(fit), series="Seasonally Adjusted") +
@@ -351,7 +351,7 @@ autoplot(elecequip, series="Data") +
 It can be useful to use seasonal plots and seasonal sub-series plots of the seasonal component. These help us to visualize the variation in the seasonal component over time. Figure \@ref(fig:elecequip3) shows a seasonal sub-series plot of the seasonal component from Figure \@ref(fig:x11). In this case, there are only very small changes over time.
 
 
-```{r elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the X11 decomposition shown in Figure \\@ref(fig:x11).", echo=TRUE, cache=TRUE}
+```{r elecequip3, fig.cap="Seasonal sub-series plot of the seasonal component from the X11 decomposition shown in Figure \\@ref(fig:x11).", echo=TRUE}
 ggsubseriesplot(seasonal(fit)) + ylab("Seasonal")
 ```
 
@@ -364,7 +364,7 @@ ggsubseriesplot(seasonal(fit)) + ylab("Seasonal")
 
 The details are beyond the scope of this book. However, a complete discussion of the method is available in @Dagum2016. Here we will only demonstrate how to use it via the `seasonal` package.
 
-```{r seats, echo=TRUE, warning=FALSE, cache=TRUE, fig.width=8, fig.height=7, fig.cap="A SEATS decomposition of the new orders index for electrical equipment."}
+```{r seats, echo=TRUE, warning=FALSE, fig.width=8, fig.height=7, fig.cap="A SEATS decomposition of the new orders index for electrical equipment."}
 library(seasonal)
 fit <- seas(elecequip)
 autoplot(fit) +
@@ -397,7 +397,7 @@ It is possible to obtain a multiplicative decomposition by first taking logs of 
 
 The best way to begin learning how to use STL is to see some examples and experiment with the settings. Figure \@ref(fig:elecequip-stl) showed an example of STL applied to the electrical equipment orders data. Figure \@ref(fig:elecequip-stl2) shows an alternative STL decomposition where the trend-cycle is more flexible, the seasonal component does not change over time, and the robust option has been used. Here, it is more obvious that there has been a down-turn at the end of the series, and that the orders in 2009 were unusually low (corresponding to some large negative values in the remainder component).
 
-```{r elecequip-stl2, fig.cap="The electrical equipment orders (top) and its three additive components obtained from a robust STL decomposition with flexible trend-cycle and fixed seasonality.",fig.width=8, fig.height=7, echo=TRUE, cache=TRUE}
+```{r elecequip-stl2, fig.cap="The electrical equipment orders (top) and its three additive components obtained from a robust STL decomposition with flexible trend-cycle and fixed seasonality.",fig.width=8, fig.height=7, echo=TRUE}
 elecequip %>%
   stl(t.window=13, s.window="periodic", robust=TRUE) %>%
   autoplot
@@ -428,7 +428,7 @@ To forecast the seasonally adjusted component, any non-seasonal forecasting meth
 
 ### Example: Electrical equipment manufacturing {-}
 
-```{r elecequip4, fig.cap="Naïve forecasts of the seasonally adjusted data obtained from an STL decomposition of the electrical equipment orders data.", echo=TRUE, cache=TRUE}
+```{r elecequip4, fig.cap="Naïve forecasts of the seasonally adjusted data obtained from an STL decomposition of the electrical equipment orders data.", echo=TRUE}
 fit <- stl(elecequip, t.window=13, s.window="periodic", robust=TRUE)
 eeadj <- seasadj(fit)
 autoplot(naive(eeadj)) + ylab("New orders index") +
@@ -440,7 +440,7 @@ Figure \@ref(fig:elecequip4) shows naïve forecasts of the seasonally adjusted e
 This is made easy with the `forecast` function applied to the `stl` object. You need to specify the method being used on the seasonally adjusted data, and the function will do the re-seasonalizing for you. The resulting forecasts of the original data are shown in Figure \@ref(fig:elecequip5).
 
 
-```{r elecequip5, fig.cap="Forecasts of the electrical equipment orders data based on a naïve forecast of the seasonally adjusted data and a seasonal naïve forecast of the seasonal component, after an STL decomposition of the data.", echo=TRUE, cache=TRUE}
+```{r elecequip5, fig.cap="Forecasts of the electrical equipment orders data based on a naïve forecast of the seasonally adjusted data and a seasonal naïve forecast of the seasonal component, after an STL decomposition of the data.", echo=TRUE}
 fcast <- forecast(fit, method="naive")
 autoplot(fcast) + ylab("New orders index")
 ```
@@ -474,12 +474,12 @@ As well as the naïve method, several other possible forecasting methods are ava
 
 3. Figures \@ref(fig:labour) and \@ref(fig:labour2) shows the result of decomposing the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.
 
-    ```{r labour, echo=FALSE, fig.cap="Decomposition of the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.", fig.width=8, fig.height=7, cache=TRUE}
+    ```{r labour, echo=FALSE, fig.cap="Decomposition of the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.", fig.width=8, fig.height=7}
     fit <- stl(labour, robust=TRUE, s.window=11)
     autoplot(fit) + xlab("Year")
     ```
 
-    ```{r labour2, echo=FALSE, fig.cap="Seasonal component from the decomposition shown in Figure \\@ref(fig:labour).", cache=TRUE}
+    ```{r labour2, echo=FALSE, fig.cap="Seasonal component from the decomposition shown in Figure \\@ref(fig:labour)."}
     ggsubseriesplot(seasonal(fit))
     ```
 

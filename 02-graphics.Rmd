@@ -10,7 +10,7 @@ A time series can be thought of as a list of numbers, along with some informatio
 
 Suppose you have annual observations for the last few years:
 
-```{r tstable, echo=FALSE, cache=TRUE}
+```{r tstable, echo=FALSE}
 x <- c(123,39,78,52,110)
 yr <- 2012:2016
 knitr::kable(data.frame(Year=yr,Observation=x), booktabs=TRUE)
@@ -36,7 +36,7 @@ Almost all of the data used in this book is already stored as `ts` objects. But 
 
 The "frequency" is the number of observations before the seasonal pattern repeats.^[This is the opposite of the definition of frequency in physics, or in Fourier analysis, where this would be called the "period".] When using the `ts()` function in R, the following choices should be used.
 
-```{r freqtable, echo=FALSE, cache=TRUE}
+```{r freqtable, echo=FALSE}
 tab <- data.frame(Data=c("Annual","Quarterly","Monthly","Weekly"),
   frequency=c(1,4,12,52))
 knitr::kable(tab, booktabs=TRUE)
@@ -53,7 +53,7 @@ In chapter \@ref(ch-advanced) we will look at handling these types of multiple s
 
 For time series data, the obvious graph to start with is a time plot. That is, the observations are plotted against the time of observation, with consecutive observations joined by straight lines. Figure \@ref(fig:ansett) below shows the weekly economy passenger load on Ansett Airlines between Australia's two largest cities.
 
-```{r ansett, fig.cap="Weekly economy passenger load on Ansett Airlines.", cache=TRUE}
+```{r ansett, fig.cap="Weekly economy passenger load on Ansett Airlines."}
 autoplot(melsyd[,"Economy.Class"]) +
   ggtitle("Economy class passengers: Melbourne-Sydney") +
   xlab("Year") + ylab("Thousands")
@@ -74,7 +74,7 @@ Any model will need to take all these features into account in order to effectiv
 
 A simpler time series is shown in Figure \@ref(fig:a10).
 
-```{r a10, fig.cap="Monthly sales of antidiabetic drugs in Australia.", cache=TRUE}
+```{r a10, fig.cap="Monthly sales of antidiabetic drugs in Australia."}
 autoplot(a10) +
   ggtitle("Antidiabetic drug sales") +
   ylab("$ million") + xlab("Year")
@@ -101,7 +101,7 @@ Many time series include trend, cycles and seasonality. When choosing a forecast
 
 The following four examples show different combinations of the above components.
 
-```{r 6-decomp1, echo=FALSE, cache=TRUE, fig.cap="Four examples of time series showing different patterns."}
+```{r 6-decomp1, echo=FALSE, fig.cap="Four examples of time series showing different patterns."}
 smallfonts <- theme(text = element_text(size = 9),
             axis.text = element_text(size=8))
 p1 <- autoplot(hsales) + smallfonts +
@@ -132,7 +132,7 @@ gridExtra::grid.arrange(p1,p2,p3,p4,ncol=2)
 A seasonal plot is similar to a time plot except that the data are plotted against the individual "seasons" in which the data were observed. An example is given below showing the antidiabetic drug sales.
 
 
-```{r seasonplot1, fig.cap="Seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%", cache=TRUE}
+```{r seasonplot1, fig.cap="Seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%"}
 ggseasonplot(a10, year.labels=TRUE, year.labels.left=TRUE) +
   ylab("$ million") + ggtitle("Seasonal plot: antidiabetic drug sales")
 ```
@@ -143,7 +143,7 @@ In this case, it is clear that there is a large jump in sales in January each ye
 
 A useful variation on the seasonal plot uses polar coordinates, as shown below.
 
-```{r seasonplot2, fig.cap="Polar seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%", cache=TRUE}
+```{r seasonplot2, fig.cap="Polar seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%"}
 ggseasonplot(a10, polar=TRUE) +
   ylab("$ million") + ggtitle("Polar seasonal plot: antidiabetic drug sales")
 ```
@@ -152,7 +152,7 @@ ggseasonplot(a10, polar=TRUE) +
 
 An alternative plot that emphasises the seasonal patterns is where the data for each season are collected together in separate mini time plots.
 
-```{r subseriesplot, fig.cap="Seasonal subseries plot of monthly antidiabetic drug sales in Australia.", cache=TRUE}
+```{r subseriesplot, fig.cap="Seasonal subseries plot of monthly antidiabetic drug sales in Australia."}
 ggsubseriesplot(a10) + ylab("$ million") +
   ggtitle("Seasonal subseries plot: antidiabetic drug sales")
 ```
@@ -165,7 +165,7 @@ The graphs discussed so far are useful for visualizing individual time series. I
 
 Figure \@ref(fig:motel) shows two time series: monthly takings (in \$million) from accommodation at hotels, motels and guest houses in Victoria (top) and total room nights for each corresponding month (in thousands). "Room nights" is the total number of rooms booked multiplied by the number of nights people stayed in those rooms.
 
-```{r motel, fig.cap="Monthly takings and room nights for accommodation in Victoria, Australia.", cache=TRUE}
+```{r motel, fig.cap="Monthly takings and room nights for accommodation in Victoria, Australia."}
 autoplot(motel[,2:1]/1000, facet=TRUE) +
   xlab("Year") + ylab("") +
   ggtitle("Total monthly accommodation: Victoria, Australia")
@@ -173,7 +173,7 @@ autoplot(motel[,2:1]/1000, facet=TRUE) +
 
 We can study the relationship between takings and room nights by plotting one series against the other.
 
-```{r motel2, fig.cap="Monthly takings plotted against room nights for accommodation in Victoria, Australia.", cache=TRUE}
+```{r motel2, fig.cap="Monthly takings plotted against room nights for accommodation in Victoria, Australia."}
 qplot(Roomnights/1000, Takings/1000, data=as.data.frame(motel)) +
   ylab("Takings ($million)") + xlab("Room nights (thousands)")
 ```
@@ -195,7 +195,7 @@ This scatterplot helps us to visualize the relationship between the variables.
 
 Figure \@ref(fig:beerlagplot) displays scatterplots of quarterly Australian beer production, where the horizontal axis shows lagged values of the time series. Each graph shows $y_{t}$ plotted against $y_{t-k}$ for different values of $k$.
 
-```{r beerlagplot, fig.cap="Lagged scatterplots for quarterly beer production.", fig.width=8, fig.height=8, cache=TRUE}
+```{r beerlagplot, fig.cap="Lagged scatterplots for quarterly beer production.", fig.width=8, fig.height=8}
 beer2 <- window(ausbeer, start=1992)
 gglagplot(beer2)
 ```
@@ -221,7 +221,7 @@ where $T$ is the length of the time series.
 
 The first nine autocorrelation coefficients for the beer production data are given in the following table.
 
-```{r beeracftable, echo=FALSE, cache=TRUE}
+```{r beeracftable, echo=FALSE}
 beeracf <- matrix(acf(c(beer2), lag.max=9,
                       plot=FALSE)$acf[-1,,1], nrow=1)
 colnames(beeracf) <- paste("$r_",1:9,"$",sep="")
@@ -232,7 +232,7 @@ knitr::kable(beeracf, booktabs=TRUE, format="pandoc",
 
 These correspond to the nine scatterplots in Figure \@ref(fig:beerlagplot). The autocorrelation coefficients are normally plotted to form the *autocorrelation function* or ACF. The plot is also known as a *correlogram*.
 
-```{r beeracf, fig.cap="Autocorrelation function of quarterly beer production.", cache=TRUE, fig.height=3}
+```{r beeracf, fig.cap="Autocorrelation function of quarterly beer production.", fig.height=3}
 ggAcf(beer2)
 ```
 
@@ -252,12 +252,12 @@ When data are seasonal, the autocorrelations will be larger for the seasonal lag
 When data are both trended and seasonal, you see a combination of these effects, as illustrated in Figure \@ref(fig:acfelec).
 
 
-```{r aelec, echo=TRUE, cache=TRUE, fig.cap="Monthly Australian electricity demand from 1980--1995."}
+```{r aelec, echo=TRUE, fig.cap="Monthly Australian electricity demand from 1980--1995."}
 aelec <- window(elec, start=1980)
 autoplot(aelec) + xlab("Year") + ylab("GWh")
 ```
 
-```{r acfelec, echo=TRUE, cache=TRUE, fig.cap="ACF of monthly Australian electricity demand.", fig.height=3}
+```{r acfelec, echo=TRUE, fig.cap="ACF of monthly Australian electricity demand.", fig.height=3}
 ggAcf(aelec, lag=48)
 ```
 
@@ -267,13 +267,13 @@ The slow decrease in the ACF as the lags increase is due to the trend, while the
 
 Time series that show no autocorrelation are called "white noise". Figure \@ref(fig:wnoise) gives an example of a white noise series.
 
-```{r wnoise, fig.cap="A white noise time series.", cache=TRUE}
+```{r wnoise, fig.cap="A white noise time series."}
 set.seed(30)
 y <- ts(rnorm(50))
 autoplot(y) + ggtitle("White noise")
 ```
 
-```{r wnoiseacf, fig.cap="Autocorrelation function for the white noise series.", cache=TRUE, fig.height=3}
+```{r wnoiseacf, fig.cap="Autocorrelation function for the white noise series.", fig.height=3}
 ggAcf(y)
 ```
 
@@ -317,7 +317,7 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
 4. The following time plots and ACF plots correspond to four different time series. Your task is to match each  time plot in the first row with one of the ACF plots in the second row.
 
-    ```{r acfguess, fig.height=6, fig.width=12, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+    ```{r acfguess, fig.height=6, fig.width=12, echo=FALSE, message=FALSE, warning=FALSE}
     tp1 <- autoplot(cowtemp) + xlab("") + ylab("chirps per minute") +
       ggtitle("1. Daily temperature of cow")
     tp2 <- autoplot(USAccDeaths/1e3) + xlab("") + ylab("thousands") +

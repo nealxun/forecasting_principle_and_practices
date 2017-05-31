@@ -16,7 +16,7 @@ $$
 $$
 An example of data from such a model is shown in Figure \@ref(fig:SLRpop1). The parameters $\beta_0$ and $\beta_1$ denote the intercept and the slope of the line respectively. The intercept $\beta_0$ represents the predicted value of $y$ when $x=0$. The slope $\beta_1$ represents the average predicted change in $y$ resulting from a one unit increase in $x$.
 
-```{r SLRpop1, fig.cap="An example of data from a linear regression model.", echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
+```{r SLRpop1, fig.cap="An example of data from a linear regression model.", echo=FALSE, warning=FALSE, message=FALSE}
 set.seed(2)
 x <- runif(50, 0, 4)
 df <- data.frame(x=x,
@@ -55,12 +55,12 @@ quarters <- rownames(.preformat.ts(uschange))
 
 Figure \@ref(fig:ConsInc) shows time series of quarterly percentage changes (growth rates) of real personal consumption expenditure ($y$) and real personal disposable income ($x$) for the US from `r head(quarters,1)` to `r tail(quarters,1)`.
 
-```{r ConsInc, echo=TRUE, cache=TRUE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US."}
+```{r ConsInc, echo=TRUE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US."}
 autoplot(uschange[,c("Consumption","Income")]) +
   ylab("% change") + xlab("Year")
 ```
 
-```{r, cache=TRUE, include=FALSE}
+```{r, include=FALSE}
 fit.cons <- tslm(Consumption ~ Income, data=uschange)
 ```
 
@@ -70,7 +70,7 @@ $$
 $$
 (We put a "hat" above the $y$ to indicate this is an estimate or prediction.)
 
-```{r ConsInc2, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
+```{r ConsInc2, echo=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
 uschange %>%
   as.data.frame %>%
   ggplot(aes(x=Income, y=Consumption)) +
@@ -82,7 +82,7 @@ uschange %>%
 
 This equation is estimated in R using the `tslm` function:
 
-```{r, echo=TRUE, cache=TRUE}
+```{r, echo=TRUE}
 tslm(Consumption ~ Income, data=uschange)
 ```
 
@@ -106,7 +106,7 @@ where $y$ is the variable to be forecast and $x_{1},\dots,x_{k}$ are the $k$ pre
 Figure \@ref(fig:MultiPredictors) shows additional predictors that may be useful for forecasting US consumption expenditure. These are quarterly percentage changes in industrial production and personal savings, and quarterly changes in the unemployment rate (as this is already a percentage). Building a multiple linear regression model can potentially generate more accurate forecasts as we expect consumption expenditure to not only depend on personal income but on other predictors as well.
 
 
-```{r MultiPredictors, echo=FALSE, fig.cap="Quarterly percentage changes in industrial production and personal savings and quarterly changes in the unemployment rate for the US over the period 1960Q1-2016Q3.", cache=TRUE}
+```{r MultiPredictors, echo=FALSE, fig.cap="Quarterly percentage changes in industrial production and personal savings and quarterly changes in the unemployment rate for the US over the period 1960Q1-2016Q3."}
 autoplot(uschange[,3:5], facets = TRUE, colour=TRUE) +
   ylab("") + xlab("Year") +
   guides(colour="none")
@@ -115,7 +115,7 @@ autoplot(uschange[,3:5], facets = TRUE, colour=TRUE) +
 The first column of Figure \@ref(fig:ScatterMatrix) below shows the relationships between consumption and each of the predictors. The scatterplots show positive relationships with income and industrial production, and negative relationships with savings and unemployment. The strength of these relationships are shown by the correlation coefficients across the first row. The remaining scatterplots and correlation coefficients show the relationships between the predictors.
 
 <!--
-```{r ScatterMatrixold, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
+```{r ScatterMatrixold, echo=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
 my_fn <- function(data, mapping, ...){
   ggplot(data = data, mapping = mapping) +
     geom_point() +
@@ -133,7 +133,7 @@ uschange %>%
 ```
 -->
 
-```{r ScatterMatrix, echo=TRUE, cache=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
+```{r ScatterMatrix, echo=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
 uschange %>%
   as.data.frame %>%
   GGally::ggpairs()
@@ -181,7 +181,7 @@ where $y$ is the percentage change in real personal consumption expenditure, $x_
 
 The following output provides information about the fitted model. The first column of `Coefficients` gives an estimate of each $\beta$ coefficient and the second column gives its standard error (i.e., the standard deviation which would be obtained from repeatedly estimating the $\beta$ coefficients on similar data sets). The standard error gives a measure of the uncertainty in the estimated $\beta$ coefficient.
 
-```{r usestim, echo=TRUE, fig.cap="Multiple regression output from least squares estimation.", cache=TRUE}
+```{r usestim, echo=TRUE, fig.cap="Multiple regression output from least squares estimation."}
 fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings,
   data=uschange)
 summary(fit.consMR)
@@ -201,7 +201,7 @@ Plugging in the values of $x_{1,t},\ldots,x_{k,t}$ for $t=1,\ldots,T$ returns pr
 The following plots show the actual values compared to the fitted values for the percentage change in the US consumption expenditure series. The time plot in Figure \@ref(fig:usfitted1) shows that the fitted values follow the actual data fairly closely. This is verified by the strong positive relationship shown by the scatterplot in Figure \@ref(fig:usfitted2).
 
 
-```{r usfitted1, echo=TRUE, cache=TRUE, fig.cap="Time plot of US consumption expenditure and predicted expenditure."}
+```{r usfitted1, echo=TRUE, fig.cap="Time plot of US consumption expenditure and predicted expenditure."}
 autoplot(uschange[,'Consumption'], series="Data") +
   autolayer(fitted(fit.consMR), series="Fitted") +
   xlab("Year") + ylab("") +
@@ -209,7 +209,7 @@ autoplot(uschange[,'Consumption'], series="Data") +
   guides(colour=guide_legend(title=" "))
 ```
 
-```{r usfitted2, echo=TRUE, cache=TRUE, fig.cap="Actual US consumption expenditure plotted against predicted US consumption expenditure.", message=FALSE, warning=FALSE}
+```{r usfitted2, echo=TRUE, fig.cap="Actual US consumption expenditure plotted against predicted US consumption expenditure.", message=FALSE, warning=FALSE}
 cbind(Data=uschange[,"Consumption"], Fitted=fitted(fit.consMR)) %>%
   as.data.frame %>%
   ggplot(aes(x=Data, y=Fitted)) +
@@ -246,7 +246,7 @@ If there are more than two categories, then the variable can be coded using seve
 
 For example, suppose we are forecasting daily electricity demand and we want to account for the day of the week as a predictor. Then the following dummy variables can be created.
 
-```{r dowdummy, echo=FALSE, cache=TRUE}
+```{r dowdummy, echo=FALSE}
 df <- matrix("0", nrow=13, ncol=6)
 df[1:6,] <- paste(diag(6))
 df[8:12,] <- paste(diag(6)[1:5,])
@@ -269,7 +269,7 @@ The `tslm` function will automatically handle this situation if you specify the 
 
 Recall the Australian quarterly beer production data shown again in Figure \@ref(fig:beeragain) below.
 
-```{r beeragain, echo=TRUE, cache=TRUE, fig.cap="Australian quarterly beer production."}
+```{r beeragain, echo=TRUE, fig.cap="Australian quarterly beer production."}
 beer2 <- window(ausbeer, start=1992)
 autoplot(beer2) + xlab("Year") + ylab("Megalitres")
 ```
@@ -280,7 +280,7 @@ We want to forecast the value of future beer production. We can model this data 
 \]
 where $d_{i,t} = 1$ if $t$ is in quarter $i$ and 0 otherwise. The first quarter variable has been omitted, so the coefficients associated with the other quarters are measures of the difference between those quarters and the first quarter.
 
-```{r fig.beerfit, echo=TRUE, cache=TRUE}
+```{r fig.beerfit, echo=TRUE}
 fit.beer <- tslm(beer2 ~ trend + season)
 summary(fit.beer)
 ```
@@ -290,14 +290,14 @@ Note that `trend` and `season` are not objects in the R workspace; they are crea
 There is a downward trend of `r round(fit.beer$coef['trend'], 3)` megalitres per quarter. On average, the second quarter has production of `r -round(fit.beer$coef['season2'], 1)` megalitres lower than the first quarter, the third quarter has production of `r -round(fit.beer$coef['season3'], 1)` megalitres lower than the first quarter, and the fourth quarter has production of `r round(fit.beer$coef['season4'], 1)` megalitres higher than the first quarter.
 
 
-```{r beerlm2, echo=TRUE, cache=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
+```{r beerlm2, echo=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
 autoplot(beer2, series="Data") +
   autolayer(fitted(fit.beer), series="Fitted") +
   xlab("Year") + ylab("Megalitres") +
   ggtitle("Quarterly Beer Production")
 ```
 
-```{r beerlm3, echo=TRUE, cache=TRUE, fig.cap="Actual beer production plotted against predicted beer production."}
+```{r beerlm3, echo=TRUE, fig.cap="Actual beer production plotted against predicted beer production."}
 cbind(Data=beer2, Fitted=fitted(fit.beer)) %>%
   as.data.frame %>%
   ggplot(aes(x=Data, y=Fitted, colour=as.factor(cycle(beer2)))) +
@@ -327,7 +327,7 @@ The advantage of using Fourier terms is that we can often use fewer predictor va
 
 In R, these Fourier terms are produced using the `fourier` function. For example, the Australian beer data can be modelled like this.
 
-```{r fourierbeer, echo=TRUE, cache=TRUE}
+```{r fourierbeer, echo=TRUE}
 fourier.beer <- tslm(beer2 ~ trend + fourier(beer2, K=2))
 summary(fourier.beer)
 ```
@@ -422,7 +422,7 @@ The remaining residuals show that the model has captured the patterns in the dat
 
 The histogram shows that the residuals from modelling the beer data seem to be slightly negatively skewed, although that is due to the large negative value in 2004 Q4.
 
-```{r beerresidcheck, echo=TRUE, cache=TRUE, fig.cap="Analysing the residuals from a regression model for beer production.", message=FALSE, warning=FALSE}
+```{r beerresidcheck, echo=TRUE, fig.cap="Analysing the residuals from a regression model for beer production.", message=FALSE, warning=FALSE}
 checkresiduals(fit.beer)
 ```
 
@@ -436,7 +436,7 @@ It is also necessary to plot the residuals against any predictors *not* in the m
 
 The residuals from the multiple regression model for forecasting US consumption plotted against each predictor in Figure \@ref(fig:resids) seem to be randomly scattered and therefore we are satisfied with these in this case.
 
-```{r resids, echo=TRUE, cache=TRUE, fig.cap="Scatterplots of residuals versus each predictor."}
+```{r resids, echo=TRUE, fig.cap="Scatterplots of residuals versus each predictor."}
 df <- as.data.frame(uschange)
 df[,"Residuals"]  <- as.numeric(residuals(fit.consMR))
 p1 <- ggplot(df, aes(x=Income, y=Residuals)) + geom_point()
@@ -454,7 +454,7 @@ A plot of the residuals against the fitted values should also show no pattern. I
 Figure \@ref(fig:electrendseas) shows the residuals against the fitted values from fitting a linear trend and seasonal dummies to the electricity data we first encountered in Section \@ref(sec-transformations). The plot shows that the trend in the data is nonlinear and that the forecast variable requires a transformation as we observe a heteroscedastic pattern with variation increasing along the x-axis.
 
 
-```{r electrendseas, echo=TRUE, cache=TRUE, fig.cap="Scatterplot of residuals versus fitted."}
+```{r electrendseas, echo=TRUE, fig.cap="Scatterplot of residuals versus fitted."}
 fit <- tslm(elec ~ trend + season)
 cbind(Fitted=fitted(fit), Residuals=residuals(fit)) %>%
   as.data.frame %>%
@@ -479,7 +479,7 @@ Outliers also occur when some observations are simply different. In this case it
 Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US consumption on income (the example introduced in Section \@ref(Regr-Intro)). In the left panel the outlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which is the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
 
 
-```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, cache=TRUE, message=FALSE,warning=FALSE}
+```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, message=FALSE,warning=FALSE}
 yx <- as.data.frame(uschange[,1:2])
 fit1 <- lm(Consumption ~ Income, data=yx)
 
@@ -522,13 +522,13 @@ The $R^2$ value is commonly used, often incorrectly, in forecasting. $R^2$ will 
 
 Recall the example of US consumption data discussed in Section \@ref(Regr-LSprinciple). The output for the estimated model is reproduced here for convenience:
 
-```{r, echo=TRUE, cache=TRUE}
+```{r, echo=TRUE}
 fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings,
   data=uschange)
 summary(fit.consMR)
 ```
 
-```{r, echo=FALSE, cache=TRUE}
+```{r, echo=FALSE}
 r <- cor(fit.consMR$fitted.values,uschange[,"Consumption"])
 ```
 
@@ -556,7 +556,7 @@ More often than not, time series data are "non-stationary"; that is, the values 
 For example consider the two variables plotted below in Figure \@ref(fig:spurious). These appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea.
 
 
-```{r spurious, echo=FALSE, fig.height=5, warning=FALSE, fig.cap="Trending time series data can appear to be related as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE, cache=TRUE}
+```{r spurious, echo=FALSE, fig.height=5, warning=FALSE, fig.cap="Trending time series data can appear to be related as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE}
 aussies <- window(ausair, end=2011)
 p1 <- autoplot(aussies) + xlab("Year") + ylab("Air Passengers in Australia")
 p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")
@@ -574,7 +574,7 @@ Regressing non-stationary time series can lead to spurious regressions. The outp
 Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
 
 
-```{r, fig.cap="Residuals from a spurious regression.", echo=TRUE, cache=TRUE}
+```{r, fig.cap="Residuals from a spurious regression.", echo=TRUE}
 fit <- tslm(aussies ~ guinearice)
 summary(fit)
 checkresiduals(fit)
@@ -620,7 +620,7 @@ Although this looks this looks like a  time-consuming procedure there are very f
 
 Under this criterion, the best model is the one with the smallest value of CV.
 
-```{r, echo=TRUE, cache=TRUE}
+```{r, echo=TRUE}
 CV(fit.consMR)
 ```
 
@@ -658,7 +658,7 @@ To obtain all these measures in R, use `CV(fit)`. In the multiple regression exa
 
 The results have been sorted according to the AICc and therefore the best models are given at the top of the table, and the worst at the bottom of the table.
 
-```{r tblusMR, echo=FALSE, cache=TRUE}
+```{r tblusMR, echo=FALSE}
 fit <- list()
 fit[[1]] <- lm(Consumption ~ Income + Production + Savings + Unemployment, data = uschange)
 fit[[2]] <- lm(Consumption ~ Income + Production + Savings , data = uschange)
@@ -749,7 +749,7 @@ A comparative evaluation of ex-ante forecasts and ex-post forecasts can help to 
 
 Normally, we cannot use actual future values of the predictor variables when producing ex-ante forecasts because their values will not be known in advance. However, the special predictors introduced in Section \@ref(Regr-UsefulPredictors) are all known in advance, as they are based on calendar variables (e.g., seasonal dummy variables or public holiday indicators) or deterministic functions of time (e.g. time trend). In such cases, there is no difference between ex ante and ex post forecasts.
 
-```{r beerlm1, echo=TRUE, cache=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
+```{r beerlm1, echo=TRUE, fig.cap="Forecasts from the regression model for beer production. The dark shaded region shows 80% prediction intervals and the light shaded region shows 95% prediction intervals."}
 beer2 <- window(ausbeer, start=1992)
 fit.beer <- tslm(beer2 ~ trend + season)
 fcast <- forecast(fit.beer)
@@ -762,7 +762,7 @@ autoplot(fcast) +
 In this setting, the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the predicted change in consumption when there is a constant growth of 1% and 0.5% respectively for income and savings with no change in the employment rate, versus a respective decline of 1% and 0.5%, for each of the four quarters following the end of the sample. The resulting forecasts are calculated below and shown in Figure \@ref(fig:ConsInc4). We should note that prediction intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume that the values of the predictors are known in advance.
 
 
-```{r, ConsInc4, echo=TRUE, cache=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
+```{r, ConsInc4, echo=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
 fit.consBest <- tslm(Consumption ~ Income + Savings + Unemployment, data = uschange)
 h <- 4
 newdata <-
@@ -809,7 +809,7 @@ The estimated simple regression line in the US consumption example is
 \[ \hat{y}_t=`r round(coef(fit.cons)[1],2)` + `r round(coef(fit.cons)[2],2)`x_t.
 \]
 
-```{r, cache=TRUE, include=FALSE}
+```{r, include=FALSE}
 h <- 4
 fcast.up <- forecast(fit.cons,
 	newdata=data.frame(Income=rep(mean(uschange[,"Income"]), h)))
@@ -821,7 +821,7 @@ fcast.up$mean[1]
 Assuming that for the next four quarters personal income will increase by its historical mean value of $\bar{x}=`r round(mean(uschange[,"Income"]),2)`\%$, consumption is forecast to increase by $`r round(fcast.up$mean[1],2)`\%$ and
 the corresponding $95\%$ and $80\%$ prediction intervals are $[`r round(fcast.up$lower[1,2],2)`,`r round(fcast.up$upper[1,2],2)`]$ and $[`r round(fcast.up$lower[1,1],2)`,`r round(fcast.up$upper[1,1],2)`]$ respectively (calcualted using R). If we assume an extreme increase of $10\%$ in income then the prediction intervals are considerably wider as shown in Figure \@ref(fig:ConsSimplePI).
 
-```{r, echo=FALSE, fig.cap="Prediction intervals if inomce increased by its historical mean versus an extreme increase of 10%.", cache=TRUE, ConsSimplePI, echo=TRUE}
+```{r, echo=FALSE, fig.cap="Prediction intervals if inomce increased by its historical mean versus an extreme increase of 10%.", ConsSimplePI, echo=TRUE}
 
 autoplot(uschange[,"Consumption"]) +
   ylab("% change in US consumption") +
@@ -954,7 +954,7 @@ in the model. If the associated coefficients of $x_{1,t}$ and $x_{2,t}$ are $\be
 
 Figure \@ref(fig:marathonLinear) below in the left panel shows the Boston marathon winning times (in minutes) since it started in 1897. The time series shows a general downward trend as the winning times have been improving over the years. The panel on the right shows the residuals from fitting a linear trend to the data. The plot shows an obvious nonlinear pattern which has not been captured by the linear trend.
 
-```{r marathonLinear, echo=FALSE, fig.cap="Fitting a linear trend to the Boston marathon winning times is inadequate", message=TRUE, warning=FALSE, cache=TRUE}
+```{r marathonLinear, echo=FALSE, fig.cap="Fitting a linear trend to the Boston marathon winning times is inadequate", message=TRUE, warning=FALSE}
 fit.lin <- tslm(marathon ~ trend)
 p1 <- autoplot(marathon) +
   autolayer(fitted(fit.lin), series = "Linear trend") +
@@ -972,7 +972,7 @@ The fitted exponential trend and forecasts are shown in Figure \@ref(fig:maratho
 
 Simply eyeballing the winning times reveals three very different periods. There is a lot of volatility in the winning times from the beginning up to about 1940 with the winning times decreasing overall but with significant increases in the decade of the 1920s. The almost linear decrease in times after 1940 is then followed by a flattening out after the 1980s with almost an upturn towards the end of the sample. Following these observations we specify as knots the years 1940 and 1980. We should warn here that subjectively identifying suitable knots in the data can lead to overfitting which can be detrimental to the forecast performance of a model and should be performed with caution.
 
-```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE, fig.cap="Projecting forecasts from a linear, exponential, piecewise linear trends and a cubic spline for the Boston marathon winning times", cache=TRUE}
+```{r marathonNonlinear, echo=TRUE, message=TRUE, warning=FALSE, fig.cap="Projecting forecasts from a linear, exponential, piecewise linear trends and a cubic spline for the Boston marathon winning times"}
 
 h <- 10
 
@@ -1013,7 +1013,7 @@ autoplot(marathon) +
 
 Figure \@ref(fig:marathonNonlinear) above shows the fitted lines and forecasts from linear, exponential and piecewise linear trends. The piecewise linear trend fits the data better than both the exponential and linear trends and seems to return sensible forecasts. The residuals plotted in the Figure \@ref(fig:residPiecewise) below show that the model has mostly captured the trend well although there is some autocorrelation remaining (we will deal with this in Chapter \ref(ch-advanced)). We should however again warn here that the projection forward from the piecewise linear trend can be very sensitive to the choice of location of the knots, especially the ones located towards the end of the sample. For example moving the knot placed at 1980 even five years forward will reveal very different forecasts. The wide prediction interval associated with the forecasts form the piecewise linear trend reflects the volatility observed in the historical winning times.
 
-```{r residPiecewise, fig.cap="Residuals from the piecewise trend.",  message=FALSE, warning=FALSE, cache=TRUE}
+```{r residPiecewise, fig.cap="Residuals from the piecewise trend.",  message=FALSE, warning=FALSE}
 checkresiduals(fit.pw)
 ```
 

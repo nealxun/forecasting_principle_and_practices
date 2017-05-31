@@ -65,7 +65,7 @@ rwf(y, h, drift=TRUE)
 
 Figure \@ref(fig:beerf) shows the first three methods applied to the quarterly beer production data.
 
-```{r beerf, fig.cap="Forecasts of Australian quarterly beer production.", warning=FALSE, message=FALSE, cache=TRUE}
+```{r beerf, fig.cap="Forecasts of Australian quarterly beer production.", warning=FALSE, message=FALSE}
 # Set training data from 1992-2007
 beer2 <- window(ausbeer,start=1992,end=c(2007,4))
 # Plot some forecasts
@@ -80,7 +80,7 @@ autoplot(beer2) +
 
 In Figure \@ref(fig:djf), the non-seasonal methods were applied to a series of 250 days of the Dow Jones Index.
 
-```{r djf, fig.cap="Forecasts based on 250 days of the Dow Jones Index.", message=FALSE, warning=FALSE, cache=TRUE}
+```{r djf, fig.cap="Forecasts based on 250 days of the Dow Jones Index.", message=FALSE, warning=FALSE}
 # Set training data to first 250 days
 dj2 <- window(dj,end=250)
 # Plot some forecasts
@@ -130,7 +130,7 @@ A good value of $\lambda$ is one which makes the size of the seasonal variation 
 
 The `BoxCox.lambda()` function will choose a value of lambda for you.
 
-```{r BoxCoxlambda, echo=TRUE, cache=TRUE}
+```{r BoxCoxlambda, echo=TRUE}
 (lambda <- BoxCox.lambda(elec))
 autoplot(BoxCox(elec,lambda))
 ```
@@ -159,7 +159,7 @@ Some of the variation seen in seasonal data may be due to simple calendar effect
 
 For example, if you are studying the monthly milk production on a farm, there will be variation between the months simply because of the different numbers of days in each month, in addition to the seasonal variation across the year.
 
-```{r cowmilk, fig.cap="Monthly milk production per cow. Source: @Cryer2008.", cache=TRUE}
+```{r cowmilk, fig.cap="Monthly milk production per cow. Source: @Cryer2008."}
 cbind(Monthly = milk, DailyAverage=milk/monthdays(milk)) %>%
   autoplot(facet=TRUE) + xlab("Years") + ylab("Pounds") +
     ggtitle("Milk production per cow")
@@ -232,23 +232,23 @@ $$
 
 The following graphs show the Dow Jones Index (DJI), and the residuals obtained from forecasting the DJI using the naïve method.
 
-```{r DJautoplot, fig.cap="The Dow Jones Index measured daily to 15 July 1994.", cache=TRUE}
+```{r DJautoplot, fig.cap="The Dow Jones Index measured daily to 15 July 1994."}
 dj2 <- window(dj, end=250)
 autoplot(dj2) + xlab("Day") + ylab("") +
   ggtitle("Dow Jones Index (daily ending 15 Jul 94)")
 ```
 
-```{r DJresid, fig.cap="Residuals from forecasting the Dow Jones Index using the naïve method.", cache=TRUE, warning=FALSE}
+```{r DJresid, fig.cap="Residuals from forecasting the Dow Jones Index using the naïve method.", warning=FALSE}
 res <- residuals(naive(dj2))
 autoplot(res) + xlab("Day") + ylab("") +
   ggtitle("Residuals from naïve method")
 ```
 
-```{r DJhist, fig.cap="Histogram of the residuals from the naïve method applied to the Dow Jones Index. The left tail is a little too long for a normal distribution.", cache=TRUE, warning=FALSE, message=FALSE}
+```{r DJhist, fig.cap="Histogram of the residuals from the naïve method applied to the Dow Jones Index. The left tail is a little too long for a normal distribution.", warning=FALSE, message=FALSE}
 gghistogram(res) + ggtitle("Histogram of residuals")
 ```
 
-```{r DJacf, fig.cap="ACF of the residuals from the naïve method applied to the Dow Jones Index. The lack of correlation suggesting the forecasts are good.", cache=TRUE, fig.height=3}
+```{r DJacf, fig.cap="ACF of the residuals from the naïve method applied to the Dow Jones Index. The lack of correlation suggesting the forecasts are good.", fig.height=3}
 ggAcf(res) + ggtitle("ACF of residuals")
 ```
 
@@ -279,7 +279,7 @@ How large is too large? If the autocorrelations did come from a white noise seri
 
 For the Dow-Jones example, the naïve model has no parameters, so $K=0$ in that case also.
 
-```{r Boxtest, cache=TRUE}
+```{r Boxtest}
 # lag=h and fitdf=K
 Box.test(res, lag=10, fitdf=0)
 
@@ -290,7 +290,7 @@ For both $Q$ and $Q^*$, the results are not significant (i.e., the $p$-values ar
 
 All of these methods for checking residuals are conveniently packaged into one R function, which will produce a time plot, ACF plot and histogram of the residuals (with an overlayed normal distribution for comparison), and do a Ljung-Box test with the correct degrees of freedom:
 
-```{r checkresiduals, cache=TRUE, warning=FALSE}
+```{r checkresiduals, warning=FALSE}
 checkresiduals(naive(dj2))
 ```
 
@@ -303,7 +303,7 @@ It is important to evaluate forecast accuracy using genuine forecasts. Consequen
 
 When choosing models, it is common practice to separate the available data into two portions, training and test data, where the training data is used to estimate any parameters of a forecasting method and the test data is used to evaluate its accuracy. Because the test data is not used in determining the forecasts, it should provide a reliable indication of how well the model is likely to forecast on new data.
 
-```{r traintest, fig.height=1, echo=FALSE, cache=TRUE}
+```{r traintest, fig.height=1, echo=FALSE}
 train = 1:18
 test = 19:24
 par(mar=c(0,0,0,0))
@@ -393,7 +393,7 @@ Similarly, the *mean squared scaled error* (MSSE) can be defined where the error
 
 ###Examples {-}
 
-```{r beeraccuracy, fig.cap="Forecasts of Australian quarterly beer production using data up to the end of 2007.", cache=TRUE, message=FALSE,warning=FALSE}
+```{r beeraccuracy, fig.cap="Forecasts of Australian quarterly beer production using data up to the end of 2007.", message=FALSE,warning=FALSE}
 beer2 <- window(ausbeer,start=1992,end=c(2007,4))
 beerfit1 <- meanf(beer2,h=10)
 beerfit2 <- rwf(beer2,h=10)
@@ -417,7 +417,7 @@ accuracy(beerfit2, beer3)
 accuracy(beerfit3, beer3)
 ```
 
-```{r beeraccuracytable, echo=FALSE, cache=TRUE}
+```{r beeraccuracytable, echo=FALSE}
 beer3 <- window(ausbeer, start=2008)
 tab <- matrix(NA,ncol=4,nrow=3)
 tab[1,] <- accuracy(beerfit1, beer3)[2,c(2,3,5,6)]
@@ -432,7 +432,7 @@ It is obvious from the graph that the seasonal naïve method is best for these d
 
 To take a non-seasonal example, consider the Dow Jones Index. The following graph shows the 250 observations ending on 15 July 1994, along with forecasts of the next 42 days obtained from three different methods.
 
-```{r djfc, fig.cap="Forecasts of the Dow Jones Index from 16 July 1994.", cache=TRUE, warning=FALSE}
+```{r djfc, fig.cap="Forecasts of the Dow Jones Index from 16 July 1994.", warning=FALSE}
 dj2 <- window(dj, end=250)
 djfc1 <- meanf(dj2, h=42)
 djfc2 <- rwf(dj2, h=42)
@@ -453,7 +453,7 @@ accuracy(djfc2, dj3)
 accuracy(djfc3, dj3)
 ```
 
-```{r djaccuracytable, echo=FALSE, cache=TRUE}
+```{r djaccuracytable, echo=FALSE}
 dj3 <- window(dj, start=251)
 tab <- matrix(NA,ncol=4,nrow=3)
 tab[1,] <- accuracy(djfc1, dj3)[2,c(2,3,5,6)]
@@ -473,7 +473,7 @@ A more sophisticated version of training/test sets is time series cross-validati
 
 The following diagram illustrates the series of training and test sets, where the blue observations form the training sets, and the red observations form the test sets.
 
-```{r cv1, cache=TRUE, echo=FALSE, fig.height=4}
+```{r cv1, echo=FALSE, fig.height=4}
 par(mar=c(0,0,0,0))
 plot(0,0,xlim=c(0,28),ylim=c(0,1),
        xaxt="n",yaxt="n",bty="n",xlab="",ylab="",type="n")
@@ -498,7 +498,7 @@ The forecast accuracy is computed by averaging over the test sets. This procedur
 
 With time series forecasting, one-step forecasts may not be as relevant as multi-step forecasts. In this case, the cross-validation procedure based on a rolling forecasting origin can be modified to allow multi-step errors to be used. Suppose that we are interested in models that produce good $4$-step-ahead forecasts. Then the corresponding diagram is shown below.
 
-```{r cv4, cache=TRUE, echo=FALSE, fig.height=4}
+```{r cv4, echo=FALSE, fig.height=4}
 par(mar=c(0,0,0,0))
 plot(0,0,xlim=c(0,28),ylim=c(0,1),
        xaxt="n",yaxt="n",bty="n",xlab="",ylab="",type="n")
@@ -521,7 +521,7 @@ text(28,.95,"time")
 
 Time series cross validation is implemented with the `tsCV` function. In the following example, we compare the residual RMSE with the RMSE obtained via time series cross-validation.
 
-```{r tscv, cache=TRUE}
+```{r tscv}
 e <- tsCV(dj, rwf, drift=TRUE, h=1)
 sqrt(mean(e^2, na.rm=TRUE))
 sqrt(mean(residuals(rwf(dj, drift=TRUE))^2, na.rm=TRUE))
@@ -556,7 +556,7 @@ where $\hat\sigma$ is an estimate of the standard deviation of the forecast dist
 
 When forecasting one step ahead, the standard deviation of the forecast distribution is almost the same as the standard deviation of the residuals. (In fact, the two standard deviations are identical if there are no parameters to be estimated, as is the case with the naïve method. For forecasting methods involving parameters to be estimated, the standard deviation of the forecast distribution is slightly larger than the residual standard deviation, although this difference is often ignored.)
 
-```{r djpi, echo=FALSE, cache=TRUE}
+```{r djpi, echo=FALSE}
 djsd <- sqrt(mean(res^2, na.rm=TRUE))
 djf <- tail(dj2,1)
 mult <- -qnorm(.5-c(80,95)/200)
@@ -576,7 +576,7 @@ $$
 The value of the multiplier (1.96 or 1.28) determines the percentage of the prediction interval. The following table gives the values to be used for different percentages.
 
 
-```{r pcmultipliers, echo=FALSE, cache=TRUE}
+```{r pcmultipliers, echo=FALSE}
 p <- c(seq(50,95,by=5),96:99)
 tab <- data.frame(Percentage=p, Multiplier=qnorm(0.5+p/200))
 knitr::kable(tab, digits=2, booktabs=TRUE,
@@ -595,13 +595,13 @@ If a transformation has been used, then the prediction interval should be comput
 
 Prediction intervals are computed for you when using any of the benchmark forecasting methods. For example, here is the output when using the naïve method for the Dow-Jones index.
 
-```{r djforecasts, echo=TRUE, cache=TRUE}
+```{r djforecasts, echo=TRUE}
 naive(dj2)
 ```
 
 When plotted, the prediction intervals are shown as shaded region, with the strength of colour indicating the probability associated with the interval.
 
-```{r djforecasts2, echo=TRUE, cache=TRUE}
+```{r djforecasts2, echo=TRUE}
 autoplot(naive(dj2))
 ```
 
@@ -641,7 +641,7 @@ If the first argument is of class `ts`, it returns forecasts from the automatic 
 
 Here is a simple example, applying `forecast()` to the `ausbeer` data:
 
-```{r ausbeerfc, cache=TRUE}
+```{r ausbeerfc}
 forecast(ausbeer)
 ```
 

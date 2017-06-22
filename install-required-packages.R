@@ -1,4 +1,4 @@
-install.packages(c(
+update.packages(c(
   "fpp2",
   "gridExtra",
   "seasonal",

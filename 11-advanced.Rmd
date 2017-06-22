@@ -285,8 +285,59 @@ The forecasts actually go slightly negative, which is of course impossible. If w
 ```{r, cache=TRUE}
 fit <- nnetar(sunspotarea, lambda=0)
 autoplot(forecast(fit,h=20))
-
 ```
+
+#### Prediction intervals {-}
+
+Suppose we fit a NNETAR model to the famous Canadian `lynx` data:
+
+```{r}
+library(forecast)
+(fit <- nnetar(lynx, lambda=0.5))
+```
+
+We have used a Box-Cox transformation with $\lambda=0.5$ to ensure the residuals will be roughly homoscedastic.
+
+The model can be written as
+$$
+  y_t = f(\boldsymbol{y}_{t-1}) + \varepsilon_t
+$$
+where $\boldsymbol{y}_{t-1} = (y_{t-1},y_{t-2},\dots,y_{t-8})'$ is a vector containing lagged values of the series, and $f$ is a neural network with 4 hidden nodes in a single layer.
+
+The error series $\{\varepsilon_t\}$ is assumed to be homoscedastic (and possibly also normally distributed).
+
+We can simulate future sample paths of this model iteratively, by randomly generating a value for $\varepsilon_t$, either from a normal distribution, or by resampling from the historical values. So if $\varepsilon^*_{T+1}$ is a random draw from the distribution of errors at time $T+1$, then
+$$
+  y^*_{T+1} = f(\boldsymbol{y}_{T}) + \varepsilon^*_{T+1}
+$$
+is one possible draw from the forecast distribution for $y_{T+1}$. Setting 
+$\boldsymbol{y}_{T+1}^* = (y^*_{T+1}, y_{T}, \dots, y_{T-6})'$, we can then repeat the process to get
+$$
+  y^*_{T+2} = f(\boldsymbol{y}^*_{T+1}) + \varepsilon^*_{T+2}.
+$$
+In this way, we can iteratively simulate a future sample path. By repeatedly simulating sample paths, we build up knowledge of the distribution for all future values based on the fitted neural network. Here is a simulation of 9 possible future sample paths for the lynx data. Each sample path covers the next 20 years after the observed data.
+
+
+```{r, message=FALSE}
+sim <- ts(matrix(0, nrow=20, ncol=9), start=end(lynx)[1]+1)
+for(i in seq(9))
+  sim[,i] <- simulate(fit, nsim=20)
+
+library(ggplot2)
+autoplot(lynx) + forecast::autolayer(sim)
+```
+
+If we do this a few hundred or thousand times, we can get a very good picture of the forecast distributions. This is how the `forecast.nnetar` function produces prediction intervals:
+
+```{r}
+fcast <- forecast(fit, PI=TRUE, h=20)
+autoplot(fcast)
+```
+
+Because it is a little slow, `PI=FALSE` is the default, so prediction intervals are not computed unless requested. The `npaths` argument in `forecast.nnetar` controls how many simulations are done (default 1000). By default, the errors are drawn from a normal distribution. The `bootstrap` argument allows the errors to be "bootstrapped" (i.e., randomly drawn from the historical errors). 
+
+
+
 
 ## Exercises
 

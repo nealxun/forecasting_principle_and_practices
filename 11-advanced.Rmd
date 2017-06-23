@@ -172,7 +172,7 @@ A criticism VARs face is that they are atheoretical. They are not built on some 
 library(vars)
 ```
 
-```{r, cache=TRUE}
+```{r varselect, cache=TRUE}
 VARselect(uschange[,1:2], lag.max=8, type="const")[["selection"]]
 
 var <- VAR(uschange[,1:2], p=3, type="const")
@@ -282,21 +282,22 @@ autoplot(forecast(fit,h=20))
 
 The forecasts actually go slightly negative, which is of course impossible. If we wanted to restrict the forecasts to remain positive, we could use a log transformation (specified by the Box-Cox parameter $\lambda=0$):
 
-```{r, cache=TRUE}
+```{r nnetarsunspots, cache=TRUE}
 fit <- nnetar(sunspotarea, lambda=0)
 autoplot(forecast(fit,h=20))
 ```
 
 #### Prediction intervals {-}
 
+Unlike most of the methods considered in this book, neural networks are not based on a well-defined stochastic model, and so it is not straightforward to derive prediction intervals for the resultant forecasts. However, we can still do it using simulation where future sample paths are generated using bootstrapped residuals.
+
 Suppose we fit a NNETAR model to the famous Canadian `lynx` data:
 
 ```{r}
-library(forecast)
 (fit <- nnetar(lynx, lambda=0.5))
 ```
 
-We have used a Box-Cox transformation with $\lambda=0.5$ to ensure the residuals will be roughly homoscedastic.
+We have used a Box-Cox transformation with $\lambda=0.5$ to ensure the residuals will be roughly homoscedastic (i.e., have constant variance).
 
 The model can be written as
 $$
@@ -318,12 +319,11 @@ $$
 In this way, we can iteratively simulate a future sample path. By repeatedly simulating sample paths, we build up knowledge of the distribution for all future values based on the fitted neural network. Here is a simulation of 9 possible future sample paths for the lynx data. Each sample path covers the next 20 years after the observed data.
 
 
-```{r, message=FALSE}
+```{r nnetarsim, message=FALSE}
 sim <- ts(matrix(0, nrow=20, ncol=9), start=end(lynx)[1]+1)
 for(i in seq(9))
   sim[,i] <- simulate(fit, nsim=20)
 
-library(ggplot2)
 autoplot(lynx) + forecast::autolayer(sim)
 ```
 

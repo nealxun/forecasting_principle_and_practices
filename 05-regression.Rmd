@@ -60,7 +60,7 @@ autoplot(uschange[,c("Consumption","Income")]) +
   ylab("% change") + xlab("Year")
 ```
 
-```{r, include=FALSE}
+```{r fitcons, include=FALSE}
 fit.cons <- tslm(Consumption ~ Income, data=uschange)
 ```
 
@@ -82,7 +82,7 @@ uschange %>%
 
 This equation is estimated in R using the `tslm` function:
 
-```{r, echo=TRUE}
+```{r tslmcons, echo=TRUE}
 tslm(Consumption ~ Income, data=uschange)
 ```
 
@@ -522,13 +522,13 @@ The $R^2$ value is commonly used, often incorrectly, in forecasting. $R^2$ will 
 
 Recall the example of US consumption data discussed in Section \@ref(Regr-LSprinciple). The output for the estimated model is reproduced here for convenience:
 
-```{r, echo=TRUE}
+```{r fitconsMR, echo=TRUE}
 fit.consMR <- tslm(Consumption ~ Income + Production + Unemployment + Savings,
   data=uschange)
 summary(fit.consMR)
 ```
 
-```{r, echo=FALSE}
+```{r corfitconsMR, echo=FALSE}
 r <- cor(fit.consMR$fitted.values,uschange[,"Consumption"])
 ```
 
@@ -574,7 +574,7 @@ Regressing non-stationary time series can lead to spurious regressions. The outp
 Cases of spurious regression might appear to give reasonable short-term forecasts, but they will generally not continue to work into the future.
 
 
-```{r, fig.cap="Residuals from a spurious regression.", echo=TRUE}
+```{r tslmspurious, fig.cap="Residuals from a spurious regression.", echo=TRUE}
 fit <- tslm(aussies ~ guinearice)
 summary(fit)
 checkresiduals(fit)
@@ -620,7 +620,7 @@ Although this looks this looks like a  time-consuming procedure there are very f
 
 Under this criterion, the best model is the one with the smallest value of CV.
 
-```{r, echo=TRUE}
+```{r CVfitconsMR, echo=TRUE}
 CV(fit.consMR)
 ```
 
@@ -762,7 +762,7 @@ autoplot(fcast) +
 In this setting, the forecaster assumes possible scenarios for the predictor variables that are of interest. For example, a US policy maker may be interested in comparing the predicted change in consumption when there is a constant growth of 1% and 0.5% respectively for income and savings with no change in the employment rate, versus a respective decline of 1% and 0.5%, for each of the four quarters following the end of the sample. The resulting forecasts are calculated below and shown in Figure \@ref(fig:ConsInc4). We should note that prediction intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume that the values of the predictors are known in advance.
 
 
-```{r, ConsInc4, echo=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
+```{r ConsInc4, echo=TRUE, fig.cap="Forecasting percentage changes in personal consumption expenditure for the US under scenario based forecasting."}
 fit.consBest <- tslm(Consumption ~ Income + Savings + Unemployment, data = uschange)
 h <- 4
 newdata <-
@@ -809,7 +809,7 @@ The estimated simple regression line in the US consumption example is
 \[ \hat{y}_t=`r round(coef(fit.cons)[1],2)` + `r round(coef(fit.cons)[2],2)`x_t.
 \]
 
-```{r, include=FALSE}
+```{r fitconsupdown, include=FALSE}
 h <- 4
 fcast.up <- forecast(fit.cons,
 	newdata=data.frame(Income=rep(mean(uschange[,"Income"]), h)))
@@ -821,7 +821,7 @@ fcast.up$mean[1]
 Assuming that for the next four quarters personal income will increase by its historical mean value of $\bar{x}=`r round(mean(uschange[,"Income"]),2)`\%$, consumption is forecast to increase by $`r round(fcast.up$mean[1],2)`\%$ and
 the corresponding $95\%$ and $80\%$ prediction intervals are $[`r round(fcast.up$lower[1,2],2)`,`r round(fcast.up$upper[1,2],2)`]$ and $[`r round(fcast.up$lower[1,1],2)`,`r round(fcast.up$upper[1,1],2)`]$ respectively (calcualted using R). If we assume an extreme increase of $10\%$ in income then the prediction intervals are considerably wider as shown in Figure \@ref(fig:ConsSimplePI).
 
-```{r, echo=FALSE, fig.cap="Prediction intervals if inomce increased by its historical mean versus an extreme increase of 10%.", ConsSimplePI, echo=TRUE}
+```{r conSimplePI, echo=FALSE, fig.cap="Prediction intervals if inomce increased by its historical mean versus an extreme increase of 10%.", echo=TRUE}
 
 autoplot(uschange[,"Consumption"]) +
   ylab("% change in US consumption") +

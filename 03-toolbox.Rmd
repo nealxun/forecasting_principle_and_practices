@@ -97,7 +97,34 @@ Sometimes one of these simple methods will be the best forecasting method availa
 
 ## Transformations and adjustments {#sec-transformations}
 
-Adjusting the historical data can often lead to a simpler forecasting model. Here, we deal with four kinds of adjustments: mathematical transformations, calendar adjustments, population adjustments and inflation adjustments. The purpose of these transformations and adjustments is to simplify the patterns in the historical data by removing known sources of variation or by making the pattern more consistent across the whole data set. Simpler patterns usually lead to more accurate forecasts.
+Adjusting the historical data can often lead to a simpler forecasting model. Here, we deal with four kinds of adjustments: calendar adjustments, population adjustments, inflation adjustments and mathematical transformations. The purpose of these adjustments and transformations is to simplify the patterns in the historical data by removing known sources of variation or by making the pattern more consistent across the whole data set. Simpler patterns usually lead to more accurate forecasts.
+
+###Calendar adjustments {-}
+
+Some of the variation seen in seasonal data may be due to simple calendar effects. In such cases, it is usually much easier to remove the variation before fitting a forecasting model. The `monthdays` function will compute the number of days in each month or quarter.
+
+For example, if you are studying the monthly milk production on a farm, there will be variation between the months simply because of the different numbers of days in each month, in addition to the seasonal variation across the year.
+
+```{r cowmilk, fig.cap="Monthly milk production per cow. Source: @Cryer2008."}
+cbind(Monthly = milk, DailyAverage=milk/monthdays(milk)) %>%
+  autoplot(facet=TRUE) + xlab("Years") + ylab("Pounds") +
+    ggtitle("Milk production per cow")
+```
+
+Notice how much simpler the seasonal pattern is in the average daily production plot compared to the average monthly production plot. By looking at the average daily production instead of the average monthly production, we effectively remove the variation due to the different month lengths. Simpler patterns are usually easier to model and lead to more accurate forecasts.
+
+A similar adjustment can be done for sales data when the number of trading days in each month varies. In this case, the sales per trading day can be modelled instead of the total sales for each month.
+
+###Population adjustments {-}
+
+Any data that are affected by population changes can be adjusted to give per-capita data. That is, consider the data per person (or per thousand people, or per million people) rather than the total. For example, if you are studying the number of hospital beds in a particular region over time, the results are much easier to interpret if you remove the effects of population changes by considering the number of beds per thousand people. Then you can see whether there have been real increases in the number of beds, or whether the increases are due entirely to population increases. It is possible for the total number of beds to increase, but the number of beds per thousand people to decrease. This occurs when the population is increasing faster than the number of hospital beds. For most data that are affected by population changes, it is best to use per-capita data rather than the totals.
+
+###Inflation adjustments {-}
+
+Data which are affected by the value of money are best adjusted before modelling. For example, the average cost of a new house will have increased over the last few decades due to inflation. A \$200,000 house this year is not the same as a \$200,000 house twenty years ago. For this reason, financial time series are usually adjusted so that all values are stated in dollar values from a particular year. For example, the house price data may be stated in year 2000 dollars.
+
+To make these adjustments, a price index is used. If $z_{t}$ denotes the price index and $y_{t}$ denotes the original house price in year $t$, then $x_{t} = y_{t}/z_{t} * z_{2000}$ gives the adjusted house price at year 2000 dollar values. Price indexes are often constructed by government agencies. For consumer goods, a common price index is the Consumer Price Index (or CPI).
+
 
 ###Mathematical transformations {-}
 
@@ -136,14 +163,14 @@ autoplot(BoxCox(elec,lambda))
 ```
 
 Having chosen a transformation, we need to forecast the transformed data. Then, we need to reverse the transformation (or *back-transform*) to obtain forecasts on the original scale. The reverse Box-Cox transformation is given by
-$$
+\begin{equation} 
+(\#eq:backtransform)
   y_{t} =
     \begin{cases}
-      \exp(w_{t}) & \lambda=0;\\
+      \exp(w_{t}) & \text{if $\lambda=0$};\\
       (\lambda w_t+1)^{1/\lambda} & \text{otherwise}.
     \end{cases}
-  $$
-Often a small adjustment is made to the back-transformed forecasts to correct for bias that arises due to the transformation.
+\end{equation}
 
 ### Features of power transformations {-}
 
@@ -153,31 +180,36 @@ Often a small adjustment is made to the back-transformed forecasts to correct fo
 -   Often no transformation is needed.
 -   Transformations sometimes make little difference to the forecasts but have a large effect on prediction intervals.
 
-###Calendar adjustments {-}
+### Bias adjustments {-}
 
-Some of the variation seen in seasonal data may be due to simple calendar effects. In such cases, it is usually much easier to remove the variation before fitting a forecasting model. The `monthdays` function will compute the number of days in each month or quarter.
+One issue with using mathematical transformations such as Box-Cox transformations is that the back-transformed forecast will not be the mean of the forecast distribution. In fact, it will usually be the median of the forecast distribution (assuming that the distribution on the transformed space is symmetric).  For many purposes, this is acceptable, but occasionally the mean forecast is required. For example, you may wish to add up sales forecasts from various regions to form a forecast for the whole country. But medians do not add up, whereas means do.
 
-For example, if you are studying the monthly milk production on a farm, there will be variation between the months simply because of the different numbers of days in each month, in addition to the seasonal variation across the year.
+For a Box-Cox transformation, the backtransformed mean is given by
+\begin{equation}  
+(\#eq:backtransformmean)
+y_t = 
+  \begin{cases}
+     \exp(w_t)\left[1 + \frac{\sigma^2}{2}\right] & \text{if $\lambda=0$;}\\
+     (\lambda w_t+1)^{1/\lambda}\left[1 + \frac{\sigma^2(1-\lambda)}{2(\lambda w_t+1)^{2}}\right] & \text{otherwise;}
+  \end{cases}
+\end{equation}
+where $\sigma^2$ is the forecast variance. The larger the forecast variance, the bigger the difference between the mean and the median.
 
-```{r cowmilk, fig.cap="Monthly milk production per cow. Source: @Cryer2008."}
-cbind(Monthly = milk, DailyAverage=milk/monthdays(milk)) %>%
-  autoplot(facet=TRUE) + xlab("Years") + ylab("Pounds") +
-    ggtitle("Milk production per cow")
+The difference between the simple back-transformed forecast given by \@ref(eq:backtransform) and the mean given by \@ref(eq:backtransformmean) is called the "bias". When we use the mean, rather than the median, we say the point forecasts have been "bias-adjusted". To see how much difference this bias-adjustment makes, consider the following example.  Here we are forecasting the average annual price of eggs using the drift method with a log transformation $(\lambda=0)$. The log transformation is useful in this case to ensure the forecasts and the prediction intervals stay positive.
+
+
+```{r biasadjust, message=FALSE, cache=TRUE, echo=TRUE}
+fc <- rwf(eggs, drift=TRUE, lambda=0, h=50, level=80)
+fc2 <- rwf(eggs, drift=TRUE, lambda=0, h=50, level=80, biasadj=TRUE)
+autoplot(eggs) +
+  autolayer(fc, series="Simple back transformation") +
+  autolayer(fc2, PI=FALSE, series="Bias adjusted") +
+  guides(colour=guide_legend(title="Forecast"))
 ```
 
-Notice how much simpler the seasonal pattern is in the average daily production plot compared to the average monthly production plot. By looking at the average daily production instead of the average monthly production, we effectively remove the variation due to the different month lengths. Simpler patterns are usually easier to model and lead to more accurate forecasts.
+The blue line shows the forecast medians while the red line shows the forecast means. Notice how the skewed forecast distribution pulls up the point forecast when we use the bias adjustment.
 
-A similar adjustment can be done for sales data when the number of trading days in each month varies. In this case, the sales per trading day can be modelled instead of the total sales for each month.
-
-###Population adjustments {-}
-
-Any data that are affected by population changes can be adjusted to give per-capita data. That is, consider the data per person (or per thousand people, or per million people) rather than the total. For example, if you are studying the number of hospital beds in a particular region over time, the results are much easier to interpret if you remove the effects of population changes by considering the number of beds per thousand people. Then you can see whether there have been real increases in the number of beds, or whether the increases are due entirely to population increases. It is possible for the total number of beds to increase, but the number of beds per thousand people to decrease. This occurs when the population is increasing faster than the number of hospital beds. For most data that are affected by population changes, it is best to use per-capita data rather than the totals.
-
-###Inflation adjustments {-}
-
-Data which are affected by the value of money are best adjusted before modelling. For example, the average cost of a new house will have increased over the last few decades due to inflation. A \$200,000 house this year is not the same as a \$200,000 house twenty years ago. For this reason, financial time series are usually adjusted so that all values are stated in dollar values from a particular year. For example, the house price data may be stated in year 2000 dollars.
-
-To make these adjustments, a price index is used. If $z_{t}$ denotes the price index and $y_{t}$ denotes the original house price in year $t$, then $x_{t} = y_{t}/z_{t} * z_{2000}$ gives the adjusted house price at year 2000 dollar values. Price indexes are often constructed by government agencies. For consumer goods, a common price index is the Consumer Price Index (or CPI).
+Bias adjustment is not done by default in the forecast package. If you want your forecasts to be means rather than medians, use the argument `biadadj=TRUE` when you select your Box-Cox transformation parameter.
 
 
 ## Residual diagnostics {#toolbox-resids}
@@ -403,7 +435,7 @@ autoplot(window(ausbeer, start=1992)) +
   autolayer(beerfit2, series="Naïve", PI=FALSE) +
   autolayer(beerfit3, series="Seasonal naïve", PI=FALSE) +
   xlab("Year") + ylab("Megalitres") +
-  ggtitle("Forecasts for quarterly beer production")  +
+  ggtitle("Forecasts for quarterly beer production") +
   guides(colour=guide_legend(title="Forecast"))
 ```
 

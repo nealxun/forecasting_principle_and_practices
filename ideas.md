@@ -7,6 +7,7 @@
  * bias adjustment for Box-Cox transformations (blog post)
  * Some derivations of prediction intervals -- random walks, meanf, SES, 
  * subset and window for time series
+ * bootstrapped prediction intervals and simulations
 
 ## STLF chapter
  * different types of residuals for STLF.
@@ -31,6 +32,7 @@
  * Forecast combinations (blog post)
  * Forecasting intervals for aggregates (blog post)
  * prediction intervals too narrow (blog post)
+ * Ensuring your forecasts stay positive
  * Forecasting within limits (blog post)
  * Backcasting (blog post)
  * Forecasting with short time series (blog post)

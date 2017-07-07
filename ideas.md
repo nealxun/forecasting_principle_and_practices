@@ -1,11 +1,11 @@
 # fpp2 ideas to add
 
  * Add Datacamp examples
- * examples involving electricity demand, online shopping, and restaurant bookings. 
+ * examples involving electricity demand, online shopping, and restaurant bookings.
 
 ## Toolbox chapter
  * bias adjustment for Box-Cox transformations (blog post)
- * Some derivations of prediction intervals -- random walks, meanf, SES, 
+ * Some derivations of prediction intervals -- random walks, meanf, SES,
  * subset and window for time series
  * bootstrapped prediction intervals and simulations
 
@@ -15,7 +15,7 @@
 ## ETS chapter
  * exponential smoothing with covariates?
  * different types of residuals for ETS models.
- * Some derivations of prediction intervals -- SES, 
+ * Some derivations of prediction intervals -- SES,
  * Formulas for forecast variance in ETS chapter.
  * Bagged ETS
 
@@ -27,7 +27,7 @@
 ## Some practical forecasting issues (new chapter)
  * weekly data (blog post)
  * daily data (blog post)
- * sub-daily data, 
+ * sub-daily data,
  * count time series
  * Forecast combinations (blog post)
  * Forecasting intervals for aggregates (blog post)
@@ -40,4 +40,6 @@
  * Forecasting annual totals from monthly data (blog post)
  * Out-of-sample one-step forecasts, and in-sample h-step forecasts (blog posts)
  * FAQ on the AIC (blog post)
-
+ * Missing values
+ * Handling outliers and tsclean
+ * How to improve your forecasts

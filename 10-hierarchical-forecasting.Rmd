@@ -72,16 +72,15 @@ where $\bm{y}_t$ is a vector of all the observations in the hierarchy at time $t
 
 ` I would like to add example here using hts`
 
-```{r, eval=FALSE, include=FALSE}
+```{r, eval=FALSE, include=FALSE, cache=TRUE}
+library(hts)
 abc <- ts(5 + matrix(sort(rnorm(1000)), ncol = 10, nrow = 100))
 colnames(abc) <- c("A10A", "A10B", "A10C", "A20A", "A20B",
                    "B30A", "B30B", "B30C", "B40A", "B40B")
 
 head(abc)
 y <- hts(abc, characters = c(1, 2, 1))
-head(y)
 attributes(y)
-
 ```
 
 ## Grouped time series

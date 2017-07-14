@@ -43,3 +43,4 @@
  * Missing values
  * Handling outliers and tsclean
  * How to improve your forecasts
+ * Bootstrapped forecasts -- non-normal residuals

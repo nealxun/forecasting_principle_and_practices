@@ -33,7 +33,7 @@ We will look at several methods for obtaining the components $S_{t}$, $T_{t}$ an
 ```{r elecequip-trend,  fig.cap="Electrical equipment orders: the trend-cycle component (red) and the raw data (grey).", echo=FALSE}
 fit <- stl(elecequip, s.window=7, t.window=13, robust=TRUE)
 autoplot(elecequip, series="Data") +
-  autolayer(trendcycle(fit), series="Trend-cycle") +
+  forecast::autolayer(trendcycle(fit), series="Trend-cycle") +
 xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
   scale_colour_manual(values=c("Data"="gray","Trend-cycle"="red"),
@@ -60,7 +60,7 @@ Figure \@ref(fig:elecequip-sa) shows the seasonally adjusted electrical equipmen
 
 ```{r elecequip-sa, fig.cap="Seasonally adjusted electrical equipment orders (red) and the original data (grey).", echo=FALSE}
 autoplot(elecequip, series="Data") +
-  autolayer(seasadj(fit), series="Seasonally Adjusted") +
+  forecast::autolayer(seasadj(fit), series="Seasonally Adjusted") +
   xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
   scale_colour_manual(values=c("gray","blue"),
@@ -109,7 +109,7 @@ In the second column of this table, a moving average of order 5 is shown, provid
 
 ```{r ressales2, fig.cap="Residential electricity sales (black) along with the 5-MA estimate of the trend-cycle (red).", echo=TRUE, warning=FALSE,message=FALSE}
 autoplot(elecsales, series="Data") +
-  autolayer(ma(elecsales,5), series="5-MA") +
+  forecast::autolayer(ma(elecsales,5), series="5-MA") +
   xlab("Year") + ylab("GWh") +
   ggtitle("Annual electricity sales: South Australia") +
   scale_colour_manual(values=c("Data"="grey50","5-MA"="red"),
@@ -126,7 +126,7 @@ mak <- c(3,5,7,9)
 for(m in seq(mak))
 {
   autoplot(elecsales, series="Data") +
-    autolayer(ma(elecsales, mak[m]), series="MA") +
+    forecast::autolayer(ma(elecsales, mak[m]), series="MA") +
     scale_colour_manual(values=c("Data"="grey50","MA"="red")) +
     ggtitle(paste(mak[m],"-MA", sep="")) +
     xlab("Year") + ylab("GWh") +
@@ -198,7 +198,7 @@ Other choices for the order of the MA will usually result in trend-cycle estimat
 
 ```{r elecequip2, fig.cap="A 2x12-MA applied to the electrical equipment orders index.", echo=TRUE, warning=FALSE}
 autoplot(elecequip, series="Data") +
-  autolayer(ma(elecequip, 12), series="12-MA") +
+  forecast::autolayer(ma(elecequip, 12), series="12-MA") +
   xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
   scale_colour_manual(values=c("Data"="grey","12-MA"="red"),
@@ -340,8 +340,8 @@ For example, Figure \@ref(fig:x11-seasadj) shows the trend-cycle component and t
 
 ```{r x11-seasadj, echo=TRUE, warning=FALSE, fig.cap="Electrical equipment orders: the original data (grey), the trend-cycle component (red) and the seasonally adjusted data (blue)."}
 autoplot(elecequip, series="Data") +
-  autolayer(trendcycle(fit), series="Trend") +
-  autolayer(seasadj(fit), series="Seasonally Adjusted") +
+  forecast::autolayer(trendcycle(fit), series="Trend") +
+  forecast::autolayer(seasadj(fit), series="Seasonally Adjusted") +
   xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)") +
   scale_colour_manual(values=c("gray","blue","red"),

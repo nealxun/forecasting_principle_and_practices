@@ -178,7 +178,7 @@ The black line in Figure \@ref(fig:ses) is a plot of the data, which shows a cha
 
 ```{r ses, fig.cap="Simple exponential smoothing applied to oil production in Saudi Arabia (1996--2013).", echo=TRUE}
 autoplot(fc) +
-  autolayer(fitted(fc), series="Fitted") +
+  forecast::autolayer(fitted(fc), series="Fitted") +
   ylab("Oil (millions of tonnes)") + xlab("Year")
 ```
 
@@ -270,8 +270,8 @@ Figure \@ref(fig:dampedtrend) shows the forecasts for years 2014--2018 generated
 fc <- holt(air, h=15)
 fc2 <- holt(air, damped=TRUE, phi = 0.9, h=15)
 autoplot(air) +
-  autolayer(fc, PI=FALSE, series="Holt's method") +
-  autolayer(fc2, PI=FALSE, series="Damped Holt's method") +
+  forecast::autolayer(fc, PI=FALSE, series="Holt's method") +
+  forecast::autolayer(fc2, PI=FALSE, series="Damped Holt's method") +
   ggtitle("Forecasts from Holt's method") +
   xlab("Year") + ylab("Air passengers in Australia (millions)") +
   guides(colour=guide_legend(title="Forecast"))
@@ -369,8 +369,8 @@ aust <- window(austourists,start=2005)
 fit1 <- hw(aust,seasonal="additive")
 fit2 <- hw(aust,seasonal="multiplicative")
 autoplot(aust) +
-  autolayer(fit1, PI=FALSE, series="HW additive forecasts") +
-  autolayer(fit2, PI=FALSE, series="HW multiplicative forecasts") +
+  forecast::autolayer(fit1, PI=FALSE, series="HW additive forecasts") +
+  forecast::autolayer(fit2, PI=FALSE, series="HW multiplicative forecasts") +
   xlab("Year") + ylab("International visitor night in Australia (millions)") +
   guides(colour=guide_legend(title="Forecast"))
 ```

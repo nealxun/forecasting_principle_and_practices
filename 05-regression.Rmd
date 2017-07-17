@@ -203,7 +203,7 @@ The following plots show the actual values compared to the fitted values for the
 
 ```{r usfitted1, echo=TRUE, fig.cap="Time plot of US consumption expenditure and predicted expenditure."}
 autoplot(uschange[,'Consumption'], series="Data") +
-  autolayer(fitted(fit.consMR), series="Fitted") +
+  forecast::autolayer(fitted(fit.consMR), series="Fitted") +
   xlab("Year") + ylab("") +
   ggtitle("Percentage change in US consumption expenditure") +
   guides(colour=guide_legend(title=" "))
@@ -292,7 +292,7 @@ There is a downward trend of `r round(fit.beer$coef['trend'], 3)` megalitres per
 
 ```{r beerlm2, echo=TRUE, fig.cap="Time plot of beer production and predicted beer production."}
 autoplot(beer2, series="Data") +
-  autolayer(fitted(fit.beer), series="Fitted") +
+  forecast::autolayer(fitted(fit.beer), series="Fitted") +
   xlab("Year") + ylab("Megalitres") +
   ggtitle("Quarterly Beer Production")
 ```
@@ -775,8 +775,8 @@ newdata <-
 fcast.down <- forecast(fit.consBest, newdata=newdata)
 
 autoplot(uschange[,1]) + ylab("% change in US consumption") +
-  autolayer(fcast.up, PI=TRUE, series="increase") +
-  autolayer(fcast.down, PI=TRUE, series="decrease") +
+  forecast::autolayer(fcast.up, PI=TRUE, series="increase") +
+  forecast::autolayer(fcast.down, PI=TRUE, series="decrease") +
   guides(colour=guide_legend(title="Scenario"))
 ```
 
@@ -825,8 +825,8 @@ the corresponding $95\%$ and $80\%$ prediction intervals are $[`r round(fcast.up
 
 autoplot(uschange[,"Consumption"]) +
   ylab("% change in US consumption") +
-  autolayer(fcast.up, PI=TRUE, series="Average increase") +
-  autolayer(fcast.down, PI=TRUE, series="Extreme increase") +
+  forecast::autolayer(fcast.up, PI=TRUE, series="Average increase") +
+  forecast::autolayer(fcast.down, PI=TRUE, series="Extreme increase") +
   guides(colour=guide_legend(title="Scenario"))
 ```
 
@@ -957,7 +957,7 @@ Figure \@ref(fig:marathonLinear) below in the left panel shows the Boston marath
 ```{r marathonLinear, echo=FALSE, fig.cap="Fitting a linear trend to the Boston marathon winning times is inadequate", message=TRUE, warning=FALSE}
 fit.lin <- tslm(marathon ~ trend)
 p1 <- autoplot(marathon) +
-  autolayer(fitted(fit.lin), series = "Linear trend") +
+  forecast::autolayer(fitted(fit.lin), series = "Linear trend") +
   xlab("Year") +  ylab("Winning times in minutes") +
   guides(colour=guide_legend(title=" ")) +
   theme(legend.position = "none")
@@ -998,12 +998,12 @@ newdata <- cbind(t=t.new,t1=t1.new,t2=t2.new)%>%as.data.frame
 fcasts.pw <- forecast(fit.pw,newdata = newdata)
 
 autoplot(marathon) +
-  autolayer(fitted(fit.lin), series = "Linear") +
-  autolayer(fitted(fit.exp), series="Exponential") +
-  autolayer(fitted(fit.pw), series = "Piecewise") +
-  autolayer(fcasts.pw, series="Piecewise") +
-  autolayer(fcasts.lin$mean, series = "Linear") +
-  autolayer(fcasts.exp$mean, series="Exponential") +
+  forecast::autolayer(fitted(fit.lin), series = "Linear") +
+  forecast::autolayer(fitted(fit.exp), series="Exponential") +
+  forecast::autolayer(fitted(fit.pw), series = "Piecewise") +
+  forecast::autolayer(fcasts.pw, series="Piecewise") +
+  forecast::autolayer(fcasts.lin$mean, series = "Linear") +
+  forecast::autolayer(fcasts.exp$mean, series="Exponential") +
   xlab("Year") +  ylab("Winning times in minutes") +
   ggtitle("Boston Marathon") +
   guides(colour=guide_legend(title=" "))

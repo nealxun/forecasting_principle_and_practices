@@ -205,8 +205,8 @@ In this case, the estimated growth in visitor numbers is also `r format(drift, d
 fc1 <- forecast(fit1, xreg=data.frame(trend=length(austa)+1:10))
 fc2 <- forecast(fit2, h=10)
 autoplot(austa) +
-  autolayer(fc2, series="Stochastic trend") +
-  autolayer(fc1, series="Deterministic trend") +
+  forecast::autolayer(fc2, series="Stochastic trend") +
+  forecast::autolayer(fc1, series="Deterministic trend") +
   ggtitle("Forecasts from deterministic and stochastic trend models") +
   xlab("Year") + ylab("Visitors to Australia (millions)") +
   guides(colour=guide_legend(title="Forecast"))

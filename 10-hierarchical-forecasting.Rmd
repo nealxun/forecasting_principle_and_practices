@@ -4,11 +4,11 @@
 
 ## Hierarchical time series
 
-Time series can often be naturally disaggregated in a hierarchical structure using attributes such as geographical location, product type, etc. For example, the total number of bicycles sold by a cycling warehouse can be disaggregated into a hierarchy of bicycle types. Such a warehouse will sell road bikes, mountain bikes, children bikes or hybrids. Each of these can be disaggregated into finer categories. Children’s bikes can be divided into balance bikes for children under 4 years old, single speed bikes for children between 4 and 6 and bikes for children over the age of 6. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such disaggregation imposes a hierarchical structure. We refer to these as *hierarchical time series*.
+Time series can often be naturally disaggregated by various attributes. For example, the total number of bicycles sold by a cycling manufacturer can be disaggregated by product type such as road bikes, mountain bikes, children bikes and hybrids. Each of these can be disaggregated into finer categories. For example children’s bikes can be divided into balance bikes for children under the age of four, single speed bikes for children between the ages of four and six and other bikes for children over the age of six. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such disaggregation imposes a hierarchical structure and we refer to the resulting collection of time series as *hierarchical time series*. 
 
-To take another example, a manufacturing company may track sales by country, and within each country by region, and within each region by sales outlet. Such geographical structures are commonly found in business, economics and other areas. Again, this is a hierarchical structure, and the complete collection of sales data can be thought of as hierarchical time series. An important feature of hierarchical time series is that they have a unique structure with which they disaggregate or aggregate.
+Commonly found in business and economics are hierarchical time series based on geographical location. For example the total sales of a manufacturing company can be disaggregated by country, then within each country by state, within each state by region and so on down to the outlet level. Generateing accurate forecasts for each of these time series is 
 
-Figure \@ref(fig:HierTree) below shows a $K=2$-level hierarchical structure.^[We will use this hierarchical structure in order to introduce the methods for forecasting hierarchical time series that follow.] At the top of the hierarchy, level 0, is the "Total", the most aggregate level of the data. We denote as $y_t$ the $t$th observation of the "Total" series for $t=1,\dots,T$.
+A feature that distinguishes hierarchical time series (from grouped time series which follow in Section \@ref(Sec:grouped-ts)) is that they have a unique structure with which they disaggregate. Figure \@ref(fig:HierTree) below shows a $K=2$-level hierarchical structure.^[We will use this hierarchical structure in order to introduce the methods for forecasting hierarchical time series that follow.] At the top of the hierarchy, level 0, is the "Total", the most aggregate level of the data. We denote as $y_t$ the $t$th observation of the "Total" series for $t=1,\dots,T$.
 
 The "Total" is disaggregated into 2 series at level 1 and each of these into 3 and 2 series respectively at the bottom level of the hierarchy, level 2. Below the top most aggregate level we denote as $\y{j}{t}$ the $t$th observation of the series which corresponds to node $j$. For example $y_{A,t}$ denotes the $t$th observation of the series corresponding to node A at level 1, $y_{AB,t}$ denotes the $t$th observation of the series corresponding to node AB at level 2, and so on.
 
@@ -83,7 +83,7 @@ y <- hts(abc, characters = c(1, 2, 1))
 attributes(y)
 ```
 
-## Grouped time series
+## Grouped time series {#Sec:grouped-ts}
 Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. Frames can be carbon, aluminium or steel. They can be single speed or have multiple gears. We refer to these as *grouped time series*.
 
 We can also get a similar effect when we combine two hierarchical structures. For example the bicycle manufacturer may disaggregate sales by product and also by geographical location. In this case we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. We can disaggregate by product type and then geographical location but also vice versa.

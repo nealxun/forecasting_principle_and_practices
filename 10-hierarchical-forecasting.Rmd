@@ -3,7 +3,7 @@
 *Warning: this is a more advanced section and assumes knowledge of some basic matrix algebra. We have however tried to simplify and explain in as much as detail as possible all the notation used.*
 
 **Need to revise the following after I finish the chapter**
-In this chapter we discuss forecasting large collections of time series that follow some aggregation structure. The challenge is that we require forecasts that are *coherent*, i.e., forecasts that reflect the aggregation structure the collection of time series follows. Commonly used approaches for generating coherent forecasts are based on selecting a single level of aggregation, generating forecasts at that level and then aggregating these up (using the bottom-up approach), disaggregating these down (using a top-down approach) or applying both these (using a middle-out approach). These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated and then reconciled in order to become coherent. 
+In this chapter we discuss forecasting large collections of time series that follow some aggregation structure. The challenge is that we require forecasts that are *coherent*, i.e., forecasts that reflect the aggregation structure the collection of time series follows. Commonly used approaches for generating coherent forecasts are based on selecting a single level of aggregation, generating forecasts at that level and then aggregating these up (using the bottom-up approach), disaggregating these down (using a top-down approach) or applying both these (using a middle-out approach). These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@ref(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated. These are then these reconciled so that they become coherent.
 
 - This approach has the advantage that information from all time series is used. 
 
@@ -165,11 +165,18 @@ Grouped time series can be thought of as hierarchical time series that do not im
 
 ## Base and revised forecasts 
 
-Our aim is to forecast each series belonging to a hierarchical or a grouped structure.
+Our aim is to generate coherent forecasts for each series belonging to a hierarchical or a grouped structure. 
+
+As mentioned in the introduction commonly used approaches for generating coherent forecasts are based on selecting a single level of aggregation, generating forecasts at that level and then combing these by either aggregating up (using the bottom-up approach), disaggregating these down (using a top-down approach) or applying both these (using a middle-out approach). The alternative and a more advnanced approach would is to first generate forecasts for all the time series and then reconclie these so that they become coherent. In this session we introduce the general 
+
+These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated. These are then these reconciled so that they become coherent.
+
 
 We denote as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to observation $T$ and as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.] We refer to these as *base forecasts*. They are forecasts generated for each time series in the hierarchical or grouped structure using a suitable forecasting method presented in earlier sections of this book.
 
 Although the data follows exactly the aggregation structure (as reflected by the summing matrix) base forecasts in general will not. It is only under very special circumstances such as using very simple methods for all time series, for example using naïve forecasts, that the base forecasts will be coherent.
+
+
 
 The base forecasts can however be combined to produce a set of forecasts that are coherent. We refer to these as *revised forecasts* and denote them as $\ytilde{j}{h}$ and $\tilde{y}_{h}$ respectively. 
 

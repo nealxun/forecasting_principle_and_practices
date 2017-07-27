@@ -4,7 +4,7 @@
 
 **Need to revise the following after I finish the chapter**
 
-In this chapter we discuss forecasting large collections of time series that follow some aggregation structure. The challenge is that we require forecasts that are *coherent*, i.e., forecasts that add up in a consistent way with the aggregation structure the collection of time series follow. Commonly used approaches are based on selecting a single level of aggregation, generating forecasts at that level and then combining these to produce coherent forecasts for all the time series. These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@ref(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated and these are then reconciled so that they become coherent.
+In this chapter we discuss forecasting large collections of time series that follow some aggregation structure. The challenge is that we require forecasts that are *coherent*, i.e., forecasts that add up in a manner consistent with the aggregation structure the collection of time series follow. Commonly used approaches are based on selecting a single level of aggregation, generating forecasts at that level and then combining these to produce coherent forecasts for all the time series. These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@ref(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated and these are then reconciled so that they become coherent.
 
 - This approach has the advantage that information from all time series is used. 
 
@@ -165,21 +165,19 @@ where now the second and third rows of $\bm{S}$ represent \@ref(eq:middlelevelAB
 
 Grouped time series can be thought of as hierarchical time series that do not impose a unique hierarchical structure in the sense that the order by which the series can be grouped is not unique.
 
-## Base and revised forecasts 
+## Base and coherent forecasts 
 
-Our aim is to generate coherent forecasts for each series belonging to a hierarchical or a grouped structure. 
+Our aim is to generate a set of coherent forecasts across all the series of a hierarchical or a grouped structure.
 
 Commonly used approaches are based on first generating forecasts for a single level of aggregation, and then producing coherent forecasts by aggregating these up using a bottom-up approach, disaggregating them down using a top-down approach, or a combination of the two using a middle-out approach. The details of these methods are presented in Sections \@ref(Hier:bu) to \@ref(Hier:mo). An alternative and a more advnanced approach is to first generate forecasts for all the time series and then reconcile these so that they become coherent. The details of this approach which we refer to as the optimal reconciliation approach are presented in Section \@ref(Hier:reconciliation). 
 
-In what follows in this session we introduce the concepts of base and revised forecasts in order to build a unified framework that incorporates all of the approaches outlined above for both hierarchical and grouped time series.
+In what follows in this section we introduce and formally define the concepts of base and coherent forecasts in order to build a unified framework that incorporates all of the approaches outlined above for both hierarchical and grouped time series.
 
-We denote as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to observation $T$ and as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.] We refer to these as *base forecasts*. These are forecasts generated for each time series in the aggregation structure using a suitable forecasting method presented in earlier sections of this book.
+Denote as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series having observed the time series up to time $T$. Likewise as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to time $T$.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.] We refer to these as *base forecasts*. These are forecasts generated for each time series in the aggregation structure using a suitable forecasting method presented in earlier sections of this book.
 
-Although the data follows exactly the aggregation structure (as reflected by the summing matrix) base forecasts in general will not. It is only under very special circumstances such as using very simple methods for all time series (for example using naïve forecasts) that the base forecasts will be coherent.
+Although the data follows exactly the aggregation structure (as reflected by the summing matrix) base forecasts in general will not. It is only under very special circumstances such as using a very simple method to forecasts all the time series (for example using naïve forecasts for all series) that the base forecasts will be coherent.
 
-The base forecasts can however be combined to produce a set of forecasts that are coherent. We refer to these as *revised forecasts* and denote them as $\ytilde{j}{h}$ and $\tilde{y}_{h}$ respectively. 
-
-- There are a number of ways of combining base forecasts in order to obtain revised coherent forecasts. The following sections discuss some of the possible combining approaches that can be used for forecasting time series data that possess hierarchical or grouped structures.
+The base forecasts can however be combined, as briefly described above, to produce a set of forecasts that are coherent. We denote the set of coherent forecasts for the "Total" series and all series below the top level as $\tilde{y}_{h}$ and $\ytilde{j}{h}$ respectively. 
 
 ## The bottom-up approach {#Hier:bu}
 
@@ -187,7 +185,7 @@ A commonly applied method is the bottom-up approach. This approach involves firs
 
 For example, for the hierarchy of Figure \@ref(fig:HierTree) we first generate  $h$-step-ahead base forecasts for each of the bottom level series: $$\yhat{AA}{h},~~\yhat{AB}{h},~~\yhat{AC}{h},~~ \yhat{BA}{h}~~\text{and}~~\yhat{BB}{h}.$$
 
-Aggregating these up the hierarchy we get $h$-step-ahead revised forecasts for the rest of the series:  $$\tilde{y}_{h}=\yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}+\yhat{BA}{h}+\yhat{BB}{h},~~~\ytilde{A}{h}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}$$ and $$\ytilde{B}{h}= \yhat{BA}{h}+\yhat{BB}{h}.$$
+Aggregating these up the hierarchy we get $h$-step-ahead coherent forecasts for the rest of the series: $$\tilde{y}_{h}=\yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}+\yhat{BA}{h}+\yhat{BB}{h},~~~\ytilde{A}{h}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}$$ and $$\ytilde{B}{h}= \yhat{BA}{h}+\yhat{BB}{h}.$$
 
 As in equation \@ref(eq:smatrix) we can employ the summing matrix here and write
 $$
@@ -220,11 +218,11 @@ $$
     \yhat{BB}{h}
   \end{bmatrix}.
 $$
-In general, using more compact notation the bottom-up approach can be represented as
+In general, using more compact notation, the bottom-up approach can be represented as
 $$
   \tilde{\bm{y}}_{h}=\bm{S}\hat{\bm{y}}_{K,h}
 $$
-where $\tilde{\bm{y}_t}$ is an $n$-dimensional vector of revised $h$-step ahead forecasts for each time series in any aggregation structrue and $\hat{\bm{y}}_{K,t}$ is an $m$-dimensional vector of $h$-step ahead base forecasts for each of the bottom level series of any aggregation structure. Note that for the bottom-up approach the revised forecasts for the bottom level series are equal to the base forecasts, i.e., $\tilde{\bm{y}}_{K,t}=\hat{\bm{y}}_{K,t}$.
+where $\tilde{\bm{y}_t}$ is an $n$-dimensional vector of coherent $h$-step ahead forecasts for each time series within any aggregation structure and $\hat{\bm{y}}_{K,h}$ is an $m$-dimensional vector of $h$-step ahead base forecasts for each of the bottom level series of any aggregation structure. Note that for the bottom-up approach the coherent forecasts for the bottom level series are equal to the base forecasts, i.e., $\tilde{\bm{y}}_{K,t}=\hat{\bm{y}}_{K,t}$.
 
 The greatest advantage of this approach is that we are forecasting at the bottom level of a structure and therefore no information is lost due to aggregation. On the other hand bottom level data can be quite noisy and more challenging to model and forecast.
 
@@ -237,9 +235,9 @@ $$
 $$
 Using matrix notation we can stack the set of proportions in a $m$-dimensional column vector $\bm{p}=(p_1,\ldots,p_{m})'$^[$A'$ denotes the transpose of $A$.] and write
 $$\tilde{\bm{y}}_{K,t}=\bm{p}\hat{y}_t$$
-Once the bottom level $h$-step forecasts have been generated these can be aggregated to generate revised forecasts for the rest of the series. In general using the summing matrix and for a specified set of proportions, top-down approaches can be represented as,
+Once the bottom level $h$-step forecasts have been generated these can be aggregated to generate coherent forecasts for the rest of the series. In general using the summing matrix and for a specified set of proportions, top-down approaches can be represented as,
 $$\tilde{\bm{y}}_h=\bm{S}\bm{p}\hat{y}_t.$$
-Note that for all top-down approaches the top level revised forecasts are equal to the top level base forecasts, i.e., $\tilde{y}_{h}=\hat{y}_{h}$.
+Note that for all top-down approaches the top level coherent forecasts are equal to the top level base forecasts, i.e., $\tilde{y}_{h}=\hat{y}_{h}$.
 
 The most common top-down approaches specify proportions based on the historical proportions of the data. The two most common versions follow.
 
@@ -259,21 +257,21 @@ for $j=1,\dots,m$. Each proportion $p_j$ captures the average historical value o
 
 The greatest attribute of such top-down approaches is their simplicity to apply. One only needs to model and generate forecasts for the most aggregated top level series. In general these approaches seem to produce quite reliable forecasts for the aggregate levels and they are very useful with low count data. On the other hand, their greatest disadvantage is the loss of information due to aggregation. Using such a top-down approaches, we are unable to capture and take advantage of individual series characteristics such as time dynamics, special events, etc.
 
-In the example on forecasting Australian domestic tourism demand that follows, the data are highly seasonal. The seasonal pattern of tourist arrivals may vary across series depending on the tourism destination. An area that is a summer holiday destination will have a very different seasonal pattern to an area that is seen as a winter hoiday destination. This will not be captured by disaggregating the total of these destinations based on historical proportions. Finally, with these methods the disaggregation of the "Total" series forecasts depends on historical and static proportions, and these proportions may be distorted by trends in the data.
+- In the example on forecasting Australian domestic tourism demand that follows, the data are highly seasonal. The seasonal pattern of tourist arrivals may vary across series depending on the tourism destination. An area that is a summer holiday destination will have a very different seasonal pattern to an area that is seen as a winter hoiday destination. This will not be captured by disaggregating the total of these destinations based on historical proportions. Finally, with these methods the disaggregation of the "Total" series forecasts depends on historical and static proportions, and these proportions may be distorted by trends in the data.
 
 ### Forecast proportions {-}
 
 An alternative approach that improves on the historical and static nature of the proportions specified above is to use forecast proportions introduced in @AthEtAl2009.
 
-To demonstrate the intuition of this method, consider a one level hierarchy. We first generate $h$-step-ahead base forecasts for all the series. At level 1 we calculate the proportion of each $h$-step-ahead base forecast to the aggregate of all the $h$-step-ahead base forecasts at this level. We refer to these as the forecast proportions and we use these to disaggregate the top level $h$-step ahead forecast and generate revised forecasts for the whole of the hierarchy.
+To demonstrate the intuition of this method, consider a one level hierarchy. We first generate $h$-step-ahead base forecasts for all the series. At level 1 we calculate the proportion of each $h$-step-ahead base forecast to the aggregate of all the $h$-step-ahead base forecasts at this level. We refer to these as the forecast proportions and we use these to disaggregate the top level $h$-step ahead forecast and generate coherent forecasts for the whole of the hierarchy.
 
 For a $K$-level hierarchy this process is repeated for each node going from the top to the very bottom level. Applying this process leads to the following general rule for obtaining the forecast proportions
 $$
   p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}
 $$
-for $j=1,2,\dots,m$. These forecast proportions disaggregate the $h$-step-ahead base forecast of the "Total" series to $h$-step-ahead revised forecasts of the bottom level series. $\hat{y}_{j,h}^{(\ell)}$ is the $h$-step-ahead base forecast of the series that corresponds to the node which is $\ell$ levels above $j$. $\hat{S}_{j,h}^{(\ell)}$ is the sum of the $h$-step-ahead base forecasts below the node that is $\ell$ levels above node $j$ and are directly connected to that node.
+for $j=1,2,\dots,m$. These forecast proportions disaggregate the $h$-step-ahead base forecast of the "Total" series to $h$-step-ahead coherent forecasts of the bottom level series. $\hat{y}_{j,h}^{(\ell)}$ is the $h$-step-ahead base forecast of the series that corresponds to the node which is $\ell$ levels above $j$. $\hat{S}_{j,h}^{(\ell)}$ is the sum of the $h$-step-ahead base forecasts below the node that is $\ell$ levels above node $j$ and are directly connected to that node.
 
-We will use the hierarchy of Figure \@ref(fig:HierTree) to explain this notation and to demonstrate how this general rule is reached. Assume we have generated base forecasts for each series in the hierarchy. Remember that for the top level "Total" series, $\tilde{y}_{h}=\hat{y}_{h}$, for any top-down approach. Here are some examples using the above notation:
+We will use the hierarchy of Figure \@ref(fig:HierTree) to explain this notation and to demonstrate how this general rule is reached. Assume we have generated base forecasts for each series in the hierarchy. Recall that for the top level "Total" series, $\tilde{y}_{h}=\hat{y}_{h}$, for any top-down approach. Here are some examples using the above notation:
 
   * $\hat{y}_{\text{A},h}^{(1)}=\hat{y}_{\text{B},h}^{(1)}=\hat{y}_{h}= \tilde{y}_{h}$
   * $\hat{y}_{\text{AA},h}^{(1)}=\hat{y}_{\text{AB},h}^{(1)}=\hat{y}_{\text{AC},h}^{(1)}= \hat{y}_{\text{A},h}$
@@ -281,7 +279,7 @@ We will use the hierarchy of Figure \@ref(fig:HierTree) to explain this notation
   * $\Shat{AA}{h}{1} = \Shat{AB}{h}{1}= \Shat{AC}{h}{1}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}$
   * $\Shat{AA}{h}{2} = \Shat{AB}{h}{2}= \Shat{AC}{h}{2}= \Shat{A}{h}{1} = \Shat{B}{h}{1}= \hat{S}_{h}= \yhat{A}{h}+\yhat{B}{h}$
 
-Moving down the farthest left branch of the hierarchy the revised forecasts are given by
+Moving down the farthest left branch of the hierarchy coherent forecasts are given by
 $$
   \ytilde{A}{h} = \Bigg(\frac{\yhat{A}{h}}{\Shat{A}{h}{1}}\Bigg) \tilde{y}_{h} =
   \Bigg(\frac{\yhat{AA}{h}^{(1)}}{\Shat{AA}{h}{2}}\Bigg) \tilde{y}_{h}
@@ -299,11 +297,11 @@ The other proportions can be similarly obtained. The greatest disadvantage of th
 
 ## Middle-out approach {#Hier:mo}
 
-The middle-out approach combines bottom-up and top-down approaches. First the "middle level" is chosen and base forecasts are generated for all the series of this level. For the series above the middle level, revised forecasts are generated using the bottom-up approach by aggregating the "middle-level" base forecasts upwards. For the series below the "middle level", revised forecasts are generated using a top-down approach by disaggregating the "middle level" base forecasts downwards.
+The middle-out approach combines bottom-up and top-down approaches. First the "middle level" is chosen and base forecasts are generated for all the series of this level. For the series above the middle level, coherent forecasts are generated using the bottom-up approach by aggregating the "middle-level" base forecasts upwards. For the series below the "middle level", coherent forecasts are generated using a top-down approach by disaggregating the "middle level" base forecasts downwards.
 
 ## Optimal reconciliation approach {#Hier:reconciliation}
 
-Denote as $\bm{\hat{y}}_h$ a set of $h$-step ahead base forecasts generated independently for each series in a structure and stacked the same way as the data. For example for the hierarchy of Figure \@ref(fig:HierTree)
+Denote as $\bm{\hat{y}}_h$ a set of $h$-step ahead base forecasts generated for each series in a structure and stacked the same way as the data. For example for the hierarchy of Figure \@ref(fig:HierTree)
 $$
 \bm{\hat{y}}_h=\begin{bmatrix}
     \hat{y}_h \\
@@ -318,11 +316,11 @@ $$
 $$
 
 Then in general all forecasting approaches for either hierarchical or grouped structures can be represented as
-\begin{equation}
+\begin{equation} 
   \bm{\tilde{y}}_h=\bm{S}\bm{P}\bm{\hat{y}}_h
   (\#eq:SP)
 \end{equation}
-where reading from right to left, $\bm{\hat{y}}_h$ is the set of independent $h$-step ahead base forecasts as defined above, $\bm{P}$ is a matrix that projects the independent base forecasts into the bottom level, the summing matrix $\bm{S}$ sums these up the aggregation structure to produce a set of revised forecasts $\bm{\tilde{y}}_h$.
+where reading from right to left, $\bm{\hat{y}}_h$ is the set of $h$-step ahead base forecasts as defined above, $\bm{P}$ is a matrix that projects the base forecasts into the bottom level, and the summing matrix $\bm{S}$ sums these up the aggregation structure to produce a set of coherent forecasts $\bm{\tilde{y}}_h$.
 
 The $\bm{P}$ matrix is defined according to the approach implemented. For example if the bottom-up approach is used to forecast the hierarchy of Figure \@ref(fig:HierTree),
 $$\bm{P}=
@@ -334,7 +332,7 @@ $$\bm{P}=
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
   \end{bmatrix}.
   $$
-Notice that the $\bm{P}$ comprises two partitions. The first three columns which zero out the independent base forecasts for the series above the bottom level and the $n_K$-dimensional identity matrix which picks only the independent base forecasts of the bottom level, to then be summed up the hierarchy by the $\bm{S}$ matrix.
+Notice that the $\bm{P}$ comprises two partitions. The first three columns which zero out the base forecasts of the series above the bottom level and the $m$-dimensional identity matrix which picks only the base forecasts of the bottom level, to then be summed up the hierarchy by the $\bm{S}$ matrix.
 
 If any of the top-down approaches were used then $$\bm{P}=
   \begin{bmatrix}
@@ -345,17 +343,17 @@ If any of the top-down approaches were used then $$\bm{P}=
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
   \end{bmatrix},
   $$
-so that the first column includes the set of proportions that distribute the independent base forecasts of the top level to the bottom level and the rest of the columns zero out the independent base forecasts below the very top level of aggregation.
+so that the first column includes a set of proportions that distribute the base forecasts of the top level to the bottom level to then be summed up the hierarchy by the $\bm{S}$ matrix. The rest of the columns zero out the base forecasts below the very top level of aggregation.
 
-For a middle out approach the $\bm{P}$ matrix will be a combination of the above two. Using a set of proportions, the independent base forecasts of some pre-chosen level will be disaggregated to the bottom level to then be summed up the hierarchy with the summing matrix, with all other independent base forecasts being zeroed out.
+For a middle out approach the $\bm{P}$ matrix will be a combination of the above two. Using a set of proportions, the base forecasts of some pre-chosen level will be disaggregated to the bottom level to then be summed up the hierarchy with the summing matrix, with all other base forecasts being zeroed out.
 
-All the approaches we have considered so far in this chapter involve choosing a particular level in the aggregation structure, generating independent base forecasts for this level, and then either aggregating up or disaggregating down these base forecasts to generate revised forecasts for the rest of the series. The above examples clearly reflect this through the $\bm{P}$ matrix.
+All the approaches we have considered so far in this chapter involve choosing a particular level in the aggregation structure, generating base forecasts for this level, and then either aggregating up or disaggregating down these base forecasts to generate coherent forecasts for the rest of the series. The above examples clearly reflect this through the $\bm{P}$ matrix.
 
-In this section we introduce an approach that instead involves generating independent base forecast for each series. As these base forecasts are independently generated they will not add up according to the hierarchical or grouped structure, i.e., they will not be "aggregate consistent". The base forecasts are then combined to generate a set of revised forecasts that are as close as possible to the base forecasts but also aggregate consistently with the structure.
+In this section we introduce an approach that instead involves generating base forecast for each series in the aggregation structure. The base forecasts are then reconciled to generate a set of forecasts that are as close as possible to the base forecasts but are also coherent.
 
-The general idea is derived from wanting to find a $\bm{P}$ matrix that minimises the forecast error of the revised forecasts from forecasting each time series in the structure. In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed in order to get a good flavour of the approach. These unfortunately complicate the presentation. However following through these steps we get to the specification of $\bm{P}$ in equation \@ref(eq:MinT) which is labelled the **MinT** estimator as it **Min**imises the **T**race of the forecast errors of the revised forecasts across the whole structure. For further details and discussion please refer to @Mint.
+The general idea is derived from wanting to find a $\bm{P}$ matrix that minimises the forecast error of a set of coherent forecasts from forecasting each time series in the structure. In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed in order to get a good flavour of the approach. These unfortunately complicate the presentation. However, following through these steps we get to the specification of $\bm{P}$ in equation \@ref(eq:MinT) which is labelled the **MinT** estimator as it **Min**imises the **T**race of the forecast errors of the coherent  forecasts across the whole structure. For further details and discussion please refer to @Mint.
 
-Let $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$ be the forecast errors after having produced a set of revised forecasts across the whole structure, stacked in the same order as the data. Note that this expression is a generalisation of a forecast error as defined in Section \@ref(accuracy) using matrix notation. It can be easily shown through Equation \@ref(eq:SP) above that for a set of independent base forecasts that are unbiased, which will be the case for all base forecasts generated using methods introduced in this book, using a $\bm{P}$ matrix such that $\bm{S}\bm{P}\bm{S}=\bm{S}$, generates a set of revised forecasts $\bm{\tilde{y}}_h$ that are also unbiased. Note that this will not hold for any top-down approach.^[TODO: See Exercise 10.1 - possibly set this as an exercise.]
+Let $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$ be the forecast errors after having produced a set of coherent forecasts across the whole structure, stacked in the same order as the data. Note that this expression is a generalisation of a forecast error as defined in Section \@ref(accuracy) using matrix notation. It can be easily shown through Equation \@ref(eq:SP) above that for a set of base forecasts that are unbiased, which will be the case for all base forecasts generated using methods introduced in this book, using a $\bm{P}$ matrix such that $\bm{S}\bm{P}\bm{S}=\bm{S}$, generates a set of coherent forecasts $\bm{\tilde{y}}_h$ that are also unbiased. Note that this will not hold for any top-down approach.^[TODO: See Exercise 10.1 - possibly set this as an exercise.]
 
 @Mint show in Lemma 1 that
 \begin{equation*}

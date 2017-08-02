@@ -313,7 +313,7 @@ forecast.gts2 <- function (object, h = ifelse(frequency(object$bts) > 1L, 2L *
 #clean the dataset
 library(data.table)
 
-dfa <- read.csv("data_a.csv", strip.white = TRUE)
+dfa <- read.csv("prison.csv", strip.white = TRUE)
 
 dfa$indigenous[dfa$indigenous =="3"] <- "2"
 dfa$indigenous <- as.character(dfa$indigenous)

@@ -346,5 +346,14 @@ ncol(allts(y))
 
 tmp = forecast(y, h = 8, method = "comb", weights = "wls", fmethod = "ets")
 
-plot(tmp)
+plot(tmp,levels = 0)
+plot(tmp,levels = 1)
+plot(tmp,levels = 2)
+plot(tmp,levels = 3)
+plot(tmp,levels = 4)
+plot(tmp,levels = 5)
+plot(tmp,levels = 6)
+plot(tmp,levels = 7)
+
+
 

@@ -1,8 +1,5 @@
-setwd("C:/Users/tomas/Dropbox/Forecasting Prison Numbers/Data")
-setwd("C:/Users/steelto/Dropbox/Forecasting Prison Numbers/Data")
-#setwd("C:/Users/steelto/Documents")
-
 ##data visualisation##
+
 
 library(data.table)
 library(stringi)
@@ -17,10 +14,10 @@ library(scales)
 library(lubridate)
 library(gridExtra)
 
-dfa <- read.csv("prison.csv", strip.white = TRUE)
+
+dfa <- read.csv("prisonLF.csv", strip.white = TRUE)
 
 dfa$state <- as.character(dfa$state)
-dfa$sex <- as.character(dfa$sex)
 
 dfa$indigenous[dfa$indigenous =="3"] <- "2"
 dfa$indigenous <- as.character(dfa$indigenous)
@@ -34,6 +31,13 @@ dfa$legal <- as.character(dfa$legal)
 dfa$legal[dfa$legal =="4"] <- "2"
 dfa$legal <- as.character(dfa$legal)
 
+# dfa$gender[dfa$gender =="1"] <- "3"
+# dfa$gender[dfa$gender =="2"] <- "1"
+# dfa$gender[dfa$gender =="3"] <- "2"
+dfa$gender <- as.character(dfa$gender)
+
+
+
 #pop <- read.csv("aus_residents.csv", strip.white = TRUE)
 #pop$t <- as.Date(pop$date, format = "%Y/%m/%d")
 
@@ -44,9 +48,8 @@ str(dfa)
 dfa$count <- as.numeric(dfa$count)
 str(dfa)
 
-dfa$quarter <- as.Date(cut(dfa$t, breaks = "quarter"))
-dfa$year <- as.Date(cut(dfa$t, breaks="year"))
-
+#dfa$quarter <- as.Date(cut(dfa$t, breaks = "quarter"))
+#dfa$year <- as.Date(cut(dfa$t, breaks="year"))
 
 ##getting the descriptions clearer in the attributes
 dfa$state[dfa$state =="1"] <- "NSW"
@@ -58,8 +61,8 @@ dfa$state[dfa$state =="6"] <- "TAS"
 dfa$state[dfa$state =="7"] <- "NT"
 dfa$state[dfa$state =="8"] <- "ACT"
 
-dfa$sex[dfa$sex =="1"] <- "Male"
-dfa$sex[dfa$sex =="2"] <- "Female"
+dfa$gender[dfa$gender =="1"] <- "Male"
+dfa$gender[dfa$gender =="2"] <- "Female"
 
 dfa$indigenous[dfa$indigenous =="1"] <- "ATSI"
 dfa$indigenous[dfa$indigenous =="2"] <- "Other"
@@ -67,50 +70,58 @@ dfa$indigenous[dfa$indigenous =="2"] <- "Other"
 dfa$legal[dfa$legal =="2"] <- "Sentenced"
 dfa$legal[dfa$legal =="1"] <- "Remamded"
 
+write.csv(dfa, file = "prisonLF1.csv",row.names = FALSE)
 
+dfa <- read.csv("prisonLF1.csv")
+dfa$t <- as.Date(dfa$date, format = "%Y/%m/%d")
+dfa$count <- as.numeric(dfa$count)
+dfa$quarter <- as.Date(cut(dfa$t, breaks = "quarter"))
+dfa$year <- as.Date(cut(dfa$t, breaks="year"))
 
 #total
-ggplot(data = dfa, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") + 
+p1<-ggplot(data = dfa, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
-  ggtitle("Australian adult prison population") + 
+  ggtitle("Australian prison population: total") + 
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Total number of prisoners")
+  ylab("Number of prisoners")
 
 #group by state
-ggplot(data = dfa, aes(x = quarter, y = count, group = state, colour = state))  +
+p2<-ggplot(data = dfa, aes(x = quarter, y = count, group = state, colour = state))  +
   stat_summary(fun.y = sum, geom = "line")+ 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
-  ggtitle("Australian adult prison population by state") + 
+  ggtitle("Australian prison population by state") + 
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Total number of prisoners") +
+  ylab("Number of prisoners") +
   scale_y_continuous(breaks = c(500, 1500, 2500, 3500, 4500, 5500, 6500, 7500, 8500, 9500, 10500, 11500, 12500, 13500, 14500))
 
-
 #group by legal status
-ggplot(data = dfa, aes(x = quarter, y = count, group = legal, colour = legal))  +
+p3<-ggplot(data = dfa, aes(x = quarter, y = count, group = legal, colour = legal))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
-  ggtitle("Australian adult prison population by legal status") + 
+  ggtitle("Australian prison population by legal status") + 
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Total number of prisoners") +
+  ylab("Number of prisoners") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))
 
-#group by sex
-ggplot(data = dfa, aes(x = quarter, y = count, group = sex, colour = sex))  +
+#group by gender
+p4<-ggplot(data = dfa, aes(x = quarter, y = count, group = gender, colour = gender))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
-  ggtitle("Australian adult prison population by sex") + theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("Australian prison population by gender") + 
+  #theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Total number of prisoners") +
+  ylab("Number of prisoners") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))
 
+
+gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
 
 #group by legal and state
 ggplot(data = dfa, aes(x = quarter, y = count, group = legal, colour = legal))  +
@@ -118,7 +129,7 @@ ggplot(data = dfa, aes(x = quarter, y = count, group = legal, colour = legal))  
   scale_x_date(labels = date_format("%Y"), date_breaks= "2 years") + 
   ggtitle("Australian adult prison population by legal status and state") + 
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Year") +
   ylab("Total number of prisoners") +
   scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,
@@ -126,13 +137,13 @@ ggplot(data = dfa, aes(x = quarter, y = count, group = legal, colour = legal))  
                                 9500, 10000, 10500, 11000, 11500, 12000)) +
   facet_grid(.~state)
 
-#group by sex and state
-ggplot(data = dfa, aes(x = quarter, y = count, group = sex, colour = sex))  +
+#group by gender and state
+ggplot(data = dfa, aes(x = quarter, y = count, group = gender, colour = gender))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%Y"), date_breaks= "2 years") + 
-  ggtitle("Australian adult prison population by sex and state") + 
+  ggtitle("Australian adult prison population by gender and state") + 
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Year") +
   ylab("Total number of prisoners") +
   scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,
@@ -140,25 +151,25 @@ ggplot(data = dfa, aes(x = quarter, y = count, group = sex, colour = sex))  +
                                 9500, 10000, 10500, 11000, 11500, 12000)) +
   facet_grid(.~state)
 
-#group by legal and sex
-ggplot(data = dfa, aes(x = quarter, y = count, group = sex, colour = sex))  +
+#group by legal and gender
+ggplot(data = dfa, aes(x = quarter, y = count, group = gender, colour = gender))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
   ggtitle("Australian adult prison population by state") + 
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
   ylab("Total number of prisoners") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
   facet_grid(.~legal)
 
-#group by legal, sex and state
-ggplot(data = dfa, aes(x = quarter, y = count, group = interaction(legal, sex), colour = interaction(legal, sex)))  +
+#group by legal, gender and state
+ggplot(data = dfa, aes(x = quarter, y = count, group = interaction(legal, gender), colour = interaction(legal, gender)))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%Y"), date_breaks= "2 years") + 
   ggtitle("Australian adult prison population by indigenous status, legal status and state") + 
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Year") +
   ylab("Total number of prisoners") +
   scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,
@@ -192,8 +203,8 @@ ggplot(data = dfa, aes(x = quarter, y = count, group = indigenous, colour = indi
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
   facet_grid(.~legal)
 
-#group by Indigenous and sex
-ggplot(data = dfa, aes(x = quarter, y = count, group = sex, colour = sex))  +
+#group by Indigenous and gender
+ggplot(data = dfa, aes(x = quarter, y = count, group = gender, colour = gender))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
   ggtitle("Australian adult prison population by state") + 
@@ -205,7 +216,7 @@ ggplot(data = dfa, aes(x = quarter, y = count, group = sex, colour = sex))  +
   facet_grid(.~indigenous)
 
 #group by indigenous, legal and state
-ggplot(data = dfa, aes(x = quarter, y = count, group = interaction(indigenous, sex), colour = interaction(indigenous, sex)))  +
+ggplot(data = dfa, aes(x = quarter, y = count, group = interaction(indigenous, gender), colour = interaction(indigenous, gender)))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%Y"), date_breaks= "2 years") + 
   ggtitle("Australian adult prison population by indigenous status, legal status and state") + 
@@ -217,7 +228,7 @@ ggplot(data = dfa, aes(x = quarter, y = count, group = interaction(indigenous, s
   facet_grid(.~legal)
 
 #group by indigenous, legal and state
-ggplot(data = dfa, aes(x = quarter, y = count, group = interaction(indigenous, sex), colour = interaction(indigenous, sex)))  +
+ggplot(data = dfa, aes(x = quarter, y = count, group = interaction(indigenous, gender), colour = interaction(indigenous, gender)))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%Y"), date_breaks= "2 years") + 
   ggtitle("Australian adult prison population by indigenous status, legal status and state") + 
@@ -242,7 +253,7 @@ ggplot(data = dfa, aes(x = quarter, y = count, group = indigenous, colour = indi
   facet_grid(.~state)
 
 
-#group by indigenous and sex
+#group by indigenous and gender
 ggplot(data = dfa, aes(x = quarter, y = count, group = indigenous, colour = indigenous))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%Y"), date_breaks= "2 years") + 
@@ -252,7 +263,7 @@ ggplot(data = dfa, aes(x = quarter, y = count, group = indigenous, colour = indi
   xlab("Year") +
   ylab("Total number of prisoners") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
-  facet_grid(.~sex)
+  facet_grid(.~gender)
 
 #group by indigenous status
 ggplot(data = dfa, aes(x = quarter, y = count, group = indigenous, colour = indigenous))  +
@@ -264,7 +275,7 @@ ggplot(data = dfa, aes(x = quarter, y = count, group = indigenous, colour = indi
   xlab("Quarter") +
   ylab("Total number of prisoners") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
-  facet_grid(.~sex)
+  facet_grid(.~gender)
 
 scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,
                               5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 
@@ -275,10 +286,10 @@ scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 450
 
 ################
 
-dfa <- read.csv("prison.csv", strip.white = TRUE)
+dfa <-read.csv("prisonLF.csv", strip.white = TRUE)
 
 dfa$state <- as.character(dfa$state)
-dfa$sex <- as.character(dfa$sex)
+dfa$gender <- as.character(dfa$gender)
 
 dfa$indigenous[dfa$indigenous =="3"] <- "2"
 dfa$indigenous <- as.character(dfa$indigenous)
@@ -294,13 +305,13 @@ dfa$legal <- as.character(dfa$legal)
 
 dfa$count <- as.numeric(dfa$count)
 
-dfa <- aggregate(count ~ state + sex + legal + date, data = dfa, FUN = sum)
+dfa <- aggregate(count ~ state + legal + gender + date, data = dfa, FUN = sum)
 
-dfa_w <- reshape(dfa, idvar = c("state", "sex", "legal"), timevar = "date", direction = "wide")
+dfa_w <- reshape(dfa, idvar = c("state", "legal", "gender"), timevar = "date", direction = "wide")
 
 dfa_w$pathString <- paste(dfa_w$state,#length=1
-                          dfa_w$sex, #length=1
                           dfa_w$legal, #length=1
+                          dfa_w$gender, #length=1
                           sep="")
 
 #rename the columns
@@ -321,24 +332,33 @@ newdata2[newdata2 == 'n/a'] = NA
 newdata2 = apply(newdata2, 2, as.numeric)
 
 library(hts)
-bts <- ts(newdata2, start=c(2005,1), end=c(2016,4), frequency=4)
+
+write.csv(newdata2, file = "prison.csv",row.names = FALSE)
+
+data <- read.csv("prison.csv", strip.white = TRUE, check.names=FALSE)
+
+
+data<-newdata2
+bts <- ts(data, start=c(2005,1), end=c(2016,4), frequency=4)
 
 plot(bts[,1:8])
 
-
-# 8 states, 2 sex, 2 gender
-state <- rep(c("NSW", "VIC", "QLD", "SA", "WA", "NT", "ACT", "TAS"), 32/8)
-leg <- rep(rep(c("s","r"),each=8),2)
-sex <- rep(c("M","F"),each=32/2)
-
-state_leg <- as.character(interaction(state,leg, sep=""))
-state_sex <- as.character(interaction(state,sex,sep=""))
-sex_leg <- as.character(interaction(sex,leg, sep=""))
-
-#state_leg_sex <- as.character(interaction(state,leg,sex,sep=""))
+y.gts <- gts(bts, characters = c(1,1,1))
 
 
-gc <-rbind(state,leg,sex,state_leg, state_sex, sex_leg)
+# 8 states, 2 legal, 2 gender
+s <- rep(c("NSW", "VIC", "QLD", "SA", "WA", "NT", "ACT", "TAS"), 32/8)
+l <- rep(rep(c("Rem","Sen"),each=8),2) # Sentenced is number 2 here
+g <- rep(c("M","F"),each=32/2)
+
+s_l <- as.character(interaction(s,l, sep=""))
+s_g <- as.character(interaction(s,g,sep=""))
+g_l <- as.character(interaction(g,l, sep=""))
+
+#state_leg_gender <- as.character(interaction(state,leg,gender,sep=""))
+
+
+gc <-rbind(s,l,g,s_l, s_g, g_l)
 
 y <- gts(bts,groups=gc)
 

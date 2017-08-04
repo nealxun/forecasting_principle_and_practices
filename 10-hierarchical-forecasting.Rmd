@@ -165,7 +165,7 @@ Grouped time series can be thought of as hierarchical time series that do not im
 
 #### Example: Forecasting Australian prison population {-}
 
-```{r Prison, echo=FALSE, fig.cap="Percentage changes in personal consumption expenditure and personal income for the US.", message=FALSE, warning=FALSE}
+```{r Prison, echo=FALSE, fig.cap="Australian adult prison population grouped by state, legal status and gender.", message=FALSE, warning=FALSE}
 dfa <- read.csv("C:/George/fpp2/Ch10Data/prisonLF1.csv")
 dfa$t <- as.Date(dfa$date, format = "%Y/%m/%d")
 dfa$count <- as.numeric(dfa$count)
@@ -178,7 +178,7 @@ library(scales)
 p1<-ggplot(data = dfa, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
   ggtitle("Australian prison population: total") + 
-  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
   ylab("Number of prisoners")
@@ -186,20 +186,20 @@ p1<-ggplot(data = dfa, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, 
 #group by state
 p2<-ggplot(data = dfa, aes(x = quarter, y = count, group = state, colour = state))  +
   stat_summary(fun.y = sum, geom = "line")+ 
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
-  ggtitle("Australian prison population by state") + 
-  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") + 
+  ggtitle("Grouped by state") + 
+  theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
   ylab("Number of prisoners") +
-  scale_y_continuous(breaks = c(500, 1500, 2500, 3500, 4500, 5500, 6500, 7500, 8500, 9500, 10500, 11500, 12500, 13500, 14500))
+  scale_y_continuous(breaks = c(500, 2500, 4500, 6500, 8500, 10500, 12500, 14500))
 
 #group by legal status
 p3<-ggplot(data = dfa, aes(x = quarter, y = count, group = legal, colour = legal))  +
   stat_summary(fun.y = sum, geom = "line") + 
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
-  ggtitle("Australian prison population by legal status") + 
-  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") + 
+  ggtitle("Grouped by legal status") + 
+  theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
   ylab("Number of prisoners") +
@@ -208,9 +208,9 @@ p3<-ggplot(data = dfa, aes(x = quarter, y = count, group = legal, colour = legal
 #group by gender
 p4<-ggplot(data = dfa, aes(x = quarter, y = count, group = gender, colour = gender))  +
   stat_summary(fun.y = sum, geom = "line") + 
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
-  ggtitle("Australian prison population by gender") + 
-  #theme(plot.title = element_text(hjust = 0.5)) +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") + 
+  ggtitle("Grouped by gender") + 
+  theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
   ylab("Number of prisoners") +

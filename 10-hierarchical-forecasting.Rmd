@@ -4,15 +4,15 @@
 
 In this chapter we discuss forecasting large collections of time series that follow some aggregation structure. The challenge is that we require forecasts that are *coherent*, i.e., forecasts that add up in a manner consistent with the aggregation structure the collection of time series follow. Commonly used approaches are based on selecting a single level of aggregation, generating forecasts at that level and then combining these to produce coherent forecasts for all the time series. These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@ref(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated and these are then reconciled so that they become coherent.
 
-- This approach has the advantage that information from all time series is used. 
+- This approach has the advantage that information from all time series is used.
 
 - say something about the hts package: all approaches are implemented using the hts package
 
 ## Hierarchical time series
 
-Time series can often be naturally disaggregated by various attributes of interest. For example, the total number of bicycles sold by a cycling manufacturer can be disaggregated by product type such as: road bikes, mountain bikes, children bikes and hybrids. Each of these can be disaggregated into finer categories. For example children’s bikes can be divided into balance bikes for children under the age of four, single speed bikes for children between the ages of four and six and other bikes for children over the age of six. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such a collection of time series follow a hierarchical aggregation structure and we refer to these as *hierarchical time series*. 
+Time series can often be naturally disaggregated by various attributes of interest. For example, the total number of bicycles sold by a cycling manufacturer can be disaggregated by product type such as: road bikes, mountain bikes, children bikes and hybrids. Each of these can be disaggregated into finer categories. For example children’s bikes can be divided into balance bikes for children under the age of four, single speed bikes for children between the ages of four and six and other bikes for children over the age of six. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such a collection of time series follow a hierarchical aggregation structure and we refer to these as *hierarchical time series*.
 
-Commonly found in business and economics are hierarchical time series based on geographical locations. For example the total sales of a manufacturing company can be disaggregated by country, then within each country by state, within each state by region and so on down to the outlet level. 
+Commonly found in business and economics are hierarchical time series based on geographical locations. For example the total sales of a manufacturing company can be disaggregated by country, then within each country by state, within each state by region and so on down to the outlet level.
 
 A feature that distinguishes hierarchical time series (from grouped time series that follow in Section \@ref(Hier:grouped-ts)) is that they have a unique structure with which they aggregate. Figure \@ref(fig:HierTree) below shows a $K=2$-level hierarchical structure.^[We will use this hierarchical structure in order to introduce the methods for forecasting hierarchical time series that follow.] At the top of the hierarchy, at level 0, is the "Total", the most aggregate level of the data. We denote as $y_t$ the $t$th observation of the "Total" series for $t=1,\dots,T$.
 
@@ -81,7 +81,7 @@ where $\bm{y}_t$ is a $n$-dimensional vector of all the observations in the hier
 
 ###Example: Australian tourism hierarchy
 
-Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Each of these can be further subdivided into smaller areas. We refer to these as zones. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the three largest states of Australia, namely New South Wales (NSW), Queensland (QLD), Victoria (VIC) and other (OTH). For each of these we consider visitor nights within the following zones. For NSW we consider: Metro NSW, Northern NSW, Southern NSW; for QLD: Metro QLD, Central QLD and Northern QLD; and for VIC: Metro VIC, Western VIC and Eastern VIC. For OTH we consider Metro and non-Metro areas across Australia. Note that the zones are constructed so that the Metro zones contain the capital cities and surrounding areas around these generally considered to be metro areas. 
+Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Each of these can be further subdivided into smaller areas. We refer to these as zones. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the three largest states of Australia, namely New South Wales (NSW), Queensland (QLD), Victoria (VIC) and other (OTH). For each of these we consider visitor nights within the following zones. For NSW we consider: Metro NSW, Northern NSW, Southern NSW; for QLD: Metro QLD, Central QLD and Northern QLD; and for VIC: Metro VIC, Western VIC and Eastern VIC. For OTH we consider Metro and non-Metro areas across Australia. Note that the zones are constructed so that the Metro zones contain the capital cities and surrounding areas around these generally considered to be metro areas.
 
 ```{r AustHier, echo=FALSE, fig.cap="....", message=FALSE, warning=FALSE, fig.show = "hold",fig.height=8,fig.width=12}
 
@@ -99,7 +99,7 @@ plot(g, layout = layout,vertex.size=40)
 ## Grouped time series {#Hier:grouped-ts}
 Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. Frames can be carbon, aluminium or steel. They can be single speed or have multiple gears. We can also get a similar structure when we combine two hierarchical structures. For example the bicycle manufacturer may disaggregate sales by product and also by geographical location. We refer to these as *grouped time series*. With grouped time series we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. For example we can disaggregate the bicycles by product type and then geographical location but also vice versa.
 
-Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the grouped structure, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes. 
+Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the grouped structure, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes.
 
 ```{r GroupTree, echo=FALSE, fig.cap="Alternative representations of a two level grouped structure.", out.width="49.9%", fig.show = "hold",fig.height=14,fig.width=12}
 
@@ -173,7 +173,7 @@ The left plot in the top row of Figure \@ref(fig:prison) shows the total number 
 
 ```{r prison, fig.width=9, fig.heigh=8, echo=FALSE, fig.cap="Total Australian adult prison population and Australian prison population grouped by state, by legal status and by gender.", warning=FALSE,message=FALSE}
 
-prison <- read.csv("C:/George/fpp2/Ch10Data/prisonLF1.csv")
+prison <- read.csv("Ch10Data/prisonLF1.csv")
 
 prison$t <- as.Date(prison$date, format = "%Y/%m/%d")
 prison$count <- as.numeric(prison$count)
@@ -183,9 +183,9 @@ prison$year <- as.Date(cut(prison$t, breaks="year"))
 library(scales)
 
 #total
-p1<-ggplot(data = prison, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") + 
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
-  ggtitle("Australian prison population: total") + 
+p1<-ggplot(data = prison, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") +
+  ggtitle("Australian prison population: total") +
   theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
@@ -193,9 +193,9 @@ p1<-ggplot(data = prison, aes(x = quarter, y = count)) + stat_summary(fun.y = su
 
 #group by state
 p2<-ggplot(data = prison, aes(x = quarter, y = count, group = state, colour = state))  +
-  stat_summary(fun.y = sum, geom = "line")+ 
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") + 
-  ggtitle("Grouped by state") + 
+  stat_summary(fun.y = sum, geom = "line")+
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
+  ggtitle("Grouped by state") +
   theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
@@ -204,9 +204,9 @@ p2<-ggplot(data = prison, aes(x = quarter, y = count, group = state, colour = st
 
 #group by legal status
 p3<-ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = legal))  +
-  stat_summary(fun.y = sum, geom = "line") + 
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") + 
-  ggtitle("Grouped by legal status") + 
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
+  ggtitle("Grouped by legal status") +
   theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
@@ -215,9 +215,9 @@ p3<-ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = le
 
 #group by gender
 p4<-ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = gender))  +
-  stat_summary(fun.y = sum, geom = "line") + 
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") + 
-  ggtitle("Grouped by gender") + 
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
+  ggtitle("Grouped by gender") +
   theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
@@ -228,7 +228,7 @@ gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
 ```
 
 
-Figure \@ref(fig:prison1) below shows the Australian prison population grouped by all possible combinations of two attributes at a time. The top plot shows the prison population grouped by state and legal status, the middle panel shows the prison poplulation grouped by state and gender and the bottom panel shows the prison population grouped by legal status and gender. 
+Figure \@ref(fig:prison1) below shows the Australian prison population grouped by all possible combinations of two attributes at a time. The top plot shows the prison population grouped by state and legal status, the middle panel shows the prison poplulation grouped by state and gender and the bottom panel shows the prison population grouped by legal status and gender.
 ```{r prison1, fig.width=9,fig.heigth=20, echo=FALSE, fig.cap="Australian adult prison population grouped by pairs of attributes.", message=FALSE, warning=FALSE}
 #group by legal and state
 p5 <- ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = legal))  +
@@ -294,11 +294,11 @@ ggplot(data = prison, aes(x = quarter, y = count, group = interaction(legal, gen
 
 `Exercise: write out the S matrix for the Australian tourism hierarchy and the Australian grouped structure`
 
-## Base and coherent forecasts 
+## Base and coherent forecasts
 
 The aim is to generate a set of coherent forecasts across all the series of a hierarchical or a grouped structure.
 
-Commonly used approaches are based on first generating forecasts for a single level of aggregation, and then producing coherent forecasts by aggregating these up using a bottom-up approach, disaggregating them down using a top-down approach, or a combination of the two using a middle-out approach. The details of these methods are presented in Sections \@ref(Hier:bu) to \@ref(Hier:mo). An alternative and a more advnanced approach is to first generate forecasts for all the time series and then reconcile these so that they become coherent. The details of this approach which we refer to as the optimal reconciliation approach are presented in Section \@ref(Hier:reconciliation). 
+Commonly used approaches are based on first generating forecasts for a single level of aggregation, and then producing coherent forecasts by aggregating these up using a bottom-up approach, disaggregating them down using a top-down approach, or a combination of the two using a middle-out approach. The details of these methods are presented in Sections \@ref(Hier:bu) to \@ref(Hier:mo). An alternative and a more advnanced approach is to first generate forecasts for all the time series and then reconcile these so that they become coherent. The details of this approach which we refer to as the optimal reconciliation approach are presented in Section \@ref(Hier:reconciliation).
 
 In what follows in this section we introduce and formally define the concepts of base and coherent forecasts in order to build a unified framework that incorporates all of the approaches outlined above for both hierarchical and grouped time series.
 
@@ -306,7 +306,7 @@ Denote as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" se
 
 Although the data follows exactly the aggregation structure (as reflected by the summing matrix) base forecasts in general will not. It is only under very special circumstances such as using a very simple method to forecasts all the time series (for example using naïve forecasts for all series) that the base forecasts will be coherent.
 
-The base forecasts can however be combined, as briefly described above, to produce a set of forecasts that are coherent. We denote the set of coherent forecasts for the "Total" series and all series below the top level as $\tilde{y}_{h}$ and $\ytilde{j}{h}$ respectively. 
+The base forecasts can however be combined, as briefly described above, to produce a set of forecasts that are coherent. We denote the set of coherent forecasts for the "Total" series and all series below the top level as $\tilde{y}_{h}$ and $\ytilde{j}{h}$ respectively.
 
 ## The bottom-up approach {#Hier:bu}
 
@@ -358,7 +358,7 @@ The greatest advantage of this approach is that we are forecasting at the bottom
 
 ## Top-down approaches {#Hier:td}
 
-Top-down approaches involve first generating forecasts for the "Total" series $y_t$ on the top of the aggregation structure and then disaggregating these downwards. We let $p_1,\dots,p_{m}$ be a set of proportions which dictate how the base forecasts of the "Total" series are to be distributed to revised forecasts for each series at the bottom level of the structure. For example for the hierarchy of Figure \@ref(fig:HierTree) 
+Top-down approaches involve first generating forecasts for the "Total" series $y_t$ on the top of the aggregation structure and then disaggregating these downwards. We let $p_1,\dots,p_{m}$ be a set of proportions which dictate how the base forecasts of the "Total" series are to be distributed to revised forecasts for each series at the bottom level of the structure. For example for the hierarchy of Figure \@ref(fig:HierTree)
 $$
   \ytilde{AA}{t}=p_1\hat{y}_t,~~~\ytilde{AB}{t}=p_2\hat{y}_t,~~~\ytilde{AC}{t}=p_3\hat{y}_t,~~~\ytilde{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\ytilde{BB}{t}=p_5\hat{y}_t.
 $$
@@ -443,7 +443,7 @@ $$
 $$
 
 Then in general all forecasting approaches for either hierarchical or grouped structures can be represented as
-\begin{equation} 
+\begin{equation}
   \bm{\tilde{y}}_h=\bm{S}\bm{P}\bm{\hat{y}}_h
   (\#eq:SP)
 \end{equation}

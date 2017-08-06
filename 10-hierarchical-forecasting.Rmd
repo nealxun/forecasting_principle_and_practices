@@ -79,21 +79,25 @@ where $\bm{y}_t$ is a $n$-dimensional vector of all the observations in the hier
 
 ` I would like to add example here using hts`
 
-```{r, eval=FALSE, include=FALSE, cache=TRUE}
-library(hts)
-abc <- ts(5 + matrix(sort(rnorm(1000)), ncol = 10, nrow = 100))
-colnames(abc) <- c("A10A", "A10B", "A10C", "A20A", "A20B",
-                   "B30A", "B30B", "B30C", "B40A", "B40B")
+###Example: Australian tourism hierarchy
 
-head(abc)
-y <- hts(abc, characters = c(1, 2, 1))
-attributes(y)
+Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Each of these can be further subdivided into smaller areas. We refer to these as zones. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the three largest states of Australia, namely New South Wales (NSW), Queensland (QLD), Victoria (VIC) and other (OTH). For each of these we consider visitor nights within the following zones. For NSW we consider: Metro NSW, Northern NSW, Southern NSW; for QLD: Metro QLD, Central QLD and Northern QLD; and for VIC: Metro VIC, Western VIC and Eastern VIC. For OTH we consider Metro and non-Metro areas across Australia. Note that the zones are constructed so that the Metro zones contain the capital cities and surrounding areas around these generally considered to be metro areas. 
+
+```{r AustHier, echo=FALSE, fig.cap="....", message=FALSE, warning=FALSE, fig.show = "hold",fig.height=8,fig.width=12}
+
+g <- igraph::graph_from_literal(AUS--NSW:QLD:VIC:OTH, NSW--MetNSW:NthNSW:SthNSW, QLD--MetQLD:NthQLD:SthQLD, VIC--MetVIC:NthVIC:SthVIC, OTH--MetOTH:NonMetOTH)
+layout <- igraph::layout_as_tree(g, root = "AUS")
+igraph::V(g)$color <- rainbow(4)# c("Thistle", "GreenYellow", "LightBlue",
+  #rep("GreenYellow", 3), rep("LightBlue", 3))
+igraph::V(g)$label.cex<-2
+
+plot(g, layout = layout,vertex.size=40)
 ```
 
-## Grouped time series {#Hier:grouped-ts}
-Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. Frames can be carbon, aluminium or steel. They can be single speed or have multiple gears. We refer to these as *grouped time series*.
 
-We can also get a similar structure when we combine two hierarchical structures. For example the bicycle manufacturer may disaggregate sales by product and also by geographical location. In this case we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. We can disaggregate by product type and then geographical location but also vice versa.
+
+## Grouped time series {#Hier:grouped-ts}
+Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. Frames can be carbon, aluminium or steel. They can be single speed or have multiple gears. We can also get a similar structure when we combine two hierarchical structures. For example the bicycle manufacturer may disaggregate sales by product and also by geographical location. We refer to these as *grouped time series*. With grouped time series we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. For example we can disaggregate the bicycles by product type and then geographical location but also vice versa.
 
 Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the grouped structure, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes. 
 
@@ -163,19 +167,23 @@ where now the second and third rows of $\bm{S}$ represent \@ref(eq:middlelevelAB
 
 Grouped time series can be thought of as hierarchical time series that do not impose a unique hierarchical structure in the sense that the order by which the series can be grouped is not unique.
 
-#### Example: Forecasting Australian prison population {-}
+#### Example: Australian prison population {-}
+The left plot in the top row of Figure \@ref(fig:prison) shows the total number of prisoners in Australia over the period 2005 Q1 to 2016 Q4. This represents the top level series in the grouping structure. The rest of the plots show the prison population grouped by (i) state^[Australia comprises eight geographical areas six states and two territories: Australian Capital Territory, New South Wales, Northern Terrirory, Queensland, South Australia, Tasmania, Victoria, Western Australia.] (ii) legal status, whether prisoners have already been sentenced or are in remand waiting for a sentence and (iii) gender.
 
-```{r Prison, echo=FALSE, fig.cap="Australian adult prison population grouped by state, legal status and gender.", message=FALSE, warning=FALSE}
-dfa <- read.csv("C:/George/fpp2/Ch10Data/prisonLF1.csv")
-dfa$t <- as.Date(dfa$date, format = "%Y/%m/%d")
-dfa$count <- as.numeric(dfa$count)
-dfa$quarter <- as.Date(cut(dfa$t, breaks = "quarter"))
-dfa$year <- as.Date(cut(dfa$t, breaks="year"))
+
+```{r prison, fig.width=9, fig.heigh=8, echo=FALSE, fig.cap="Total Australian adult prison population and Australian prison population grouped by state, by legal status and by gender.", warning=FALSE,message=FALSE}
+
+prison <- read.csv("C:/George/fpp2/Ch10Data/prisonLF1.csv")
+
+prison$t <- as.Date(prison$date, format = "%Y/%m/%d")
+prison$count <- as.numeric(prison$count)
+prison$quarter <- as.Date(cut(prison$t, breaks = "quarter"))
+prison$year <- as.Date(cut(prison$t, breaks="year"))
 
 library(scales)
 
 #total
-p1<-ggplot(data = dfa, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") + 
+p1<-ggplot(data = prison, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") + 
   ggtitle("Australian prison population: total") + 
   theme(plot.title = element_text(size=12)) +
@@ -184,7 +192,7 @@ p1<-ggplot(data = dfa, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, 
   ylab("Number of prisoners")
 
 #group by state
-p2<-ggplot(data = dfa, aes(x = quarter, y = count, group = state, colour = state))  +
+p2<-ggplot(data = prison, aes(x = quarter, y = count, group = state, colour = state))  +
   stat_summary(fun.y = sum, geom = "line")+ 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") + 
   ggtitle("Grouped by state") + 
@@ -192,10 +200,10 @@ p2<-ggplot(data = dfa, aes(x = quarter, y = count, group = state, colour = state
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
   ylab("Number of prisoners") +
-  scale_y_continuous(breaks = c(500, 2500, 4500, 6500, 8500, 10500, 12500, 14500))
+  scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))
 
 #group by legal status
-p3<-ggplot(data = dfa, aes(x = quarter, y = count, group = legal, colour = legal))  +
+p3<-ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = legal))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") + 
   ggtitle("Grouped by legal status") + 
@@ -206,7 +214,7 @@ p3<-ggplot(data = dfa, aes(x = quarter, y = count, group = legal, colour = legal
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))
 
 #group by gender
-p4<-ggplot(data = dfa, aes(x = quarter, y = count, group = gender, colour = gender))  +
+p4<-ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = gender))  +
   stat_summary(fun.y = sum, geom = "line") + 
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") + 
   ggtitle("Grouped by gender") + 
@@ -216,14 +224,79 @@ p4<-ggplot(data = dfa, aes(x = quarter, y = count, group = gender, colour = gend
   ylab("Number of prisoners") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))
 
-
 gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
-  
 ```
+
+
+Figure \@ref(fig:prison1) below shows the Australian prison population grouped by all possible combinations of two attributes at a time. The top plot shows the prison population grouped by state and legal status, the middle panel shows the prison poplulation grouped by state and gender and the bottom panel shows the prison population grouped by legal status and gender. 
+```{r prison1, fig.width=9,fig.heigth=20, echo=FALSE, fig.cap="Australian adult prison population grouped by pairs of attributes.", message=FALSE, warning=FALSE}
+#group by legal and state
+p5 <- ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = legal))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%Y"), date_breaks= "23 months") +
+  ggtitle("Australian adult prison population by state and legal status") +
+  theme(plot.title = element_text(size=12)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Total number of prisoners") +
+  scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
+  facet_grid(.~state)
+
+#group by gender and state
+p6 <- ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = gender))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%Y"), date_breaks= "18 months") +
+  ggtitle("Australian adult prison population by state and gender") +
+  theme(plot.title = element_text(size=12)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Total number of prisoners") +
+  scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
+  facet_grid(.~state)
+
+p7<-ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = gender))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") +
+  ggtitle("Australian adult prison by legal status and gender") +
+  theme(plot.title = element_text(size=12)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Total number of prisoners") +
+  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
+  facet_grid(.~legal)
+
+gridExtra::grid.arrange(p5, p6,p7, ncol=1)
+
+```
+Figure \@ref(fig:prisonBTS) shows the Australian adult population grouped by all three attributes: state, legal status and gender. These form the bottom level series of the grouped structure for the Australian prison population.
+
+```{r prisonBTS, fig.width=9, echo=FALSE, fig.cap="Bottom level times series for the Australian adult prison population, grouped by state, legal status and gender.", message=FALSE, warning=FALSE}
+
+#group by legal, gender and state
+ggplot(data = prison, aes(x = quarter, y = count, group = interaction(legal, gender), colour = interaction(legal, gender)))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%Y"), date_breaks= "2 years") +
+  ggtitle("Australian adult prison population by state, legal status and gender") +
+  theme(plot.title = element_text(size=12)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Year") +
+  ylab("Total number of prisoners") +
+  scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,
+                                5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000,
+                                9500, 10000, 10500, 11000, 11500, 12000)) +
+    facet_grid(.~state)
+
+```
+
+`Exercise: write out the S matrix for the Australian tourism hierarchy and the Australian grouped structure`
 
 ## Base and coherent forecasts 
 
-Our aim is to generate a set of coherent forecasts across all the series of a hierarchical or a grouped structure.
+The aim is to generate a set of coherent forecasts across all the series of a hierarchical or a grouped structure.
 
 Commonly used approaches are based on first generating forecasts for a single level of aggregation, and then producing coherent forecasts by aggregating these up using a bottom-up approach, disaggregating them down using a top-down approach, or a combination of the two using a middle-out approach. The details of these methods are presented in Sections \@ref(Hier:bu) to \@ref(Hier:mo). An alternative and a more advnanced approach is to first generate forecasts for all the time series and then reconcile these so that they become coherent. The details of this approach which we refer to as the optimal reconciliation approach are presented in Section \@ref(Hier:reconciliation). 
 
@@ -479,9 +552,7 @@ method
     tdfp
     :   Top-down forecasts using forecast proportions.
 
-##Example: Australian tourism hierarchy
 
-Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the three largest states of Australia, namely Victoria (VIC), New South Wales (NSW), Queensland (QLD) and other. For each of these we consider visitor nights for each respective capital city, namely, Melbourne (MEL), Sydney (SYD) and Brisbane (BGC).^[For the purpose of this example we include with Brisbane, visitor nights at the Gold Coast, a coastal city and a major tourism attraction near Brisbane.] The hierarchical structure is shown in Figure \@ref(fig-9-4-Aust). The CAP category in the bottom level includes visitor nights in all other five capital cities of the remaining states and territories.
 
 ```
 \@ref(fig-9-4-Aust)

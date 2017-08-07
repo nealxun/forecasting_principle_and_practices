@@ -77,29 +77,30 @@ or in more compact notation
 \end{equation}
 where $\bm{y}_t$ is a $n$-dimensional vector of all the observations in the hierarchy at time $t$, $\bm{S}$ is the summing matrix as defined above, and $\bm{y}_{K,t}$ is an $m$-dimensional vector of all the observations in the bottom level of the hierarchy at time $t$. Note that the first row in the summing $\bm{S}$ represents equation \@ref(eq:toplevel) above, the second and third row represent \@ref(eq:middlelevel). The rows below these comprise an $m$-dimensional identity matrix $\bm{I}_m$ so that each bottom level observation on the right hand side of the equation is equal to itself in the left hand side.
 
-` I would like to add example here using hts`
+
+
 
 ###Example: Australian tourism hierarchy
 
-Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Each of these can be further subdivided into smaller areas. We refer to these as zones. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the three largest states of Australia, namely New South Wales (NSW), Queensland (QLD), Victoria (VIC) and other (OTH). For each of these we consider visitor nights within the following zones. For NSW we consider: Metro NSW, Northern NSW, Southern NSW; for QLD: Metro QLD, Central QLD and Northern QLD; and for VIC: Metro VIC, Western VIC and Eastern VIC. For OTH we consider Metro and non-Metro areas across Australia. Note that the zones are constructed so that the Metro zones contain the capital cities and surrounding areas around these generally considered to be metro areas.
+Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Each of these can be further subdivided into smaller areas fo interest. We refer to these as zones. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also these smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the three largest states of Australia, namely New South Wales (NSW), Queensland (QLD), Victoria (VIC) and other (OTH). For each of these we consider visitor nights within the following zones. We consider, for NSW: Metro NSW, North Coast NSW, South Coast NSW, South Inner NSW and North Inner NSW; for QLD: Metro QLD, Central Coast QLD, North Coast QLD and Central Inner QLD; and for VIC: Metro VIC, West Coast VIC, East Coast VIC, East Inner VIC and West Inner VIC. For OTH we consider Metro and non-Metro areas across Australia. Note that the zones are constructed so that the Metro zones contain the capital cities and surrounding areas around these generally considered to be metro areas. For further details on these geographical areas please refer to Appendix C in @Mint.
 
-```{r AustHier, echo=FALSE, fig.cap="....", message=FALSE, warning=FALSE, fig.show = "hold",fig.height=8,fig.width=12}
+To create a hierarchical time series we use the `hts` function as shown below. The function requires as inputs the bottom-level time and information about the hierarchical structure. `vn2` is a time series matrix containing the bottom-level times series. There are alternative ways to pass to the function the structure of the hieararchy. In this case we are using the `characters` input.
 
-g <- igraph::graph_from_literal(AUS--NSW:QLD:VIC:OTH, NSW--MetNSW:NthNSW:SthNSW, QLD--MetQLD:NthQLD:SthQLD, VIC--MetVIC:NthVIC:SthVIC, OTH--MetOTH:NonMetOTH)
-layout <- igraph::layout_as_tree(g, root = "AUS")
-igraph::V(g)$color <- rainbow(4)# c("Thistle", "GreenYellow", "LightBlue",
-  #rep("GreenYellow", 3), rep("LightBlue", 3))
-igraph::V(g)$label.cex<-2
+`nodes` specifies the structure of the hierarchy. The first five series (zones within NSW) aggregate to one group (NSW), the next four (zones within QLD) to another and so on.
 
-plot(g, layout = layout,vertex.size=40)
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#tourism <- hts(vn2, nodes=list(4,c(5,4,5,2)))
+
+list(4,c(5,4,5,2))
 ```
-
 
 
 ## Grouped time series {#Hier:grouped-ts}
 Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. Frames can be carbon, aluminium or steel. They can be single speed or have multiple gears. We can also get a similar structure when we combine two hierarchical structures. For example the bicycle manufacturer may disaggregate sales by product and also by geographical location. We refer to these as *grouped time series*. With grouped time series we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. For example we can disaggregate the bicycles by product type and then geographical location but also vice versa.
 
 Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the grouped structure, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes.
+
+`include plots here`
 
 ```{r GroupTree, echo=FALSE, fig.cap="Alternative representations of a two level grouped structure.", out.width="49.9%", fig.show = "hold",fig.height=14,fig.width=12}
 
@@ -169,6 +170,23 @@ Grouped time series can be thought of as hierarchical time series that do not im
 
 #### Example: Australian prison population {-}
 The left plot in the top row of Figure \@ref(fig:prison) shows the total number of prisoners in Australia over the period 2005 Q1 to 2016 Q4. This represents the top level series in the grouping structure. The rest of the plots show the prison population grouped by (i) state^[Australia comprises eight geographical areas six states and two territories: Australian Capital Territory, New South Wales, Northern Terrirory, Queensland, South Australia, Tasmania, Victoria, Western Australia.] (ii) legal status, whether prisoners have already been sentenced or are in remand waiting for a sentence and (iii) gender.
+
+To create a grouped time series we use the `gts` function as shown below. Similarly to the hts function the gts function requires as inputs the bottom-level time and information about the grouped structure. `prison` is a time series matrix containing the bottom-level times series. 
+
+The informaion about the `nodes` specifies the structure of the hierarchy. The first five series (zones within NSW) aggregate to one group (NSW), the next four (zones within QLD) to another and so on.
+
+
+```{r }
+data <- read.csv("Ch10Data/prison.csv", strip.white = TRUE, check.names=FALSE)
+bts <- ts(data, start=c(2005,1), end=c(2016,4), frequency=4)
+# Need to make data into prison time series matrix to add to fpp2
+
+y.gts <- gts(bts, characters = c(1,1,1))
+
+```
+
+
+
 
 
 ```{r prison, fig.width=9, fig.heigh=8, echo=FALSE, fig.cap="Total Australian adult prison population and Australian prison population grouped by state, by legal status and by gender.", warning=FALSE,message=FALSE}
@@ -292,7 +310,6 @@ ggplot(data = prison, aes(x = quarter, y = count, group = interaction(legal, gen
 
 ```
 
-`Exercise: write out the S matrix for the Australian tourism hierarchy and the Australian grouped structure`
 
 ## Base and coherent forecasts
 
@@ -510,13 +527,11 @@ In summary, unlike any other existing approach, the optimal combination forecast
 
 ## The hts package
 
-Hierarchical time series forecasting is implemented in the **hts** package in R.
-
-The `hts` function creates a hierarchical time series. The required inputs are the bottom level time series observations, and information about the hierarchical structure. For example, the structure shown in Figure \@ref(fig:HierTree) is specified as follows:
+Forecasting hierarchical and grouped time series is implemented using the **hts** package. We use the `hts` function to create a hierarchical time series. The required inputs are the bottom level time series observations, and information about the hierarchical structure. For example, the structure shown in Figure \@ref(fig:HierTree) is specified as follows:
 
 ```{r}
 library(hts)
-# vn is a time series matrix containing the bottom level series
+# tourism is a time series matrix containing the bottom level series
 
 y <- hts(vn, nodes=list(4,c(2,2,2,2)))
 allf <- forecast(y, h=8)
@@ -524,6 +539,7 @@ plot(allf)
 
 ```
 
+and the `gts` funtion to create a grouped times series. 
 For a grouped but non-hierarchical time series, the `gts` function can be used. If there are more levels, the `g` argument should be a matrix where each row contains the grouping structure for each level.
 
 Forecasts are obtained, as usual, with the `forecast` function. By default it produces forecasts using the optimal combination approach with ETS models used for the base forecasts. But other models and methods can be specified via the following arguments.
@@ -579,3 +595,4 @@ y <- hts(vn, nodes=list(4,c(2,2,2,2)))
 allf <- forecast(y, h=8)
 plot(allf)
 ```
+`Exercise: write out the S matrices for the Australian tourism hierarchy and the Australian grouped structure`

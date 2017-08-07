@@ -1,4 +1,4 @@
-tmp <- read_csv("C:/George/fpp2/Ch10Data/tourism.csv")
+tmp <- read_csv("d:/George/fpp2/Ch10Data/tourism.csv")
 head(tmp)
 
 AUS <- colnames(tmp)[c(3:78)]
@@ -62,7 +62,7 @@ OthAUS <- dplyr::setdiff(AUS, c(MetNSW, NthNSW, SthNSW,
                              MetVIC,EstVIC,WstVIC,
                              MetQLD,CtlQLD,NthQLD))
 
-OthMet <- c("Canberra",
+MetOTH <- c("Canberra",
             "Adelaide",
             "Barossa",
             "Adelaide Hills",
@@ -71,12 +71,12 @@ OthMet <- c("Canberra",
             "Darwin",
             "Alice Springs")
 
-Oth <- dplyr::setdiff(AUS, c(MetNSW, NthNSW, SthNSW,
+NotOTH <- dplyr::setdiff(AUS, c(MetNSW, NthNSW, SthNSW,
                                 MetVIC,EstVIC,WstVIC,
-                                MetQLD,CtlQLD,NthQLD,OthMet))
+                                MetQLD,CtlQLD,NthQLD,MetOTH))
 
 
-zonesData <- tmp %>%
+tourism <- tmp %>%
   transmute(Year, Month) %>%
   mutate(`MetNSW` = rowSums(tmp[, MetNSW]),
          `NthNSW` = rowSums(tmp[, NthNSW]),
@@ -87,10 +87,20 @@ zonesData <- tmp %>%
          `MetQLD` = rowSums(tmp[, MetQLD]),
          `CtlQLD` = rowSums(tmp[, CtlQLD]),
          `NthQLD` = rowSums(tmp[, NthQLD]),
-         `OthMet` = rowSums(tmp[, OthMet]),
-         `Oth` = rowSums(tmp[, Oth]))
+         `MetOTH` = rowSums(tmp[, MetOTH]),
+         `NotOTH` = rowSums(tmp[, NotOTH]))
 
-#save(zones, file = "zones.Rdata")
 
-write.csv(zonesData, )
+
+# Aggregate to quarterly and produce the following plots
+# (Total) (NSW, QLD, VIC, OTH)
+
+# (MetNSW, NthNSW, SthNSW)
+# (MetQLD, CtlQLD, NthQLD)
+# (MetVIC, WstVIC, EstVIC)
+# (MetOTH, NotOTH)
+
+
+
+
 

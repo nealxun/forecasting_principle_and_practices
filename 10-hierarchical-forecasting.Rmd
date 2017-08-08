@@ -103,10 +103,9 @@ tourism.hts <- hts(vn2, characters = c(3, 5))
 
 ```
 
+The left plot in Figure \@ref(tourismStates) shows that total number of visitor nights and the right plot shows the visitor night per state revealing the diversity across the dynamics for each state. 
 
-
-
-```{r tourismStates, fig.height=10, echo=FALSE, fig.cap="Visitor nights spent by Australians away from home over the period 1998 Q1 to 2016 Q4 disaggregated by State.", warning=FALSE,message=FALSE}
+```{r tourismStates, fig.height=10, echo=FALSE, fig.cap="Australian domestic Visitor nights over the period 1998 Q1 to 2016 Q4 disaggregated by State.", warning=FALSE,message=FALSE}
 
 tourismL0 <- aggts(tourism.hts, levels = 0)
 p1<-autoplot(tourismL0) +
@@ -123,6 +122,36 @@ gridExtra::grid.arrange(p1, p2, nrow=1)
 
 ```
 
+
+```{r tourismZones, fig.height=10, echo=FALSE, fig.cap="Australian domestic Visitor nights over the period 1998 Q1 to 2016 Q4 disaggregated by Zones.", warning=FALSE,message=FALSE}
+tourismL2 <- aggts(tourism.hts, levels = 2)
+nodes <- tourism.hts$nodes
+nodesB <- as.numeric(nodes[[length(nodes)]], deparse = FALSE)
+ends <- cumsum(nodesB)
+start <- c(1, ends[1:(length(nodesB) - 1)] + 1)
+time <- tibble(Time = zoo::as.Date(tourismL2))
+
+plotsL2 <- list()
+
+#i=1
+for(i in 1:length(start))
+{
+  datL2 <- bind_cols(time, tibble::as_tibble(tourismL2[, start[i]:ends[i]]))
+  meltL2 <- melt(datL2, id = "Time")
+  plotsL2[[i]] <- ggplot(meltL2) + geom_line(aes(x= Time, y = as.numeric(value), group = variable, color = variable)) +
+    scale_colour_discrete(guide = guide_legend(title = "Region")) +
+    xlab("Time") + ylab("Visitor nights ('000)")
+}
+
+gridExtra::grid.arrange(plotsL2[[1]],
+                        plotsL2[[2]],
+                        plotsL2[[3]],
+                        plotsL2[[4]],
+                        plotsL2[[5]],
+                        plotsL2[[6]], nrow=2)
+
+
+```
 
 
 ## Grouped time series {#Hier:grouped-ts}

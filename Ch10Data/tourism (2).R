@@ -118,7 +118,7 @@ tourism <- tmp %>%
          `NSWNthIn` = rowSums(tmp[, NSWNth]),
          `QLDMetro` = rowSums(tmp[, QLDMet]),
          `QLDCntrl` = rowSums(tmp[, QLDCtl]),
-         `QLDNthCo` = rowSums(tmp[, QLDNtC]),
+         `QLDNthCo` = rowSums(tmp[, QLDNth]),
          `SAUMetro` = rowSums(tmp[, SAUMet]),
          `SAUCoast` = rowSums(tmp[, SAUCst]),
          `SAUInner` = rowSums(tmp[, SAUInd]),
@@ -187,6 +187,7 @@ nodes <- tourism.hts$nodes
 nodesB <- as.numeric(nodes[[length(nodes)]], deparse = FALSE)
 ends <- cumsum(nodesB)
 start <- c(1, ends[1:(length(nodesB) - 1)] + 1)
+time <- tibble(Time = zoo::as.Date(tourismL2))
 
 plotsL2 <- list()
 

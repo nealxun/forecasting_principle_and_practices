@@ -273,7 +273,8 @@ p1<-ggplot(data = prison, aes(x = quarter, y = count)) + stat_summary(fun.y = su
   theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Number of prisoners")
+  ylab("Number of prisoners")+
+  scale_colour_discrete(guide = guide_legend(title = "Zone"))
 
 #group by state
 p2<-ggplot(data = prison, aes(x = quarter, y = count, group = state, colour = state))  +
@@ -284,7 +285,8 @@ p2<-ggplot(data = prison, aes(x = quarter, y = count, group = state, colour = st
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
   ylab("Number of prisoners") +
-  scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))
+  scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
+  scale_colour_discrete(guide = guide_legend(title = "State"))
 
 #group by legal status
 p3<-ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = legal))  +
@@ -295,7 +297,8 @@ p3<-ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = le
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
   ylab("Number of prisoners") +
-  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))
+  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
+  scale_colour_discrete(guide = guide_legend(title = "Legal status"))
 
 #group by gender
 p4<-ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = gender))  +
@@ -306,7 +309,8 @@ p4<-ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = g
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
   ylab("Number of prisoners") +
-  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))
+  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
+  scale_colour_discrete(guide = guide_legend(title = "Gender"))
 
 gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
 ```
@@ -325,6 +329,7 @@ p5 <- ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = 
   xlab("Quarter") +
   ylab("Total number of prisoners") +
   scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
+  scale_colour_discrete(guide = guide_legend(title = "Legal status"))+
   facet_grid(.~state)
 
 #group by gender and state
@@ -338,6 +343,7 @@ p6 <- ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour =
   xlab("Quarter") +
   ylab("Total number of prisoners") +
   scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
+  scale_colour_discrete(guide = guide_legend(title = "Gender"))+
   facet_grid(.~state)
 
 p7<-ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = gender))  +
@@ -350,6 +356,7 @@ p7<-ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = g
   xlab("Quarter") +
   ylab("Total number of prisoners") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
+  scale_colour_discrete(guide = guide_legend(title = "Gender"))+
   facet_grid(.~legal)
 
 gridExtra::grid.arrange(p5, p6,p7, ncol=1)
@@ -372,6 +379,7 @@ ggplot(data = prison, aes(x = quarter, y = count, group = interaction(legal, gen
   scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,
                                 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000,
                                 9500, 10000, 10500, 11000, 11500, 12000)) +
+  scale_colour_discrete(guide = guide_legend(title = "Legal status & Gender"))+
     facet_grid(.~state)
 
 ```

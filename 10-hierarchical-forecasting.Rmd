@@ -77,29 +77,56 @@ or in more compact notation
 \end{equation}
 where $\bm{y}_t$ is a $n$-dimensional vector of all the observations in the hierarchy at time $t$, $\bm{S}$ is the summing matrix as defined above, and $\bm{y}_{K,t}$ is an $m$-dimensional vector of all the observations in the bottom level of the hierarchy at time $t$. Note that the first row in the summing $\bm{S}$ represents equation \@ref(eq:toplevel) above, the second and third row represent \@ref(eq:middlelevel). The rows below these comprise an $m$-dimensional identity matrix $\bm{I}_m$ so that each bottom level observation on the right hand side of the equation is equal to itself in the left hand side.
 
-
-
-
 ###Example: Australian tourism hierarchy
 
-Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Each of these can be further subdivided into smaller areas of interest. We refer to these as zones. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also these smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the six states of Australia, namely New South Wales (NSW), Queensland (QLD), SOuth Australia (SAU), Victoria (VIC), Western Australia (WA) and other (OTH). For each of these we consider visitor nights within the following zones; we consider for NSW: Metro NSW (NSWMetro), North Coast NSW (NSWNthCo), South Coast NSW (NSWSthCo), South Inner NSW (NSWSthIn) and North Inner NSW (NSWNthIn); for QLD: Metro QLD (QLDMetro), Central QLD (QLDCntrl) and North Coast QLD (QLDNthCo); for SAU: Metro SAU (SAUMetro), Costal SAU (SAUCoast) and Inner SAU (SAUInner); for VIC: Metro VIC (VICMetro), West Coast VIC (VICWstCo), East Coast VIC (VICEstCo), Inner VIC (VICInner); for for WAU: Metro WAU (WAUMetro), Costal WAU (WAUCoast) and Inner WAU (WAUInner); and for OTH we consider Metro (OTHMetro) and non-Metro (OTHNoMet) areas across the rest of Australia. Note that the zones are constructed so that the Metro zones contain the capital cities and surrounding areas around these generally considered to be metro areas. For further details on these geographical areas please refer to Appendix C in @Mint.
+Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Each of these can be further subdivided into smaller areas of interest. We refer to these as zones. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also these smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the six states of Australia, namely New South Wales (NSW), Queensland (QLD), South Australia (SAU), Victoria (VIC), Western Australia (WA) and other (OTH). For each of these we consider visitor nights within the following zones. 
 
-To create a hierarchical time series we use the `hts` function. The function requires as inputs the bottom-level time series and information about the hierarchical structure. `vn2` is a time series matrix containing the bottom-level series. There are alternative ways to pass to the function the structure of the hieararchy. In this case we are using the `characters` input.
+|State  |Zones                              |
+|:------|:---------------------------------------------------------------------|
+|NSW    |Metro (NSWMetro), North Coast (NSWNthCo), South Coast (NSWSthCo), South Inner (NSWSthIn), North Inner (NSWNthIn)|
+|QLD    |Metro (QLDMetro), Central (QLDCntrl), North Coast (QLDNthCo)|
+|SAu    |Metro (SAUMetro), Costal (SAUCoast), Inner (SAUInner)|
+|VIC    |Metro (VICMetro), West Coast (VICWstCo), East Coast (VICEstCo), Inner (VICInner)|
+|WAu    |Metro (WAUMetro), Costal (WAUCoast), Inner (WAUInner)|
+|OTH    |Metro (OTHMetro), Non-Metro (OTHNoMet)|
 
-`nodes` specifies the structure of the hierarchy. The first five series (zones within NSW) aggregate to one group (NSW), the next four (zones within QLD) to another and so on.
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-#tourism <- hts(vn2, nodes=list(4,c(5,4,5,2)))
+In summary we consider five zones for NSW, four zones for VIC, and three zones for each, QLD, SAU and WAU. The zones are constructed so that the Metro zones contain the capital cities and surrounding areas around these generally considered to be metro areas. Therefore for OTH we consider Metro (OTHMetro) and non-Metro (OTHNoMet) areas across the rest of Australia. For further details on these geographical areas please refer to Appendix C in @Mint.
 
-bts <- read.csv("Ch10Data/vn2.csv")
-bts <- ts(bts, start = 1998, frequency = 4)
-tourism.hts <- hts(bts, characters = c(3, 5))
+To create a hierarchical time series we use the `hts` function. The function requires as inputs the bottom-level time series and information about the hierarchical structure. `vn2` is a time series matrix containing the bottom-level series. There are alternative ways to pass to the function the structure of the hieararchy. In this case we are using the `characters` input. The first three characters of each column name of `vn2` capture the categories at the first level of the hierarchy (states). The following five characters capture the bottom level categories (zones).
 
-list(4,c(5,4,5,2))
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+vn2 <- read.csv("Ch10Data/vn2.csv") 
+vn2 <- ts(vn2, start = 1998, frequency = 4)
+tourism.hts <- hts(vn2, characters = c(3, 5)) 
+# I keep vn2 here as we will only use this line when we add vn2 in the fpp2 package
+
 ```
 
 
+
+
+```{r tourismStates, fig.height=10, echo=FALSE, fig.cap="Visitor nights spent by Australians away from home over the period 1998 Q1 to 2016 Q4 disaggregated by State.", warning=FALSE,message=FALSE}
+
+tourismL0 <- aggts(tourism.hts, levels = 0)
+p1<-autoplot(tourismL0) +
+  xlab("Time") +
+  ylab("Visitor nights ('000)")+
+  scale_colour_discrete(guide = guide_legend(title = "Region"))
+
+tourismL1 <- aggts(tourism.hts, levels = 1)
+p2<-autoplot(tourismL1) + xlab("Time") +
+   ylab("") +
+   scale_colour_discrete(guide = guide_legend(title = "States"))
+ 
+gridExtra::grid.arrange(p1, p2, nrow=1)
+
+```
+
+
+
 ## Grouped time series {#Hier:grouped-ts}
+
 Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. Frames can be carbon, aluminium or steel. They can be single speed or have multiple gears. We can also get a similar structure when we combine two hierarchical structures. For example the bicycle manufacturer may disaggregate sales by product and also by geographical location. We refer to these as *grouped time series*. With grouped time series we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. For example we can disaggregate the bicycles by product type and then geographical location but also vice versa.
 
 Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the grouped structure, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes.

@@ -1,7 +1,6 @@
 require(tidyverse)
 require(reshape2)
 require(hts)
-
 require(zoo)
 
 tmp <- read_csv("c:/george/fpp2/Ch10Data/tourism.csv")

@@ -6,7 +6,7 @@ In this chapter we discuss forecasting large collections of time series that fol
 
 ### The hts package {-}
 
-Forecasting hierarchical and grouped time series is implemented using the **hts** package. Forecasts are simply obtained with the `forecast` function. The R code below shows the possible arguments that this function takes when applied to a hierarchical or grouped time series. We explain each of the arguments in what follows.
+Forecasting hierarchical and grouped time series is implemented using the **hts** package. Forecasts are simply obtained as usual with the `forecast` function. The R code below shows the possible arguments that this function takes when applied to a hierarchical or grouped time series. 
 
 
 ```r
@@ -16,9 +16,22 @@ method = c("comb", "bu", "mo", "tdgsa", "tdgsf", "tdfp"),
 weights = c("wls", "ols", "mint", "nseries"), ...)
 
 ```
+We explain each of the arguments in the sections that follow in detail. Below we provide a bried overview.???
+
+`object`
+:   A hierarchical or grouped time series object to be forecast. We present how to generate a hierarchical time series object in Section \@ref(Hier:hierarchical-ts) and a grouped time series object in Section \@ref(Hier:grouped-ts) using the `hts` function. 
+
+`fmethod`
+:   The forecasting model used for generating base forecasts. Possible values are `"ets"`, `"arima"` and `rw`. These models have been studied in Chapters \@(), \@() and \@() respectively. What is meant by base forecasts becomes clear in Section   \@ref(Hier:base-coherent-forecasts). 
+
+`method`
+:   The method used for generating coherent forecasts. The possible values this argument can take are explained in Sections \@ref(Hier:bu)-\@ref(Hier:reconciliation).
+
+`weights`
+:   Weight associated with the reconcilication approach presented in Section \@ref(Hier:reconciliation). 
 
 
-## Hierarchical time series
+## Hierarchical time series {#Hier:hierarchical-ts}
 
 Time series can often be naturally disaggregated by various attributes of interest. For example, the total number of bicycles sold by a cycling manufacturer can be disaggregated by product type such as: road bikes, mountain bikes, children bikes and hybrids. Each of these can be disaggregated into finer categories. For example children’s bikes can be divided into balance bikes for children under the age of four, single speed bikes for children between the ages of four and six and other bikes for children over the age of six. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such a collection of time series follow a hierarchical aggregation structure and we refer to these as *hierarchical time series*.
 
@@ -114,7 +127,7 @@ tourism.hts <- hts(vn2, characters = c(3, 5))
 
 ```
 
-The left plot in Figure \@ref(fig:tourismStates) below shows the total number of visitor nights for Australia while the right plot shows the visitor nights per state. These reveal diverse dynamics at the national aggregate level and the first level of aggregation across each state. The `aggts` function extracts time series from a `hts` object for any level of aggregation.
+The top plot in Figure \@ref(fig:tourismStates) below shows the total number of visitor nights for Australia while the plots in the bottow row show the visitor nights disaggregated by state. The plots reveal diverse dynamics at the aggregate national level and the first level of aggregation across each state. The `aggts` function extracts time series from a `hts` object for any level of aggregation.
 
 ```{r tourismStates, fig.width=10, echo=FALSE, fig.cap="Australian domestic Visitor nights over the period 1998 Q1 to 2016 Q4 disaggregated by State.", warning=FALSE,message=FALSE,echo=TRUE,}
 tourismL0 <- aggts(tourism.hts, levels = 0)
@@ -401,7 +414,7 @@ ggplot(data = prisonLF, aes(x = quarter, y = count, group = interaction(legal, g
 ```
 
 
-## Base and coherent forecasts
+## Base and coherent forecasts {#Hier:base-coherent-forecasts}
 
 The aim is to generate a set of coherent forecasts across all the series of a hierarchical or a grouped structure.
 
@@ -613,37 +626,6 @@ where $\hat{\bm{e}}_{t}$ is an $n$-dimensional vector of residuals of the models
 
 In summary, unlike any other existing approach, the optimal combination forecasts are generated using all the information available within a hierarchical or a grouped structure. This is very important as particular aggregation levels or groupings may reveal features of the data that are of interest to the user and are important to be modelled. These features may be completely hidden or not easily identifiable at other levels. For example, consider a hierarchical structure reflecting the geographical division of a country into states, regions, down to a very fine grid of statistical local areas. There are significant differences between the seasonal patterns in the number of tourists visiting a state or a region that is mainly seen as a summer destination versus a state or a region that caters for winter activities. These differences will be smoothed at the country level due to aggregation and on the other hand it may be extremely challenging to identify at the very bottom level of a statistical local area due to noise. Another example for a grouped structure is the difference in the sales of clothes between genders. Such differences will be completely smoothed out at the very top level of aggregation considering total sales, or may be very challenging to identify due to noise at the very bottom level.
 
-
-
-`object`
-:   A hierarchical or grouped time series object to be forecast.
-
-
-by passing to the funciton a hts or a gts object. By default it produces forecasts using the optimal reconciliation approach with ETS models used for the base forecasts. But other models and methods can be specified via the following arguments.
-
-`fmethod`
-:   The forecasting model to be used for the base forecasts. Possible values are `"ets"`, `"arima"` and `rw`.
-
-`method`
-:   The method used for reconciling the base forecasts. It can take the following values:
-
-`comb`
-:   Optimal combination forecasts;
-
-`bu`
-:   Bottom-up forecasts;
-
-`mo`
-:   Middle-out forecasts where the level used is specified by the `level` argument’
-
-`tdgsa`
-:   Top-down forecasts based on the average historical proportions (Gross-Sohl method A);@GS90
-
-`tdgsf`
-:   Top-down forecasts based on the proportion of historical averages (Gross-Sohl method F);
-
-`tdfp`
-:   Top-down forecasts using forecast proportions.
 
 
 Figure \@ref(fig-9-4-forecasts) shows all the times series in the hierarchy which span the period 1998:Q1 to 2011:Q4. The dotted lines show the revised forecasts generated by the optimal combination approach. The base forecasts for each series are generated using the ETS methodology of Chapter \@ref(ch-expsmooth).

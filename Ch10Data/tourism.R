@@ -3,7 +3,7 @@ require(reshape2)
 require(hts)
 require(zoo)
 
-tmp <- read_csv("c:/george/fpp2/Ch10Data/tourism.csv")
+tmp <- read_csv("d:/george/fpp2/Ch10Data/tourism.csv")
 head(tmp)
 
 AUS <- colnames(tmp)[c(3:78)]
@@ -158,12 +158,12 @@ autoplot(tourismL0) +
   labs("") +
   scale_colour_manual(values = "black") + guides(colour = FALSE)
 
-# time <- tibble(Time = zoo::as.Date(tourismL0))
-# datL0 <- bind_cols(time, as_tibble(tourismL0))
-# ggplot(datL0) +
-#   geom_line(aes(x = Time, y = as.numeric(Total))) +
-#   xlab("Time") + ylab("Visitor nights ('000)") +
-#   guides(colour = FALSE)
+time <- tibble(Time = zoo::as.Date(tourismL0))
+datL0 <- bind_cols(time, as_tibble(tourismL0))
+ggplot(datL0) +
+  geom_line(aes(x = Time, y = as.numeric(Total))) +
+  xlab("Time") + ylab("Visitor nights ('000)") +
+  guides(colour = FALSE)
 
 # Level 1
 
@@ -182,13 +182,16 @@ tourismL1 <- aggts(tourism.hts, levels = 1)
 # Level 2
 
 tourismL2 <- aggts(tourism.hts, levels = 2)
+time <- tibble(Time = zoo::as.Date(tourismL2))
 nodes <- tourism.hts$nodes
 nodesB <- as.numeric(nodes[[length(nodes)]], deparse = FALSE)
 ends <- cumsum(nodesB)
 start <- c(1, ends[1:(length(nodesB) - 1)] + 1)
 time <- tibble(Time = zoo::as.Date(tourismL2))
 
+
 plotsL2 <- list()
+
 
 #i=1
 for(i in 1:length(start))

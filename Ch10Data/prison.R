@@ -16,7 +16,7 @@ library(gridExtra)
 
 
 prison <- read.csv("Ch10Data/prisonLF.csv", strip.white = TRUE)
-prison <- read.csv("Ch10Data/prisonLF1.csv")
+# prison <- read.csv("Ch10Data/prisonLF1.csv")
 
 prison$state <- as.character(prison$state)
 
@@ -71,7 +71,7 @@ prison$indigenous[prison$indigenous =="2"] <- "Other"
 prison$legal[prison$legal =="2"] <- "Sentenced"
 prison$legal[prison$legal =="1"] <- "Remamded"
 
-write.csv(prison, file = "prisonLF1.csv",row.names = FALSE)
+#write.csv(prison, file = "prisonLF1.csv",row.names = FALSE)
 
 prison <- read.csv("prisonLF1.csv")
 prison$t <- as.Date(prison$date, format = "%Y/%m/%d")
@@ -287,8 +287,7 @@ scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 450
 
 
 ################
-
-prison <-read.csv("prisonLF.csv", strip.white = TRUE)
+prison <-read.csv("D:/George/fpp2/Ch10Data/prisonLF.csv", strip.white = TRUE)
 
 prison$state <- as.character(prison$state)
 prison$gender <- as.character(prison$gender)
@@ -335,12 +334,12 @@ newdata2 = apply(newdata2, 2, as.numeric)
 
 library(hts)
 
-write.csv(newdata2, file = "prison.csv",row.names = FALSE)
+#write.csv(newdata2, file = "prison.csv",row.names = FALSE)
+#data <- read.csv("Ch10Data/prison.csv", strip.white = TRUE, check.names=FALSE)
 
-
-data <- read.csv("Ch10Data/prison.csv", strip.white = TRUE, check.names=FALSE)
+data<-newdata2
 bts <- ts(data, start=c(2005,1), end=c(2016,4), frequency=4)
-vn
+
 y.gts <- gts(bts, characters = c(1,1,1))
 ncol(allts(y))
 
@@ -357,21 +356,22 @@ g_l <- as.character(interaction(g,l,sep=""))
 
 gc <-rbind(s,l,g,s_l, s_g, g_l)
 
-y <- gts(bts,groups=gc)
+y <- gts(bts,groups=gc,historical=TRUE)
 
 colnames(aggts(y, levels=2))
 ncol(allts(y))
 
-tmp = forecast(y, h = 8, method = "comb", weights = "wls", fmethod = "ets")
+fcsts = forecast(y, h = 8, method = "comb", weights = "wls", fmethod = "ets")
 
-plot(tmp,levels = 0)
-plot(tmp,levels = 1)
-plot(tmp,levels = 2)
-plot(tmp,levels = 3)
-plot(tmp,levels = 4)
-plot(tmp,levels = 5)
-plot(tmp,levels = 6)
-plot(tmp,levels = 7)
+par(mfrow=c(2,2))
 
+plot(fcsts,levels = 0)
+plot(fcsts,levels = 1)
+plot(fcsts,levels = 2)
+plot(fcsts,levels = 3)
+plot(fcsts,levels = 4)
+plot(fcsts,levels = 5)
+plot(fcsts,levels = 6)
+plot(fcsts,levels = 7)
 
 

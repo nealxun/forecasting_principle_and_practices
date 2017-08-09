@@ -2,11 +2,21 @@
 
 *Warning: this is a more advanced section and assumes knowledge of some basic matrix algebra. We have however tried to simplify and explain in as much as detail as possible all the notation used starting from basic concepts and building up.*
 
-In this chapter we discuss forecasting large collections of time series that follow some aggregation structure. The challenge is that we require forecasts that are *coherent*, i.e., forecasts that add up in a manner consistent with the aggregation structure the collection of time series follow. Commonly used approaches are based on selecting a single level of aggregation, generating forecasts at that level and then combining these to produce coherent forecasts for all the time series. These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@ref(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated and these are then reconciled so that they become coherent.
+In this chapter we discuss forecasting large collections of time series that follow some aggregation structure which we classify as either hierarchical or grouped time series. The challenge is that we require forecasts that are *coherent*, i.e., forecasts that add up in a manner consistent with the aggregation structure the collection of time series follow. Commonly used approaches are based on selecting a single level of aggregation, generating forecasts at that level and then combining these to produce coherent forecasts for all the time series. These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@ref(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated and these are then reconciled so that they become coherent.
 
-- This approach has the advantage that information from all time series is used.
+### The hts package {-}
 
-- say something about the hts package: all approaches are implemented using the hts package
+Forecasting hierarchical and grouped time series is implemented using the **hts** package. Forecasts are simply obtained with the `forecast` function. The R code below shows the possible arguments that this function takes when applied to a hierarchical or grouped time series. We explain each of the arguments in what follows.
+
+
+```r
+forecast(object, h = ifelse(frequency(object$bts)>1, 2*frequency(object$bts), 10), 
+fmethod = c("ets", "arima", "rw"),
+method = c("comb", "bu", "mo", "tdgsa", "tdgsf", "tdfp"), 
+weights = c("wls", "ols", "mint", "nseries"), ...)
+
+```
+
 
 ## Hierarchical time series
 
@@ -77,7 +87,7 @@ or in more compact notation
 \end{equation}
 where $\bm{y}_t$ is a $n$-dimensional vector of all the observations in the hierarchy at time $t$, $\bm{S}$ is the summing matrix as defined above, and $\bm{y}_{K,t}$ is an $m$-dimensional vector of all the observations in the bottom level of the hierarchy at time $t$. Note that the first row in the summing $\bm{S}$ represents equation \@ref(eq:toplevel) above, the second and third row represent \@ref(eq:middlelevel). The rows below these comprise an $m$-dimensional identity matrix $\bm{I}_m$ so that each bottom level observation on the right hand side of the equation is equal to itself in the left hand side.
 
-###Example: Australian tourism hierarchy
+###Example: Australian tourism hierarchy {-}
 
 Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Each of these can be further subdivided into smaller areas of interest. We refer to these as zones. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also these smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the six states of Australia, namely New South Wales (NSW), Queensland (QLD), South Australia (SAU), Victoria (VIC), Western Australia (WA) and other (OTH). For each of these we consider visitor nights within the following zones. 
 
@@ -106,19 +116,26 @@ tourism.hts <- hts(vn2, characters = c(3, 5))
 
 The left plot in Figure \@ref(fig:tourismStates) below shows the total number of visitor nights for Australia while the right plot shows the visitor nights per state. These reveal diverse dynamics at the national aggregate level and the first level of aggregation across each state. The `aggts` function extracts time series from a `hts` object for any level of aggregation.
 
-```{r tourismStates, fig.height=10, echo=FALSE, fig.cap="Australian domestic Visitor nights over the period 1998 Q1 to 2016 Q4 disaggregated by State.", warning=FALSE,message=FALSE,echo=TRUE,}
+```{r tourismStates, fig.width=10, echo=FALSE, fig.cap="Australian domestic Visitor nights over the period 1998 Q1 to 2016 Q4 disaggregated by State.", warning=FALSE,message=FALSE,echo=TRUE,}
 tourismL0 <- aggts(tourism.hts, levels = 0)
 p1<-autoplot(tourismL0) +
-  xlab("Time") +
-  ylab("Visitor nights ('000)")
+  xlab("Year") +
+  ylab("Visitor nights ('000)")+
+  ggtitle("Total")
 
 tourismL1 <- aggts(tourism.hts, levels = 1)
-p2<-autoplot(tourismL1) + 
-  xlab("Time") +
-  ylab("") +
+p2<-autoplot(tourismL1[,c(1,3,5)]) + 
+  xlab("Year") +
+  ylab("Visitor nights ('000)")+
   scale_colour_discrete(guide = guide_legend(title = "State"))
  
-gridExtra::grid.arrange(p1, p2, nrow=1)
+p3<-autoplot(tourismL1[,c(2,4,6)]) + 
+  xlab("Year") +
+  ylab("Visitor nights ('000)")+
+  scale_colour_discrete(guide = guide_legend(title = "State"))
+
+lay=rbind(c(1,1),c(2,3))
+gridExtra::grid.arrange(p1, p2,p3, layout_matrix=lay)
 ```
 The plots in Figure \@ref(fig:tourismZones) below show the bottom level time series, i.e., the visitor nights for each zone. These help us visualise the diverse individual dynamics within each zones and assist in identifying unique and important time series, for example the costal WAU zone which shows significant growth over the last few years. 
 
@@ -143,8 +160,10 @@ for(i in 1:length(start))
   meltL2 <- melt(datL2, id = "Time")
   plotsL2[[i]] <-   ggplot(meltL2) + geom_line(aes(x= Time, y = as.numeric(value), group = variable, color = variable)) +
     scale_colour_discrete(guide = guide_legend(title = "Zone")) +
-    xlab("Time") + ylab("Visitor nights ('000)")
+    xlab("Year") + ylab("Visitor nights ('000)")
 }
+
+
 gridExtra::grid.arrange(plotsL2[[1]],plotsL2[[2]],plotsL2[[3]],
                         plotsL2[[4]],plotsL2[[5]],plotsL2[[6]], nrow=2)
 
@@ -226,18 +245,79 @@ Grouped time series can be thought of as hierarchical time series that do not im
 #### Example: Australian prison population {-}
 The left plot in the top row of Figure \@ref(fig:prison) shows the total number of prisoners in Australia over the period 2005 Q1 to 2016 Q4. This represents the top level series in the grouping structure. The rest of the plots show the prison population grouped by (i) state^[Australia comprises eight geographical areas six states and two territories: Australian Capital Territory, New South Wales, Northern Terrirory, Queensland, South Australia, Tasmania, Victoria, Western Australia. In this example we consider all eight.] (ii) legal status, whether prisoners have already been sentenced or are in remand waiting for a sentence and (iii) gender.
 
-To create a grouped time series we use the `gts` function as shown below. Similarly to the hts function the gts function requires as inputs the bottom-level time series and information about the grouped structure. `prison` is a time series matrix containing the bottom-level times series. Similarly to the hts function the information about the grouped structure can be passed in using the `characters` input. An alternative is to be more explicit about the labelling of the series and use the `groups` input. The code below shows examples for both these.
+```{r prison, fig.width=9, fig.heigh=8, echo=FALSE, fig.cap="Total Australian adult prison population and Australian prison population grouped by state, by legal status and by gender.", warning=FALSE,message=FALSE}
 
-`TODO: talk about interactions here` 
+prisonLF <- read.csv("Ch10Data/prisonLF1.csv")
+
+prisonLF$t <- as.Date(prisonLF$date, format = "%Y/%m/%d")
+prisonLF$count <- as.numeric(prisonLF$count)
+prisonLF$quarter <- as.Date(cut(prisonLF$t, breaks = "quarter"))
+prisonLF$year <- as.Date(cut(prisonLF$t, breaks="year"))
+
+library(scales)
+
+#total
+p1<-ggplot(data = prisonLF, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") +
+  ggtitle("Australian prisonLF population: total") +
+  theme(plot.title = element_text(size=12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Number of prisonLFers")+
+  scale_colour_discrete(guide = guide_legend(title = "Zone"))
+
+#group by state
+p2<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = state, colour = state))  +
+  stat_summary(fun.y = sum, geom = "line")+
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
+  ggtitle("Grouped by state") +
+  theme(plot.title = element_text(size=12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Number of prisonLFers") +
+  scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
+  scale_colour_discrete(guide = guide_legend(title = "State"))
+
+#group by legal status
+p3<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = legal, colour = legal))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
+  ggtitle("Grouped by legal status") +
+  theme(plot.title = element_text(size=12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Number of prisonLFers") +
+  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
+  scale_colour_discrete(guide = guide_legend(title = "Legal status"))
+
+#group by gender
+p4<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = gender, colour = gender))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
+  ggtitle("Grouped by gender") +
+  theme(plot.title = element_text(size=12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Number of prisonLFers") +
+  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
+  scale_colour_discrete(guide = guide_legend(title = "Gender"))
+
+gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
+```
+
+
+To create a grouped time series we use the `gts` function as shown below. Similarly to the hts function the gts function requires as inputs the bottom-level time series and information about the grouping structure. `prison` is a time series matrix containing the bottom-level times series. Similarly to the hts function the information about the grouping structure can be passed in using the `characters` input. An alternative is to be more explicit about the labelling of the series and use the `groups` input. The code below shows examples for both these.
+
+`TODO: talk about interactions here - but possibly need to wait for update of the hts` 
 
 
 ```{r, echo=TRUE}
-data <- read.csv("Ch10Data/prison.csv", strip.white = TRUE, check.names=FALSE)
-bts <- ts(data, start=c(2005,1), end=c(2016,4), frequency=4)
+prison <- read.csv("Ch10Data/prison.csv", strip.white = TRUE, check.names=FALSE)
+prison <- ts(prison, start=c(2005,1), end=c(2016,4), frequency=4)
 # Need to make data into prison time series matrix to add to fpp2
 
 # Using the `characters` input
-y.gts <- gts(bts, characters = c(1,1,1))
+prison.gts <- gts(prison, characters = c(1,1,1))
 
 # Using the `groups` input # 8 states, 2 legal, 2 gender
 s <- rep(c("NSW", "VIC", "QLD", "SA", "WA", "NT", "ACT", "TAS"), 32/8)
@@ -247,114 +327,50 @@ s_l <- as.character(interaction(s,l,sep=""))
 s_g <- as.character(interaction(s,g,sep=""))
 g_l <- as.character(interaction(g,l,sep=""))
 gc <-rbind(s,l,g,s_l, s_g, g_l)
-y <- gts(bts,groups=gc)
+prison.bts <- gts(prison,groups=gc)
 
-```
-
-
-
-
-
-```{r prison, fig.width=9, fig.heigh=8, echo=FALSE, fig.cap="Total Australian adult prison population and Australian prison population grouped by state, by legal status and by gender.", warning=FALSE,message=FALSE}
-
-prison <- read.csv("Ch10Data/prisonLF1.csv")
-
-prison$t <- as.Date(prison$date, format = "%Y/%m/%d")
-prison$count <- as.numeric(prison$count)
-prison$quarter <- as.Date(cut(prison$t, breaks = "quarter"))
-prison$year <- as.Date(cut(prison$t, breaks="year"))
-
-library(scales)
-
-#total
-p1<-ggplot(data = prison, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") +
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") +
-  ggtitle("Australian prison population: total") +
-  theme(plot.title = element_text(size=12)) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  xlab("Quarter") +
-  ylab("Number of prisoners")+
-  scale_colour_discrete(guide = guide_legend(title = "Zone"))
-
-#group by state
-p2<-ggplot(data = prison, aes(x = quarter, y = count, group = state, colour = state))  +
-  stat_summary(fun.y = sum, geom = "line")+
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
-  ggtitle("Grouped by state") +
-  theme(plot.title = element_text(size=12)) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  xlab("Quarter") +
-  ylab("Number of prisoners") +
-  scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
-  scale_colour_discrete(guide = guide_legend(title = "State"))
-
-#group by legal status
-p3<-ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = legal))  +
-  stat_summary(fun.y = sum, geom = "line") +
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
-  ggtitle("Grouped by legal status") +
-  theme(plot.title = element_text(size=12)) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  xlab("Quarter") +
-  ylab("Number of prisoners") +
-  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
-  scale_colour_discrete(guide = guide_legend(title = "Legal status"))
-
-#group by gender
-p4<-ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = gender))  +
-  stat_summary(fun.y = sum, geom = "line") +
-  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
-  ggtitle("Grouped by gender") +
-  theme(plot.title = element_text(size=12)) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  xlab("Quarter") +
-  ylab("Number of prisoners") +
-  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
-  scale_colour_discrete(guide = guide_legend(title = "Gender"))
-
-gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
 ```
 
 
 Figure \@ref(fig:prison1) below shows the Australian prison population grouped by all possible combinations of two attributes at a time. The top plot shows the prison population grouped by state and legal status, the middle panel shows the prison poplulation grouped by state and gender and the bottom panel shows the prison population grouped by legal status and gender.
 ```{r prison1, fig.width=9,fig.heigth=20, echo=FALSE, fig.cap="Australian adult prison population grouped by pairs of attributes.", message=FALSE, warning=FALSE}
 #group by legal and state
-p5 <- ggplot(data = prison, aes(x = quarter, y = count, group = legal, colour = legal))  +
+p5 <- ggplot(data = prisonLF, aes(x = quarter, y = count, group = legal, colour = legal))  +
   stat_summary(fun.y = sum, geom = "line") +
   scale_x_date(labels = date_format("%Y"), date_breaks= "23 months") +
-  ggtitle("Australian adult prison population by state and legal status") +
+  ggtitle("Australian adult prisonLF population by state and legal status") +
   theme(plot.title = element_text(size=12)) +
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Total number of prisoners") +
+  ylab("Total number of prisonLFers") +
   scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
   scale_colour_discrete(guide = guide_legend(title = "Legal status"))+
   facet_grid(.~state)
 
 #group by gender and state
-p6 <- ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = gender))  +
+p6 <- ggplot(data = prisonLF, aes(x = quarter, y = count, group = gender, colour = gender))  +
   stat_summary(fun.y = sum, geom = "line") +
   scale_x_date(labels = date_format("%Y"), date_breaks= "18 months") +
-  ggtitle("Australian adult prison population by state and gender") +
+  ggtitle("Australian adult prisonLF population by state and gender") +
   theme(plot.title = element_text(size=12)) +
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Total number of prisoners") +
+  ylab("Total number of prisonLFers") +
   scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
   scale_colour_discrete(guide = guide_legend(title = "Gender"))+
   facet_grid(.~state)
 
-p7<-ggplot(data = prison, aes(x = quarter, y = count, group = gender, colour = gender))  +
+p7<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = gender, colour = gender))  +
   stat_summary(fun.y = sum, geom = "line") +
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") +
-  ggtitle("Australian adult prison by legal status and gender") +
+  ggtitle("Australian adult prisonLF by legal status and gender") +
   theme(plot.title = element_text(size=12)) +
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Total number of prisoners") +
+  ylab("Total number of prisonLFers") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
   scale_colour_discrete(guide = guide_legend(title = "Gender"))+
   facet_grid(.~legal)
@@ -367,15 +383,15 @@ Figure \@ref(fig:prisonBTS) shows the Australian adult population grouped by all
 ```{r prisonBTS, fig.width=9, echo=FALSE, fig.cap="Bottom level times series for the Australian adult prison population, grouped by state, legal status and gender.", message=FALSE, warning=FALSE}
 
 #group by legal, gender and state
-ggplot(data = prison, aes(x = quarter, y = count, group = interaction(legal, gender), colour = interaction(legal, gender)))  +
+ggplot(data = prisonLF, aes(x = quarter, y = count, group = interaction(legal, gender), colour = interaction(legal, gender)))  +
   stat_summary(fun.y = sum, geom = "line") +
   scale_x_date(labels = date_format("%Y"), date_breaks= "2 years") +
-  ggtitle("Australian adult prison population by state, legal status and gender") +
+  ggtitle("Australian adult prisonLF population by state, legal status and gender") +
   theme(plot.title = element_text(size=12)) +
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Year") +
-  ylab("Total number of prisoners") +
+  ylab("Total number of prisonLFers") +
   scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,
                                 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000,
                                 9500, 10000, 10500, 11000, 11500, 12000)) +
@@ -393,11 +409,11 @@ Commonly used approaches are based on first generating forecasts for a single le
 
 In what follows in this section we introduce and formally define the concepts of base and coherent forecasts in order to build a unified framework that incorporates all of the approaches outlined above for both hierarchical and grouped time series.
 
-Denote as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series having observed the time series up to time $T$. Likewise as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to time $T$.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.] We refer to these as *base forecasts*. These are forecasts generated for each time series in the aggregation structure using a suitable forecasting method presented in earlier sections of this book.
+Denote as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series having observed the time series up to time $T$.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.]  Likewise denote as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to time $T$. We refer to these as **base forecasts**. These are forecasts generated for each time series in the aggregation structure using a suitable forecasting method presented in earlier sections of this book.
 
-Although the data follows exactly the aggregation structure (as reflected by the summing matrix) base forecasts in general will not. It is only under very special circumstances such as using a very simple method to forecasts all the time series (for example using naïve forecasts for all series) that the base forecasts will be coherent.
+Although the data follows exactly the aggregation structure (as reflected by the summing matrix $\bm{S}$) base forecasts in general will not. It is only under very special circumstances such as using a very simple method to forecasts all the time series (for example using naïve forecasts for all series) that the base forecasts will be coherent.
 
-The base forecasts can however be combined, as briefly described above, to produce a set of forecasts that are coherent. We denote the set of coherent forecasts for the "Total" series and all series below the top level as $\tilde{y}_{h}$ and $\ytilde{j}{h}$ respectively.
+The base forecasts can however be combined, as briefly described above, to produce a set of forecasts that are coherent. We denote the set of **coherent forecasts** for the "Total" series and all series below the top level as $\tilde{y}_{h}$ and $\ytilde{j}{h}$ respectively.
 
 ## The bottom-up approach {#Hier:bu}
 
@@ -445,7 +461,6 @@ $$
 where $\tilde{\bm{y}_t}$ is an $n$-dimensional vector of coherent $h$-step ahead forecasts for each time series within any aggregation structure and $\hat{\bm{y}}_{K,h}$ is an $m$-dimensional vector of $h$-step ahead base forecasts for each of the bottom level series of any aggregation structure. Note that for the bottom-up approach the coherent forecasts for the bottom level series are equal to the base forecasts, i.e., $\tilde{\bm{y}}_{K,t}=\hat{\bm{y}}_{K,t}$.
 
 The greatest advantage of this approach is that we are forecasting at the bottom level of a structure and therefore no information is lost due to aggregation. On the other hand bottom level data can be quite noisy and more challenging to model and forecast.
-
 
 ## Top-down approaches {#Hier:td}
 
@@ -567,7 +582,7 @@ For a middle out approach the $\bm{P}$ matrix will be a combination of the above
 
 All the approaches we have considered so far in this chapter involve choosing a particular level in the aggregation structure, generating base forecasts for that level, and then either aggregating these up or disaggregating them down to generate coherent forecasts for the rest of the series. The above examples clearly reflect this through the $\bm{P}$ matrix.
 
-In this section we introduce an approach that instead involves generating base forecast for each series in the aggregation structure. The base forecasts are then reconciled to generate a set of forecasts that are as close as possible to the base forecasts but are also coherent.
+In this section we introduce an approach that instead involves generating base forecast for each series in the aggregation structure. The base forecasts are then reconciled to generate a set of forecasts that are as close as possible to the base forecasts but are also coherent. Therefore we describe the resulting set of coherent forecasts as optimally reconciled coherent forecasts.
 
 The general idea is derived from wanting to find a $\bm{P}$ matrix that minimises the forecast error of a set of coherent forecasts from forecasting each time series in the structure. In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed in order to get a good flavour of the approach. These unfortunately complicate the presentation. However, following through these steps we get to the specification of $\bm{P}$ in equation \@ref(eq:MinT) which is labelled the *MinT* estimator as it *Min*imises the *T*race of the forecast errors of the coherent  forecasts across the whole structure. For further details and discussion please refer to @Mint.
 
@@ -596,70 +611,40 @@ where $\hat{\bm{e}}_{t}$ is an $n$-dimensional vector of residuals of the models
 
 3. Set $\bm{W}_{h}=k_{h}\bm{\Lambda}$, $\forall h$ where $k_{h} > 0$ and $\bm{\Lambda}=\text{diag}(\bm{S}\bm{1})$ where $\bm{1}$ is a unit column vector of dimension $n$. This specification assumes that the bottom level base forecast errors each have variance $k_{h}$ and are uncorrelated between nodes. Hence each element of the diagonal $\bm{\Lambda}$ matrix contains the number of forecast error variances contributing to that aggregation level. This estimator only depends on the structure of the hierarchy or the grouped time series. It is therefore referred to as the specification that applies *structural scaling*. Notice that the structural scaling assumes equivariant forecast errors only at the bottom level of the structure and not across all levels which is unrealistically assumed by the first specification. Furthermore, applying the structural scaling specification is particularly useful in cases where residuals are not available and therefore variance scaling cannot be applied. For example, in cases where the base forecasts are generated by judgemental forecasting introduced in Chapter \@ref(ch-judgmental).
 
-
 In summary, unlike any other existing approach, the optimal combination forecasts are generated using all the information available within a hierarchical or a grouped structure. This is very important as particular aggregation levels or groupings may reveal features of the data that are of interest to the user and are important to be modelled. These features may be completely hidden or not easily identifiable at other levels. For example, consider a hierarchical structure reflecting the geographical division of a country into states, regions, down to a very fine grid of statistical local areas. There are significant differences between the seasonal patterns in the number of tourists visiting a state or a region that is mainly seen as a summer destination versus a state or a region that caters for winter activities. These differences will be smoothed at the country level due to aggregation and on the other hand it may be extremely challenging to identify at the very bottom level of a statistical local area due to noise. Another example for a grouped structure is the difference in the sales of clothes between genders. Such differences will be completely smoothed out at the very top level of aggregation considering total sales, or may be very challenging to identify due to noise at the very bottom level.
 
-## The hts package
 
-Forecasting hierarchical and grouped time series is implemented using the **hts** package. We use the `hts` function to create a hierarchical time series. The required inputs are the bottom level time series observations, and information about the hierarchical structure. For example, the structure shown in Figure \@ref(fig:HierTree) is specified as follows:
 
-```{r}
-library(hts)
-# tourism is a time series matrix containing the bottom level series
+`object`
+:   A hierarchical or grouped time series object to be forecast.
 
-y <- hts(vn, nodes=list(4,c(2,2,2,2)))
-allf <- forecast(y, h=8)
-plot(allf)
 
-```
+by passing to the funciton a hts or a gts object. By default it produces forecasts using the optimal reconciliation approach with ETS models used for the base forecasts. But other models and methods can be specified via the following arguments.
 
-and the `gts` funtion to create a grouped times series. 
-For a grouped but non-hierarchical time series, the `gts` function can be used. If there are more levels, the `g` argument should be a matrix where each row contains the grouping structure for each level.
+`fmethod`
+:   The forecasting model to be used for the base forecasts. Possible values are `"ets"`, `"arima"` and `rw`.
 
-Forecasts are obtained, as usual, with the `forecast` function. By default it produces forecasts using the optimal combination approach with ETS models used for the base forecasts. But other models and methods can be specified via the following arguments.
-
-fmethod
-:   The forecasting model to be used for the base forecasts. Possible values are `"ets"`, `"arima"` and `"rw"`.
-
-method
+`method`
 :   The method used for reconciling the base forecasts. It can take the following values:
 
-    comb
-    :   Optimal combination forecasts;
+`comb`
+:   Optimal combination forecasts;
 
-    bu
-    :   Bottom-up forecasts;
+`bu`
+:   Bottom-up forecasts;
 
-    mo
-    :   Middle-out forecasts where the level used is specified by the `level` argument’
+`mo`
+:   Middle-out forecasts where the level used is specified by the `level` argument’
 
-    tdgsa
-    :   Top-down forecasts based on the average historical proportions (Gross-Sohl method A);@GS90
+`tdgsa`
+:   Top-down forecasts based on the average historical proportions (Gross-Sohl method A);@GS90
 
-    tdgsf
-    :   Top-down forecasts based on the proportion of historical averages (Gross-Sohl method F);
+`tdgsf`
+:   Top-down forecasts based on the proportion of historical averages (Gross-Sohl method F);
 
-    tdfp
-    :   Top-down forecasts using forecast proportions.
+`tdfp`
+:   Top-down forecasts using forecast proportions.
 
-
-
-```
-\@ref(fig-9-4-Aust)
-
-=[ellipse,draw,inner sep=1pt] =[sibling distance=30mm,font=] =[sibling
-distance=15mm,font=]
-
-child <span>node <span>NSW</span> child <span>node
-<span>SYD</span></span> child <span>node <span>Other</span></span>
-</span> child <span>node <span>VIC</span> child <span>node
-<span>MEL</span></span> child <span>node <span>Other</span></span>
-</span> child <span>node <span>QLD</span> child <span>node
-<span>BGC</span></span> child <span>node <span>Other</span></span>
-</span> child <span>node <span>Other</span> child <span>node
-<span>CAP</span></span> child <span>node <span>Other</span></span>
-</span>;
-```
 
 Figure \@ref(fig-9-4-forecasts) shows all the times series in the hierarchy which span the period 1998:Q1 to 2011:Q4. The dotted lines show the revised forecasts generated by the optimal combination approach. The base forecasts for each series are generated using the ETS methodology of Chapter \@ref(ch-expsmooth).
 
@@ -669,4 +654,25 @@ y <- hts(vn, nodes=list(4,c(2,2,2,2)))
 allf <- forecast(y, h=8)
 plot(allf)
 ```
+
+
+###Example: Forecasting Australian prison population (continued) {-}
+
+
+```{r prisonFcasts, fig.width=9, echo=FALSE, fig.cap="Forecasts.", message=FALSE, warning=FALSE,fig.show = 'hold'}
+
+fcsts = forecast(prison.gts, h = 8, method = "comb", weights = "wls", fmethod = "ets")
+
+par(mfrow=c(2,2))
+plot(fcsts,levels = 0)
+plot(fcsts,levels = 1)
+plot(fcsts,levels = 2)
+plot(fcsts,levels = 3)
+plot(fcsts,levels = 4)
+plot(fcsts,levels = 5)
+plot(fcsts,levels = 6)
+plot(fcsts,levels = 7)
+```
+
+
 `Exercise: write out the S matrices for the Australian tourism hierarchy and the Australian grouped structure`

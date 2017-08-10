@@ -3,7 +3,7 @@ require(reshape2)
 require(hts)
 require(zoo)
 
-tmp <- read_csv("d:/george/fpp2/Ch10Data/tourism.csv")
+tmp <- read_csv("c:/george/fpp2/Ch10Data/tourism.csv")
 head(tmp)
 
 AUS <- colnames(tmp)[c(3:78)]
@@ -134,8 +134,8 @@ tourism <- tmp %>%
 chk <- tourism[, 3:ncol(tourism)]
 bts <- ts(apply(chk, 2, function(x) aggregate(ts(x, start = 1998, frequency = 12), nfrequency = 4)), start = 1998, frequency = 4)
 
-write.csv(bts, "vn2.csv",row.names = FALSE)
-bts <- read.csv("vn2.csv")
+#write.csv(bts, "vn2.csv",row.names = FALSE)
+#bts <- read.csv("vn2.csv")
 bts <- ts(bts, start = 1998, frequency = 4)
 
 # bts<-window(bts,start=c(2008,2))
@@ -143,20 +143,16 @@ bts <- ts(bts, start = 1998, frequency = 4)
 
 tourism.hts <- hts(bts, characters = c(3, 5))
 
-tmp<-forecast.gts(tourism.hts,h=8,fmethod = "ets")
-plot(tmp)
-autoplot(aggts(tmp,levels=0))
 
 require(ggplot2)
 
 # Top Level
 tourismL0 <- aggts(tourism.hts, levels = 0)
 #
-autoplot(tourismL0) +
-  xlab("Time") +
-  ylab("Visitor nights ('000)") +
-  labs("") +
-  scale_colour_manual(values = "black") + guides(colour = FALSE)
+p1<-autoplot(tourismL0) +
+  xlab("Year") +
+  ylab("Visitor nights ('000)")+
+  ggtitle("Total")
 
 time <- tibble(Time = zoo::as.Date(tourismL0))
 datL0 <- bind_cols(time, as_tibble(tourismL0))
@@ -168,9 +164,18 @@ ggplot(datL0) +
 # Level 1
 
 tourismL1 <- aggts(tourism.hts, levels = 1)
- autoplot(tourismL1) + xlab("Time") +
-   ylab("Visitor nights ('000)") +
-   scale_colour_discrete(guide = guide_legend(title = "States"))
+p2<-autoplot(tourismL1[,c(1,3,5)]) +
+   xlab("Year") +
+   ylab("Visitor nights ('000)")+
+   scale_colour_discrete(guide = guide_legend(title = "State"))
+
+p3<-autoplot(tourismL1[,c(2,4,6)]) +
+   xlab("Year") +
+   ylab("Visitor nights ('000)")+
+   scale_colour_discrete(guide = guide_legend(title = "State"))
+
+ lay=rbind(c(1,1),c(2,3))
+ gridExtra::grid.arrange(p1, p2,p3, layout_matrix=lay)
 
 # datL1 <- bind_cols(time, as_tibble(tourismL1))
 # meltL1 <- melt(datL1, id = "Time")
@@ -204,12 +209,17 @@ for(i in 1:length(start))
 }
 
 plotsL2[[1]]
-plotsL2[[2]]  
+plotsL2[[2]]
 plotsL2[[3]]
 plotsL2[[4]]
 plotsL2[[5]]
 plotsL2[[6]]
 
+fcsts<-forecast.gts(tourism.hts,h=8,fmethod = "ets")
 
+plot(fcsts)
+plot(fcsts,levels = 0)
+plot(fcsts,levels = 1)
+plot(fcsts,levels = 2)
 
-
+autoplot(aggts(tmp,levels=0))

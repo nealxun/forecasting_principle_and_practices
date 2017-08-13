@@ -2,12 +2,11 @@
 
 *Warning: this is a more advanced section and assumes knowledge of some basic matrix algebra. We have however tried to simplify and explain in as much as detail as possible all the notation used starting from basic concepts and building up.*
 
-In this chapter we discuss forecasting large collections of time series that follow some aggregation structure. We clasify these as hierarchical or grouped time series in Sections \@ref(Hier:hierarchical-ts) and \@ref(Hier:grouped-ts) respectively. The challenge is that we require forecasts that are **coherent** across the aggregation structure. I.e., forecasts that add up in a manner consistent with the aggregation structure the collection of time series follow. Commonly used approaches are based on selecting a single level of aggregation, generating forecasts at that level and then combining these to produce coherent forecasts for the other time series. These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@ref(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated and these are then reconciled so that they become coherent. This appraoch has the advantage that it incorporates information and the correlation structure across all the series in the collection.
+In this chapter we discuss forecasting large collections of time series that follow either a hierarchical or grouped aggregation structure. We clasify these as hierarchical or grouped time series in Sections \@ref(Hier:hierarchical-ts) and \@ref(Hier:grouped-ts) respectively. The challenge is that we require forecasts that are **coherent** across the aggregation structure. I.e., forecasts that add up in a manner consistent with the aggregation structure the collection of time series follow. Commonly used approaches are based on selecting a single level of aggregation, generating forecasts at that level and then combining these to produce coherent forecasts for the other time series. These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). In Section \@ref(Hier:reconciliation) we introduce the concept of reconciliation where forecasts of all the times series in the collection are first generated and these are then reconciled so that they become coherent. This appraoch has the advantage that it incorporates information and the correlation structure across all the series in the collection.
 
 ### The hts package {-}
 
 Forecasting hierarchical and grouped time series is implemented using the **hts** package. Forecasts are simply obtained as usual with the `forecast` function. The R code below shows the possible arguments that this function takes when applied to a hierarchical or grouped time series. 
-
 
 ```r
 forecast(object, h = ifelse(frequency(object$bts)>1, 2*frequency(object$bts), 10), 
@@ -16,7 +15,7 @@ method = c("comb", "bu", "mo", "tdgsa", "tdgsf", "tdfp"),
 weights = c("wls", "ols", "mint", "nseries"), ...)
 
 ```
-We explain each of the arguments in the sections that follow in detail. Below we provide a brief introduction.
+We explain each of the arguments in the sections that follow in detail. Below is a brief introduction.
 
 `object`
 :   A hierarchical or grouped time series object to be forecast. We present how to generate a hierarchical time series object in Section \@ref(Hier:hierarchical-ts) and a grouped time series object in Section \@ref(Hier:grouped-ts) using the `hts` function. 
@@ -420,10 +419,11 @@ Commonly used approaches are based on first generating forecasts for a single le
 
 In what follows in this section we introduce and formally define the concepts of base and coherent forecasts in order to build a unified framework that incorporates all of the approaches outlined above for both hierarchical and grouped time series.
 
-Denote as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series having observed the time series up to time $T$.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.]  Likewise denote as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to time $T$. We refer to these as **base forecasts**. These are forecasts generated for each time series in the aggregation structure using a suitable forecasting method presented in earlier sections of this book. The `hts` package has three inbuit options to produce base forecasts. These are controlled by the `fmethod` method argument   
+Denote as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series having observed the time series up to time $T$.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.]  Likewise denote as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to time $T$. We refer to these as **base forecasts**. These are forecasts generated for each time series in the aggregation structure using a suitable forecasting method. The `hts` package has three inbuit options to produce base forecasts. These are controlled by the `fmethod` method argument   
 ```r
 forecast(..., fmethod = c("ets", "arima", "rw"), ...). 
 ```
+as discussed in the Introduction of this Chapter \@ref(ch-hierarchical).
 
 Although the data follows exactly the aggregation structure (as reflected by the summing matrix $\bm{S}$) base forecasts will generally not. It is only under very special circumstances such as using a very simple method to forecasts all the time series (for example using naïve forecasts for all series) that the base forecasts will be coherent.
 
@@ -682,7 +682,7 @@ In summary, unlike any other existing approach, the optimal reconciliation forec
 
 ###Example: Forecasting Australian prison population (continued) {-}
 
-Figure \@ref(fig:prisonFcasts1) plots 8-step-ahead coherent forecasts generated using the optimal reconciliation approach with the WLS estimator using variance scaling.
+Figure \@ref(fig:prisonFcasts1) plots coherent forecasts generated by the optimal reconciliation approach with the WLS estimator that uses variance scaling.
 
 ```{r prisonFcasts1, out.width = '50%',fig.width=6, fig.asp=0.7, echo=TRUE, fig.cap="8-step-ahead forecasts for the total Australian adult prison population andfor the population grouped by state, by legal status and by gender.", message=FALSE, warning=FALSE,fig.show = 'hold'}
 
@@ -698,7 +698,7 @@ plot(fcsts,levels = 3, color_lab=TRUE)
 title(main = "Grouped by gender")
 ```
 
-Figures \@ref(fig:prisonFcasts2) and \@ref(fig:prisonFcasts3) plot 8-step-ahead forecasts for all the interactions of the attributes. 
+Figures \@ref(fig:prisonFcasts2) and \@ref(fig:prisonFcasts3) plot the coherent forecasts for all the interactions of the attributes. 
 
 ```{r prisonFcasts2, out.width = '50%',fig.width=6, fig.asp=0.7, echo=FALSE, fig.cap="Forecasts for the Australian adult prison population grouped by pairs of attributes..", message=FALSE, warning=FALSE,fig.show = 'hold'}
 
@@ -720,3 +720,7 @@ plot(fcsts,levels = 7, color_lab=TRUE)
 ## Exercises {#ex:hierarchical}
 
 1. Exercise: write out the S matrices for the Australian tourism hierarchy and the Australian grouped structure. Use the `smatrix` command to verify your answers.
+
+2. Generate forecasts from the bottom up approach for the tourism data. Plot the forecatsts and comment on there nature. Play with the window.
+
+2. Set as training set and test set and compare the forecast accuracy of bu v opt. 

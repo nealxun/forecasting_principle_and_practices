@@ -547,7 +547,7 @@ year = {1991}
   doi     = {10.1016/j.ijforecast.2008.07.004},
 }
 
-@Article{HynEtAl2011,
+@Article{Hyndman2011,
   author    = {Hyndman, Rob J and Ahmed, Roman A and Athanasopoulos, George and Shang, Han Lin},
   title     = {Optimal combination forecasts for hierarchical time series},
   journal   = {Computational Statistics and Data Analysis},
@@ -557,17 +557,6 @@ year = {1991}
   month     = {9},
   doi       = {10.1016/j.csda.2011.03.006},
   publisher = {Citeseer},
-}
-
-@Article{GroSoh1990,
-  author  = {Gross, C W and Sohl, J E},
-  title   = {{Disaggregation methods to expedite product line forecasting}},
-  journal = {Journal of Forecasting},
-  year    = {1990},
-  volume  = {9},
-  pages   = {233--254},
-  annote  = {File:0188},
-  file    = {:C$\backslash$:/George/PDFs/Gross, Sohl - 1990 - Disaggregation methods to expedite product line forecasting.pdf:pdf},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}

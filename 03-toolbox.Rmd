@@ -163,7 +163,7 @@ autoplot(BoxCox(elec,lambda))
 ```
 
 Having chosen a transformation, we need to forecast the transformed data. Then, we need to reverse the transformation (or *back-transform*) to obtain forecasts on the original scale. The reverse Box-Cox transformation is given by
-\begin{equation} 
+\begin{equation}
 (\#eq:backtransform)
   y_{t} =
     \begin{cases}
@@ -185,9 +185,9 @@ Having chosen a transformation, we need to forecast the transformed data. Then, 
 One issue with using mathematical transformations such as Box-Cox transformations is that the back-transformed forecast will not be the mean of the forecast distribution. In fact, it will usually be the median of the forecast distribution (assuming that the distribution on the transformed space is symmetric).  For many purposes, this is acceptable, but occasionally the mean forecast is required. For example, you may wish to add up sales forecasts from various regions to form a forecast for the whole country. But medians do not add up, whereas means do.
 
 For a Box-Cox transformation, the backtransformed mean is given by
-\begin{equation}  
+\begin{equation}
 (\#eq:backtransformmean)
-y_t = 
+y_t =
   \begin{cases}
      \exp(w_t)\left[1 + \frac{\sigma^2}{2}\right] & \text{if $\lambda=0$;}\\
      (\lambda w_t+1)^{1/\lambda}\left[1 + \frac{\sigma^2(1-\lambda)}{2(\lambda w_t+1)^{2}}\right] & \text{otherwise;}
@@ -280,7 +280,7 @@ autoplot(res) + xlab("Day") + ylab("") +
 gghistogram(res) + ggtitle("Histogram of residuals")
 ```
 
-```{r DJacf, fig.cap="ACF of the residuals from the naïve method applied to the Dow Jones Index. The lack of correlation suggesting the forecasts are good.", fig.height=3}
+```{r DJacf, fig.cap="ACF of the residuals from the naïve method applied to the Dow Jones Index. The lack of correlation suggesting the forecasts are good.", fig.asp=0.35}
 ggAcf(res) + ggtitle("ACF of residuals")
 ```
 
@@ -335,7 +335,7 @@ It is important to evaluate forecast accuracy using genuine forecasts. Consequen
 
 When choosing models, it is common practice to separate the available data into two portions, training and test data, where the training data is used to estimate any parameters of a forecasting method and the test data is used to evaluate its accuracy. Because the test data is not used in determining the forecasts, it should provide a reliable indication of how well the model is likely to forecast on new data.
 
-```{r traintest, fig.height=1, echo=FALSE}
+```{r traintest, fig.asp=0.1, echo=FALSE}
 train = 1:18
 test = 19:24
 par(mar=c(0,0,0,0))
@@ -505,7 +505,7 @@ A more sophisticated version of training/test sets is time series cross-validati
 
 The following diagram illustrates the series of training and test sets, where the blue observations form the training sets, and the red observations form the test sets.
 
-```{r cv1, echo=FALSE, fig.height=4}
+```{r cv1, echo=FALSE, fig.asp=0.47}
 par(mar=c(0,0,0,0))
 plot(0,0,xlim=c(0,28),ylim=c(0,1),
        xaxt="n",yaxt="n",bty="n",xlab="",ylab="",type="n")
@@ -530,7 +530,7 @@ The forecast accuracy is computed by averaging over the test sets. This procedur
 
 With time series forecasting, one-step forecasts may not be as relevant as multi-step forecasts. In this case, the cross-validation procedure based on a rolling forecasting origin can be modified to allow multi-step errors to be used. Suppose that we are interested in models that produce good $4$-step-ahead forecasts. Then the corresponding diagram is shown below.
 
-```{r cv4, echo=FALSE, fig.height=4}
+```{r cv4, echo=FALSE, fig.asp=0.47}
 par(mar=c(0,0,0,0))
 plot(0,0,xlim=c(0,28),ylim=c(0,1),
        xaxt="n",yaxt="n",bty="n",xlab="",ylab="",type="n")

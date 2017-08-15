@@ -195,7 +195,7 @@ This scatterplot helps us to visualize the relationship between the variables.
 
 Figure \@ref(fig:beerlagplot) displays scatterplots of quarterly Australian beer production, where the horizontal axis shows lagged values of the time series. Each graph shows $y_{t}$ plotted against $y_{t-k}$ for different values of $k$.
 
-```{r beerlagplot, fig.cap="Lagged scatterplots for quarterly beer production.", fig.width=8, fig.height=8}
+```{r beerlagplot, fig.cap="Lagged scatterplots for quarterly beer production.", fig.asp=1}
 beer2 <- window(ausbeer, start=1992)
 gglagplot(beer2)
 ```
@@ -232,7 +232,7 @@ knitr::kable(beeracf, booktabs=TRUE, format="pandoc",
 
 These correspond to the nine scatterplots in Figure \@ref(fig:beerlagplot). The autocorrelation coefficients are normally plotted to form the *autocorrelation function* or ACF. The plot is also known as a *correlogram*.
 
-```{r beeracf, fig.cap="Autocorrelation function of quarterly beer production.", fig.height=3}
+```{r beeracf, fig.cap="Autocorrelation function of quarterly beer production.", fig.asp=0.35}
 ggAcf(beer2)
 ```
 
@@ -257,7 +257,7 @@ aelec <- window(elec, start=1980)
 autoplot(aelec) + xlab("Year") + ylab("GWh")
 ```
 
-```{r acfelec, echo=TRUE, fig.cap="ACF of monthly Australian electricity demand.", fig.height=3}
+```{r acfelec, echo=TRUE, fig.cap="ACF of monthly Australian electricity demand.", fig.asp=0.35}
 ggAcf(aelec, lag=48)
 ```
 
@@ -273,7 +273,7 @@ y <- ts(rnorm(50))
 autoplot(y) + ggtitle("White noise")
 ```
 
-```{r wnoiseacf, fig.cap="Autocorrelation function for the white noise series.", fig.height=3}
+```{r wnoiseacf, fig.cap="Autocorrelation function for the white noise series.", fig.asp=0.35}
 ggAcf(y)
 ```
 
@@ -317,7 +317,7 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
 4. The following time plots and ACF plots correspond to four different time series. Your task is to match each  time plot in the first row with one of the ACF plots in the second row.
 
-    ```{r acfguess, fig.height=6, fig.width=12, echo=FALSE, message=FALSE, warning=FALSE}
+    ```{r acfguess, fig.asp=0.5, fig.width=12, echo=FALSE, message=FALSE, warning=FALSE}
     tp1 <- autoplot(cowtemp) + xlab("") + ylab("chirps per minute") +
       ggtitle("1. Daily temperature of cow")
     tp2 <- autoplot(USAccDeaths/1e3) + xlab("") + ylab("thousands") +

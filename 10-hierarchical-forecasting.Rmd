@@ -2,23 +2,43 @@
 
 *Warning: this is a more advanced section and assumes knowledge of some basic matrix algebra. We have however tried to simplify and explain in as much as detail as possible all the notation used starting from basic concepts and building up.*
 
-In this chapter we discuss forecasting large collections of time series that follow some aggregation structure. The challenge is that we require forecasts that are *coherent*, i.e., forecasts that add up in a manner consistent with the aggregation structure the collection of time series follow. Commonly used approaches are based on selecting a single level of aggregation, generating forecasts at that level and then combining these to produce coherent forecasts for all the time series. These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). Section \@ref(Hier:reconciliation) introduces the concept of reconciliation where forecasts of all the times series in the collection are first generated and these are then reconciled so that they become coherent.
+In this chapter we discuss forecasting large collections of time series that follow either a hierarchical or grouped aggregation structure. We clasify these as hierarchical or grouped time series in Sections \@ref(Hier:hierarchical-ts) and \@ref(Hier:grouped-ts) respectively. The challenge is that we require forecasts that are **coherent** across the aggregation structure. I.e., forecasts that add up in a manner consistent with the aggregation structure the collection of time series follow. Commonly used approaches are based on selecting a single level of aggregation, generating forecasts at that level and then combining these to produce coherent forecasts for the other time series. These approaches are presented in Sections \@ref(Hier:bu)-\@ref(Hier:mo). In Section \@ref(Hier:reconciliation) we introduce the concept of reconciliation where forecasts of all the times series in the collection are first generated and these are then reconciled so that they become coherent. This appraoch has the advantage that it incorporates information and the correlation structure across all the series in the collection.
 
-- This approach has the advantage that information from all time series is used. 
+### The hts package {-}
 
-- say something about the hts package: all approaches are implemented using the hts package
+Forecasting hierarchical and grouped time series is implemented using the **hts** package. Forecasts are simply obtained as usual with the `forecast` function. The R code below shows the possible arguments that this function takes when applied to a hierarchical or grouped time series. 
 
-## Hierarchical time series
+```r
+forecast(object, h = ifelse(frequency(object$bts)>1, 2*frequency(object$bts), 10), 
+fmethod = c("ets", "arima", "rw"),
+method = c("comb", "bu", "mo", "tdgsa", "tdgsf", "tdfp"), 
+weights = c("wls", "ols", "mint", "nseries"), ...)
 
-Time series can often be naturally disaggregated by various attributes of interest. For example, the total number of bicycles sold by a cycling manufacturer can be disaggregated by product type such as: road bikes, mountain bikes, children bikes and hybrids. Each of these can be disaggregated into finer categories. For example children’s bikes can be divided into balance bikes for children under the age of four, single speed bikes for children between the ages of four and six and other bikes for children over the age of six. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such a collection of time series follow a hierarchical aggregation structure and we refer to these as *hierarchical time series*. 
+```
+We explain each of the arguments in the sections that follow in detail. Below is a brief introduction.
 
-Commonly found in business and economics are hierarchical time series based on geographical locations. For example the total sales of a manufacturing company can be disaggregated by country, then within each country by state, within each state by region and so on down to the outlet level. 
+`object`
+:   A hierarchical or grouped time series object to be forecast. We present how to generate a hierarchical time series object in Section \@ref(Hier:hierarchical-ts) and a grouped time series object in Section \@ref(Hier:grouped-ts) using the `hts` function. 
 
-A feature that distinguishes hierarchical time series (from grouped time series that follow in Section \@ref(Hier:grouped-ts)) is that they have a unique structure with which they aggregate. Figure \@ref(fig:HierTree) below shows a $K=2$-level hierarchical structure.^[We will use this hierarchical structure in order to introduce the methods for forecasting hierarchical time series that follow.] At the top of the hierarchy, at level 0, is the "Total", the most aggregate level of the data. We denote as $y_t$ the $t$th observation of the "Total" series for $t=1,\dots,T$.
+`fmethod`
+:   The forecasting model used for generating base forecasts. Possible values are `"ets"`, `"arima"` and `rw`. These models have been studied in Chapters \@ref(ch-expsmooth), \@ref(ch-arima) and \@ref(ch-toolbox) respectively. What is meant by base forecasts becomes clear in Section  \@ref(Hier:base-coherent-forecasts). 
 
-The "Total" is disaggregated into 2 series at level 1 and each of these into 3 and 2 series respectively at the bottom level of the hierarchy. Below the top most aggregate level, we denote as $\y{j}{t}$ the $t$th observation of the series which corresponds to node $j$. For example $y_{A,t}$ denotes the $t$th observation of the series corresponding to node A at level 1, $y_{AB,t}$ denotes the $t$th observation of the series corresponding to node AB at level 2, and so on.
+`method`
+:   The method used for generating coherent forecasts. The possible values this argument can take are explained in Sections \@ref(Hier:bu)-\@ref(Hier:reconciliation).
 
-The total number of series in the hierarchy is $n=1+2+5=8$. We denote as $m$ the number of series at the bottom level, a dimension that is important in what follows. In this case $m=5$.
+`weights`
+:   Weight associated with the reconcilication approach presented in Section \@ref(Hier:reconciliation). 
+
+
+## Hierarchical time series {#Hier:hierarchical-ts}
+
+Time series can often be naturally disaggregated by various attributes of interest. For example, the total number of bicycles sold by a cycling manufacturer can be disaggregated by product type such as: road bikes, mountain bikes, children bikes and hybrids. Each of these can be disaggregated into finer categories. For example children’s bikes can be divided into balance bikes for children under the age of four, single speed bikes for children between the ages of four and six and other bikes for children over the age of six. Hybrid bikes can be divided into city, commuting, comfort, and trekking bikes; and so on. Such a collection of time series follow a hierarchical aggregation structure and we refer to these as *hierarchical time series*.
+
+Commonly found in business and economics are hierarchical time series based on geographical locations. For example the total sales of a manufacturing company can be disaggregated by country, then within each country by state, within each state by region and so on down to the outlet level.
+
+A feature that distinguishes hierarchical time series (from grouped time series that follow in Section \@ref(Hier:grouped-ts)) is that they have a unique structure with which they aggregate. Figure \@ref(fig:HierTree) shows a $K=2$-level hierarchical structure. At the top of the hierarchy, at level 0, is the "Total", the most aggregate level of the data. We denote as $y_t$ the $t$th observation of the "Total" series for $t=1,\dots,T$. The "Total" is disaggregated into two series at level 1 and each of these into three and two series respectively at the bottom-level of the hierarchy. Below the top most aggregate level, we denote as $\y{j}{t}$ the $t$th observation of the series which corresponds to node $j$. For example $y_{A,t}$ denotes the $t$th observation of the series corresponding to node A at level 1, $y_{AB,t}$ denotes the $t$th observation of the series corresponding to node AB at level 2, and so on.
+
+The total number of series in the hierarchy is $n=1+2+5=8$. We denote as $m$ the number of series at the bottom-level, a dimension that is important in what follows. In this case $m=5$. Note that always $n>m$.
 
 ```{r HierTree, echo=FALSE, fig.cap="A two level hierarchical tree diagram.", message=FALSE, warning=FALSE, fig.show = "hold",fig.height=8,fig.width=12}
 
@@ -31,7 +51,7 @@ igraph::V(g)$label.cex<-2
 plot(g, layout = layout,vertex.size=40)
 ```
 
-For any time $t$, the observations at the bottom level of the hierarchy will aggregate to the observations of the series above. For example,
+For any time $t$, the observations at the bottom-level of the hierarchy will aggregate to the observations of the series above. For example,
 \begin{equation}
 y_{t}=\y{AA}{t}+\y{AB}{t}+\y{AC}{t}+\y{BA}{t}+\y{BB}{t}
   (\#eq:toplevel)
@@ -39,7 +59,7 @@ y_{t}=\y{AA}{t}+\y{AB}{t}+\y{AC}{t}+\y{BA}{t}+\y{BB}{t}
 \begin{equation} \y{A}{t}=\y{AA}{t}+\y{AB}{t}+\y{AC}{t}\quad \text{and} \quad  \y{B}{t}=\y{BA}{t}+\y{BB}{t}.
 (\#eq:middlelevel)
 \end{equation}
-Substituting \@ref(eq:middlelevel) into \@ref(eq:toplevel) we also get $y_{t}=\y{A}{t}+\y{B}{t}$. These equations can be thought of as aggregation constraints or summing equalities and can be more efficienlty represented using matrix notation. We construct an $n\times m$ matrix $\bm{S}$ referred to as the *summing matrix*  which dictates how the bottom level series are aggregated, consistent with the aggregation structure. For the hierarchical structure in Figure \@ref(fig:HierTree) we can write
+Substituting \@ref(eq:middlelevel) into \@ref(eq:toplevel) we also get $y_{t}=\y{A}{t}+\y{B}{t}$. These equations can be thought of as aggregation constraints or summing equalities and can be more efficienlty represented using matrix notation. We construct an $n\times m$ matrix $\bm{S}$ referred to as the *summing matrix*  which dictates how the bottom-level series are aggregated, consistent with the aggregation structure. For the hierarchical structure in Figure \@ref(fig:HierTree) we write
 $$
   \begin{bmatrix}
     y_{t} \\
@@ -75,27 +95,97 @@ or in more compact notation
   \bm{y}_t=\bm{S}\bm{y}_{K,t},
   (\#eq:smatrix)
 \end{equation}
-where $\bm{y}_t$ is a $n$-dimensional vector of all the observations in the hierarchy at time $t$, $\bm{S}$ is the summing matrix as defined above, and $\bm{y}_{K,t}$ is an $m$-dimensional vector of all the observations in the bottom level of the hierarchy at time $t$. Note that the first row in the summing $\bm{S}$ represents equation \@ref(eq:toplevel) above, the second and third row represent \@ref(eq:middlelevel). The rows below these comprise an $m$-dimensional identity matrix $\bm{I}_m$ so that each bottom level observation on the right hand side of the equation is equal to itself in the left hand side.
+where $\bm{y}_t$ is a $n$-dimensional vector of all the observations in the hierarchy at time $t$, $\bm{S}$ is the summing matrix as defined above, and $\bm{y}_{K,t}$ is an $m$-dimensional vector of all the observations in the bottom-level of the hierarchy at time $t$. Note that the first row in the summing $\bm{S}$ represents equation \@ref(eq:toplevel) above, the second and third row represent \@ref(eq:middlelevel). The rows below these comprise an $m$-dimensional identity matrix $\bm{I}_m$ so that each bottom-level observation on the right hand side of the equation is equal to itself in the left hand side.
 
-` I would like to add example here using hts`
+###Example: Australian tourism hierarchy {-}
 
-```{r, eval=FALSE, include=FALSE, cache=TRUE}
-library(hts)
-abc <- ts(5 + matrix(sort(rnorm(1000)), ncol = 10, nrow = 100))
-colnames(abc) <- c("A10A", "A10B", "A10C", "A20A", "A20B",
-                   "B30A", "B30B", "B30C", "B40A", "B40B")
+Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Each of these can be further subdivided into smaller areas of interest referred to as zones. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also the regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the six states of Australia, namely: New South Wales (NSW), Queensland (QLD), South Australia (SAU), Victoria (VIC), Western Australia (WA) and other (OTH). For each of these we consider visitor nights within the following zones. 
 
-head(abc)
-y <- hts(abc, characters = c(1, 2, 1))
-attributes(y)
+|State  |Zones                              |
+|:------|:---------------------------------------------------------------------|
+|NSW    |Metro (NSWMetro), North Coast (NSWNthCo), South Coast (NSWSthCo), South Inner (NSWSthIn), North Inner (NSWNthIn)|
+|QLD    |Metro (QLDMetro), Central (QLDCntrl), North Coast (QLDNthCo)|
+|SAu    |Metro (SAUMetro), Costal (SAUCoast), Inner (SAUInner)|
+|VIC    |Metro (VICMetro), West Coast (VICWstCo), East Coast (VICEstCo), Inner (VICInner)|
+|WAu    |Metro (WAUMetro), Costal (WAUCoast), Inner (WAUInner)|
+|OTH    |Metro (OTHMetro), Non-Metro (OTHNoMet)|
+
+
+In summary, we consider five zones for NSW, four zones for VIC, and three zones for each QLD, SAU and WAU. Note that Metro zones contain the capital cities and surrounding areas around these generally considered to be metro areas. For OTH we consider Metro (OTHMetro) and non-Metro (OTHNoMet) areas across the rest of Australia. For further details on these geographical areas please refer to Appendix C in @Mint.
+
+To create a hierarchical time series we use the `hts` function as shown in the code below. The function requires as inputs the bottom-level time series and information about the hierarchical structure. `vn2` is a time series matrix containing the bottom-level series. There are alternative ways to pass to the function the structure of the hieararchy. In this case we are using the `characters` input. The first three characters of each column name of `vn2` capture the categories at the first level of the hierarchy (States). The following five characters capture the bottom-level categories (Zones).
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+vn2 <- read.csv("Ch10Data/vn2.csv") 
+vn2 <- ts(vn2, start = 1998, frequency = 4)
+require(hts)
+tourism.hts <- hts(vn2, characters = c(3, 5)) 
+# I keep vn2 here as we will only use this line when we add vn2 in the fpp2 package
+
+```
+
+The top plot in Figure \@ref(fig:tourismStates) shows the total number of visitor nights for the total of Australia while the plots bellow show the visitor nights disaggregated by state. These reveal diverse and rich dynamics at the aggregate national level and the first level of disaggregation across each state. The `aggts` function extracts time series from a `hts` object for any level of aggregation.
+
+```{r tourismStates, fig.width=10, fig.asp=0.7, echo=FALSE, fig.cap="Australian domestic visitor nights over the period 1998 Q1 to 2016 Q4 disaggregated by State.", warning=FALSE,message=FALSE,echo=TRUE,}
+tourismL0 <- aggts(tourism.hts, levels = 0)
+p1<-autoplot(tourismL0) +
+  xlab("Year") +
+  ylab("Visitor nights ('000)")+
+  ggtitle("Total")
+
+tourismL1 <- aggts(tourism.hts, levels = 1)
+p2<-autoplot(tourismL1[,c(1,3,5)]) + 
+  xlab("Year") +
+  ylab("Visitor nights ('000)")+
+  scale_colour_discrete(guide = guide_legend(title = "State"))
+ 
+p3<-autoplot(tourismL1[,c(2,4,6)]) + 
+  xlab("Year") +
+  ylab("Visitor nights ('000)")+
+  scale_colour_discrete(guide = guide_legend(title = "State"))
+
+lay=rbind(c(1,1),c(2,3))
+gridExtra::grid.arrange(p1, p2,p3, layout_matrix=lay)
+```
+The plots in Figure \@ref(fig:tourismZones) below show the bottom-level time series, i.e., the visitor nights for each zone. These help us visualise the diverse individual dynamics within each zones and assist in identifying unique and important time series. Notice for example the costal WAU zone which shows significant growth over the last few years.
+
+```{r tourismZones, fig.width=10, fig.asp=0.8, echo=FALSE, fig.cap="Australian domestic visitor nights over the period 1998 Q1 to 2016 Q4 disaggregated by Zones.", warning=FALSE,message=FALSE}
+require(tidyverse)
+require(reshape2)
+require(zoo)
+
+tourismL2 <- aggts(tourism.hts, levels = 2)
+nodes <- tourism.hts$nodes
+nodesB <- as.numeric(nodes[[length(nodes)]], deparse = FALSE)
+ends <- cumsum(nodesB)
+start <- c(1, ends[1:(length(nodesB) - 1)] + 1)
+time <- tibble(Time = zoo::as.Date(tourismL2))
+
+plotsL2 <- list()
+
+#i=1
+for(i in 1:length(start))
+{
+  datL2 <- bind_cols(time, as_tibble(tourismL2[, start[i]:ends[i]]))
+  meltL2 <- melt(datL2, id = "Time")
+  plotsL2[[i]] <-   ggplot(meltL2) + geom_line(aes(x= Time, y = as.numeric(value), group = variable, color = variable)) +
+    scale_colour_discrete(guide = guide_legend(title = "Zone")) +
+    xlab("Year") + 
+    ylab("Visitor nights ('000)")
+}
+
+
+gridExtra::grid.arrange(plotsL2[[1]],plotsL2[[2]],plotsL2[[3]],
+                        plotsL2[[4]],plotsL2[[5]],plotsL2[[6]], nrow=3)
+
 ```
 
 ## Grouped time series {#Hier:grouped-ts}
-Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. Frames can be carbon, aluminium or steel. They can be single speed or have multiple gears. We refer to these as *grouped time series*.
 
-We can also get a similar structure when we combine two hierarchical structures. For example the bicycle manufacturer may disaggregate sales by product and also by geographical location. In this case we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. We can disaggregate by product type and then geographical location but also vice versa.
+Another possibility is that series can be naturally grouped together based on attributes without necessarily imposing a hierarchical structure. For example the bicycles sold by the warehouse can be for males, females or unisex. Frames can be carbon, aluminium or steel. They can be single speed or have multiple gears. We can also get a similar structure when we combine two hierarchical structures. For example the bicycle manufacturer may disaggregate sales by product and also by geographical location. We refer to these as *grouped time series*. With grouped time series we still have a hierarchical structure however the structure does not naturally disaggregate in a unique way. For example we can disaggregate the bicycles by product type and then geographical location but also vice versa.
 
-Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the grouped structure, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes. 
+Figure \@ref(fig:GroupTree) below shows a $K=2$-level grouped structure. At the top of the grouped structure, is the "Total", the most aggregate level of the data, again represented by $y_t$. The "Total" can be disaggregated by attributes (A, B) forming series $\y{A}{t}$ and $\y{B}{t}$, or by attributes (X, Y) forming series $\y{X}{t}$ and $\y{Y}{t}$. At the bottom the data are disaggregated by both attributes.
+
 
 ```{r GroupTree, echo=FALSE, fig.cap="Alternative representations of a two level grouped structure.", out.width="49.9%", fig.show = "hold",fig.height=14,fig.width=12}
 
@@ -127,7 +217,7 @@ However, for the first level of the grouped structure,
 (\#eq:middlelevelXY).
 \end{equation}
 
-These equalities can again be represented by the summing matrix $\bm{S}$ which recall is of dimension $n\times m$. The total number of series is $n=9$ with $m=4$ series at the bottom level. For the grouped structure in Figure \@ref(fig:GroupTree) we write
+These equalities can again be represented by the summing matrix $\bm{S}$ which recall is of dimension $n\times m$. The total number of series is $n=9$ with $m=4$ series at the bottom-level. For the grouped structure in Figure \@ref(fig:GroupTree) we write
 $$
   \begin{bmatrix}
     y_{t} \\
@@ -163,25 +253,187 @@ where now the second and third rows of $\bm{S}$ represent \@ref(eq:middlelevelAB
 
 Grouped time series can be thought of as hierarchical time series that do not impose a unique hierarchical structure in the sense that the order by which the series can be grouped is not unique.
 
-## Base and coherent forecasts 
+#### Example: Australian prison population {-}
+The left plot in the top row of Figure \@ref(fig:prison) shows the total number of prisoners in Australia over the period 2005 Q1 to 2016 Q4. This represents the top-level series in the grouping structure. The rest of the plots show the prison population grouped by (i) state^[Australia comprises eight geographical areas six states and two territories: Australian Capital Territory, New South Wales, Northern Terrirory, Queensland, South Australia, Tasmania, Victoria, Western Australia. In this example we consider all eight.] (ii) legal status, whether prisoners have already been sentenced or are in remand waiting for a sentence, and (iii) gender.
 
-Our aim is to generate a set of coherent forecasts across all the series of a hierarchical or a grouped structure.
+```{r prison, fig.width=10, fig.asp = .8, echo=FALSE, fig.cap="Total Australian adult prison population and Australian prison population grouped by state, by legal status and by gender.", warning=FALSE,message=FALSE}
 
-Commonly used approaches are based on first generating forecasts for a single level of aggregation, and then producing coherent forecasts by aggregating these up using a bottom-up approach, disaggregating them down using a top-down approach, or a combination of the two using a middle-out approach. The details of these methods are presented in Sections \@ref(Hier:bu) to \@ref(Hier:mo). An alternative and a more advnanced approach is to first generate forecasts for all the time series and then reconcile these so that they become coherent. The details of this approach which we refer to as the optimal reconciliation approach are presented in Section \@ref(Hier:reconciliation). 
+prisonLF <- read.csv("Ch10Data/prisonLF1.csv")
+
+prisonLF$t <- as.Date(prisonLF$date, format = "%Y/%m/%d")
+prisonLF$count <- as.numeric(prisonLF$count)
+prisonLF$quarter <- as.Date(cut(prisonLF$t, breaks = "quarter"))
+prisonLF$year <- as.Date(cut(prisonLF$t, breaks="year"))
+
+library(scales)
+
+#total
+p1<-ggplot(data = prisonLF, aes(x = quarter, y = count)) + stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") +
+  ggtitle("Australian prison population: total") +
+  theme(plot.title = element_text(size=12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Number of prisoners")+
+  scale_colour_discrete(guide = guide_legend(title = "Zone"))
+
+#group by state
+p2<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = state, colour = state))  +
+  stat_summary(fun.y = sum, geom = "line")+
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
+  ggtitle("Grouped by state") +
+  theme(plot.title = element_text(size=12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Number of prisoners") +
+  scale_y_continuous(breaks = c(0,2500, 5000, 7500, 10000, 12500))+
+  scale_colour_discrete(guide = guide_legend(title = "State"))
+
+#group by legal status
+p3<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = legal, colour = legal))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
+  ggtitle("Grouped by legal status") +
+  theme(plot.title = element_text(size=12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Number of prisonLFers") +
+  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
+  scale_colour_discrete(guide = guide_legend(title = "Legal status"))
+
+#group by gender
+p4<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = gender, colour = gender))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "18 months") +
+  ggtitle("Grouped by gender") +
+  theme(plot.title = element_text(size=12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Number of prisonLFers") +
+  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
+  scale_colour_discrete(guide = guide_legend(title = "Gender"))
+
+gridExtra::grid.arrange(p1, p2, p3, p4, nrow=2)
+```
+
+
+To create a grouped time series we use the `gts` function as shown below. Similarly to the hts function the gts function requires as inputs the bottom-level time series and information about the grouping structure. `prison` is a time series matrix containing the bottom-level times series. Similarly to the hts function the information about the grouping structure can be passed in using the `characters` input. An alternative is to be more explicit about the labelling of the series and use the `groups` input. The code below shows examples for both these.
+
+`TODO: talk about interactions here - but possibly need to wait for update of the hts` 
+
+
+```{r, echo=TRUE}
+prison <- read.csv("Ch10Data/prison.csv", strip.white = TRUE, check.names=FALSE)
+prison <- ts(prison, start=c(2005,1), end=c(2016,4), frequency=4)
+# Need to make data into prison time series matrix to add to fpp2
+
+# Using the `characters` input
+prison.gts <- gts(prison, characters = c(1,1,1))
+
+# Using the `groups` input # 8 states, 2 legal, 2 gender
+s <- rep(c("NSW", "VIC", "QLD", "SA", "WA", "NT", "ACT", "TAS"), 32/8)
+l <- rep(rep(c("Rem","Sen"),each=8),2) # Sentenced is number 2 here
+g <- rep(c("M","F"),each=32/2)
+s_l <- as.character(interaction(s,l,sep=""))
+s_g <- as.character(interaction(s,g,sep=""))
+g_l <- as.character(interaction(g,l,sep=""))
+gc <-rbind(s,l,g,s_l, s_g, g_l)
+prison.gts <- gts(prison,groups=gc)
+
+```
+
+
+Figure \@ref(fig:prison1) shows the Australian prison population grouped by all possible combinations of two attributes at a time. The top plot shows the prison population grouped by state and legal status, the middle panel shows the prison poplulation grouped by state and gender and the bottom panel shows the prison population grouped by legal status and gender.
+```{r prison1, fig.width = 10, fig.asp = 1, echo=FALSE, fig.cap="Australian adult prison population grouped by pairs of attributes.", message=FALSE, warning=FALSE}
+#group by legal and state
+p5 <- ggplot(data = prisonLF, aes(x = quarter, y = count, group = legal, colour = legal))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%Y"), date_breaks= "23 months") +
+  ggtitle("Australian adult prison population by state and legal status") +
+  theme(plot.title = element_text(size=12)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Total number of prisoners") +
+  #scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
+  scale_colour_discrete(guide = guide_legend(title = "Legal status"))+
+  facet_grid(.~state)
+
+#group by gender and state
+p6 <- ggplot(data = prisonLF, aes(x = quarter, y = count, group = gender, colour = gender))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%Y"), date_breaks= "18 months") +
+  ggtitle("Australian adult prison population by state and gender") +
+  theme(plot.title = element_text(size=12)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Total number of prisoners") +
+#  scale_y_continuous(breaks = c(0,500, 2500, 4500, 6500, 8500, 10500, 12500, 14500,60000))+
+  scale_colour_discrete(guide = guide_legend(title = "Gender"))+
+  facet_grid(.~state)
+
+#group by legal and gender
+p7<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = gender, colour = gender))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") +
+  ggtitle("Australian adult prisonLF by legal status and gender") +
+  theme(plot.title = element_text(size=12)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Quarter") +
+  ylab("Total number of prisonLFers") +
+#  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
+  scale_colour_discrete(guide = guide_legend(title = "Gender"))+
+  facet_grid(.~legal)
+
+gridExtra::grid.arrange(p5, p6,p7, ncol=1)
+
+```
+Figure \@ref(fig:prisonBTS) shows the Australian adult population grouped by all three attributes: state, legal status and gender. These form the bottom-level series of the grouped structure for the Australian prison population.
+
+```{r prisonBTS, fig.width = 9, fig.asp = .5, echo=FALSE, fig.cap="Bottom-level time series for the Australian adult prison population, grouped by state, legal status and gender.", message=FALSE, warning=FALSE}
+
+#group by legal, gender and state
+ggplot(data = prisonLF, aes(x = quarter, y = count, group = interaction(legal, gender), colour = interaction(legal, gender)))  +
+  stat_summary(fun.y = sum, geom = "line") +
+  scale_x_date(labels = date_format("%Y"), date_breaks= "2 years") +
+  ggtitle("Australian adult prison population by state, legal status and gender") +
+  theme(plot.title = element_text(size=12)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Year") +
+  ylab("Total number of prisoners") +
+#  scale_y_continuous(breaks = c(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,                                5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000,                                9500, 10000, 10500, 11000, 11500, 12000)) +
+  scale_colour_discrete(guide = guide_legend(title = "Legal status & Gender"))+
+    facet_grid(.~state)
+
+```
+
+
+## Base and coherent forecasts {#Hier:base-coherent-forecasts}
+
+The aim is to generate a set of coherent forecasts across all the series of a hierarchical or a grouped structure.
+
+Commonly used approaches are based on first generating forecasts for a single level of aggregation, and then producing coherent forecasts by aggregating these up using a bottom-up approach, disaggregating them down using a top-down approach, or a combination of the two using a middle-out approach. The details of these methods are presented in Sections \@ref(Hier:bu) to \@ref(Hier:mo). An alternative and a more advnanced approach is to first generate forecasts for all the time series and then reconcile these so that they become coherent. The details of this approach which we refer to as the optimal reconciliation approach are presented in Section \@ref(Hier:reconciliation).
 
 In what follows in this section we introduce and formally define the concepts of base and coherent forecasts in order to build a unified framework that incorporates all of the approaches outlined above for both hierarchical and grouped time series.
 
-Denote as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series having observed the time series up to time $T$. Likewise as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to time $T$.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.] We refer to these as *base forecasts*. These are forecasts generated for each time series in the aggregation structure using a suitable forecasting method presented in earlier sections of this book.
+Denote as $\hat{y}_{h}$ the $h$-step-ahead forecast generated for the "Total" series having observed the time series up to time $T$.^[We have simplified the previously used notation of $\hat{y}_{T+h|T}$ for brevity.]  Likewise denote as $\yhat{j}{h}$ the $h$-step-ahead forecast generated for the series at node $j$ having observed the time series up to time $T$. We refer to these as **base forecasts**. These are forecasts generated for each time series in the aggregation structure using a suitable forecasting method. The `hts` package has three inbuit options to produce base forecasts. These are controlled by the `fmethod` method argument   
+```r
+forecast(..., fmethod = c("ets", "arima", "rw"), ...). 
+```
+as discussed in the Introduction of this Chapter \@ref(ch-hierarchical).
 
-Although the data follows exactly the aggregation structure (as reflected by the summing matrix) base forecasts in general will not. It is only under very special circumstances such as using a very simple method to forecasts all the time series (for example using naïve forecasts for all series) that the base forecasts will be coherent.
+Although the data follows exactly the aggregation structure (as reflected by the summing matrix $\bm{S}$) base forecasts will generally not. It is only under very special circumstances such as using a very simple method to forecasts all the time series (for example using naïve forecasts for all series) that the base forecasts will be coherent.
 
-The base forecasts can however be combined, as briefly described above, to produce a set of forecasts that are coherent. We denote the set of coherent forecasts for the "Total" series and all series below the top level as $\tilde{y}_{h}$ and $\ytilde{j}{h}$ respectively. 
+The base forecasts can however be combined, as briefly described above, to produce a set of forecasts that are coherent. We denote the set of **coherent forecasts** for the "Total" series and all series below the top-level as $\tilde{y}_{h}$ and $\ytilde{j}{h}$ respectively.
 
 ## The bottom-up approach {#Hier:bu}
 
-A commonly applied method is the bottom-up approach. This approach involves first generating  base forecasts for each series at the bottom level. Then aggregating these upwards to produce forecasts for all the series in the structure.
+A commonly applied method for generating coherent forecasts is the bottom-up approach. This approach involves first generating  base forecasts for each series at the bottom-level and then aggregating these upwards to produce forecasts for all the series in the structure.
 
-For example, for the hierarchy of Figure \@ref(fig:HierTree) we first generate  $h$-step-ahead base forecasts for each of the bottom level series: $$\yhat{AA}{h},~~\yhat{AB}{h},~~\yhat{AC}{h},~~ \yhat{BA}{h}~~\text{and}~~\yhat{BB}{h}.$$
+For example, for the hierarchy of Figure \@ref(fig:HierTree) we first generate  $h$-step-ahead base forecasts for each of the bottom-level series: $$\yhat{AA}{h},~~\yhat{AB}{h},~~\yhat{AC}{h},~~ \yhat{BA}{h}~~\text{and}~~\yhat{BB}{h}.$$
 
 Aggregating these up the hierarchy we get $h$-step-ahead coherent forecasts for the rest of the series: $$\tilde{y}_{h}=\yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}+\yhat{BA}{h}+\yhat{BB}{h},~~~\ytilde{A}{h}= \yhat{AA}{h}+\yhat{AB}{h}+\yhat{AC}{h}$$ and $$\ytilde{B}{h}= \yhat{BA}{h}+\yhat{BB}{h}.$$
 
@@ -216,58 +468,75 @@ $$
     \yhat{BB}{h}
   \end{bmatrix}.
 $$
+
 In general, using more compact notation, the bottom-up approach can be represented as
 $$
   \tilde{\bm{y}}_{h}=\bm{S}\hat{\bm{y}}_{K,h}
 $$
-where $\tilde{\bm{y}_t}$ is an $n$-dimensional vector of coherent $h$-step ahead forecasts for each time series within any aggregation structure and $\hat{\bm{y}}_{K,h}$ is an $m$-dimensional vector of $h$-step ahead base forecasts for each of the bottom level series of any aggregation structure. Note that for the bottom-up approach the coherent forecasts for the bottom level series are equal to the base forecasts, i.e., $\tilde{\bm{y}}_{K,t}=\hat{\bm{y}}_{K,t}$.
+where $\tilde{\bm{y}_t}$ is an $n$-dimensional vector of coherent $h$-step-ahead forecasts of each time series within any aggregation structure and $\hat{\bm{y}}_{K,h}$ is an $m$-dimensional vector of $h$-step-ahead base forecasts for each of the bottom-level series of any aggregation structure. Note that for the bottom-up approach the coherent forecasts for the bottom-level series are equal to the base forecasts, i.e., $\tilde{\bm{y}}_{K,t}=\hat{\bm{y}}_{K,t}$.
 
-The greatest advantage of this approach is that we are forecasting at the bottom level of a structure and therefore no information is lost due to aggregation. On the other hand bottom level data can be quite noisy and more challenging to model and forecast.
+The greatest advantage of this approach is that we are forecasting at the bottom-level of a structure and therefore no information is lost due to aggregation. On the other hand bottom-level data can be quite noisy and more challenging to model and forecast.
+
+The bottom-up approach is implemented in the `forecast` package by setting 
+```r
+forecast(..., method = "bu", ...). 
+```
+
 
 
 ## Top-down approaches {#Hier:td}
 
-Top-down approaches involve first generating forecasts for the "Total" series $y_t$ on the top of the aggregation structure and then disaggregating these downwards. We let $p_1,\dots,p_{m}$ be a set of proportions which dictate how the base forecasts of the "Total" series are to be distributed to revised forecasts for each series at the bottom level of the structure. For example for the hierarchy of Figure \@ref(fig:HierTree) 
+Top-down approaches involve first generating forecasts for the "Total" series $y_t$ on the top of the aggregation structure and then disaggregating these downwards. We let $p_1,\dots,p_{m}$ be a set of proportions which dictate how the base forecasts of the "Total" series are to be distributed to revised forecasts for each series at the bottom-level of the structure. For example for the hierarchy of Figure \@ref(fig:HierTree) using proportions $p_1,\dots,p_{5}$ we get, 
 $$
   \ytilde{AA}{t}=p_1\hat{y}_t,~~~\ytilde{AB}{t}=p_2\hat{y}_t,~~~\ytilde{AC}{t}=p_3\hat{y}_t,~~~\ytilde{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\ytilde{BB}{t}=p_5\hat{y}_t.
 $$
 Using matrix notation we can stack the set of proportions in a $m$-dimensional column vector $\bm{p}=(p_1,\ldots,p_{m})'$^[$A'$ denotes the transpose of $A$.] and write
 $$\tilde{\bm{y}}_{K,t}=\bm{p}\hat{y}_t$$
-Once the bottom level $h$-step forecasts have been generated these can be aggregated to generate coherent forecasts for the rest of the series. In general using the summing matrix and for a specified set of proportions, top-down approaches can be represented as,
+Once the bottom-level $h$-step-ahead forecasts have been generated these can be aggregated to generate coherent forecasts for the rest of the series. In general using the summing matrix and for a specified set of proportions, top-down approaches can be represented as,
 $$\tilde{\bm{y}}_h=\bm{S}\bm{p}\hat{y}_t.$$
-Note that for all top-down approaches the top level coherent forecasts are equal to the top level base forecasts, i.e., $\tilde{y}_{h}=\hat{y}_{h}$.
+Note that for all top-down approaches the top-level coherent forecasts are equal to the top-level base forecasts, i.e., $\tilde{y}_{h}=\hat{y}_{h}$.
 
-The most common top-down approaches specify proportions based on the historical proportions of the data. The two most common versions follow.
+The most common top-down approaches specify proportions based on the historical proportions of the data. The two most common versions follow. These performed well in the study of @GroSoh1990 hence the acronyms in the `forecast` package.
 
 ### Average historical proportions {-}
 
 $$
   p_j=\frac{1}{T}\sum_{t=1}^{T}\frac{y_{j,t}}{{y_t}}
 $$
-for $j=1,\dots,m$. Each proportion $p_j$ reflects the average of the historical proportions of the bottom level series $y_{j,t}$ over the period $t=1,\dots,T$ relative to the total aggregate $y_t$.
+for $j=1,\dots,m$. Each proportion $p_j$ reflects the average of the historical proportions of the bottom-level series $y_{j,t}$ over the period $t=1,\dots,T$ relative to the total aggregate $y_t$.
+
+This approach is implemented in the `forecast` package by setting 
+```r
+forecast(...,method = "tdgsa",...). 
+```
 
 ### Proportions of the historical averages {-}
 
 $$
   p_j={\sum_{t=1}^{T}\frac{y_{j,t}}{T}}\Big/{\sum_{t=1}^{T}\frac{y_t}{T}}
 $$
-for $j=1,\dots,m$. Each proportion $p_j$ captures the average historical value of the bottom level series $y_{j,t}$ relative to the average value of the total aggregate $y_t$.
+for $j=1,\dots,m$. Each proportion $p_j$ captures the average historical value of the bottom-level series $y_{j,t}$ relative to the average value of the total aggregate $y_t$.
 
-The greatest attribute of such top-down approaches is their simplicity to apply. One only needs to model and generate forecasts for the most aggregated top level series. In general these approaches seem to produce quite reliable forecasts for the aggregate levels and they are very useful with low count data. On the other hand, their greatest disadvantage is the loss of information due to aggregation. Using such a top-down approaches, we are unable to capture and take advantage of individual series characteristics such as time dynamics, special events, etc.
+This approach is implemented in the `forecast` package by setting 
+```r
+forecast(..., method = "tdgsf", ...). 
+```
+
+The greatest attribute of such top-down approaches is their simplicity to apply. One only needs to model and generate forecasts for the most aggregated top-level series. In general these approaches seem to produce quite reliable forecasts for the aggregate levels and they are very useful with low count data. On the other hand, their greatest disadvantage is the loss of information due to aggregation. Using such top-down approaches, we are unable to capture and take advantage of individual series characteristics such as time dynamics, special events, etc.
 
 ### Forecast proportions {-}
 
 An alternative approach that improves on the historical and static nature of the proportions specified above is to use forecast proportions introduced in @AthEtAl2009.
 
-To demonstrate the intuition of this method, consider a one level hierarchy. We first generate $h$-step-ahead base forecasts for all the series. At level 1 we calculate the proportion of each $h$-step-ahead base forecast to the aggregate of all the $h$-step-ahead base forecasts at this level. We refer to these as the forecast proportions and we use these to disaggregate the top level $h$-step ahead forecast and generate coherent forecasts for the whole of the hierarchy.
+To demonstrate the intuition of this method, consider a one level hierarchy. We first generate $h$-step-ahead base forecasts for all the series. At level 1 we calculate the proportion of each $h$-step-ahead base forecast to the aggregate of all the $h$-step-ahead base forecasts at this level. We refer to these as the forecast proportions and we use these to disaggregate the top-level $h$-step-ahead forecast and generate coherent forecasts for the whole of the hierarchy.
 
-For a $K$-level hierarchy this process is repeated for each node going from the top to the very bottom level. Applying this process leads to the following general rule for obtaining the forecast proportions
+For a $K$-level hierarchy this process is repeated for each node going from the top to the very bottom-level. Applying this process leads to the following general rule for obtaining the forecast proportions
 $$
   p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}
 $$
-for $j=1,2,\dots,m$. These forecast proportions disaggregate the $h$-step-ahead base forecast of the "Total" series to $h$-step-ahead coherent forecasts of the bottom level series. $\hat{y}_{j,h}^{(\ell)}$ is the $h$-step-ahead base forecast of the series that corresponds to the node which is $\ell$ levels above $j$. $\hat{S}_{j,h}^{(\ell)}$ is the sum of the $h$-step-ahead base forecasts below the node that is $\ell$ levels above node $j$ and are directly connected to that node.
+for $j=1,2,\dots,m$. These forecast proportions disaggregate the $h$-step-ahead base forecast of the "Total" series to $h$-step-ahead coherent forecasts of the bottom-level series. $\hat{y}_{j,h}^{(\ell)}$ is the $h$-step-ahead base forecast of the series that corresponds to the node which is $\ell$ levels above $j$. $\hat{S}_{j,h}^{(\ell)}$ is the sum of the $h$-step-ahead base forecasts below the node that is $\ell$ levels above node $j$ and are directly connected to that node.
 
-We will use the hierarchy of Figure \@ref(fig:HierTree) to explain this notation and to demonstrate how this general rule is reached. Assume we have generated base forecasts for each series in the hierarchy. Recall that for the top level "Total" series, $\tilde{y}_{h}=\hat{y}_{h}$, for any top-down approach. Here are some examples using the above notation:
+We will use the hierarchy of Figure \@ref(fig:HierTree) to explain this notation and to demonstrate how this general rule is reached. Assume we have generated base forecasts for each series in the hierarchy. Recall that for the top-level "Total" series, $\tilde{y}_{h}=\hat{y}_{h}$, for any top-down approach. Here are some examples using the above notation:
 
   * $\hat{y}_{\text{A},h}^{(1)}=\hat{y}_{\text{B},h}^{(1)}=\hat{y}_{h}= \tilde{y}_{h}$
   * $\hat{y}_{\text{AA},h}^{(1)}=\hat{y}_{\text{AB},h}^{(1)}=\hat{y}_{\text{AC},h}^{(1)}= \hat{y}_{\text{A},h}$
@@ -291,13 +560,24 @@ $$
 $$
 The other proportions can be similarly obtained. The greatest disadvantage of the top-down forecast proportions approach, which is a disadvantage of any top-down approach, is that they do not produce unbiased revised forecasts even if the base forecasts are unbiased as shown by @HynEtAl2011
 
+This approach is implemented in the `forecast` package by setting 
+```r
+forecast(..., method = "tdfp", ...). 
+```
+
+
 ## Middle-out approach {#Hier:mo}
 
 The middle-out approach combines bottom-up and top-down approaches. First the "middle level" is chosen and base forecasts are generated for all the series of this level. For the series above the middle level, coherent forecasts are generated using the bottom-up approach by aggregating the "middle-level" base forecasts upwards. For the series below the "middle level", coherent forecasts are generated using a top-down approach by disaggregating the "middle level" base forecasts downwards.
 
-## Optimal reconciliation approach {#Hier:reconciliation}
+This approach is implemented in the `forecast` package by setting 
+```r
+forecast(..., method = "mo",...). 
+```
 
-Denote as $\bm{\hat{y}}_h$ a set of $h$-step ahead base forecasts generated for each series in a structure and stacked the same way as the data. For example for the hierarchy of Figure \@ref(fig:HierTree)
+## The projection matrix {#Hier:projection}
+
+Denote as $\bm{\hat{y}}_h$ a set of $h$-step-ahead base forecasts generated for each series in a hierarchial or grouped structure and stacked the same way as the data. For example for the hierarchy of Figure \@ref(fig:HierTree)
 $$
 \bm{\hat{y}}_h=\begin{bmatrix}
     \hat{y}_h \\
@@ -311,12 +591,12 @@ $$
   \end{bmatrix}.
 $$
 
-Then in general all forecasting approaches for either hierarchical or grouped structures can be represented as
-\begin{equation} 
+In general, all forecasting approaches for either hierarchical or grouped structures can be represented as
+\begin{equation}
   \bm{\tilde{y}}_h=\bm{S}\bm{P}\bm{\hat{y}}_h
   (\#eq:SP)
 \end{equation}
-where reading from right to left, $\bm{\hat{y}}_h$ is the set of $h$-step ahead base forecasts as defined above, $\bm{P}$ is a matrix that projects the base forecasts into the bottom level, and the summing matrix $\bm{S}$ sums these up the aggregation structure to produce a set of coherent forecasts $\bm{\tilde{y}}_h$.
+where reading from right to left, $\bm{\hat{y}}_h$ is the set of $h$-step-ahead base forecasts as defined above, $\bm{P}$ is a matrix that projects the base forecasts into the bottom-level, and the summing matrix $\bm{S}$ sums these up using the aggregation structure to produce a set of coherent forecasts $\bm{\tilde{y}}_h$.
 
 The $\bm{P}$ matrix is defined according to the approach implemented. For example if the bottom-up approach is used to forecast the hierarchy of Figure \@ref(fig:HierTree),
 $$\bm{P}=
@@ -328,7 +608,7 @@ $$\bm{P}=
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
   \end{bmatrix}.
   $$
-Notice that the $\bm{P}$ comprises two partitions. The first three columns which zero out the base forecasts of the series above the bottom level and the $m$-dimensional identity matrix which picks only the base forecasts of the bottom level, to then be summed up the hierarchy by the $\bm{S}$ matrix.
+Notice that the $\bm{P}$ comprises two partitions. The first three columns which zero out the base forecasts of the series above the bottom-level and the $m$-dimensional identity matrix which picks only the base forecasts of the bottom-level, to then be summed up the hierarchy by the $\bm{S}$ matrix.
 
 If any of the top-down approaches were used then $$\bm{P}=
   \begin{bmatrix}
@@ -337,116 +617,110 @@ If any of the top-down approaches were used then $$\bm{P}=
     p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
-  \end{bmatrix},
+  \end{bmatrix}.
   $$
-so that the first column includes a set of proportions that distribute the base forecasts of the top level to the bottom level to then be summed up the hierarchy by the $\bm{S}$ matrix. The rest of the columns zero out the base forecasts below the very top level of aggregation.
+The first column includes a set of proportions that distribute the base forecasts of the top-level to the bottom-level. These are then summed up the hierarchy by the $\bm{S}$ matrix. The rest of the columns zero out the base forecasts below the very top-level of aggregation.
 
-For a middle out approach the $\bm{P}$ matrix will be a combination of the above two. Using a set of proportions, the base forecasts of some pre-chosen level will be disaggregated to the bottom level to then be summed up the hierarchy with the summing matrix, with all other base forecasts being zeroed out.
+For a middle out approach the $\bm{P}$ matrix will be a combination of the above two. Using a set of proportions, the base forecasts of some pre-chosen level will be disaggregated to the bottom-level to then be summed up the hierarchy with the summing matrix, with all other base forecasts being zeroed out.
+
+## The optimal reconciliation approach {#Hier:reconciliation}
 
 All the approaches we have considered so far in this chapter involve choosing a particular level in the aggregation structure, generating base forecasts for that level, and then either aggregating these up or disaggregating them down to generate coherent forecasts for the rest of the series. The above examples clearly reflect this through the $\bm{P}$ matrix.
 
-In this section we introduce an approach that instead involves generating base forecast for each series in the aggregation structure. The base forecasts are then reconciled to generate a set of forecasts that are as close as possible to the base forecasts but are also coherent.
+In this section we introduce an approach that instead involves generating base forecasts for each series in the aggregation structure. The base forecasts are then reconciled to generate a set of coherent forecasts that are as close as possible to the base forecasts. Therefore we describe the resulting set of coherent forecasts as optimally reconciled coherent forecasts.
 
 The general idea is derived from wanting to find a $\bm{P}$ matrix that minimises the forecast error of a set of coherent forecasts from forecasting each time series in the structure. In what follows we present a simplified summary of the approach. There are a few necessary steps that need to be followed in order to get a good flavour of the approach. These unfortunately complicate the presentation. However, following through these steps we get to the specification of $\bm{P}$ in equation \@ref(eq:MinT) which is labelled the *MinT* estimator as it *Min*imises the *T*race of the forecast errors of the coherent  forecasts across the whole structure. For further details and discussion please refer to @Mint.
 
-Let $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$ be the forecast errors after having produced a set of coherent forecasts across the whole structure, stacked in the same order as the data. Note that this expression is a generalisation of a forecast error as defined in Section \@ref(accuracy) using matrix notation. It can be easily shown through Equation \@ref(eq:SP) above that for a set of base forecasts that are unbiased, which will be the case for all base forecasts generated using methods introduced in this book, using a $\bm{P}$ matrix such that $\bm{S}\bm{P}\bm{S}=\bm{S}$, generates a set of coherent forecasts $\bm{\tilde{y}}_h$ that are also unbiased. Note that this will not hold for any top-down approach.^[TODO: See Exercise 10.1 - possibly set this as an exercise.]
+Let $$\bm{e}_{T+h}=\bm{y}_{T+h}-\tilde{\bm{y}}_h$$ be the forecast errors after having produced a set of coherent forecasts across the whole structure, stacked in the same order as the data. Note that this expression is a generalisation of a forecast error as defined in Section \@ref(accuracy) using matrix notation. It can be easily shown through Equation \@ref(eq:SP) that for a set of base forecasts that are unbiased,^[All forecasting approaches used in this textbook generate unbiased forecasts.] defining a $\bm{P}$ matrix such that $\bm{S}\bm{P}\bm{S}=\bm{S}$, generates a set of coherent forecasts $\bm{\tilde{y}}_h$ that are also unbiased. Note that this will not hold for any top-down approach.^[TODO: See Exercise 10.1 - possibly set this as an exercise.]
 
 @Mint show in Lemma 1 that
 \begin{equation*}
 \text{Var}[\bm{y}_{T+h}-\tilde{\bm{y}}_h]=\bm{S}\bm{P}\bm{W}_h\bm{P}'\bm{S}'
 \end{equation*}
-where $\bm{W}_h=E[(\bm{y}_{T+h}-\hat{\bm{y}}_h)(\bm{y}_{T+h}-\hat{\bm{y}}_h)']$ is the variance-covariance matrix of the $h$-step ahead base forecast errors. This is a very important result as it shows that the forecast error variance of the coherent forecasts is a function of the error variance of base forecasts $\bm{W}_h$. The objective is to find a matrix $\bm{P}$ that minimises the error variance of the coherent forecasts. @Mint show in Theorem 1 that the optimal matrix $\bm{P}$ that minimises the $tr[\bm{S}\bm{P}\bm{W}_h\bm{P}'\bm{S}']$ such that $\bm{S}\bm{P}\bm{S}=\bm{S}$ is given by
+where $\bm{W}_h=E[(\bm{y}_{T+h}-\hat{\bm{y}}_h)(\bm{y}_{T+h}-\hat{\bm{y}}_h)']$ is the variance-covariance matrix of the $h$-step-ahead base forecast errors. This is a very important result as it shows that the forecast error variance of the coherent forecasts is a function of the error variance of base forecasts $\bm{W}_h$. The objective is to find a matrix $\bm{P}$ that minimises the error variance of the coherent forecasts. @Mint show in Theorem 1 that the optimal matrix $\bm{P}$ that minimises the $tr[\bm{S}\bm{P}\bm{W}_h\bm{P}'\bm{S}']$ such that $\bm{S}\bm{P}\bm{S}=\bm{S}$, is given by
 \begin{equation}
-\bm{P}=(\bm{S}'\bm{W}_h^{-1}\bm{S})^{-1}\bm{S}'\bm{W}_h^{-1},
+\bm{P}=(\bm{S}'\bm{W}_h^{-1}\bm{S})^{-1}\bm{S}'\bm{W}_h^{-1}
 (\#eq:MinT)
 \end{equation}
 referred to as the *MinT* estimator.
 
-Note that the MinT estimator involves $\bm{W}_h$ the forecast error variance of the $h$-step ahead base forecasts. As this is challenging to estimate we provide below three simplifying specifications which have been shown to work well in both simulations and in practice.
+Note that the MinT estimator involves $\bm{W}_h$ the forecast error variance of the $h$-step-ahead base forecasts. As this is challenging to estimate we provide below three simplifying specifications which have been shown to work well in both simulations and in practice.
 
-1. Set $\bm{W}_h=k_h\bm{I}$ $\forall h$ where $k_{h} > 0$.^[Note that $k_{h}$ is a proportionality constant. It does not need to be estimated or specified here as it gets cancelled out in estimating $\bm{P}$ in \@ref(eq:MinT). We include it here for completeness.] This is the most simplifying assumption to make. Note that in this case $\bm{P}$ is independent of the data and no further estimation is required. The disadvantage is however that this specification does not account for the differences in the scale between the levels of the structure which naturally exist due to aggregation. The two specifications that follow do account for this.
-
+1. Set $\bm{W}_h=k_h\bm{I}$ $\forall h$ where $k_{h} > 0$.^[Note that $k_{h}$ is a proportionality constant. It does not need to be estimated or specified here as it gets cancelled out in estimating $\bm{P}$ in \@ref(eq:MinT). We include it here for completeness.] This is the most simplifying assumption to make. Note that in this case $\bm{P}$ is independent of the data and no further estimation is required. The disadvantage is however that this specification does not account for the differences in the scale between the levels of the structure which naturally exist due to aggregation. The two specifications that follow do account for this. This approach is implemented in the `forecast` package by setting 
+    ```r
+    forecast(..., method = "comb", weights = "ols", ...). 
+    ```
+    The weights here are referred to as the OLS (ordinary least squares) estimator as setting $\bm{W}_h=k_h\bm{I}$ in \@ref(eq:MinT) gives the least squares estimator we introduced in Section \@ref(Regr-MatrixEquations) with $\bm{X}=\bm{S}$ and $\bm{y}=\hat{\bm{y}}$.
+    
 2. Set $\bm{W}_{h} = k_{h}\text{diag}(\hat{\bm{W}}_{1})$ $\forall h$ where $k_{h} > 0$ and
     \[
         \hat{\bm{W}}_{1} = \frac{1}{T}\sum_{t=1}^{T}\hat{\bm{e}}_{t}\hat{\bm{e}}_{t}'
     \]
-where $\hat{\bm{e}}_{t}$ is an $n$-dimensional vector of residuals of the models that generated the base forecasts stacked in the same order as the data. Each element in this vector is the same as defined in Section \@ref(toolbox-resids). This specification scales the base forecasts using the variance of the residuals and it is therefore referred to as the *variance scaling* specification.
+where $\hat{\bm{e}}_{t}$ is an $n$-dimensional vector of residuals of the models that generated the base forecasts stacked in the same order as the data. Each element in this vector is the same as defined in Section \@ref(toolbox-resids). The approach is implemented by setting 
+    ```r
+    forecast(..., method = "comb", weights = "wls", ...). 
+    ```
+    This specification scales the base forecasts using the variance of the residuals and it is therefore referred to as the WLS (weighted least squares) estimator using *variance scaling*. 
 
-3. Set $\bm{W}_{h}=k_{h}\bm{\Lambda}$, $\forall h$ where $k_{h} > 0$ and $\bm{\Lambda}=\text{diag}(\bm{S}\bm{1})$ where $\bm{1}$ is a unit column vector of dimension $n$. This specification assumes that the bottom level base forecast errors each have variance $k_{h}$ and are uncorrelated between nodes. Hence each element of the diagonal $\bm{\Lambda}$ matrix contains the number of forecast error variances contributing to that aggregation level. This estimator only depends on the structure of the hierarchy or the grouped time series. It is therefore referred to as the specification that applies *structural scaling*. Notice that the structural scaling assumes equivariant forecast errors only at the bottom level of the structure and not across all levels which is unrealistically assumed by the first specification. Furthermore, applying the structural scaling specification is particularly useful in cases where residuals are not available and therefore variance scaling cannot be applied. For example, in cases where the base forecasts are generated by judgemental forecasting introduced in Chapter \@ref(ch-judgmental).
+3. Set $\bm{W}_{h}=k_{h}\bm{\Lambda}$, $\forall h$ where $k_{h} > 0$ and $\bm{\Lambda}=\text{diag}(\bm{S}\bm{1})$ where $\bm{1}$ is a unit column vector of dimension $n$. This specification assumes that the bottom-level base forecast errors each have variance $k_{h}$ and are uncorrelated between nodes. Hence each element of the diagonal $\bm{\Lambda}$ matrix contains the number of forecast error variances contributing to that aggregation level. This estimator only depends on the structure of the hierarchy or the grouped time series. It is therefore referred to as the specification that applies *structural scaling*. Notice that the structural scaling assumes equivariant forecast errors only at the bottom-level of the structure and not across all levels which is unrealistically assumed by the first specification. Furthermore, applying the structural scaling specification is particularly useful in cases where residuals are not available and therefore variance scaling cannot be applied. For example, in cases where the base forecasts are generated by judgemental forecasting introduced in Chapter \@ref(ch-judgmental). This approach is implemented by setting 
+    ```r
+    forecast(..., method = "comb", weights = "nseries", ...). 
+    ```
+4. An alterantive to the above simplifying specifications is to direclty estimate the full  covariance matrix. The most obvious and simple way would be to use the sample covariance. This is implemented by setting 
+    ```r
+    forecast(..., method = "comb", weights = "mint", covariance = "sam", ...). 
+    ```
+
+    However, for cases that $m \ge T$ this is not a good estimator. Instead we use a shrinkage estimator which shrinks the sample covariance to a diagonal matrix. This is implemented by setting 
+    ```r
+    forecast(..., method = "comb", weights = "mint", covariance = "shr", ...). 
+    ```
+    For more details on MinT please refer to @Mint.
+    
+In summary, unlike any other existing approach, the optimal reconciliation forecasts are generated using all the information available within a hierarchical or a grouped structure. This is very important as particular aggregation levels or groupings may reveal features of the data that are of interest to the user and are important to be modelled. These features may be completely hidden or not easily identifiable at other levels. For example, consider a hierarchical structure reflecting the geographical division of a country into states, regions, down to a very fine grid of statistical local areas. There are significant differences between the seasonal patterns in the number of tourists visiting a state or a region that is mainly seen as a summer destination versus a state or a region that caters for winter activities. These differences will be smoothed at the country level due to aggregation and on the other hand it may be extremely challenging to identify at the very bottom-level of a statistical local area due to noise. Another example for a grouped structure is the difference in the sales of clothes between genders. Such differences will be completely smoothed out at the very top-level of aggregation considering total sales, or may be very challenging to identify due to noise at the very bottom-level.
 
 
-In summary, unlike any other existing approach, the optimal combination forecasts are generated using all the information available within a hierarchical or a grouped structure. This is very important as particular aggregation levels or groupings may reveal features of the data that are of interest to the user and are important to be modelled. These features may be completely hidden or not easily identifiable at other levels. For example, consider a hierarchical structure reflecting the geographical division of a country into states, regions, down to a very fine grid of statistical local areas. There are significant differences between the seasonal patterns in the number of tourists visiting a state or a region that is mainly seen as a summer destination versus a state or a region that caters for winter activities. These differences will be smoothed at the country level due to aggregation and on the other hand it may be extremely challenging to identify at the very bottom level of a statistical local area due to noise. Another example for a grouped structure is the difference in the sales of clothes between genders. Such differences will be completely smoothed out at the very top level of aggregation considering total sales, or may be very challenging to identify due to noise at the very bottom level.
+###Example: Forecasting Australian prison population (continued) {-}
 
-## The hts package
+Figure \@ref(fig:prisonFcasts1) plots coherent forecasts generated by the optimal reconciliation approach with the WLS estimator that uses variance scaling.
 
-Hierarchical time series forecasting is implemented in the **hts** package in R.
+```{r prisonFcasts1, out.width = '50%',fig.width=6, fig.asp=0.7, echo=TRUE, fig.cap="8-step-ahead forecasts for the total Australian adult prison population andfor the population grouped by state, by legal status and by gender.", message=FALSE, warning=FALSE,fig.show = 'hold'}
 
-The `hts` function creates a hierarchical time series. The required inputs are the bottom level time series observations, and information about the hierarchical structure. For example, the structure shown in Figure \@ref(fig:HierTree) is specified as follows:
+fcsts = forecast(prison.gts, h = 8, method = "comb", weights = "wls", fmethod = "ets")
 
-```{r}
-library(hts)
-# vn is a time series matrix containing the bottom level series
+plot(fcsts,levels = 0, color_lab=TRUE)
+title(main = "Total")
+plot(fcsts,levels = 1, color_lab=TRUE)
+title(main = "Grouped by state")
+plot(fcsts,levels = 2, color_lab=TRUE)
+title(main = "Grouped by leagal status")
+plot(fcsts,levels = 3, color_lab=TRUE)
+title(main = "Grouped by gender")
+```
 
-y <- hts(vn, nodes=list(4,c(2,2,2,2)))
-allf <- forecast(y, h=8)
-plot(allf)
+Figures \@ref(fig:prisonFcasts2) and \@ref(fig:prisonFcasts3) plot the coherent forecasts for all the interactions of the attributes. 
+
+```{r prisonFcasts2, out.width = '50%',fig.width=6, fig.asp=0.7, echo=FALSE, fig.cap="Forecasts for the Australian adult prison population grouped by pairs of attributes..", message=FALSE, warning=FALSE,fig.show = 'hold'}
+
+plot(fcsts,levels = 4, color_lab=TRUE)
+title(main = "Grouped by state and legal status")
+plot(fcsts,levels = 5, color_lab=TRUE)
+title(main = "Grouped by state and gender")
+plot(fcsts,levels = 6, color_lab=TRUE)
+title(main = "Grouped by leagal status and gender")
+plot(fcsts,levels = 7, color_lab=TRUE)
+```
+
+```{r prisonFcasts3, out.width = '80%',fig.width=10, fig.asp=0.8, echo=FALSE, fig.cap="Forecasts for the bottom-level time series of the Australian adult prison population, grouped by state, legal status and gender.", message=FALSE, warning=FALSE,fig.show = 'hold'}
+
+plot(fcsts,levels = 7, color_lab=TRUE)
 
 ```
 
-For a grouped but non-hierarchical time series, the `gts` function can be used. If there are more levels, the `g` argument should be a matrix where each row contains the grouping structure for each level.
+## Exercises {#ex:hierarchical}
 
-Forecasts are obtained, as usual, with the `forecast` function. By default it produces forecasts using the optimal combination approach with ETS models used for the base forecasts. But other models and methods can be specified via the following arguments.
+1. Exercise: write out the S matrices for the Australian tourism hierarchy and the Australian grouped structure. Use the `smatrix` command to verify your answers.
 
-fmethod
-:   The forecasting model to be used for the base forecasts. Possible values are `"ets"`, `"arima"` and `"rw"`.
+2. Generate forecasts from the bottom up approach for the tourism data. Plot the forecatsts and comment on there nature. Play with the window.
 
-method
-:   The method used for reconciling the base forecasts. It can take the following values:
-
-    comb
-    :   Optimal combination forecasts;
-
-    bu
-    :   Bottom-up forecasts;
-
-    mo
-    :   Middle-out forecasts where the level used is specified by the `level` argument’
-
-    tdgsa
-    :   Top-down forecasts based on the average historical proportions (Gross-Sohl method A);@GS90
-
-    tdgsf
-    :   Top-down forecasts based on the proportion of historical averages (Gross-Sohl method F);
-
-    tdfp
-    :   Top-down forecasts using forecast proportions.
-
-##Example: Australian tourism hierarchy
-
-Australia is divided into eight geographical areas (some referred to as states and others as territories) with each one having its own government and some economic and administrative autonomy. Business planners and tourism authorities are interested in forecasts for the whole of Australia, the states and the territories, and also smaller regions. In this example we concentrate on quarterly domestic tourism demand, measured as the number of visitor nights Australians spend away from home, for the three largest states of Australia, namely Victoria (VIC), New South Wales (NSW), Queensland (QLD) and other. For each of these we consider visitor nights for each respective capital city, namely, Melbourne (MEL), Sydney (SYD) and Brisbane (BGC).^[For the purpose of this example we include with Brisbane, visitor nights at the Gold Coast, a coastal city and a major tourism attraction near Brisbane.] The hierarchical structure is shown in Figure \@ref(fig-9-4-Aust). The CAP category in the bottom level includes visitor nights in all other five capital cities of the remaining states and territories.
-
-```
-\@ref(fig-9-4-Aust)
-
-=[ellipse,draw,inner sep=1pt] =[sibling distance=30mm,font=] =[sibling
-distance=15mm,font=]
-
-child <span>node <span>NSW</span> child <span>node
-<span>SYD</span></span> child <span>node <span>Other</span></span>
-</span> child <span>node <span>VIC</span> child <span>node
-<span>MEL</span></span> child <span>node <span>Other</span></span>
-</span> child <span>node <span>QLD</span> child <span>node
-<span>BGC</span></span> child <span>node <span>Other</span></span>
-</span> child <span>node <span>Other</span> child <span>node
-<span>CAP</span></span> child <span>node <span>Other</span></span>
-</span>;
-```
-
-Figure \@ref(fig-9-4-forecasts) shows all the times series in the hierarchy which span the period 1998:Q1 to 2011:Q4. The dotted lines show the revised forecasts generated by the optimal combination approach. The base forecasts for each series are generated using the ETS methodology of Chapter \@ref(ch-expsmooth).
-
-```{r htstourism, fig.cap="Hierarchical time series and 8-step-ahead revised forecasts for Australian domestic tourism generated by the optimal combination approach. The base forecasts for each series were generated using the ETS methodology of Chapter ??.", fig.height=6}
-require(hts)
-y <- hts(vn, nodes=list(4,c(2,2,2,2)))
-allf <- forecast(y, h=8)
-plot(allf)
-```
+2. Set as training set and test set and compare the forecast accuracy of bu v opt. 

@@ -278,3 +278,35 @@ plot(fcsts,levels = 6)
 plot(fcsts,levels = 7)
 
 
+train <- window(prison.gts,end=c(2014,4))
+test <- window(prison.gts,start=2015)
+
+fcsts.opt = forecast(train, h = 8, method = "comb", weights = "wls", fmethod = "ets")
+fcsts.bu = forecast(train, h = 8, method = "bu", fmethod = "ets")
+
+tab <- matrix(NA,ncol=4,nrow=6)
+rownames(tab) <- c("Total", "State", "Legal status", "Gender","Bottom", "All series")
+colnames(tab) <- c("MAPE","MASE","MAPE","MASE")
+
+tab[1,] <-c(accuracy.gts(fcsts.bu,test,levels = 0)[c("MAPE","MASE"),"Total"],
+            accuracy.gts(fcsts.opt,test,levels = 0)[c("MAPE","MASE"),"Total"])
+
+j=2
+for(i in c(1:3,7)){
+tab[j,] <-c(mean(accuracy.gts(fcsts.bu,test,levels = i)["MAPE",]),
+            mean(accuracy.gts(fcsts.bu,test,levels = i)["MASE",]),
+            mean(accuracy.gts(fcsts.opt,test,levels = i)["MAPE",]),
+            mean(accuracy.gts(fcsts.opt,test,levels = i)["MASE",]))
+j=j+1
+}
+
+tab[6,] <-c(mean(accuracy.gts(fcsts.bu,test)["MAPE",]),
+            mean(accuracy.gts(fcsts.bu,test)["MASE",]),
+            mean(accuracy.gts(fcsts.opt,test)["MAPE",]),
+            mean(accuracy.gts(fcsts.opt,test)["MASE",]))
+
+
+knitr::kable(tab, digits=2, booktabs=TRUE)
+
+
+

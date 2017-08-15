@@ -135,7 +135,7 @@ chk <- tourism[, 3:ncol(tourism)]
 bts <- ts(apply(chk, 2, function(x) aggregate(ts(x, start = 1998, frequency = 12), nfrequency = 4)), start = 1998, frequency = 4)
 
 #write.csv(bts, "vn2.csv",row.names = FALSE)
-#bts <- read.csv("vn2.csv")
+bts <- read.csv("vn2.csv")
 bts <- ts(bts, start = 1998, frequency = 4)
 
 # bts<-window(bts,start=c(2008,2))
@@ -215,11 +215,25 @@ plotsL2[[4]]
 plotsL2[[5]]
 plotsL2[[6]]
 
-fcsts<-forecast.gts(tourism.hts,h=8,fmethod = "ets")
+fcsts<-forecast.gts(tourism.hts,h=8,method="bu",fmethod = "ets")
 
-plot(fcsts)
-plot(fcsts,levels = 0)
+
+plot(fcsts$nodes,levels = 0)
 plot(fcsts,levels = 1)
 plot(fcsts,levels = 2)
 
+
 autoplot(aggts(tmp,levels=0))
+
+h <- 12
+ally <- aggts(htseg1)
+allf <- matrix(NA, nrow = h, ncol = ncol(ally))
+for(i in 1:ncol(ally))
+  allf[,i] <- forecast(auto.arima(ally[,i]), h = h)$mean
+allf <- ts(allf, start = 51)
+y.f <- combinef(allf, get_nodes(htseg1), weights = NULL, keep = "gts", algorithms = "lu")
+plot(y.f)
+
+
+
+

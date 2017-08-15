@@ -44,7 +44,7 @@ Figure \@ref(fig:elecequip-trend) shows the trend-cycle component, $T_t$, in red
 
 Figure \@ref(fig:elecequip-stl) shows an additive decomposition of these data. The method used for estimating components in this example is STL, which is discussed in Section \@ref(sec-6-stl).
 
-```{r elecequip-stl, fig.cap="The electricial equipment orders (top) and its three additive components.", fig.width=8, fig.height=7, echo=FALSE}
+```{r elecequip-stl, fig.cap="The electricial equipment orders (top) and its three additive components.", fig.asp=0.9, echo=FALSE}
 autoplot(fit) + xlab("Year")
 ```
 
@@ -294,7 +294,7 @@ Step 4
 :   The remainder component is calculated by dividing out the estimated seasonal and trend-cycle components: $\hat{R}_{t} = y_t /( \hat{T}_t  \hat{S}_t)$.
 
 
-```{r classical-elecequip, echo=TRUE, fig.width=8, fig.height=7, fig.cap="A classical multiplicative decomposition of the new orders index for electrical equipment."}
+```{r classical-elecequip, echo=TRUE, fig.asp=0.9, fig.cap="A classical multiplicative decomposition of the new orders index for electrical equipment."}
 fit <- decompose(elecequip, type="multiplicative")
 autoplot(fit) + xlab("Year") +
   ggtitle("Classical multiplicative decomposition of electrical equipment index")
@@ -325,7 +325,7 @@ The details of the X11 method are described in @Dagum2016. Here we will only dem
 
 The X11 method is available using the `seas` function from the `seasonal` package for R.
 
-```{r x11, echo=TRUE, warning=FALSE, fig.width=8, fig.height=7, fig.cap="An X11 decomposition of the new orders index for electrical equipment."}
+```{r x11, echo=TRUE, warning=FALSE, fig.asp=0.9, fig.cap="An X11 decomposition of the new orders index for electrical equipment."}
 library(seasonal)
 fit <- seas(elecequip, x11="")
 autoplot(fit) +
@@ -364,7 +364,7 @@ ggsubseriesplot(seasonal(fit)) + ylab("Seasonal")
 
 The details are beyond the scope of this book. However, a complete discussion of the method is available in @Dagum2016. Here we will only demonstrate how to use it via the `seasonal` package.
 
-```{r seats, echo=TRUE, warning=FALSE, fig.width=8, fig.height=7, fig.cap="A SEATS decomposition of the new orders index for electrical equipment."}
+```{r seats, echo=TRUE, warning=FALSE, fig.asp=0.9, fig.cap="A SEATS decomposition of the new orders index for electrical equipment."}
 library(seasonal)
 fit <- seas(elecequip)
 autoplot(fit) +
@@ -397,7 +397,7 @@ It is possible to obtain a multiplicative decomposition by first taking logs of 
 
 The best way to begin learning how to use STL is to see some examples and experiment with the settings. Figure \@ref(fig:elecequip-stl) showed an example of STL applied to the electrical equipment orders data. Figure \@ref(fig:elecequip-stl2) shows an alternative STL decomposition where the trend-cycle is more flexible, the seasonal component does not change over time, and the robust option has been used. Here, it is more obvious that there has been a down-turn at the end of the series, and that the orders in 2009 were unusually low (corresponding to some large negative values in the remainder component).
 
-```{r elecequip-stl2, fig.cap="The electrical equipment orders (top) and its three additive components obtained from a robust STL decomposition with flexible trend-cycle and fixed seasonality.",fig.width=8, fig.height=7, echo=TRUE}
+```{r elecequip-stl2, fig.cap="The electrical equipment orders (top) and its three additive components obtained from a robust STL decomposition with flexible trend-cycle and fixed seasonality.",fig.asp=0.9, echo=TRUE}
 elecequip %>%
   stl(t.window=13, s.window="periodic", robust=TRUE) %>%
   autoplot
@@ -474,7 +474,7 @@ As well as the naïve method, several other possible forecasting methods are ava
 
 3. Figures \@ref(fig:labour) and \@ref(fig:labour2) shows the result of decomposing the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.
 
-    ```{r labour, echo=FALSE, fig.cap="Decomposition of the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.", fig.width=8, fig.height=7}
+    ```{r labour, echo=FALSE, fig.cap="Decomposition of the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.", fig.asp=0.9}
     fit <- stl(labour, robust=TRUE, s.window=11)
     autoplot(fit) + xlab("Year")
     ```

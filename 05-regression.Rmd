@@ -479,7 +479,7 @@ Outliers also occur when some observations are simply different. In this case it
 Figure \@ref(fig:outlier) highlights the effect of a single outlier when regressing US consumption on income (the example introduced in Section \@ref(Regr-Intro)). In the left panel the outlier is only extreme in the direction of $y$ as the percentage change in consumption has been incorrectly recorded as -4%. The red line is the regression line fitted to the data which includes the outlier, compared to the black line which is the line fitted to the data without the outlier. In the right panel the outlier now is also extreme in the direction of $x$ with the 4% decrease in consumption corresponding to a 6% increase in income. In this case the outlier is very influential as the red line now deviates substantially from the black line.
 
 
-```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.height=4, echo=FALSE, message=FALSE,warning=FALSE}
+```{r outlier, fig.cap="The effect of outliers and influential observations on regression", fig.asp=0.47, echo=FALSE, message=FALSE,warning=FALSE}
 yx <- as.data.frame(uschange[,1:2])
 fit1 <- lm(Consumption ~ Income, data=yx)
 
@@ -556,7 +556,7 @@ More often than not, time series data are "non-stationary"; that is, the values 
 For example consider the two variables plotted below in Figure \@ref(fig:spurious). These appear to be related simply because they both trend upwards in the same manner. However, air passenger traffic in Australia has nothing to do with rice production in Guinea.
 
 
-```{r spurious, echo=FALSE, fig.height=5, warning=FALSE, fig.cap="Trending time series data can appear to be related as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE}
+```{r spurious, echo=FALSE, fig.asp=0.6, warning=FALSE, fig.cap="Trending time series data can appear to be related as shown in this example in which air passengers in Australia are regressed against rice production in Guinea.", message=FALSE}
 aussies <- window(ausair, end=2011)
 p1 <- autoplot(aussies) + xlab("Year") + ylab("Air Passengers in Australia")
 p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")

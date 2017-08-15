@@ -12,7 +12,7 @@ Some cases can be confusing --- a time series with cyclic behaviour (but with no
 
 In general, a stationary time series will have no predictable patterns in the long-term. Time plots will show the series to be roughly horizontal (although some cyclic behaviour is possible), with constant variance.
 
-```{r stationary, fig.cap="Which of these series are stationary? (a) Dow Jones index on 292 consecutive days; (b) Daily change in the Dow Jones index on 292 consecutive days; (c) Annual number of strikes in the US; (d) Monthly sales of new one-family houses sold in the US; (e) Annual price of a dozen eggs in the US (constant dollars); (f) Monthly total of pigs slaughtered in Victoria, Australia; (g) Annual total of lynx trapped in the McKenzie River district of north-west Canada; (h) Monthly Australian beer production; (i) Monthly Australian electricity production.", echo=FALSE}
+```{r stationary, fig.cap="Which of these series are stationary? (a) Dow Jones index on 292 consecutive days; (b) Daily change in the Dow Jones index on 292 consecutive days; (c) Annual number of strikes in the US; (d) Monthly sales of new one-family houses sold in the US; (e) Annual price of a dozen eggs in the US (constant dollars); (f) Monthly total of pigs slaughtered in Victoria, Australia; (g) Annual total of lynx trapped in the McKenzie River district of north-west Canada; (h) Monthly Australian beer production; (i) Monthly Australian electricity production.", echo=FALSE, fig.width=10}
 pl <-list()
 pl[[1]] <- autoplot(dj, main = "(a)", xlab = "Day")
 pl[[2]] <- autoplot(diff(dj), main = "(b)", xlab = "Day")
@@ -40,7 +40,7 @@ Transformations such as logarithms can help to stabilize the variance of a time 
 
 As well as looking at the time plot of the data, the ACF plot is also useful for identifying non-stationary time series. For a stationary time series, the ACF will drop to zero relatively quickly, while the ACF of non-stationary data decreases slowly. Also, for non-stationary data, the value of $r_1$ is often large and positive.
 
-```{r acfstationary, fig.cap="The ACF of the Dow-Jones index (left) and of the daily changes in the Dow-Jones index (right).", echo=FALSE, fig.height=3}
+```{r acfstationary, fig.cap="The ACF of the Dow-Jones index (left) and of the daily changes in the Dow-Jones index (right).", echo=FALSE, fig.asp=0.35}
 p1 <- ggAcf(dj)
 p2 <- ggAcf(diff(dj))
 gridExtra::grid.arrange(p1,p2, nrow=1)
@@ -107,7 +107,7 @@ $$
 $$
 Forecasts from this model are equal to the last observation from the relevant season. That is, this model gives seasonal naïve forecasts.
 
-```{r a10diff, fig.cap="Logs and seasonal differences of the A10 (antidiabetic) sales data. The logarithms stabilize the variance, while the seasonal differences remove the seasonality and trend.", fig.height=6}
+```{r a10diff, fig.cap="Logs and seasonal differences of the A10 (antidiabetic) sales data. The logarithms stabilize the variance, while the seasonal differences remove the seasonality and trend.", fig.asp=0.7}
 cbind("Sales ($million)" = a10,
       "Monthly log sales" = log(a10),
       "Annual change in log sales" = diff(log(a10),12)) %>%
@@ -122,7 +122,7 @@ To distinguish seasonal differences from ordinary differences, we sometimes refe
 
 Sometimes it is necessary to do both a seasonal difference and a first difference to obtain stationary data, as is shown in Figure \@ref(fig:usmelec). Here, the data are first transformed using logarithms (second panel), then seasonal differences are calculated (third panel). The data still seem a little non-stationary, and so a further lot of first differences are computed (bottom panel).
 
-```{r usmelec, fig.height=6, fig.cap="Top panel: US net electricity generation (billion kWh). Other panels show the same data after transforming and differencing."}
+```{r usmelec, fig.asp=0.7, fig.cap="Top panel: US net electricity generation (billion kWh). Other panels show the same data after transforming and differencing."}
 cbind("Billion kWh" = usmelec,
       "Logs" = log(usmelec),
       "Seasonally\n differenced logs" = diff(log(usmelec),12),
@@ -239,7 +239,7 @@ where $e_t$ is white noise. This is like a multiple regression but with *lagged 
 
 Autoregressive models are remarkably flexible at handling a wide range of different time series patterns. The two series in Figure \@ref(fig:arp) show series from an AR(1) model and an AR(2) model. Changing the parameters $\phi_1,\dots,\phi_p$ results in different time series patterns. The variance of the error term $e_t$ will only change the scale of the series, not the patterns.
 
-```{r arp, fig.cap="Two examples of data from autoregressive models with different parameters. Left: AR(1) with $y_t = 18 -0.8y_{t-1} + e_t$. Right: AR(2) with $y_t = 8 + 1.3y_{t-1}-0.7y_{t-2}+e_t$. In both cases, $e_t$ is normally distributed white noise with mean zero and variance one.", echo=FALSE, fig.height=3}
+```{r arp, fig.cap="Two examples of data from autoregressive models with different parameters. Left: AR(1) with $y_t = 18 -0.8y_{t-1} + e_t$. Right: AR(2) with $y_t = 8 + 1.3y_{t-1}-0.7y_{t-2}+e_t$. In both cases, $e_t$ is normally distributed white noise with mean zero and variance one.", echo=FALSE, fig.asp=0.35}
 set.seed(1)
 p1 <- autoplot(10 + arima.sim(list(ar = -0.8), n = 100)) +
   ylab("") + ggtitle("AR(1)")
@@ -272,7 +272,7 @@ where $e_t$ is white noise. We refer to this as an **MA($q$) model**. Of course,
 
 Notice that each value of $y_t$ can be thought of as a weighted moving average of the past few forecast errors. However, moving average *models* should not be confused with the moving average *smoothing* we discussed in Chapter \@ref(ch-decomposition). A moving average model is used for forecasting future values, while moving average smoothing is used for estimating the trend-cycle of past values.
 
-```{r maq, fig.cap="Two examples of data from moving average models with different parameters. Left: MA(1) with $y_t = 20 + e_t + 0.8e_{t-1}$. Right: MA(2) with $y_t = e_t- e_{t-1}+0.8e_{t-2}$. In both cases, $e_t$ is normally distributed white noise with mean zero and variance one.", echo=FALSE, fig.height=3}
+```{r maq, fig.cap="Two examples of data from moving average models with different parameters. Left: MA(1) with $y_t = 20 + e_t + 0.8e_{t-1}$. Right: MA(2) with $y_t = e_t- e_{t-1}+0.8e_{t-2}$. In both cases, $e_t$ is normally distributed white noise with mean zero and variance one.", echo=FALSE, fig.asp=0.35}
 set.seed(2)
 p1 <- autoplot(20 + arima.sim(list(ma = 0.8), n = 100)) +
   ylab("") + ggtitle("MA(1)")
@@ -426,11 +426,11 @@ To overcome this problem, we can use **partial autocorrelations**. These measure
 
 Figures \@ref(fig:usconsumptionacf) and \@ref(fig:usconsumptionpacf) shows the ACF and PACF plots for the US consumption data shown in Figure \@ref(fig:usconsumption). The partial autocorrelations have the same critical values of $\pm 1.96/\sqrt{T}$ as for ordinary autocorrelations, and these are typically shown on the plot as in Figure \@ref(fig:usconsumptionacf).
 
-```{r usconsumptionacf, fig.cap="ACF of quarterly percentage change in US consumption. A convenient way to produce a time plot, ACF plot and PACF plot in one command is to use the `ggtsdisplay` function in R.", fig.height=3}
+```{r usconsumptionacf, fig.cap="ACF of quarterly percentage change in US consumption. A convenient way to produce a time plot, ACF plot and PACF plot in one command is to use the `ggtsdisplay` function in R.", fig.asp=0.35}
 ggAcf(uschange[,"Consumption"],main="")
 ```
 
-```{r usconsumptionpacf, fig.cap="PACF of quarterly percentage change in US consumption.", fig.height=3}
+```{r usconsumptionpacf, fig.cap="PACF of quarterly percentage change in US consumption.", fig.asp=0.35}
 ggPacf(uschange[,"Consumption"],main="")
 ```
 
@@ -952,7 +952,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
 
     (a) Explain the differences among these figures. Do they all indicate that the data are white noise?
 
-    ```{r wnacfplus, fig.height=3, echo=FALSE, fig.cap="Left: ACF for a white noise series of 36 numbers. Middle: ACF for a white noise series of 360 numbers. Right: ACF for a white noise series of 1,000 numbers."}
+    ```{r wnacfplus, fig.asp=0.4, echo=FALSE, fig.cap="Left: ACF for a white noise series of 36 numbers. Middle: ACF for a white noise series of 360 numbers. Right: ACF for a white noise series of 1,000 numbers."}
     x1 <- rnorm(36)
     x2 <- rnorm(360)
     x3 <- rnorm(1000)

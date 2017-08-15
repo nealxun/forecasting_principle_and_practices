@@ -156,7 +156,7 @@ A number of different unit root tests are available, which are based on differen
 
 One of the most popular tests is the *Augmented Dickey-Fuller (ADF) test*. For this test, the following regression model is estimated:
 $$
-  y'_t = \phi y_{t-1} + \beta_1 y'_{t-1} + \beta_2 y'_{t-2} + \cdots + \beta_k y'_{t-k},
+  y'_t = \alpha + \beta t + \phi y_{t-1} + \gamma_1 y'_{t-1} + \gamma_2 y'_{t-2} + \cdots + \gamma_k y'_{t-k},
 $$
 where $y'_t$ denotes the first-differenced series, $y'_t=y_t-y_{t-1}$. and $k$ is the number of lags to include in the regression (often set to be about 3). If the original series, $y_t$, needs differencing, then the coefficient $\hat\phi$ should be approximately zero. If $y_t$ is already stationary, then $\hat{\phi}<0$. The usual hypothesis tests for regression coefficients do not work when the data are non-stationary, but the test can be carried out using the following R function from the `tseries` package.
 

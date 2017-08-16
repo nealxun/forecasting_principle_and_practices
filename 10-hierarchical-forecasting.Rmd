@@ -709,8 +709,11 @@ plot(fcsts,levels = 6, color_lab=TRUE)
 title(main = "Grouped by leagal status and gender")
 plot(fcsts,levels = 7, color_lab=TRUE)
 ```
-The `accuracy.gts` can be used to  
-```{r }
+`accuracy.gts` is a useful command that can be used to evaluate the forecast accuracy across hierarchical or grouped structures. The following table summarises the accuracy of the bottom-up and the optimal reconciliation approaches forecasting the test period 2015 Q1 to 2016 Q4. As the optimal reconciliation approach uses information from all levels in the structure we find that in general it generates more accurate coherent forecasts than the other tradiitonal alternatives which use limited information. 
+
+In the case e.  the bottom-up approach especially at levels above the bottom-level. In this case it imporves on the bottom-up 
+
+```{r tblprison,tbl.cap="Coherent forecasts for the Australian adult prison population grouped by all interactions of attributes."}
 train <- window(prison.gts,end=c(2014,4))
 test <- window(prison.gts,start=2015)
 

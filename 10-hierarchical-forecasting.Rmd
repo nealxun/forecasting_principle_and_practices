@@ -750,11 +750,8 @@ knitr::kable(tab, digits=2, booktabs=TRUE)
 
 1. Write out the $\bm{S}$ matrices for the Australian tourism hierarchy and the Australian prison grouped structure. Use the `smatrix` command to verify your answers. 
 
-2. An important result is that if we start with a set of unbiased based forecasts, i.e., $E(\hat{\bm{y}}_h)=SE(\bm{y}_{K,T+h})$ we want the resulting coherent forecasts that also unbiased, i.e., $E(\tilde{\bm{y}}_h)=E(\hat{\bm{y}}_{T+h})$. 
+2. Assume that a set of based forecasts are unbiased, i.e., $E(\hat{\bm{y}}_h)=\bm{S}E(\bm{y}_{K,T+h})$. A set of coherent forecasts will also unbiased iff  $\bm{S}\bm{P}\bm{S}=\bm{S}$. In this case $E(\tilde{\bm{y}}_h)=\bm{S}\bm{P}\bm{S}E(\bm{y}_{K,T+h})=\bm{S}E(\bm{y}_{K,T+h})$. Show that this is true for the bottom-up and optimal reconciliation approaches but not for any top-down or middle-out approaches.
 
-assuming that if yiou you start of with a set of forecasts that are unbiased, Show that $\bm{S}\bm{P}\bm{S}=\bm{S}$ for bottom-up and optimal reconciliation approach but not for any top-down approach.
-
-
-2. Generate forecasts from the bottom up approach for the tourism data. Plot the forecatsts and comment on there nature. Play with the window.
+2. Generate forecasts from the bottom up-approach for the tourism data. Plot the forecatsts and comment on theire nature. Play with the window.
 
 2. Set as training set and test set and compare the forecast accuracy of bu v opt. 

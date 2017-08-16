@@ -141,10 +141,11 @@ bts <- ts(bts, start = 1998, frequency = 4)
 # bts<-window(bts,start=c(2008,2))
 # tourism.hts <- hts(bts, nodes=list(4,c(5, 4, 5, 2)))
 
+require(hts)
+
 tourism.hts <- hts(bts, characters = c(3, 5))
 
 
-require(ggplot2)
 
 # Top Level
 tourismL0 <- aggts(tourism.hts, levels = 0)
@@ -217,13 +218,12 @@ plotsL2[[6]]
 
 fcsts<-forecast.gts(tourism.hts,h=8,method="bu",fmethod = "ets")
 
-
-plot(fcsts$nodes,levels = 0)
+plot(fcsts,levels = 0)
 plot(fcsts,levels = 1)
 plot(fcsts,levels = 2)
 
 
-autoplot(aggts(tmp,levels=0))
+
 
 h <- 12
 ally <- aggts(htseg1)

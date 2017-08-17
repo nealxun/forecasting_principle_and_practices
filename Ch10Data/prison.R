@@ -286,7 +286,7 @@ fcsts.bu = forecast(train, h = 8, method = "bu", fmethod = "ets")
 
 tab <- matrix(NA,ncol=4,nrow=6)
 rownames(tab) <- c("Total", "State", "Legal status", "Gender","Bottom", "All series")
-colnames(tab) <- c("MAPE","MASE","MAPE","MASE")
+colnames(tab) <- c("Bottom-up MAPE","Bottom-up MASE","Optimal MAPE","Optimal MASE")
 
 tab[1,] <-c(accuracy.gts(fcsts.bu,test,levels = 0)[c("MAPE","MASE"),"Total"],
             accuracy.gts(fcsts.opt,test,levels = 0)[c("MAPE","MASE"),"Total"])

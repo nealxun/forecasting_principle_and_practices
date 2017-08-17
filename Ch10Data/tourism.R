@@ -135,13 +135,14 @@ chk <- tourism[, 3:ncol(tourism)]
 bts <- ts(apply(chk, 2, function(x) aggregate(ts(x, start = 1998, frequency = 12), nfrequency = 4)), start = 1998, frequency = 4)
 
 #write.csv(bts, "vn2.csv",row.names = FALSE)
+
+require(hts)
+require(fpp2)
 bts <- read.csv("vn2.csv")
 bts <- ts(bts, start = 1998, frequency = 4)
 
 # bts<-window(bts,start=c(2008,2))
 # tourism.hts <- hts(bts, nodes=list(4,c(5, 4, 5, 2)))
-
-require(hts)
 
 tourism.hts <- hts(bts, characters = c(3, 5))
 
@@ -216,24 +217,102 @@ plotsL2[[4]]
 plotsL2[[5]]
 plotsL2[[6]]
 
-fcsts<-forecast.gts(tourism.hts,h=8,method="bu",fmethod = "ets")
-
-plot(fcsts,levels = 0)
-plot(fcsts,levels = 1)
-plot(fcsts,levels = 2)
 
 
+fcsts.bu<-forecast.gts(tourism.hts,h=8,method="bu",fmethod = "arima")
+plot(fcsts.bu,levels = 0,include=40)
+plot(fcsts.bu,levels = 1,include=40)
+plot(fcsts.bu,levels = 2,include=40)
+
+autoplot(allts(fcsts.bu)[,1])+
+  geom_point()
+
+# no trend in the forecasts although the top level historical
+# series shows growth over the last few years
+
+fit <-auto.arima(allts(tourism.hts)[,1])
+autoplot(forecast(fit,h=8))
+
+# The arima model fittd at the top series includes
+# drift - hence forecasting at the top level alone
+# we would get upward trending forecasts
+
+fcsts.comb<-forecast.gts(tourism.hts,h=8,method="comb",fmethod = "arima")
+plot(fcsts.comb,levels = 0,include=40)
+plot(fcsts.comb,levels = 1,include=40)
+plot(fcsts.comb,levels = 2,include=40)
 
 
-h <- 12
-ally <- aggts(htseg1)
+autoplot(allts(fcsts.comb)[,1])+
+  geom_point()+
+  autolayer(allts(fcsts.bu)[,1],series = "BU")
+
+autoplot(allts(fcsts.comb)[,2:7])+
+  geom_point()+
+  autolayer(allts(fcsts.bu)[,2:7])
+
+
+autoplot(allts(fcsts.comb)[,1])+
+  geom_point()+
+  forecast::autolayer(allts(fcsts.bu)[,1], series="BU")+
+  forecast::autolayer(f.arima,PI=FALSE, series="ets")
+
+
+h <- 8
+ally <- aggts(tourism.hts)
 allf <- matrix(NA, nrow = h, ncol = ncol(ally))
 for(i in 1:ncol(ally))
   allf[,i] <- forecast(auto.arima(ally[,i]), h = h)$mean
-allf <- ts(allf, start = 51)
-y.f <- combinef(allf, get_nodes(htseg1), weights = NULL, keep = "gts", algorithms = "lu")
-plot(y.f)
+allf <- ts(allf, start = 2017, frequency = 4)
+fcsts.arima <- combinef(allf, get_nodes(tourism.hts), weights = NULL, keep = "gts", algorithms = "lu")
+plot(fcsts.arima,levels = 0)
 
+autoplot(allts(fcsts.comb)[,1])+
+  geom_point()+
+  forecast::autolayer(allts(fcsts.bu)[,1], series="BU")+
+  forecast::autolayer(allts(fcsts.arima)[,1], series="arima")
+
+autoplot(allts(fcsts.comb)[,2:7])+
+  geom_point()+
+  autolayer(allts(fcsts.bu)[,2:7])+
+  autolayer(allts(fcsts.arima)[,2:7])
+
+
+train <- window(tourism.hts,end=c(2014,4))
+test <- window(tourism.hts,start=2015)
+
+
+fcsts.opt = forecast(train, h = 8, method = "comb", weights = "mint", fmethod = "arima")
+fcsts.td = forecast(train, h = 8, method = "tdfp", fmethod = "arima")
+fcsts.bu = forecast(train, h = 8, method = "bu", fmethod = "arima")
+
+plot(fcsts.td)
+
+tab <- matrix(NA,ncol=6,nrow=4)
+rownames(tab) <- c("Total", "State", "Zones","All series")
+colnames(tab) <- c("BU MAPE","BU MASE","TD MAPE","TD MASE","Opt MAPE","Opt MASE")
+
+tab[1,] <-c(accuracy.gts(fcsts.bu,test,levels = 0)[c("MAPE","MASE"),"Total"],
+            accuracy.gts(fcsts.td,test,levels = 0)[c("MAPE","MASE"),"Total"],
+            accuracy.gts(fcsts.opt,test,levels = 0)[c("MAPE","MASE"),"Total"])
+
+j=2
+for(i in c(1:2)){
+  tab[j,] <-c(mean(accuracy.gts(fcsts.bu,test,levels = i)["MAPE",]),
+              mean(accuracy.gts(fcsts.bu,test,levels = i)["MASE",]),
+              mean(accuracy.gts(fcsts.td,test,levels = i)["MAPE",]),
+              mean(accuracy.gts(fcsts.td,test,levels = i)["MASE",]),
+              mean(accuracy.gts(fcsts.opt,test,levels = i)["MAPE",]),
+              mean(accuracy.gts(fcsts.opt,test,levels = i)["MASE",]))
+  j=j+1
+}
+
+tab[4,] <-c(mean(accuracy.gts(fcsts.bu,test)["MAPE",]),
+            mean(accuracy.gts(fcsts.bu,test)["MASE",]),
+            mean(accuracy.gts(fcsts.td,test)["MAPE",]),
+            mean(accuracy.gts(fcsts.td,test)["MASE",]),
+            mean(accuracy.gts(fcsts.opt,test)["MAPE",]),
+            mean(accuracy.gts(fcsts.opt,test)["MASE",]))
 
 
 

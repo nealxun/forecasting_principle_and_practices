@@ -750,8 +750,18 @@ knitr::kable(tab, digits=2, booktabs=TRUE)
 
 1. Write out the $\bm{S}$ matrices for the Australian tourism hierarchy and the Australian prison grouped structure. Use the `smatrix` command to verify your answers. 
 
-2. Assume that a set of based forecasts are unbiased, i.e., $E(\hat{\bm{y}}_h)=\bm{S}E(\bm{y}_{K,T+h})$. A set of coherent forecasts will also unbiased iff  $\bm{S}\bm{P}\bm{S}=\bm{S}$. In this case $E(\tilde{\bm{y}}_h)=\bm{S}\bm{P}\bm{S}E(\bm{y}_{K,T+h})=\bm{S}E(\bm{y}_{K,T+h})$. Show that this is true for the bottom-up and optimal reconciliation approaches but not for any top-down or middle-out approaches.
+2. Assume that a set of base forecasts are unbiased, i.e., $E(\hat{\bm{y}}_h)=\bm{S}E(\bm{y}_{K,T+h})$. A set of coherent forecasts will also unbiased iff  $\bm{S}\bm{P}\bm{S}=\bm{S}$. In this case $E(\tilde{\bm{y}}_h)=\bm{S}\bm{P}\bm{S}E(\hat{\bm{y}}_h)=\bm{S}E(\bm{y}_{K,T+h})$. Show that this is true for the bottom-up and optimal reconciliation approaches but not for any top-down or middle-out approaches.
 
-2. Generate forecasts from the bottom up-approach for the tourism data. Plot the forecatsts and comment on theire nature. Play with the window.
+3. Generate 8-step-ahead bottom-up forecasts using arima models for the `vn2` Australian domestic tourism data. Plot the coherent forecatsts by level and comment on their nature. Are you satisfied with these forecasts?
 
-2. Set as training set and test set and compare the forecast accuracy of bu v opt. 
+4. Model the aggregate series for Australian domestic tourism data `vn2` using an arima model. Comment on the model. Generate and plot 8-step-ahead forecasts from the arima model and compare these with the bottom-up forecasts generated in question 3 for the aggregate level. 
+
+5. Generate 8-step-ahead optimally reconciled coherent forecasts using arima base forecasts for the `vn2` Australian domestic tourism data. Plot the coherent forecatsts by level and comment on their nature. How and why are these different to the bottom-up forecasts generated in question 3 above. 
+
+6. Define as a test-set the last two years of the `vn2` Australian domestic tourism data. Generate, bottom-up, top-down and optimally reconciled forecasts for this period and compare their forecasts accuracy. 
+
+## Further reading
+
+@HynAth2014, @AthEtAl2009 and @GroSoh1990 provide a good introduction to this framework. @Mint procides the latest develpoments in terms of the optimal reconciliation approach. @AthEtAl2017 expands using this framework in the time dimension with temporal hierarchies. 
+  
+

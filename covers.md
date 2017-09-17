@@ -8,7 +8,7 @@ Forecasting is required in many situations. Deciding whether to build another po
 
 This textbook provides a comprehensive introduction to forecasting methods and presents enough information about each method for readers to use them sensibly. Examples use R with many data sets taken from the authors' own consulting experience.
 
-In this second edition, all chapters have been updated to cover the latest research and forecasting methods. Three new chapters have been added on dynamic regression forecasting, hierarchical forecasting and practical forecasting issues. The latest version of the book is freely available online at http://OTexts.org/fpp
+In this second edition, all chapters have been updated to cover the latest research and forecasting methods. Three new chapters have been added on dynamic regression forecasting, hierarchical forecasting and practical forecasting issues. The latest version of the book is freely available online at http://OTexts.org/fpp2/
 
 # About the authors:
 

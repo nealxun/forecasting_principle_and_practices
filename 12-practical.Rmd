@@ -1,0 +1,26 @@
+# Some practical forecasting issues {#ch-practical}
+
+In this final chapter, we address many practical issues that arise in forecasting, and discuss some possible solutions.
+
+## Weekly, daily and sub-daily data
+
+## Time series of counts
+
+## Ensuring forecasts stay within limits
+
+## Forecast combinations {#sec-combinations}
+
+## Prediction intervals for aggregates
+
+## Backcasting
+
+## Forecasting very short and very long time series
+
+## Out-of-sample one-step forecasts
+
+## In-sample multi-step forecasts
+
+## Dealing with missing values and outliers
+
+## Bootstrapping and bagging
+

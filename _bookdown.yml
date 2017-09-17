@@ -13,6 +13,7 @@ rmd_files: ["index.Rmd"
  ,"09-dynamic-regression.Rmd"
  ,"10-hierarchical-forecasting.Rmd"
  ,"11-advanced.Rmd"
+ ,"12-practical.Rmd"
  ,"UsingR.Rmd"
  ,"references.Rmd"
 ]

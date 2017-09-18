@@ -1,6 +1,6 @@
 Use the slider below to see the effect of varying $\lambda$ to transform Australian monthly electricity demand:
 
 ```{r BoxCoxShiny, echo=FALSE}
-knitr::include_app("https://robjhyndman.shinyapps.io/BoxCox/",
+knitr::include_app("https://ebsmonash.shinyapps.io/BoxCox/",
   height = "650px")
 ```

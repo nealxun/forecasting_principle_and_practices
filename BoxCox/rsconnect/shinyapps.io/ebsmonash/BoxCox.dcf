@@ -1,0 +1,12 @@
+name: BoxCox
+title: BoxCox
+username:
+account: ebsmonash
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 216282
+bundleId: 986849
+url: https://ebsmonash.shinyapps.io/BoxCox/
+when: 1505771358.95333
+asMultiple: FALSE
+asStatic: FALSE

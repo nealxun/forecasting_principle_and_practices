@@ -371,7 +371,7 @@ autoplot(fit) +
   ggtitle("SEATS decomposition of electrical equipment index")
 ```
 
-The result is quite similar to the X11 decompsotion shown in Figure \@ref(fig:x11).
+The result is quite similar to the X11 decomposition shown in Figure \@ref(fig:x11).
 
 As with the X11 method, we  can use the  `seasonal()`,  `trendcycle()` and `remainder()` functions to extract the individual components, and `seasadj()` to compute the seasonally adjusted time series.
 

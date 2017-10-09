@@ -472,7 +472,7 @@ As well as the naïve method, several other possible forecasting methods are ava
 3. Recall your retail time series data  (from Exercise 1 in Section \@ref(ex:graphics)).
    Decompose the series using X11. Does it reveal any outliers, or unusual features that you had not noticed previously?
 
-3. Figures \@ref(fig:labour) and \@ref(fig:labour2) shows the result of decomposing the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.
+4. Figures \@ref(fig:labour) and \@ref(fig:labour2) shows the result of decomposing the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.
 
     ```{r labour, echo=FALSE, fig.cap="Decomposition of the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.", fig.asp=0.9}
     fit <- stl(labour, robust=TRUE, s.window=11)
@@ -492,7 +492,7 @@ As well as the naïve method, several other possible forecasting methods are ava
     c. Compare the results with those obtained using SEATS and X11. How are they different?
 
 
-4. We will use the `bricksq` data (Australian quarterly clay brick production. 1956--1994) for this exercise.
+6. We will use the `bricksq` data (Australian quarterly clay brick production. 1956--1994) for this exercise.
     a. Use an STL decomposition to calculate the trend-cycle and seasonal indices. (Experiment with having fixed or changing seasonality.)
     b. Compute and plot the seasonally adjusted data.
     c. Use a naïve method to produce forecasts of the seasonally adjusted data.
@@ -501,9 +501,9 @@ As well as the naïve method, several other possible forecasting methods are ava
     f. Repeat with a robust STL decomposition. Does it make much difference?
     g. Compare forecasts from `stlf` with those from `snaive`, using a test set comprising the last 2 years of data. Which is better?
 
-6. Use `stlf` to produce forecasts of the `writing` series with either `method="naive"` or `method="rwdrift"`, whichever is most appropriate. Use the `lambda` argument if you think a Box-Cox transformation is required.
+7. Use `stlf` to produce forecasts of the `writing` series with either `method="naive"` or `method="rwdrift"`, whichever is most appropriate. Use the `lambda` argument if you think a Box-Cox transformation is required.
 
-7. Use `stlf` to produce forecasts of the `fancy` series with either `method="naive"` or `method="rwdrift"`, whichever is most appropriate. Use the `lambda` argument if you think a Box-Cox transformation is required.
+8. Use `stlf` to produce forecasts of the `fancy` series with either `method="naive"` or `method="rwdrift"`, whichever is most appropriate. Use the `lambda` argument if you think a Box-Cox transformation is required.
 
 ## Further reading
 

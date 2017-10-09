@@ -23,3 +23,4 @@ fpp_cache/*
 fpp_files/*
 fpp.Rmd
 public/*
+*.bak

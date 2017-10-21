@@ -1,0 +1,74 @@
+---
+title: "Seasonal ARIMA models"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+
+##Seasonal ARIMA models
+
+\begin{block}{}\centering
+\begin{tabular}{rcc}
+ARIMA & \(~\underbrace{(p, d, q)}\) &
+\(\underbrace{(P, D, Q)_{m}}\)\tabularnewline
+& \({\uparrow}\) & \({\uparrow}\)\tabularnewline
+& Non-seasonal part & Seasonal part of\tabularnewline
+& of the model & of the model\tabularnewline
+\end{tabular}
+\end{block}
+
+ * $p=$ number of ordinary AR lags ($y_{t-1},y_{t-2},\dots,y_{t-p}$)
+ * $d=$ number of lag-1 differences
+ * $q=$ number of ordinary MA lags ($\varepsilon_{t-1},\varepsilon_{t-2},\dots,\varepsilon_{t-q}$)
+ * $P=$ number of seasonal AR lags ($y_{t-m},y_{t-2m},\dots,y_{t-Pm}$)
+ * $D=$ number of seasonal differences
+ * $Q=$ number of seasonal AR lags ($\varepsilon_{t-m},\varepsilon_{t-2m}\dots,\varepsilon_{t-Qm}$)
+ * $m=$ number of observations per year.
+
+\pause
+
+###
+A seasonal ARIMA model is non-linear
+
+## Example: Monthly retail debit card usage in Iceland
+
+```r
+autoplot(debitcards) +
+  xlab("Year") + ylab("million ISK") +
+  ggtitle("Retail debit card usage in Iceland")
+```
+
+```{r, cache=TRUE, echo=FALSE, message=FALSE}
+autoplot(debitcards) +
+  xlab("Year") + ylab("million ISK") +
+  ggtitle("Retail debit card usage in Iceland") +
+  scale_x_continuous(breaks=seq(2000,2015,by=5),
+    minor_breaks=2000:2020)
+```
+
+## Example: Monthly retail debit card usage in Iceland
+
+```{r, cache=TRUE, echo=TRUE}
+fit <- auto.arima(debitcards, lambda = 0)
+fit
+```
+
+## Example: Monthly retail debit card usage in Iceland
+
+```{r, echo=TRUE}
+fit %>% forecast(h=36) %>% autoplot() + xlab("Year")
+```
+

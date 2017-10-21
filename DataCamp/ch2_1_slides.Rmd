@@ -1,0 +1,146 @@
+---
+title: "Forecasts and potential futures"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+## Sample futures
+
+```{r austa, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
+fit <- ets(austa)
+df <- cbind(austa, simulate(fit,10))
+for(i in seq(99))
+  df <- cbind(df, simulate(fit,10))
+colnames(df) <- c("Data", paste("Future",1:100))
+set.seed(1)
+cols <- scale_colour_manual(values=c('#000000',rainbow(5)[-2],sample(rainbow(95))),
+                     breaks=c("Data",paste("Future",1:100)),
+                     name=" ")
+```
+
+```{r austa0, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(austa) +
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Total international visitors to Australia") +
+  ylim(.85,10.0) + xlim(1981,2025)
+```
+
+## Sample futures
+
+```{r austa1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(df[,1:2]) +
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Total international visitors to Australia") +
+  cols + ylim(.85,10.0) + xlim(1981,2025) +
+  theme(legend.position="none")
+```
+
+
+## Sample futures
+
+```{r austa2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(df[,1:3]) +
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Total international visitors to Australia") +
+  cols + ylim(.85,10.0) + xlim(1981,2025) +
+  theme(legend.position="none")
+```
+
+## Sample futures
+
+```{r austa3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(df[,1:4]) +
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Total international visitors to Australia") +
+  cols + ylim(.85,10.0) + xlim(1981,2025) +
+  theme(legend.position="none")
+```
+
+## Sample futures
+
+```{r austa4, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(df[,1:5]) +
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Total international visitors to Australia") +
+  cols + ylim(.85,10.0) + xlim(1981,2025) +
+  theme(legend.position="none")
+```
+
+## Sample futures
+
+```{r austa5, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(df[,1:6]) +
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Total international visitors to Australia") +
+  cols + ylim(.85,10.0) + xlim(1981,2025) +
+  theme(legend.position="none")
+```
+
+## Sample futures
+
+```{r austa15, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(df[,1:15]) +
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Total international visitors to Australia") +
+  cols + ylim(.85,10.0) + xlim(1981,2025) +
+  theme(legend.position="none")
+```
+
+## Sample futures
+
+```{r austa100, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(df[,1:100]) +
+  ylim(min(austa),10) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Total international visitors to Australia") +
+  cols + ylim(.85,10.0) + xlim(1981,2025) +
+  theme(legend.position="none")
+```
+
+
+## Forecast intervals
+
+```{r austapi, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(forecast(fit)) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Forecasts of total international visitors to Australia") +
+  ylim(0.85,10.0) + xlim(1981,2025) +
+  theme(legend.position="none")
+```
+
+## Forecast intervals
+
+\fontsize{10}{11}\sf
+
+```{r austapi2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+autoplot(forecast(fit)) +
+  ylab("Millions of visitors") + xlab("Year") +
+  ggtitle("Forecasts of total international visitors to Australia") +
+  ylim(0.85,10.0) + xlim(1981,2025)
+```
+
+* The 80% forecast intervals should contain 80% of the future observations.
+* The 95% forecast intervals should contain 95% of the future observations.
+
+##
+\centering\Large\bfseries
+Time to start forecasting!

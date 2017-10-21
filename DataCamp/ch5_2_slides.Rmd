@@ -1,0 +1,166 @@
+---
+title: "Dynamic harmonic regression"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+##Dynamic harmonic regression
+
+Periodic seasonality can be handled using pairs of Fourier terms:
+$$
+s_{k}(t) = \sin\left(\frac{2\pi k t}{m}\right)\qquad c_{k}(t) = \cos\left(\frac{2\pi k t}{m}\right)
+$$
+
+\begin{block}{}
+$$
+y_t = \beta_0 + \sum_{k=1}^K \left[\alpha_k s_k(t) + \gamma_k c_k(t)\right] + e_t$$
+\end{block}
+
+  * $m=$ seasonal period.
+  * Every periodic function can be approximated by sums of sin and cos terms for large enough $K$.
+  * Regression coefficients: $\alpha_k$ and $\gamma_k$.
+  * $e_t$ can be modelled as a non-seasonal ARIMA process.
+  * Assumes seasonal pattern is unchanging.
+
+##Example: Australian cafe expenditure
+\fontsize{10}{13}\sf
+
+```{r, echo=FALSE}
+cafe <- window(auscafe, start=2005)
+```
+
+```r
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=1),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=1, h=24)) %>%
+  autoplot() + ylim(1.6,5.1)
+```
+
+```{r, echo=FALSE}
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=1),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=1, h=24)) %>%
+  autoplot() + ylim(1.6,5.1) +
+  xlab(paste("K=",1,"   AICC=",round(fit$aicc,2)))
+```
+
+##Example: Australian cafe expenditure
+\fontsize{10}{13}\sf
+
+```r
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=2),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=2, h=24)) %>%
+  autoplot() + ylim(1.6,5.1)
+```
+
+```{r, echo=FALSE}
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=2),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=2, h=24)) %>%
+  autoplot() + ylim(1.6,5.1) +
+  xlab(paste("K=",2,"   AICC=",round(fit$aicc,2)))
+```
+
+##Example: Australian cafe expenditure
+\fontsize{10}{13}\sf
+
+```r
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=3),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=3, h=24)) %>%
+  autoplot() + ylim(1.6,5.1)
+```
+
+```{r, echo=FALSE}
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=3),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=3, h=24)) %>%
+  autoplot() + ylim(1.6,5.1) +
+  xlab(paste("K=",3,"   AICC=",round(fit$aicc,2)))
+```
+
+##Example: Australian cafe expenditure
+\fontsize{10}{13}\sf
+
+```r
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=4),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=4, h=24)) %>%
+  autoplot() + ylim(1.6,5.1)
+```
+
+```{r, echo=FALSE}
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=4),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=4, h=24)) %>%
+  autoplot() + ylim(1.6,5.1) +
+  xlab(paste("K=",4,"   AICC=",round(fit$aicc,2)))
+```
+
+
+##Example: Australian cafe expenditure
+\fontsize{10}{13}\sf
+
+```r
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=5),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=5, h=24)) %>%
+  autoplot() + ylim(1.6,5.1)
+```
+
+```{r, echo=FALSE}
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=5),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=5, h=24)) %>%
+  autoplot() + ylim(1.6,5.1) +
+  xlab(paste("K=",5,"   AICC=",round(fit$aicc,2)))
+```
+
+
+##Example: Australian cafe expenditure
+\fontsize{10}{13}\sf
+
+```r
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=6),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=6, h=24)) %>%
+  autoplot() + ylim(1.6,5.1)
+```
+
+```{r, echo=FALSE}
+fit <- auto.arima(cafe, xreg=fourier(cafe, K=6),
+                  seasonal=FALSE, lambda=0)
+fit %>% forecast(xreg=fourier(cafe, K=6, h=24)) %>%
+  autoplot() + ylim(1.6,5.1) +
+  xlab(paste("K=",6,"   AICC=",round(fit$aicc,2)))
+```
+
+
+##Dynamic harmonic regression
+
+
+\begin{block}{}
+$$
+y_t = \beta_0 + \beta_1x_{t,1} + \dots + \beta_{t,r} x_{t,r}+ \sum_{k=1}^K \left[\alpha_k s_k(t) + \gamma_k c_k(t)\right] + e_t$$
+\end{block}
+
+
+* Other predictor variables can be added as well ($x_{t,1},\dots,x_{t,r}$)
+* This is particularly useful for weekly data, daily data and sub-daily data.
+* Choose $K$ to minimize the AICc.
+* $K$ can not be more than $m/2$.
+

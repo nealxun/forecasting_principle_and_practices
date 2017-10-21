@@ -1,0 +1,118 @@
+---
+title: "Transformations for variance stabilization"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+
+##Variance stabilization
+
+If the data show increasing variation as the level of the series increases, then a transformation can be useful.
+
+Denote original observations as $y_1,\dots,y_n$ and transformed
+observations as $w_1, \dots, w_n$.
+
+\begin{block}{\footnotesize Mathematical transformations for stabilizing
+variation}
+\begin{tabular}{llc}
+Square root & $w_t = \sqrt{y_t}$ & $\downarrow$ \\[0.2cm]
+Cube root & $w_t = \sqrt[3]{y_t}$ & Increasing \\[0.2cm]
+Logarithm & $w_t = \log(y_t)$  & strength \\[0.2cm]
+Inverse   & $w_t = -1/y_t$& $\downarrow$
+\end{tabular}
+\end{block}
+\pause
+
+Logarithms are useful because they are more interpretable:
+changes in a log value are **relative (percent) changes on the original
+scale.**
+
+##Variance stabilization
+
+```{r, echo=TRUE}
+autoplot(usmelec) +
+  xlab("Year") + ylab("") +
+  ggtitle("US monthly net electricity generation")
+```
+
+##Variance stabilization
+
+```{r, echo=TRUE}
+autoplot(usmelec^0.5) +
+  xlab("Year") + ylab("") +
+  ggtitle("Square root electricity generation")
+```
+
+##Variance stabilization
+
+```{r, echo=TRUE}
+autoplot(usmelec^0.33333) +
+  xlab("Year") + ylab("") +
+  ggtitle("Cube root electricity generation")
+```
+
+##Variance stabilization
+
+```{r, echo=TRUE}
+autoplot(log(usmelec)) +
+  xlab("Year") + ylab("") +
+  ggtitle("Log electricity generation")
+```
+
+##Variance stabilization
+
+```{r, echo=TRUE}
+autoplot(-1/usmelec) +
+  xlab("Year") + ylab("") +
+  ggtitle("Inverse electricity generation")
+```
+
+##Box-Cox transformations
+
+Each of these transformations is close to a member of the
+family of \textbf{Box-Cox transformations}:
+$$w_t = \left\{\begin{array}{ll}
+        \log(y_t),      & \quad \lambda = 0; \\
+        (y_t^\lambda-1)/\lambda ,         & \quad \lambda \ne 0.
+\end{array}\right.
+$$\pause
+
+* $\lambda=1$: No substantive transformation
+* $\lambda=\frac12$: Square root plus linear transformation
+* $\lambda=\frac13$: Cube root plus linear transformation
+* $\lambda=0$: Natural logarithm
+* $\lambda=-1$: Inverse transformation
+
+\pause
+
+
+###Automated Box-Cox transformations
+
+```{r, echo=TRUE}
+(BoxCox.lambda(usmelec))
+```
+
+
+##Back-transformation
+
+\fontsize{10}{13}\sf
+
+```{r,echo=TRUE}
+usmelec %>%
+  ets(lambda=-0.57) %>%
+  forecast(h=60) %>%
+  autoplot()
+```
+

@@ -1,0 +1,79 @@
+---
+title: "Trends, seasonality and cyclicity"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+
+## Time series patterns
+
+\begin{tabular}{lp{9cm}}
+\bf\alert{Trend}    & a pattern exists involving a long-term increase or decrease in the data.\\
+\bf\alert{Seasonal} & a periodic pattern exists due to the calendar\\
+                    & (e.g., the quarter, the month, or day of the week).\\
+\bf\alert{Cyclic}   & a pattern exists where the data exhibits rises and falls that are \emph{not of fixed period} (duration usually of at least 2 years).
+\end{tabular}
+
+
+## Examples of time series patterns
+
+```{r, message=FALSE}
+autoplot(window(elec, start=1980)) +
+  ggtitle("Australian electricity production") +
+  xlab("Year") + ylab("GWh") +
+  scale_x_continuous(breaks=seq(1980,1995,by=5),
+                     minor_breaks=1980:1999)
+```
+
+## Examples of time series patterns
+
+```{r}
+autoplot(bricksq) +
+  ggtitle("Australian clay brick production") +
+  xlab("Year") + ylab("million units")
+```
+
+## Examples of time series patterns
+
+```{r}
+autoplot(ustreas) +
+  ggtitle("US Treasury bill contracts") +
+  xlab("Day") + ylab("price")
+```
+
+## Examples of time series patterns
+
+```{r}
+autoplot(lynx) +
+  ggtitle("Annual Canadian lynx trappings") +
+  xlab("Year") + ylab("Number trapped")
+```
+
+## Seasonal or cyclic?
+
+**Differences between seasonal and cyclic patterns:**
+
+ * seasonal pattern constant length; cyclic pattern variable length
+ * average length of cycle longer than length of seasonal pattern
+ * magnitude of cycle more variable than magnitude of seasonal pattern
+
+\pause
+
+###
+The timing of peaks and troughs is predictable with seasonal data,
+
+but unpredictable in the long term with cyclic data.
+

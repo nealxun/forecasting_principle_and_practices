@@ -1,0 +1,55 @@
+---
+title: "State space models for exponential smoothing"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+##ETS models
+
+   * Each exponential smoothing method can be written as an "innovations state space model" in two ways.
+   * ETS(Error, Trend, Seasonal):
+      * Error $=\{$A,M$\}$
+      * Trend $=\{$N,A,A\damped$\}$
+      * Seasonal $=\{$N,A,M$\}$.
+  * All parameters can be estimated using the "likelihood":  the probability of the data arising from the specified model.
+  * For models with additive errors, this is equivalent to minimising SSE.
+  * Choose the best model by minimizing the AICc (asymptotically equivalent to time series cross-validation).
+
+
+##Example: Australian air traffic
+\fontsize{10}{10}\sf
+
+```{r, echo=TRUE, fig.height=4}
+ets(ausair)
+```
+
+##Example: Australian air traffic
+
+```{r, echo=TRUE, fig.height=4}
+ausair %>% ets() %>% forecast() %>% autoplot()
+```
+
+##Example: Monthly cortecosteroid drug sales
+\fontsize{8}{8}\sf
+
+```{r, echo=TRUE}
+ets(h02)
+```
+
+##Example: Monthly cortecosteroid drug sales
+
+```{r, echo=TRUE, fig.height=4}
+h02 %>% ets() %>% forecast() %>% autoplot()
+```

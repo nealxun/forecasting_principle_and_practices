@@ -1,0 +1,102 @@
+---
+title: "Training and test sets"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+
+## Training and test sets
+
+\begin{block}{}
+
+\includegraphics[width=11cm]{figs/traintest-1.pdf}
+
+\end{block}
+
+<!-- ```{r traintest, fig.height=1, echo=FALSE, cache=TRUE}
+train = 1:18
+test = 19:24
+par(mar=c(0,0,0,0))
+plot(0,0,xlim=c(0,26),ylim=c(0,2),xaxt="n",yaxt="n",bty="n",xlab="",ylab="",type="n")
+arrows(0,0.5,25,0.5,0.05)
+points(train, train*0+0.5, pch=19, col="blue")
+points(test,  test*0+0.5,  pch=19, col="red")
+text(26,0.5,"time")
+text(10,1,"Training data",col="blue")
+text(21,1,"Test data",col="red")
+```
+ -->
+
+ * The test set must not be used for *any* aspect of model development or calculation of forecasts.
+ * True forecast accuracy can only be computed on the test set.
+ * A model which fits the training data well will not necessarily forecast well.
+
+
+## Example: Saudi Arabian oil production
+
+\fontsize{11}{11}\sf
+
+```{r accuracy, echo=TRUE}
+training <- window(oil, end=2003)
+test <- window(oil, start=2004)
+fc <- naive(training, h=10)
+autoplot(fc) +
+  autolayer(test, series="Test data")
+```
+
+## Forecast errors
+
+\alert{Forecast ``error''}: the difference between an observed value and its forecast in the test set.
+
+- Compare residuals which are one-step errors on the training set.
+- Unlike residuals, forecast errors on the test set involve multi-step forecasts.
+- These are *true* forecast errors as the test data is not used in computing the forecasts.
+
+
+
+## Measures of forecast accuracy
+
+\fontsize{11}{12}\sf
+
+Observation: $y_t$.\hspace*{1cm}
+Forecast: $\hat{y}_t$.\hspace*{1cm}
+Forecast error: $e_t = y_t - \hat{y}_t$
+
+\begin{tabular}{@{}lr@{ = }p{4.5cm}@{}}
+\toprule
+Mean Absolute Error: & MAE & $\text{average} |e_t|$ \\
+Mean Squared Error: & MSE & $\text{average} (e_t^2 )$\\
+Mean Absolute Percentage Error: & MAPE & $100\times\text{average} |e_t/y_t|$ \\
+Mean Absolute Scaled Error: & MASE & $\text{MAE}/Q$\par
+ where $Q$ is a scaling constant.
+\\
+\bottomrule
+\end{tabular}\pause
+
+
+  * MAE and MSE are scale dependent.
+  * MAPE is scale independent but requires $y_t > 0$.
+  * MASE is a more general alternative.
+
+## The `accuracy()` command
+
+\fontsize{9}{13}\sf
+
+```{r}
+options(digits=4)
+```
+
+```{r oil2, echo=TRUE}
+accuracy(fc, test)
+```

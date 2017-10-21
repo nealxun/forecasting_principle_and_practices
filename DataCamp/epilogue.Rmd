@@ -1,0 +1,41 @@
+---
+title: "Your future in forecasting!"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+## Your Future in Forecasting!
+
+\begin{tabular}{lp{7.5cm}}
+\raisebox{-1.7cm}{\includegraphics[width=1.5cm]{figs/fppcover.jpg}} &
+  \textbf{Online textbook:  \url{OTexts.org/fpp2/}} \\[2cm]
+%
+\raisebox{-1.2cm}{\includegraphics[width=1.5cm]{figs/datacamp.jpg}} &
+  \textbf{Other DataCamp courses:}
+  \begin{itemize}\itemsep=0cm
+    \item ARIMA modeling with R
+    \item Introduction to time series analysis
+    \item Manipulating time series data in R
+  \end{itemize} \\[-0.2cm]
+%
+ \raisebox{-0.9cm}{\includegraphics[width=1.5cm]{figs/Rlogo.png}} &
+ Practice forecasting lots of different time series, using many different methods. 
+\end{tabular} \vspace*{0.5cm}
+
+
+
+\Large\centering\bfseries 
+Good luck and happy forecasting!
+

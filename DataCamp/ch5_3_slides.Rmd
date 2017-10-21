@@ -1,0 +1,60 @@
+---
+title: "TBATS models"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+##TBATS models
+
+\begin{block}{\Large TBATS}
+\textbf{\Large T}rigonometric terms for seasonality\\
+\textbf{\Large B}ox-Cox transformations for heterogeneity\\
+\textbf{\Large A}RMA errors for short-term dynamics\\
+\textbf{\Large T}rend (possibly damped)\\
+\textbf{\Large S}easonal (including multiple and non-integer periods)
+\end{block}
+
+## US Gasoline data
+
+```{r, cache=TRUE, echo=TRUE}
+gasoline %>% tbats() %>% forecast() %>%
+  autoplot() +
+  xlab("Year") + ylab("thousand barrels per day")
+```
+
+## Call centre data
+
+```{r, cache=TRUE, echo=TRUE}
+calls %>% window(start=20) %>%
+  tbats() %>% forecast() %>%
+  autoplot() + xlab("Weeks") + ylab("Calls")
+```
+
+##TBATS model
+
+\begin{block}{\Large TBATS}\fontsize{13.5}{19}\sf
+\textbf{\Large T}rigonometric terms for seasonality\\
+\textbf{\Large B}ox-Cox transformations for heterogeneity\\
+\textbf{\Large A}RMA errors for short-term dynamics\\
+\textbf{\Large T}rend (possibly damped)\\
+\textbf{\Large S}easonal (including multiple and non-integer periods)
+\end{block}\vspace*{0.1cm}\fontsize{13}{15}\sf
+
+* Handles non-integer seasonality, multiple seasonal periods.
+* Entirely automated
+* Prediction intervals often too wide
+* Very slow on long series
+

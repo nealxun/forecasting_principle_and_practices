@@ -1,0 +1,72 @@
+---
+title: "Fitted values and residuals"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+## Fitted values and residuals
+
+A \alert{fitted value} is the forecast of an observation using all previous observations.
+
+ - That is, they are one-step forecasts.
+ - Often not true forecasts since parameters are estimated on all data.
+
+\pause
+
+A \alert{residual} is the difference between an observation and its fitted value.
+
+ - That is, they are one-step forecast errors.
+
+## Example: oil production
+
+```{r oil, fig.height=3, warning=FALSE, echo=TRUE}
+fc <- naive(oil)
+autoplot(oil, series="Data") + xlab("Year") +
+  autolayer(fitted(fc), series="Fitted") +
+  ggtitle("Oil production in Saudi Arabia")
+```
+
+## Example: oil production
+
+```{r dj2, echo=TRUE}
+autoplot(residuals(fc))
+```
+
+## Residuals should look like white noise
+
+  1. They should be uncorrelated.
+  2. They should have mean zero.
+
+\pause
+
+**Useful properties (for computing prediction intervals)**
+
+  3. They should have constant variance.
+  4. They should be normally distributed.
+
+\pause
+
+
+\begin{alertblock}{}
+We can test these assumptions using the \texttt{checkresiduals()} function.
+\end{alertblock}
+
+## Example: oil production
+
+\fontsize{9}{9}\sf
+
+```{r, warning=FALSE, echo=TRUE, fig.height=2.5}
+checkresiduals(fc)
+```

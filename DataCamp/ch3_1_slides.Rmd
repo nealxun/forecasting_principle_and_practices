@@ -1,0 +1,80 @@
+---
+title: "Exponentially weighted forecasts"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache=TRUE, warning=FALSE, message=FALSE)
+library(fpp2)
+```
+
+
+##Simple Exponential Smoothing
+
+\begin{block}{Forecasting notation}
+$\hat{y}_{t+h|t}=$ point forecast of $y_{t+h}$ given data $y_1,\dots,y_t$.
+\end{block}
+\pause
+
+\begin{block}{Forecast equation}
+$\hat{y}_{t+h|t} = \alpha y_t + \alpha(1-\alpha) y_{t-1} + \alpha(1-\alpha)^2 y_{t-2}+ \cdots$\quad where $0 \le \alpha \le1$.
+\end{block}
+
+\small\begin{tabular}{lllll}
+\toprule
+& \multicolumn{4}{l}{Weights assigned to observations for:}\\
+Observation  &   $\alpha = 0.2$   &   $\alpha = 0.4$  &   $\alpha = 0.6$  & $\alpha = 0.8$ \\
+\midrule
+$y_{t}$      & 0.2         & 0.4          & 0.6         & 0.8\\
+$y_{t-1}$    & 0.16        & 0.24         & 0.24        & 0.16\\
+$y_{t-2}$    & 0.128       & 0.144        & 0.096       & 0.032\\
+$y_{t-3}$    & 0.1024      & 0.0864       & 0.0384      & 0.0064\\
+$y_{t-4}$    & $(0.2)(0.8)^4$  & $(0.4)(0.6)^4$   & $(0.6)(0.4)^4$  & $(0.8)(0.2)^4$\\
+$y_{t-5}$    & $(0.2)(0.8)^5$  & $(0.4)(0.6)^5$   & $(0.6)(0.4)^5$  & $(0.8)(0.2)^5$\\
+\bottomrule
+\end{tabular}
+
+
+##Simple Exponential Smoothing
+\begin{block}{Component form}\vspace*{-0.8cm}
+\begin{align*}
+\text{Forecast equation}&&\hat{y}_{t+h|t} &= \ell_{t}\\
+\text{Smoothing equation}&&\ell_{t} &= \alpha y_{t} + (1 - \alpha)\ell_{t-1}
+\end{align*}
+\end{block}
+
+  * $\ell_t$ is the level (or the smoothed value) of the series at time t.
+  * We choose $\alpha$ and $\ell_0$ by minimising SSE:
+$$
+  \text{SSE}=\sum_{t=1}^T(y_t - \hat{y}_{t|t-1})^2.
+$$
+
+##Example: Oil production
+
+\fontsize{9}{9.7}\sf
+
+```{r sesfit, echo=TRUE, cache=TRUE}
+oildata <- window(oil, start=1996)
+fc <- ses(oildata, h=5)
+summary(fc)
+```
+
+##Example: Oil production
+
+\fontsize{12}{13}\sf
+
+```{r ses, echo=TRUE, cache=TRUE}
+autoplot(fc) +
+  ylab("Oil (millions of tonnes)") + xlab("Year")
+```
+
+

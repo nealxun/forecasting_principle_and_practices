@@ -1,0 +1,77 @@
+---
+title: "Dynamic regression"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+##Dynamic regression
+
+\begin{block}{Regression model with ARIMA errors}\vspace*{-0.2cm}
+\[
+y_t = \beta_0 + \beta_1 x_{1,t} + \dots + \beta_r x_{r,t} + e_t,
+\]\end{block}
+
+  * $y_t$ modeled as function of $r$ explanatory variables
+$x_{1,t},\dots,x_{r,t}$.
+  * In ordinary regression, we assume that $e_t$ is white noise.
+  * In dynamic regression, we allow $e_t$ to be an ARIMA process.
+
+
+##US personal consumption and income
+
+\fontsize{9}{13}\sf
+
+```{r usconsump, echo=TRUE}
+autoplot(uschange[,1:2], facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Quarterly changes in US consumption and personal income")
+```
+
+##US personal consumption and income
+
+\fontsize{9}{13}\sf
+
+```{r, echo=TRUE}
+ggplot(aes(x=Income,y=Consumption), data=as.data.frame(uschange)) +
+  geom_point() +
+  ggtitle("Quarterly changes in US consumption and personal income")
+```
+
+
+##Dynamic regression model for US personal consumption
+\fontsize{10}{14}\sf
+
+```{r usconsump2, echo=TRUE, fig.height=3}
+fit <- auto.arima(uschange[,"Consumption"],
+          xreg=uschange[,"Income"])
+fit
+```
+
+##Residuals from dynamic regression model
+\fontsize{9}{9}\sf
+
+```{r , echo=TRUE, fig.height=2.5}
+checkresiduals(fit)
+```
+
+##Forecasts from dynamic regression model
+\fontsize{11}{13}\sf
+
+```{r usconsump3, echo=TRUE, fig.height=3.}
+fcast <- forecast(fit, xreg = rep(0.8, 8))
+autoplot(fcast) +
+  xlab("Year") + ylab("Percentage change")
+```

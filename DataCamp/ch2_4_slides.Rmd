@@ -1,0 +1,110 @@
+---
+title: "Time series cross-validation"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+
+##Time series cross-validation {-}
+
+**Traditional evaluation**
+
+\begin{block}{}
+\includegraphics[width=11cm]{figs/traintest-1.pdf}
+\end{block}
+
+\pause
+
+**Time series cross-validation**
+
+\begin{block}{}
+\includegraphics[width=11cm]{figs/cv1-1.pdf}
+\end{block}
+
+\pause
+
+ * Forecast accuracy averaged over test sets.
+ * Also known as "forecast evaluation on a rolling origin"
+
+##Time series cross-validation {-}
+
+**Traditional evaluation**
+
+\begin{block}{}
+\includegraphics[width=11cm]{figs/traintest-1.pdf}
+\end{block}
+
+**Time series cross-validation**
+
+\begin{block}{}
+\includegraphics[width=11cm]{figs/cv2-1.pdf}
+\end{block}
+
+ * Forecast accuracy averaged over test sets.
+ * Also known as "forecast evaluation on a rolling origin"
+
+
+##Time series cross-validation {-}
+
+**Traditional evaluation**
+
+\begin{block}{}
+\includegraphics[width=11cm]{figs/traintest-1.pdf}
+\end{block}
+
+**Time series cross-validation**
+
+\begin{block}{}
+\includegraphics[width=11cm]{figs/cv3-1.pdf}
+\end{block}
+
+ * Forecast accuracy averaged over test sets.
+ * Also known as "forecast evaluation on a rolling origin"
+
+
+## tsCV function
+
+\small
+
+**RMSE using time series cross-validation**
+```{r tscv, cache=TRUE, echo=TRUE}
+e <- tsCV(oil, forecastfunction=naive, h=1)
+sqrt(mean(e^2, na.rm=TRUE))
+```
+
+ * When there are no parameters to be estimated, `tsCV` with `h=1` will give the same values as `residuals`.
+
+
+## tsCV function
+
+\fontsize{10}{10}\sf
+
+```{r tscv2, echo=TRUE}
+sq <- function(u){u^2}
+for(h in 1:10)
+{
+  oil %>% tsCV(forecastfunction=naive, h=h) %>%
+    sq() %>% mean(na.rm=TRUE) %>% print()
+}
+```
+
+* The RMSE increases with the forecast horizon.
+
+## Time series cross-validation
+
+\large
+
+* Choose the model with the smallest RMSE computed using time series cross-validation.
+* Compute it at the forecast horizon of most interest to you.

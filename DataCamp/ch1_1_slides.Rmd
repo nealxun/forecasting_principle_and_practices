@@ -1,0 +1,90 @@
+---
+title: "Welcome to Forecasting Using R"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+
+## What you will learn
+
+  * Exploring and visualizing time series
+  * Simple benchmark methods for forecasting
+  * Exponential smoothing and ARIMA models
+  * Advanced forecasting methods
+  * Measuring forecast accuracy and choosing the best method
+
+## Course textbook
+
+**Hyndman, R. J. \& Athanasopoulos, G. (2017)**
+
+**\emph{Forecasting: principles and practice}, 2nd edition**
+
+\includegraphics[width=2.5cm]{fppcover.jpg}
+
+  * Free and online at \alert{\textbf{\url{OTexts.org/fpp2/}}}
+  * Data sets in associated R package `fpp2`
+  * R code for all examples
+
+## Time series data
+
+\fontsize{10}{10}\sf
+
+  - Daily IBM stock prices
+  - Monthly rainfall in London
+  - Quarterly Australian beer production
+  - Annual Google profits
+
+\pause
+
+
+```{r, echo=FALSE, fig.height=2.8, cache=TRUE, warning=FALSE, message=FALSE}
+auscafe %>% window(start=2000) %>% autoplot() +
+  ggtitle("Monthly Australian expenditure on eating out") +
+  xlab("Year") +
+  ylab("A$ billion") +
+  scale_x_continuous(breaks=seq(2000,2015,by=5),
+                     minor_breaks=2001:2018)
+```
+
+\pause
+
+\begin{alertblock}{}
+\bfseries Forecasting is estimating how the sequence of\\ observations will continue into the future.
+\end{alertblock}
+
+## Forecasts of monthly Australian expenditure on eating out
+
+```{r, echo=FALSE, fig.height=3, cache=TRUE, message=FALSE}
+fit <- auto.arima(window(auscafe,start=2000), lambda=0, D=1)
+fit %>% forecast(h=36) %>% autoplot(include=120) +
+  ggtitle("3-year forecasts") +
+  ylab("A$ billion") +
+  xlab("Year") +
+  scale_x_continuous(breaks=seq(2000,2025,by=5),
+                     minor_breaks=2001:2020)
+```
+
+\pause
+
+###
+ * What forecasting methods are available that take account of trend, seasonality and other features of the data?
+ * How to measure the accuracy of your forecasts?
+ * How to choose a good forecasting model?
+
+##
+
+\centering\large\bfseries
+Let's get started!

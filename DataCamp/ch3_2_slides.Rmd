@@ -1,0 +1,76 @@
+---
+title: "Exponential smoothing methods with trend"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+##Holt's linear trend
+
+\begin{block}{Simple exponential smoothing}\vspace*{-.6cm}
+\begin{align*}
+\text{Forecast }&& \hat{y}_{t+h|t} &= \ell_{t} \\
+\text{Level }&& \ell_{t} &= \alpha y_{t} + (1 - \alpha)\ell_{t-1} \hspace*{1.8cm}
+\end{align*}
+\end{block}\pause
+
+\begin{block}{Holt's linear trend}\vspace*{-.6cm}
+\begin{align*}
+\text{Forecast }&& \hat{y}_{t+h|t} &= \ell_{t} + hb_{t} \\
+\text{Level }&& \ell_{t} &= \alpha y_{t} + (1 - \alpha)(\ell_{t-1} + b_{t-1})\\
+\text{Trend }&& b_{t} &= \beta^*(\ell_{t} - \ell_{t-1}) + (1 -\beta^*)b_{t-1},
+\end{align*}
+\end{block}\pause
+
+  * Two smoothing parameters $\alpha$ and $\beta^*$ ($0\le\alpha,\beta^*\le1$).
+  * Choose $\alpha, \beta^*, \ell_0, b_0$ to minimise SSE.
+
+##Holt's method in R
+
+```{r}
+airpassengers <- window(ausair, start=1990, end=2004)
+```
+
+
+```{r, fig.height=3., echo=TRUE}
+airpassengers %>% holt(h=5) %>% autoplot()
+```
+
+##Damped trend method
+\begin{block}{Component form}\vspace*{-0.6cm}
+\begin{align*}
+\hat{y}_{t+h|t} &= \ell_{t} + (\phi+\phi^2 + \dots + \phi^{h})b_{t} \\
+\ell_{t} &= \alpha y_{t} + (1 - \alpha)(\ell_{t-1} + \phi b_{t-1})\\
+b_{t} &= \beta^*(\ell_{t} - \ell_{t-1}) + (1 -\beta^*)\phi b_{t-1}.
+\end{align*}
+\end{block}
+\pause
+
+  * Damping parameter $0<\phi<1$.
+  * If $\phi=1$, identical to Holt's linear trend.
+  * Short-run forecasts trended, long-run forecasts constant.
+
+##Example: Air passengers
+
+\fontsize{10}{11}\sf
+
+```{r, echo=TRUE, fig.height=3}
+fc1 <- holt(airpassengers, h=15, PI=FALSE)
+fc2 <- holt(airpassengers, damped=TRUE, h=15, PI=FALSE)
+autoplot(airpassengers) + xlab("Year") + ylab("millions") +
+  autolayer(fc1, series="Linear trend") +
+  autolayer(fc2, series="Damped trend")
+```
+

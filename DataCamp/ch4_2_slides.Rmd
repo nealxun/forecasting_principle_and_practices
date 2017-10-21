@@ -1,0 +1,92 @@
+---
+title: "ARIMA models"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+##ARIMA models
+
+###Autoregressive (AR) models:
+\centerline{$
+  y_{t}  =  c  +  \phi_{1}y_{t - 1}  +  \phi_{2}y_{t - 2}  +  \cdots  +  \phi_{p}y_{t - p}  + e_{t},\qquad e_t \sim \text{white noise}.
+$}
+Multiple regression with \textbf{lagged observations} as predictors.
+
+\pause
+
+###Moving Average (MA) models:
+\centerline{$
+  y_{t}  =  c +  e_t + \theta_{1}e_{t - 1}  +  \theta_{2}e_{t - 2}  +  \cdots  + \theta_{q}e_{t - q},\qquad e_t \sim \text{white noise}.
+$}
+Multiple regression with \textbf{lagged \emph{errors}} as predictors.
+
+\pause
+
+###Autoregressive Moving Average (ARMA) models:
+\centerline{$
+y_{t}  =  c  +  \phi_{1}y_{t - 1}  +  \cdots  +  \phi_{p}y_{t - p}  + \theta_{1}e_{t - 1} +  \cdots  + \theta_{q}e_{t - q} +  e_{t}.
+$}
+Multiple regression with both \textbf{lagged observations} and \textbf{lagged errors} as predictors.
+
+\pause
+
+###ARIMA($p,d,q$) model:
+* Combine ARMA model with $d$ lots of **differencing**.
+
+
+##US net electricity generation
+
+```{r}
+autoplot(usnetelec) +
+  xlab("Year") +
+  ylab("billion kwh") +
+  ggtitle("US net electricity generation")
+```
+
+##US net electricity generation
+
+\fontsize{10}{11}\sf
+
+```{r, echo=FALSE}
+options(digits=4)
+```
+
+```{r, echo=TRUE}
+fit <- auto.arima(usnetelec)
+summary(fit)
+```
+
+##US net electricity generation
+
+```{r, echo=TRUE, fig.height=4}
+fit %>% forecast() %>% autoplot()
+```
+
+
+##How does auto.arima() work?
+
+###Hyndman-Khandakar algorithm:
+
+  * Select no.\ differences \textcolor{Orange}{$d$} via *unit root tests*.
+  * Select \textcolor{Orange}{$p$} and \textcolor{Orange}{$q$} by minimising *AICc*.
+  * Estimate parameters using *maximum likelihood estimation*.
+  * Use stepwise search to traverse model space, to save time.
+
+###Prediction intervals
+
+* Prediction intervals *increase in size with forecast horizon*.
+* Calculations assume residuals are *uncorrelated* and *normally distributed*.
+
+

@@ -1,0 +1,91 @@
+---
+title: "White noise"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+## White noise
+
+```{r, echo=TRUE, fig.height=2.7}
+set.seed(3)
+wn <- ts(rnorm(36))
+autoplot(wn)
+```
+
+ * "White noise" is just a time series of iid data.
+
+## White noise ACF
+
+\fontsize{11}{12}\sf
+
+```{r, echo=TRUE, fig.height=2.7}
+ggAcf(wn) + ggtitle("Sample ACF for white noise")
+```
+
+ * We expect each autocorrelation to be close to zero.
+ * 95% of all autocorrelations for white noise should lie within the blue lines on the graph.
+ * If this is not the case, the series is probably not white noise.
+
+
+## Example: Pigs slaughtered
+
+\fontsize{10}{11}\sf
+
+```{r pigs, echo=FALSE}
+pigs <- window(pigs, start=1990)
+```
+
+```{r, fig.height=3, echo=TRUE}
+autoplot(pigs) +
+  xlab("Year") + ylab("thousands") +
+  ggtitle("Monthly number of pigs slaughtered in Victoria")
+```
+
+* Is this white noise?
+
+## Example: Pigs slaughtered
+
+\fontsize{10}{10}\sf
+
+```{r, fig.height=2.5, echo=TRUE}
+ggAcf(pigs) +
+  ggtitle("ACF of monthly pigs slaughtered in Victoria")
+```
+
+ * Difficult to detect pattern in time plot.
+ * ACF shows some significant autocorrelation at lags 1, 2, and 3.
+ * These show the series is \alert{not a white noise series}.
+ * There is some information in the data that can be used to forecast future values.
+
+## Ljung-Box test
+
+\begin{block}{}
+The Ljung-Box test considers the first $h$ autocorrelation values together, rather than individually. A significant test (small $p$-value) indicates the data are probably not white noise.
+\end{block}
+
+\pause
+
+\textbf{For the pigs data:}
+
+```{r, ljungbox, echo=TRUE}
+Box.test(pigs, lag=24, fitdf=0, type="Lj")
+```
+
+ * The small p-value suggests the data are probably not white noise.
+
+## White noise
+
+* White noise is a time series that is purely random.
+* We can test for white noise by looking at an ACF plot or by doing a Ljung-Box test.

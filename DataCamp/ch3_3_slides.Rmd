@@ -1,0 +1,110 @@
+---
+title: "Exponential smoothing methods with trend and seasonality"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    keep_tex: no
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+
+##Holt-Winters additive method
+
+\begin{block}{Holt-Winters additive method}\vspace*{-0.6cm}
+\begin{align*}
+\hat{y}_{t+h|t} &= \ell_{t} + hb _{t} + s_{t-m+h_{m}^{+}} \\
+\ell_{t} &= \alpha(y_{t} - s_{t-m}) + (1 - \alpha)(\ell_{t-1} + b_{t-1})\\
+b_{t} &= \beta^*(\ell_{t} - \ell_{t-1}) + (1 - \beta^*)b_{t-1}\\
+s_{t} &= \gamma (y_{t}-\ell_{t-1}-b_{t-1}) + (1-\gamma)s_{t-m}
+\end{align*}
+\end{block}\vspace*{3.35ex}
+
+
+  * $s_{t-m+h_{m}^{+}}=$ seasonal component from final year of data.
+  * Smoothing parameters:  $0\le \alpha\le 1$, \sspace $0\le \beta^*\le 1$, \sspace $0\le \gamma\le 1-\alpha$.
+  * $m=$  period of seasonality (e.g. $m=4$ for quarterly data).
+  * seasonal component averages zero
+
+\vspace*{10cm}
+
+##Holt-Winters multiplicative method
+
+\begin{block}{Holt-Winters multiplicative method}\vspace*{-0.6cm}
+    \begin{align*}
+        \hat{y}_{t+h|t} &= (\ell_{t} + hb_{t})s_{t-m+h_{m}^{+}} \\
+        \ell_{t} &= \alpha \frac{y_{t}}{s_{t-m}} + (1 - \alpha)(\ell_{t-1} + b_{t-1})\\
+        b_{t} &= \beta^*(\ell_{t}-\ell_{t-1}) + (1 - \beta^*)b_{t-1}        \\
+        s_{t} &= \gamma \frac{y_{t}}{(\ell_{t-1} + b_{t-1})} + (1 - \gamma)s_{t-m}
+    \end{align*}
+\end{block}
+
+  * $s_{t-m+h_{m}^{+}}=$ seasonal component from final year of data.
+  * Smoothing parameters:  $0\le \alpha\le 1$, \sspace $0\le \beta^*\le 1$, \sspace  $0\le \gamma\le 1-\alpha$.
+  * $m=$  period of seasonality (e.g. $m=4$ for quarterly data).
+  * seasonal component averages one.
+
+\vspace*{10cm}
+
+##Example: Visitor Nights
+
+```{r 7-HW, echo=TRUE}
+aust <- window(austourists, start=2005)
+fc1 <- hw(aust, seasonal="additive")
+fc2 <- hw(aust, seasonal="multiplicative")
+```
+
+```{r, fig.height=3.2}
+tmp <- cbind(Data=aust,
+  "HW additive forecasts" = fc1[["mean"]],
+  "HW multiplicative forecasts" = fc2[["mean"]])
+
+autoplot(tmp) + xlab("Year") +
+  ylab("millions") + ggtitle("International visitor night in Australia") +
+  scale_color_manual(name="",
+    values=c('#000000','#1b9e77','#d95f02'),
+    breaks=c("Data","HW additive forecasts","HW multiplicative forecasts"))
+```
+
+
+## Taxonomy of exponential smoothing methods
+
+\fontsize{12}{13}\sf
+
+\begin{block}{}
+\begin{tabular}{ll|ccc}
+& &\multicolumn{3}{c}{\bf Seasonal Component} \\
+\multicolumn{2}{c|}{\bf Trend}& N & A & M\\
+\multicolumn{2}{c|}{\bf Component}  & (None)    & (Additive)  & (Multiplicative)\\
+\cline{3-5} &&&&\\[-0.4cm]
+N & (None) & (N,N) & (N,A) & (N,M)\\
+&&&&\\[-0.4cm]
+A & (Additive) & (A,N) & (A,A) & (A,M)\\
+&&&&\\[-0.4cm]
+A\damped & (Additive damped) & (A\damped,N) & (A\damped,A) & (A\damped,M)
+\end{tabular}
+\end{block}\fontsize{12}{14}\sf
+
+\begin{tabular}{lp{7.5cm}l}
+\alert{(N,N)}:        & Simple exponential smoothing               & \texttt{ses()}\\
+\alert{(A,N)}:        & Holt's linear method                       & \texttt{holt()}\\
+\alert{(A\damped,N)}: & Additive damped trend method               & \texttt{hw()}\\
+\alert{(A,A)}:~~      & Additive Holt-Winters' method              & \texttt{hw()}\\
+\alert{(A,M)}:        & Multiplicative Holt-Winters' method        & \texttt{hw()}\\
+\alert{(A\damped,M)}: & Damped multiplicative Holt-Winters' method & \texttt{hw()}
+\end{tabular}
+
+\begin{block}{}\fontsize{12}{14}\sf
+There are also multiplicative trend methods (not recommended).
+\end{block}
+
+

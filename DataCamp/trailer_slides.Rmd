@@ -1,0 +1,40 @@
+---
+title: "Welcome to the course!"
+author: "Rob J Hyndman"
+output:
+  beamer_presentation:
+    fig_height: 3
+    fig_width: 6
+    highlight: tango
+    theme: "metropolis"
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fpp2)
+```
+
+
+## Who am I?
+
+**Professor Rob J Hyndman**
+
+  - Professor of Statistics, Monash University, Australia
+  - Editor-in-Chief, *International Journal of Forecasting*
+  - Consultant to businesses and governments on forecasting issues
+  - Author of the `forecast` package for R
+  - More information at **\alert{robjhyndman.com}**
+
+## What you will learn
+
+  1. Exploring and visualizing time series in R
+  2. Benchmark methods and forecast accuracy
+  3. Exponential smoothing
+  4. Forecasting with ARIMA models
+  5. Advanced forecasting methods
+
+##
+
+\Large\centering\bfseries See you in the course!

@@ -363,11 +363,14 @@ Some references describe the test set as the "hold-out set" because these data a
 
 A forecast "error" is the difference between an observed value and its forecast. Here "error" does not mean a mistake, it means the unpredictable part of an observation.
 
+`We say here WHEN COMPUTED - did you have something in mind or should be change this to simply say - A forecast error is the difference between the observed value and the forecast using the training data:` 
 When computed on the test set, the forecast error is the difference between the observed values and the forecasts obtaining using the training data:
 $$
   e_{T+h} = y_{T+h} - \hat{y}_{T+h|T},
 $$
-where the training data is given by $\{y_1,\dots,y_T\}$ and the test data is given by $\{y_{T+1},y_{T+2},\dots\}$. Unlike residuals, forecast errors on the test set involve multi-step forecasts.
+where the training data is given by $\{y_1,\dots,y_T\}$ and the test data is given by $\{y_{T+1},y_{T+2},\dots\}$. 
+
+Note that forecast errors are different from residuals in two ways. Firstly, residuals are calculated on the training set while forecast errors are calculated on the test set. Secondly residuals are based on one-step forecasts while forecast errors can involve multi-step forecasts.
 
 We measure forecast accuracy by summarising the forecast errors in different ways.
 
@@ -553,7 +556,7 @@ text(28,.95,"time")
 
 Time series cross validation is implemented with the `tsCV` function. In the following example, we compare the residual RMSE with the RMSE obtained via time series cross-validation.
 
-```{r tscv}
+```{r }
 e <- tsCV(dj, rwf, drift=TRUE, h=1)
 sqrt(mean(e^2, na.rm=TRUE))
 sqrt(mean(residuals(rwf(dj, drift=TRUE))^2, na.rm=TRUE))
@@ -576,7 +579,43 @@ The left hand side of each pipe is passed as the first argument to the function 
 
 In this book, we will use the pipe operator whenever it makes the code easier to read.
 
+###Example: using tsCV() {-}
+` We could do this with the dj - I have done it below - another idea is to replace all dj by goog??`
 
+The `goog` data, plotted below, includes daily closing stock prices of Google Inc from the NASDAQ exchange, for 1000 consecutive trading days between 25 February 2013 and 13 February 2017. 
+
+```{r tsCV, echo=TRUE}
+autoplot(goog)
+
+```
+The code below evaluates the foresting performance of $1$ to $8$-steps-ahead `naive` forecasts with `tsCV` using MSE as the forecast error measure. The plot shows that the forecast error increases as the forecast horizon increases which we would naturally expect. 
+
+```{r tsCVplot, echo=TRUE}
+e <- matrix(NA_real_, nrow = 1000, ncol = 8)
+for (h in 1:8)
+  e[, h] <- tsCV(goog, forecastfunction = naive, h = h)
+  
+# Compute the MSE values and remove missing values
+mse <- colMeans(e^2, na.rm = T)
+
+# Plot the MSE values against the forecast horizon
+data.frame(h = 1:8, MSE = mse) %>%
+  ggplot(aes(x = h, y = MSE)) + geom_point()
+```
+
+```{r , eval=FALSE, include=FALSE}
+e <- matrix(NA_real_, nrow = length(dj), ncol = 8)
+for (h in 1:8)
+  e[, h] <- tsCV(dj, forecastfunction = naive, h = h)
+  
+# Compute the MSE values and remove missing values
+mse <- colMeans(e^2, na.rm = T)
+
+# Plot the MSE values against the forecast horizon
+data.frame(h = 1:8, MSE = mse) %>%
+  ggplot(aes(x = h, y = MSE)) + geom_point()
+
+```
 
 ## Prediction intervals
 
@@ -690,7 +729,7 @@ That works quite well if you have no idea what sort of model to use. But by the 
 
 2. Why is a Box-Cox transformation unhelpful for the `cangas` data?
 
-3. What Box-Cox transformation would you select for your retail data (from Exercise 1 in Section \@ref(ex:graphics))?
+3. What Box-Cox transformation would you select for your retail data (from Exercise 3 in Section \@ref(ex-graphics))?
 
 4. Calculate the residuals from a seasonal naïve forecast applied to the quarterly Australian beer production data from 1992. The following code will help.
 
@@ -720,13 +759,13 @@ That works quite well if you have no idea what sort of model to use. But by the 
     d. If your model doesn’t forecast well, you should make it more complicated.
     e. Always choose the model with the best forecast accuracy as measured on the test set.
 
-7. For your retail time series (from Exercise 1 in Section \@ref(ex:graphics))?
+7. For your retail time series (from Exercise 3 in Section \@ref(ex-graphics)):
 
     a. Split the data into two parts using
 
         ```r
-        x1 <- window(mytimeseries, end=c(2010,12))
-        x2 <- window(mytimeseries, start=2011)
+        x1 <- window(myts, end=c(2010,12))
+        x2 <- window(myts, start=2011)
         ```
 
     b. Check that your data have been split appropriately by producing the following plot.
@@ -753,6 +792,15 @@ That works quite well if you have no idea what sort of model to use. But by the 
         Do the residuals appear to be uncorrelated and normally distributed?
 
     f. How sensitive are the accuracy measures to the training/test split?
+
+
+8. `vn` contains quarterly visitor nights (in millions) from 1998-2015 for eight regions of Australia. 
+
+    a. Use `window()` to create three training sets for `vn[,"Melbourne"],` omitting the last 1, 2 and 3 years; call these train1, train2, and train3, respectively. For example `train1 <- window(vn[, "Melbourne"], end = c(2014, 4))`. 
+    
+    b. Compute one year of forecasts for each training set using the `snaive()` method. Call these `fc1`, `fc2` and `fc3`, respectively.
+
+    c. Use `accuracy()` to compare the MAPE over the three test sets. Comment on these.
 
 
 8. Use the Dow Jones index (data set `dowjones`) to do the following:

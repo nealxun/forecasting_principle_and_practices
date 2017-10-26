@@ -282,7 +282,7 @@ For white noise series, we expect each autocorrelation to be close to zero. Of c
 In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r format(2/sqrt(50),digits=2)`$. All of the autocorrelation coefficients lie within these limits, confirming that the data are white noise.
 
 
-## Exercises {#ex:graphics}
+## Exercises {#ex-graphics}
 
 1. Use the help menu to explore what the series `gold`, `woolyrnq` and `gas` represent. These are available in the `forecast` package.
   
@@ -326,7 +326,7 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
     b. Select one of the time series as follows (but replace the column name with your own chosen column):
 
         ```r
-        mytimeseries <- ts(retaildata[,"A3349873A"], frequency=12, start=c(1982,4))
+        myts <- ts(retaildata[,"A3349873A"], frequency=12, start=c(1982,4))
         ```
 
     c. Explore your chosen retail time series using the following functions:

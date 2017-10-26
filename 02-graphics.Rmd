@@ -141,7 +141,7 @@ These are exactly the same data as were shown earlier, but now the data from eac
 
 In this case, it is clear that there is a large jump in sales in January each year. Actually, these are probably sales in late December as customers stockpile before the end of the calendar year, but the sales are not registered with the government until a week or two later. The graph also shows that there was an unusually small number of sales in March 2008 (most other years show an increase between February and March). The small number of sales in June 2008 is probably due to incomplete counting of sales at the time the data were collected.
 
-A useful variation on the seasonal plot uses polar coordinates, as shown below.
+A useful variation on the seasonal plot uses polar coordinates. Setting `polar=TRUE` makes the time series axis circular rather than horizontal, as shown below.
 
 ```{r seasonplot2, fig.cap="Polar seasonal plot of monthly antidiabetic drug sales in Australia.", out.width="90%"}
 ggseasonplot(a10, polar=TRUE) +
@@ -284,7 +284,36 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
 ## Exercises {#ex:graphics}
 
-1. Download some monthly Australian retail data from [http://robjhyndman.com/data/retail.xlsx](http://robjhyndman.com/data/retail.xlsx). These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.
+1. Use the help menu to explore what the series `gold`, `woolyrnq` and `gas` represent. These are available in the `forecast` package.
+  
+    a. Use `autoplot` to plot each of these in separate plots.
+  
+    b. What is the frequency of each commodity series? Hint: apply the `frequency()` function. 
+
+    c. Use `which.max()` to spot the outlier in the `gold` series. Which observation was it?
+
+
+2. Download some data from [http://robjhyndman.com/data/tute1.csv](http://robjhyndman.com/data/tute1.csv). Open the file `tute1.csv` in Excel and review its contents. You should find four columns of information. Columns B through D each contain a quarterly series, labelled Sales, AdBudget and GDP. Sales contains the quarterly sales for a small company over the period 1981-2005. AdBudget is the advertising budget and GDP is the gross domestic product. All series have been adjusted for inflation.
+
+    a.  Using the File menu in RStudio, import the downloaded file. You should see the data in a table within a panel in RStudio.
+
+    b.  Convert the data to time series
+
+        ```r
+        mytimeseries <- ts(tute1[,-1], start=1981, frequency=4)
+        ```
+
+        (The `[,-1]` removes the first column which contains the quarters as we don't need them now.)
+
+    c.  Construct time series plots of each of the three series
+    
+        ```r
+        autoplot(mytimeseries, facets=TRUE)
+        ```
+
+        Check what happens when you don't include `facets=TRUE`.
+
+3. Download some monthly Australian retail data from [http://robjhyndman.com/data/retail.xlsx](http://robjhyndman.com/data/retail.xlsx). These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.
 
     a. You can read the data into R with the following script:
 
@@ -306,16 +335,16 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
         Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
 
-2. Repeat for the following series:
+4. Repeat for the following series:
 
-    `bicoal`, `chicken`, `dole`, `usdeaths`, `bricksq`, `lynx`, `ibmclose`
+    `bicoal`, `chicken`, `dole`, `usdeaths`, `bricksq`, `lynx`, `ibmclose`, `sunspotarea`, `hsales`, `hyndsight` and `gasoline`.
 
     Use the help files to find out what the series are.
 
-3. The `arrivals` data set comprises quarterly international arrivals (in thousands) to Australia from Japan, New Zealand, UK and the US. Use `autoplot` and `ggseasonplot` and compare the differences between the arrivals from these four countries. Can  you identify any unusual observations?
+5. The `arrivals` data set comprises quarterly international arrivals (in thousands) to Australia from Japan, New Zealand, UK and the US. Use `autoplot` and `ggseasonplot` and compare the differences between the arrivals from these four countries. Can  you identify any unusual observations?
 
 
-4. The following time plots and ACF plots correspond to four different time series. Your task is to match each  time plot in the first row with one of the ACF plots in the second row.
+6. The following time plots and ACF plots correspond to four different time series. Your task is to match each  time plot in the first row with one of the ACF plots in the second row.
 
     ```{r acfguess, fig.asp=0.5, fig.width=12, echo=FALSE, message=FALSE, warning=FALSE}
     tp1 <- autoplot(cowtemp) + xlab("") + ylab("chirps per minute") +
@@ -333,6 +362,8 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
     gridExtra::grid.arrange(tp1,tp2,tp3,tp4,
                             acfa,acfb,acfc,acfd,nrow=2)
     ```
+
+7. The `pigs` data shows the monthly total number of pigs slaughtered in Victoria, Australia, from Jan 1980 to Aug 1995. Use `mypigs <- window(pigs, start=1990)` to select the data starting from 1990. Use `autoplot` and `ggAcf` for `mypigs` series and compare these to white noise plots from Figures \@ref(fig:wnoise) and \@ref(fig:wnoiseacf).
 
 ## Further reading
 

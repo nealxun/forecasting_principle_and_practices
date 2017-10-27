@@ -356,7 +356,22 @@ The size of the test set is typically about 20% of the total sample, although th
 
 Some references describe the test set as the "hold-out set" because these data are "held out" of the data used for fitting. Other references call the training set the "in-sample data" and the test set the "out-of-sample data". We prefer to use "training data" and "test data" in this book.
 
+`window` is a useful command
 
+```{r }
+beer2 <- window(ausbeer,start=1992,end=c(2007,4))
+beer2 <- subset(ausbeer,start=200,end=length(ausbeer))
+
+train <- subset(gold, end = 1000)
+train <- window(gold, end = 1000)
+subset(woolyrnq,quarter=3)
+
+USAccDeaths
+
+window(USAccDeaths,start=1973,end=c(1974,1))
+subset(USAccDeaths,start=2,end=13)
+
+```
 
 
 ### Forecast errors  {-}

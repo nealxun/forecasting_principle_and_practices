@@ -356,23 +356,17 @@ The size of the test set is typically about 20% of the total sample, although th
 
 Some references describe the test set as the "hold-out set" because these data are "held out" of the data used for fitting. Other references call the training set the "in-sample data" and the test set the "out-of-sample data". We prefer to use "training data" and "test data" in this book.
 
-`window` is a useful command
+The `window` function introduced in Chapter \@ref(ch-graphics) is very useful when extracting a portion of a time series. Another useful function is `subset` from the `forecast` package which allows for more types of subsetting. A great advantage of this functions is that it allows to use indices to choose a subset. For example,
 
 ```{r }
-beer2 <- window(ausbeer,start=1992,end=c(2007,4))
-beer2 <- subset(ausbeer,start=200,end=length(ausbeer))
-
-train <- subset(gold, end = 1000)
-train <- window(gold, end = 1000)
-subset(woolyrnq,quarter=3)
-
-USAccDeaths
-
-window(USAccDeaths,start=1973,end=c(1974,1))
-subset(USAccDeaths,start=2,end=13)
-
+subset(ausbeer,start=length(ausbeer)-4*5)
 ```
+extracts the last 5 years of observations from `ausbeer`. It also allows extracting all values for a specific season. For example,
 
+```{r }
+subset(ausbeer, quarter = 1)
+```
+extracts all the first quarters.
 
 ### Forecast errors  {-}
 

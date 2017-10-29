@@ -473,6 +473,21 @@ Damping is possible with both additive and multiplicative Holt-Winters' methods.
 hw(x, damped=TRUE, seasonal="multiplicative")
 ```
 
+### Example: Holt-Winters method with daily data {-}
+The Holt-Winters method can also be used for daily type of data, where the seasonal pattern is of length 7, and the appropriate unit of time for $h$ is in days. Here, we generate daily forecasts for the last five weeks for the `hyndsight` data, which contains the daily pageviews on the Hyndsight blog for one year starting April 30, 2014.
+
+```{r,  echo=TRUE}
+
+fc <- hw(subset(hyndsight,end=length(hyndsight)-35),
+         damped = TRUE, seasonal="multiplicative", h=35)
+
+autoplot(hyndsight) +
+  forecast::autolayer(fc, PI=FALSE,series="HW multi damped")+
+  guides(colour=guide_legend(title="Daily forecasts"))
+
+```
+
+
 ##A taxonomy of exponential smoothing methods {#sec-7-6-Taxonomy}
 
 Exponential smoothing methods are not restricted to those we have presented so far. By considering variations in the combinations of the trend and seasonal components, nine exponential smoothing methods are possible, listed in Table \@ref(tab:taxonomy). Each method is labelled by a pair of letters (T,S) defining the type of ‘Trend’ and ‘Seasonal’ components. For example, (A,M) is the method with an additive trend and multiplicative seasonality; (A<sub>d</sub>,N) is the method with damped trend and no seasonality; and so on.
@@ -844,12 +859,12 @@ days’ sales for paperback and hardcover books.
 
     Which model gives the best RMSE?
 
-3. Recall your retail time series data  (from Exercise 1 in Section \@ref(ex:graphics)).
+3. Recall your retail time series data  (from Exercise 3 in Section \@ref(ex-graphics)).
     a. Why is multiplicative seasonality necessary for this series?
     b. Apply Holt-Winters’ multiplicative method to the data. Experiment with making the trend damped.
     c. Compare the RMSE of the one-step forecasts from the two methods. Which do you prefer?
     d. Check that the residuals from the best method look like white noise.
-    e. Now find the test set RMSE, while training the model to the end of 2010. Can you beat the seasonal naïve approach from Exercise 7 in Section \@ref(ex:toolbox)?
+    e. Now find the test set RMSE, while training the model to the end of 2010. Can you beat the seasonal naïve approach from Exercise 7 in Section \@ref(ex-toolbox)?
 
 4. For the same retail data, try an STL decomposition applied to the Box-Cox transformed series, followed by ETS on the seasonally adjusted data. How does that compare with your best previous forecasts on the test set?
 

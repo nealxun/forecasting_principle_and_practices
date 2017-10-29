@@ -727,7 +727,7 @@ forecast(ausbeer)
 
 That works quite well if you have no idea what sort of model to use. But by the end of this book, you should not need to use `forecast()` in this "blind" fashion. Instead, you will fit a model appropriate to the data, and then use `forecast()` to produce forecasts from that model.
 
-## Exercises {#ex:toolbox}
+## Exercises {#ex-toolbox}
 
 1. For the following series, find an appropriate Box-Cox transformation in order to stabilize the variance.
 

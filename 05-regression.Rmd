@@ -72,7 +72,7 @@ $$
 
 ```{r ConsInc2, echo=TRUE, fig.cap="Scatterplot of consumption versus income and the fitted regression line."}
 uschange %>%
-  as.data.frame %>%
+  as.data.frame() %>%
   ggplot(aes(x=Income, y=Consumption)) +
     ylab("Consumption (quarterly % change)") +
     xlab("Income (quarterly % change)") +
@@ -135,7 +135,7 @@ uschange %>%
 
 ```{r ScatterMatrix, echo=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
 uschange %>%
-  as.data.frame %>%
+  as.data.frame() %>%
   GGally::ggpairs()
 ```
 
@@ -211,7 +211,7 @@ autoplot(uschange[,'Consumption'], series="Data") +
 
 ```{r usfitted2, echo=TRUE, fig.cap="Actual US consumption expenditure plotted against predicted US consumption expenditure.", message=FALSE, warning=FALSE}
 cbind(Data=uschange[,"Consumption"], Fitted=fitted(fit.consMR)) %>%
-  as.data.frame %>%
+  as.data.frame() %>%
   ggplot(aes(x=Data, y=Fitted)) +
     geom_point() +
     xlab("Fitted (predicted values)") +
@@ -299,7 +299,7 @@ autoplot(beer2, series="Data") +
 
 ```{r beerlm3, echo=TRUE, fig.cap="Actual beer production plotted against predicted beer production."}
 cbind(Data=beer2, Fitted=fitted(fit.beer)) %>%
-  as.data.frame %>%
+  as.data.frame() %>%
   ggplot(aes(x=Data, y=Fitted, colour=as.factor(cycle(beer2)))) +
     geom_point() +
     ylab("Fitted") + xlab("Actual values") +
@@ -457,7 +457,7 @@ Figure \@ref(fig:electrendseas) shows the residuals against the fitted values fr
 ```{r electrendseas, echo=TRUE, fig.cap="Scatterplot of residuals versus fitted."}
 fit <- tslm(elec ~ trend + season)
 cbind(Fitted=fitted(fit), Residuals=residuals(fit)) %>%
-  as.data.frame %>%
+  as.data.frame() %>%
   ggplot(aes(x=Fitted, y=Residuals)) + geom_point()
 ##TODO
 ## A little too obvious. Can we find something more subtle?
@@ -561,7 +561,7 @@ aussies <- window(ausair, end=2011)
 p1 <- autoplot(aussies) + xlab("Year") + ylab("Air Passengers in Australia")
 p2 <- autoplot(guinearice) + xlab("Year") + ylab("Rice Production in Guinea")
 p3 <- cbind(guinearice, aussies) %>%
-  as.data.frame %>%
+  as.data.frame() %>%
   ggplot(aes(x=guinearice, y=aussies)) +
     geom_point() +
     ylab("Air Passengers in Australia (millions)") +
@@ -767,11 +767,11 @@ fit.consBest <- tslm(Consumption ~ Income + Savings + Unemployment, data = uscha
 h <- 4
 newdata <-
   cbind(Income=c(1,1,1,1), Savings=c(0.5,0.5,0.5,0.5), Unemployment=c(0,0,0,0)) %>%
-  as.data.frame
+  as.data.frame()
 fcast.up <- forecast(fit.consBest, newdata=newdata)
 newdata <-
   cbind(Income=rep(-1,h), Savings=rep(-0.5,h), Unemployment=rep(0,h)) %>%
-  as.data.frame
+  as.data.frame()
 fcast.down <- forecast(fit.consBest, newdata=newdata)
 
 autoplot(uschange[,1]) + ylab("% change in US consumption") +
@@ -994,7 +994,7 @@ fit.pw <- tslm(marathon ~ t + t1 + t2)
   t1.new <- t1[length(t1)]+seq(h)
   t2.new <- t2[length(t2)]+seq(h)
 
-newdata <- cbind(t=t.new,t1=t1.new,t2=t2.new)%>%as.data.frame
+newdata <- cbind(t=t.new,t1=t1.new,t2=t2.new)%>%as.data.frame()
 fcasts.pw <- forecast(fit.pw,newdata = newdata)
 
 autoplot(marathon) +

@@ -295,9 +295,12 @@ Step 4
 
 
 ```{r classical-elecequip, echo=TRUE, fig.asp=0.9, fig.cap="A classical multiplicative decomposition of the new orders index for electrical equipment."}
-fit <- decompose(elecequip, type="multiplicative")
-autoplot(fit) + xlab("Year") +
+elecequip %>% decompose(type="multiplicative") %>% 
+  autoplot() + xlab("Year") +
   ggtitle("Classical multiplicative decomposition of electrical equipment index")
+
+
+
 ```
 
 Figure \@ref(fig:classical-elecequip) shows a classical decomposition of the electrical equipment index. Compare this decomposition with that shown in Figure \@ref(fig:elecequip-trend).  The run of large negative remainder values in 2009 suggests that there is some "leakage" of the trend-cycle component into the remainder component. The trend-cycle estimate has over-smoothed the drop in the data, and the corresponding remainder values have been affected by the poor trend-cycle estimate.
@@ -327,9 +330,11 @@ The X11 method is available using the `seas` function from the `seasonal` packag
 
 ```{r x11, echo=TRUE, warning=FALSE, fig.asp=0.9, fig.cap="An X11 decomposition of the new orders index for electrical equipment."}
 library(seasonal)
-fit <- seas(elecequip, x11="")
-autoplot(fit) +
+elecequip %>% seas(x11="") %>%
+autoplot() +
   ggtitle("X11 decomposition of electrical equipment index")
+
+
 ```
 
 Compare this decomposition with the STL decomposition shown in Figure \@ref(fig:elecequip-trend) and the classical decomposition shown in Figure \@ref(fig:classical-elecequip). The X11 trend-cycle has captured the sudden fall in the data in early 2009 better than either of the other two methods, and the unusual observation at the end of 2009 is now more clearly seen in the remainder component.
@@ -366,8 +371,8 @@ The details are beyond the scope of this book. However, a complete discussion of
 
 ```{r seats, echo=TRUE, warning=FALSE, fig.asp=0.9, fig.cap="A SEATS decomposition of the new orders index for electrical equipment."}
 library(seasonal)
-fit <- seas(elecequip)
-autoplot(fit) +
+elecequip %>% seas() %>%
+autoplot() +
   ggtitle("SEATS decomposition of electrical equipment index")
 ```
 
@@ -430,9 +435,11 @@ To forecast the seasonally adjusted component, any non-seasonal forecasting meth
 
 ```{r elecequip4, fig.cap="Naïve forecasts of the seasonally adjusted data obtained from an STL decomposition of the electrical equipment orders data.", echo=TRUE}
 fit <- stl(elecequip, t.window=13, s.window="periodic", robust=TRUE)
-eeadj <- seasadj(fit)
-autoplot(naive(eeadj)) + ylab("New orders index") +
+
+fit %>% seasadj() %>% naive() %>% autoplot() + ylab("New orders index") +
   ggtitle("Naive forecasts of seasonally adjusted data")
+
+
 ```
 
 Figure \@ref(fig:elecequip4) shows naïve forecasts of the seasonally adjusted electrical equipment orders data. These are then “reseasonalized” by adding in the seasonal naïve forecasts of the seasonal component.
@@ -441,8 +448,9 @@ This is made easy with the `forecast` function applied to the `stl` object. You 
 
 
 ```{r elecequip5, fig.cap="Forecasts of the electrical equipment orders data based on a naïve forecast of the seasonally adjusted data and a seasonal naïve forecast of the seasonal component, after an STL decomposition of the data.", echo=TRUE}
-fcast <- forecast(fit, method="naive")
-autoplot(fcast) + ylab("New orders index")
+fit %>% forecast(method="naive") %>% autoplot() + ylab("New orders index")
+
+
 ```
 
 The prediction intervals shown in this graph are constructed in the same way as the point forecasts. That is, the upper and lower limits of the prediction intervals on the seasonally adjusted data are “reseasonalized” by adding in the forecasts of the seasonal component. In this calculation, the uncertainty in the forecasts of the seasonal component has been ignored. The rationale for this choice is that the uncertainty in the seasonal component is much smaller than that for the seasonally adjusted data, and so it is a reasonable approximation to ignore it.

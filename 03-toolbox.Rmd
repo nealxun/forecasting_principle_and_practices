@@ -106,8 +106,8 @@ Some of the variation seen in seasonal data may be due to simple calendar effect
 For example, if you are studying the monthly milk production on a farm, there will be variation between the months simply because of the different numbers of days in each month, in addition to the seasonal variation across the year.
 
 ```{r cowmilk, fig.cap="Monthly milk production per cow. Source: @Cryer2008."}
-cbind(Monthly = milk, DailyAverage=milk/monthdays(milk)) %>%
-  autoplot(facet=TRUE) + xlab("Years") + ylab("Pounds") +
+dframe <- cbind(Monthly = milk, DailyAverage=milk/monthdays(milk)) 
+  autoplot(dframe, facet=TRUE) + xlab("Years") + ylab("Pounds") +
     ggtitle("Milk production per cow")
 ```
 
@@ -579,14 +579,15 @@ The ugliness of the above R code makes this a good opportunity to introduce some
 
 ```r
 dj %>% tsCV(forecastfunction=rwf, drift=TRUE, h=1) -> e
-e^2 %>% mean(na.rm=TRUE) %>% sqrt
-dj %>% rwf(drift=TRUE) %>% residuals -> res
-res^2 %>% mean(na.rm=TRUE) %>% sqrt
+e^2 %>% mean(na.rm=TRUE) %>% sqrt()
+dj %>% rwf(drift=TRUE) %>% residuals() -> res
+res^2 %>% mean(na.rm=TRUE) %>% sqrt()
 ```
 
-The left hand side of each pipe is passed as the first argument to the function on the right hand side. This is consistent with the way we read from left to right in English. A consequence of using pipes is that all other arguments must be named, which also helps readability. When using pipes, it is natural to use the right arrow assignment `->` rather than the left arrow. For example, the third line above can be read as "Take the `dj` series, pass it to `rwf` with `drift=TRUE`, compute the resulting residuals, and store them as `res`".
+The left hand side of each pipe is passed as the first argument to the function on the right hand side. This is consistent with the way we read from left to right in English. A consequence of using pipes is that all other arguments must be named, which also helps readability. When using pipes, it is natural to use the right arrow assignment `->` rather than the left arrow. For example, the third line above can be read as "Take the `dj` series, pass it to `rwf` with `drift=TRUE`, compute the resulting residuals, and store them as `res`". 
 
-In this book, we will use the pipe operator whenever it makes the code easier to read.
+In this book, we will use the pipe operator whenever it makes the code easier to read. In order to be consistent, we will always follow a function with parentheses to differentiate it from other objects, even if it has no arguments. See for example the use of `sqrt()` in the code above. 
+
 
 ###Example: using tsCV() {-}
 ` We could do this with the dj - I have done it below - another idea is to replace all dj by goog??`

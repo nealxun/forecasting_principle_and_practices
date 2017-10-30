@@ -840,35 +840,35 @@ fit %>% forecast(h=8) %>%
 
 4. Combine your previous two functions to produce a function which both finds the optimal values of  $\alpha$ and $\ell_0$, and produces a forecast of the next observation in the series.
 
-4. Data set `books` contains the daily sales of paperback and
+5. Data set `books` contains the daily sales of paperback and
 hardcover books at the same store. The task is to forecast the next four
 days’ sales for paperback and hardcover books.
     a. Plot the series and discuss the main features of the data.
     b. Use the `ses` function to forecast each series, and plot the forecasts.
     c. Compute the RMSE values for the training data in each case.
 
-2.
+6.
     a. Now apply Holt’s linear method to the `paperback` and `hardback` series and compute four-day forecasts in each case.
     b. Compare the RMSE measures of Holt’s method for the two series to those of simple exponential smoothing in the previous question. (Remember that Holt's method is using one more parameter than SES.) Discuss the merits of the two forecasting methods for these data sets.
     c. Compare the forecasts for the two series using both methods. Which do you think is best?
     d. Calculate a 95% prediction interval for the first forecast for each series, using the RMSE values and assuming normal errors. Compare your intervals with those produced using `ses` and `holt`.
 
-3. For this exercise, use the price of a dozen eggs in the United States from 1900--1993 (data set `eggs`). Experiment with the various options in the `holt()` function to see how much the forecasts change with damped trend, or with a Box-Cox transformation. Try to develop an intuition of what each argument is doing to the forecasts.
+7. For this exercise use data set `eggs`, the price of a dozen eggs in the United States from 1900--1993. Experiment with the various options in the `holt()` function to see how much the forecasts change with damped trend, or with a Box-Cox transformation. Try to develop an intuition of what each argument is doing to the forecasts.
 
     [Hint: use `h=100` when calling `holt()` so you can clearly see the differences between the various options when plotting the forecasts.]
 
     Which model gives the best RMSE?
 
-3. Recall your retail time series data  (from Exercise 3 in Section \@ref(ex-graphics)).
+8. Recall your retail time series data  (from Exercise 3 in Section \@ref(ex-graphics)).
     a. Why is multiplicative seasonality necessary for this series?
     b. Apply Holt-Winters’ multiplicative method to the data. Experiment with making the trend damped.
     c. Compare the RMSE of the one-step forecasts from the two methods. Which do you prefer?
     d. Check that the residuals from the best method look like white noise.
     e. Now find the test set RMSE, while training the model to the end of 2010. Can you beat the seasonal naïve approach from Exercise 7 in Section \@ref(ex-toolbox)?
 
-4. For the same retail data, try an STL decomposition applied to the Box-Cox transformed series, followed by ETS on the seasonally adjusted data. How does that compare with your best previous forecasts on the test set?
+9. For the same retail data, try an STL decomposition applied to the Box-Cox transformed series, followed by ETS on the seasonally adjusted data. How does that compare with your best previous forecasts on the test set?
 
-4. For this exercise, use the quarterly UK passenger vehicle production data from 1977Q1--2005Q1 (data set `ukcars`).
+10. For this exercise use data set `ukcars`, the quarterly UK passenger vehicle production data from 1977Q1--2005Q1.
     a. Plot the data and describe the main features of the series.
     b. Decompose the series using STL and obtain the seasonally adjusted data.
     c. Forecast the next two years of the series using an additive damped trend method applied to the seasonally adjusted data. (This can be done in one step using `stlf` with arguments `etsmodel="AAN", damped=TRUE`.
@@ -878,8 +878,7 @@ days’ sales for paperback and hardcover books.
     g. Compare the forecasts from the three approaches? Which seems most reasonable?
     h. Check the residuals of your preferred model.
 
-
-5. For this exercise, use the monthly Australian short-term overseas visitors data, May 1985--April 2005. (Data set: `visitors`.)
+11. For this exercise use data set `visitors`, the monthly Australian short-term overseas visitors data, May 1985--April 2005.
     a. Make a time plot of your data and describe the main features of the series.
     b. Split your data into a training set and a test set comprising the last two years of available data. Forecast the test set using Holt-Winters’ multiplicative method.
     c. Why is multiplicative seasonality necessary here?
@@ -891,11 +890,21 @@ days’ sales for paperback and hardcover books.
     e. Which method gives the best forecasts? Does it pass the residual tests?
     f. Compare the same five methods using time series cross-validation with the `tsCV` function instead of using a training and test set. Do you come to the same conclusions?
 
-6. Compare `ets`, `snaive` and `stlf` on the following six time series. For `stlf`, you might need to use a Box-Cox transformation. Use a test set of three years to decide what gives the best forecasts.
+12. The `fets` function below returns ETS forecasts. 
+```r 
+  fets <- function(y, h) {
+  forecast(ets(y), h = h)
+  }
+```
+
+    a. Apply `tsCV()` for a forecast horizon of $h=4$, for both ETS and seasonal naive methods to the `cement` data, XXX. (Hint: use the newly created `fets` and the existing `snaive` functions as your forecast function arguments.)
+    b. Compute the MSE of the resulting $4$-steps-ahead errors. (Hint: make sure you remove missing values.) Why is there missing values? Comment on which forecasts are more accurate. Is this what you expected?
+
+13. Compare `ets`, `snaive` and `stlf` on the following six time series. For `stlf`, you might need to use a Box-Cox transformation. Use a test set of three years to decide what gives the best forecasts.
        `ausbeer`, `bricksq`, `dole`, `a10`, `h02`, `usmelec`.
 
-7.
-    a. Use `ets()` on some of these series:
+14.
+    a. Use `ets()` on the following series:
 
         `bicoal`, `chicken`, `dole`, `usdeaths`, `lynx`, `ibmclose`, `eggs`.
 

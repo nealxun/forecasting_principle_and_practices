@@ -583,23 +583,22 @@ res^2 %>% mean(na.rm=TRUE) %>% sqrt()
 
 The left hand side of each pipe is passed as the first argument to the function on the right hand side. This is consistent with the way we read from left to right in English. A consequence of using pipes is that all other arguments must be named, which also helps readability. When using pipes, it is natural to use the right arrow assignment `->` rather than the left arrow. For example, the third line above can be read as "Take the `dj` series, pass it to `rwf` with `drift=TRUE`, compute the resulting residuals, and store them as `res`". 
 
-In this book, we will use the pipe operator whenever it makes the code easier to read. In order to be consistent, we will always follow a function with parentheses to differentiate it from other objects, even if it has no arguments. See for example the use of `sqrt()` in the code above. 
+In the remainder of this book, we will use the pipe operator whenever it makes the code easier to read. In order to be consistent, we will always follow a function with parentheses to differentiate it from other objects, even if it has no arguments. See for example the use of `sqrt()` in the code above. 
 
 
 ###Example: using tsCV() {-}
-` We could do this with the dj - I have done it below - another idea is to replace all dj by goog??`
 
 The `goog` data, plotted below, includes daily closing stock prices of Google Inc from the NASDAQ exchange, for 1000 consecutive trading days between 25 February 2013 and 13 February 2017. 
 
 ```{r tsCV, echo=TRUE}
 autoplot(goog)
-
 ```
-The code below evaluates the foresting performance of $1$ to $8$-steps-ahead `naive` forecasts with `tsCV` using MSE as the forecast error measure. The plot shows that the forecast error increases as the forecast horizon increases which we would naturally expect. 
+
+The code below evaluates the forecasting performance of 1- to 8-step-ahead naïve  forecasts with `tsCV`, using MSE as the forecast error measure. The plot shows that the forecast error increases as the forecast horizon increases, as we would expect. 
 
 ```{r tsCVplot, echo=TRUE}
 e <- matrix(NA_real_, nrow = 1000, ncol = 8)
-for (h in 1:8)
+for (h in seq_len(8))
   e[, h] <- tsCV(goog, forecastfunction = naive, h = h)
   
 # Compute the MSE values and remove missing values
@@ -611,7 +610,7 @@ data.frame(h = 1:8, MSE = mse) %>%
 ```
 
 ## Prediction intervals {#sec:PI}
-  
+
 As discussed in Section \@ref(sec-perspective), a prediction interval gives an interval within which we expect $y_{t}$ to lie with a specified probability. For example, assuming that the forecast errors are normally distributed, a 95% prediction interval for the $h$-step forecast is
 $$
   \hat{y}_{T+h|T} \pm 1.96 \hat\sigma_h,

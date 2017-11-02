@@ -238,11 +238,11 @@ tmp[1,] <- c("","$t$","$y_t$","$\\ell_t$",
                    "$b_t$", "$\\hat{y}_{t|t-1}$")
 tmp[28,] <- c("","$h$","","","", "$\\hat{y}_{t+h|t}$")
 knitr::kable(tmp, booktabs=TRUE,
-             caption="Applying Holt's linear method with $\\alpha=0.8317$ and $\\beta^*=0.0001$ to Australian air passenger data (millions of passengers).")
+             caption="Applying Holt's linear method with $\\alpha=0.8321$ and $\\beta^*=0.0001$ to Australian air passenger data (millions of passengers).")
 ```
 
 ```{r checkholt, echo=FALSE}
-if(sum(abs(fc$model$par[1:2] - c(0.8317,0.0001))) > 1e-4)
+if(sum(abs(fc$model$par[1:2] - c(0.8321,0.0001))) > 1e-4)
   stop("Parameter error")
 ```
 
@@ -406,7 +406,7 @@ ctab <- rbind(head(ctab,length(aust)+4),
               c("$h$",rep("",4), "$\\hat{y}_{T+h|T}$"),
               tail(ctab,8))
 # Output
-knitr::kable(ctab, booktabs=TRUE, caption="Applying Holt-Winters' method with additive seasonality for forecasting international visitor nights in Australia. Notice that the additive seasonal component sums to approximately zero. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.250$, $\\beta^*=0.0069$, $\\gamma=0.456$ and RMSE$=1.786$).")
+knitr::kable(ctab, booktabs=TRUE, caption="Applying Holt-Winters' method with additive seasonality for forecasting international visitor nights in Australia. Notice that the additive seasonal component sums to approximately zero. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.306$, $\\beta^*=0.0003$, $\\gamma=0.426$ and RMSE$=1.763$).")
 ```
 
 ```{r tab76, echo=FALSE}
@@ -427,18 +427,18 @@ ctab <- rbind(head(ctab,length(aust)+4),
               c("$h$",rep("",4), "$\\hat{y}_{T+h|T}$"),
               tail(ctab,8))
 # Output
-knitr::kable(ctab,digits=2, booktabs=TRUE, caption="Applying Holt-Winters' method with multiplicative seasonality for forecasting international visitor nights in Australia. Notice that the multiplicative seasonal component sums to approximately $m=4$. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.479$, $\\beta^*=0.055$, $\\gamma=0.0001$ and RMSE$=1.590$).")
+knitr::kable(ctab,digits=2, booktabs=TRUE, caption="Applying Holt-Winters' method with multiplicative seasonality for forecasting international visitor nights in Australia. Notice that the multiplicative seasonal component sums to approximately $m=4$. The smoothing parameters and initial estimates for the components have been estimated by minimizing RMSE ($\\alpha=0.441$, $\\beta^*=0.030$, $\\gamma=0.002$ and RMSE$=1.576$).")
 ```
 
 ```{r checkhw, echo=FALSE}
 # Check numbers in table captions above
-if(sum(abs(fit1[["model"]][["par"]][1:3] - c(0.250, 0.0069*0.250, 0.456))) > 1e-3)
+if(sum(abs(fit1[["model"]][["par"]][1:3] - c(0.3063, 0.0001, 0.4263))) > 1e-3)
   stop("HW additive parameters are wrong")
-if(sum(abs(fit2[["model"]][["par"]][1:3] - c(0.479, 0.055*0.479, 0.0001))) > 1e-3)
+if(sum(abs(fit2[["model"]][["par"]][1:3] - c(0.4406, 0.0134, 0.0023))) > 1e-3)
   stop("HW multiplicative parameters are wrong")
-if(abs(accuracy(fit1$model)[1,"RMSE"] - 1.786) > 1e-3)
+if(abs(accuracy(fit1$model)[1,"RMSE"] - 1.7633) > 1e-3)
   stop("HW additive RMSE is wrong")
-if(abs(accuracy(fit2$model)[1,"RMSE"] - 1.590) > 1e-3)
+if(abs(accuracy(fit2$model)[1,"RMSE"] - 1.5756) > 1e-3)
   stop("HW multiplicative RMSE is wrong")
 ```
 

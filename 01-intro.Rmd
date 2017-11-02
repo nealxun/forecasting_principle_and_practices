@@ -25,13 +25,13 @@ Forecasting is required in many situations: deciding whether to build another po
 
 Some things are easier to forecast than others. The time of the sunrise tomorrow morning can be forecast very precisely. On the other hand, tomorrow’s lotto numbers cannot be forecast with any accuracy. The predictability of an event or a quantity depends on several factors including:
 
- 1. how well we understand the factors that contribute to
+ 1. how well we understand the factors that contribute to it;
  2. how much data are available;
  3. whether the forecasts can affect the thing we are trying to forecast.
 
-For example, forecasts of electricity demand can be highly accurate because all three conditions are usually satisfied. We have a good idea on the contributing factors: electricity demand is driven largely by temperatures, with smaller effects for calendar variation such as holidays, and economic conditions. Provided there is a sufficient history of data on electricity demand and weather conditions, and we have the skills to develop a good model linking electricity demand and the key driver variables, the forecasts can be remarkably accurate.
+For example, forecasts of electricity demand can be highly accurate because all three conditions are usually satisfied. We have a good idea of the contributing factors: electricity demand is driven largely by temperatures, with smaller effects for calendar variation such as holidays, and economic conditions. Provided there is a sufficient history of data on electricity demand and weather conditions, and we have the skills to develop a good model linking electricity demand and the key driver variables, the forecasts can be remarkably accurate.
 
-On the other hand, when forecasting currency exchange rates, only one of the conditions is satisfied: there is plenty of available data. However, we have a very limited understanding of the factors that affect exchange rates, and forecasts of the exchange rate have a direct effect on the rates themselves. If there are well-publicized forecasts that the exchange rate will increase, then people will immediately adjust the price they are willing to pay and so the forecasts are self-fulfilling. In a sense the exchange rates become their own forecasts. This is an example of the “efficient market hypothesis”. Consequently, forecasting whether the exchange rate will rise or fall tomorrow is about as predictable as forecasting whether a tossed coin will come down as a head or a tail. In both situations, you will be correct about 50% of the time, whatever you forecast. In situations like this, forecasters need to be aware of their own limitations, and not claim more than is possible.
+On the other hand, when forecasting currency exchange rates, only one of the conditions is satisfied: there is plenty of available data. However, we have a very limited understanding of the factors that affect exchange rates, and forecasts of the exchange rate have a direct effect on the rates themselves. If there are well-publicized forecasts that the exchange rate will increase, then people will immediately adjust the price they are willing to pay and so the forecasts are self-fulfilling. In a sense, the exchange rates become their own forecasts. This is an example of the “efficient market hypothesis”. Consequently, forecasting whether the exchange rate will rise or fall tomorrow is about as predictable as forecasting whether a tossed coin will come down as a head or a tail. In both situations, you will be correct about 50% of the time, whatever you forecast. In situations like this, forecasters need to be aware of their own limitations, and not claim more than is possible.
 
 Often in forecasting, a key step is knowing when something can be forecast accurately, and when forecasts will be no better than tossing a coin. Good forecasts capture the genuine patterns and relationships which exist in the historical data, but do not replicate past events that will not occur again. In this book, we will learn how to tell the difference between a random fluctuation in the past data that should be ignored, and a genuine pattern that should be modelled and extrapolated.
 
@@ -147,10 +147,6 @@ An explanatory model is very useful because it incorporates information about ot
 
 The model to be used in forecasting depends on the resources and data available, the accuracy of the competing models, and the way in which the forecasting model is to be used.
 
-### Notation {-}
-
-We will use the subscript $t$ for time. For example, $y_t$ will denote the observation at time $t$. We will use $T$ to denote the total number of observations in a time series.
-
 ## Some case studies {#case-studies}
 
 The following four cases are from our consulting practice and demonstrate different types of forecasting situations and the associated problems that often arise.
@@ -193,7 +189,7 @@ Air passenger numbers are affected by school holidays, major sporting events, ad
 A forecasting task usually involves five basic steps.
 
 Step 1: Problem definition.
-:   Often this is the most difficult part of forecasting. Defining the problem carefully requires an understanding of the way the forecasts will be used, who requires the forecasts, and how the forecasting function fits within the organization requiring the forecasts. A  forecaster needs to spend time talking to everyone who will be involved in collecting data, maintaining databases, and using the forecasts for future planning.
+:   Often this is the most difficult part of forecasting. Defining the problem carefully requires an understanding of the way the forecasts will be used, who requires the forecasts, and how the forecasting function fits within the organization requiring the forecasts. A forecaster needs to spend time talking to everyone who will be involved in collecting data, maintaining databases, and using the forecasts for future planning.
 
 Step 2: Gathering information.
 :   There are always at least two kinds of information required: (a) statistical data, and (b) the accumulated expertise of the people who collect the data and use the forecasts. Often, it will be difficult to obtain enough historical data to be able to fit a good statistical model. However, occasionally, very old data will be less useful due to changes in the system being forecast.
@@ -202,7 +198,7 @@ Step 3: Preliminary (exploratory) analysis.
 :   Always start by graphing the data. Are there consistent patterns? Is there a significant trend? Is seasonality important? Is there evidence of the presence of business cycles? Are there any outliers in the data that need to be explained by those with expert knowledge? How strong are the relationships among the variables available for analysis? Various tools have been developed to help with this analysis. These are discussed in Chapters \@ref(ch-graphics) and \@ref(ch-decomposition).
 
 Step 4: Choosing and fitting models.
-:   The best model to use depends on the availability of historical data, the strength of relationships between the forecast variable and any explanatory variables, and the way in which the forecasts are to be used. It is common to compare two or three potential models. Each model is itself an artificial construct that is based on a set of assumptions (explicit and implicit) and usually involves one or more parameters which must be “fitted” using the known historical data. We will discuss regression models (Chapter \@ref(ch-regression)), exponential smoothing methods (Chapter \@ref(ch-expsmooth)), Box-Jenkins ARIMA models (Chapter \@ref(ch-arima)), Dynamic regression models (Chapter \@ref(ch-dynamic)), Hierarchical forecasting (Chapter \@ref(ch-hierarchical)), and a variety of other topics including count time series, neural networks and vector autoregression in Chapter \@ref(ch-advanced).
+:   The best model to use depends on the availability of historical data, the strength of relationships between the forecast variable and any explanatory variables, and the way in which the forecasts are to be used. It is common to compare two or three potential models. Each model is itself an artificial construct that is based on a set of assumptions (explicit and implicit) and usually involves one or more parameters which must be estimated using the known historical data. We will discuss regression models (Chapter \@ref(ch-regression)), exponential smoothing methods (Chapter \@ref(ch-expsmooth)), Box-Jenkins ARIMA models (Chapter \@ref(ch-arima)), Dynamic regression models (Chapter \@ref(ch-dynamic)), Hierarchical forecasting (Chapter \@ref(ch-hierarchical)), and a variety of other topics including count time series, neural networks and vector autoregression in Chapter \@ref(ch-advanced).
 
 Step 5: Using and evaluating a forecasting model.
 :   Once a model has been selected and its parameters estimated, the model is used to make forecasts. The performance of the model can only be properly evaluated after the data for the forecast period have become available. A number of methods have been developed to help in assessing the accuracy of forecasts. There are also organizational issues in using and acting on the forecasts. A brief discussion of some of these issues is given in Chapter \@ref(ch-toolbox).
@@ -241,7 +237,7 @@ autoplot(forecast(fit)) +
 ```
 
 
-A forecast is always based on some observations. Suppose we denote all the information we have observed as ${\cal I}$ and we want to forecast $y_t$. We then write $y_{t} | {\cal I}$ meaning “the random variable $y_{t}$ given what we know in ${\cal I}$”. The set of values that this random variable could take, along with their relative probabilities, is known as the “probability distribution” of $y_{t} |{\cal I}$. In forecasting, we call this the “forecast distribution”.
+We will use the subscript $t$ for time. For example, $y_t$ will denote the observation at time $t$. Suppose we denote all the information we have observed as ${\cal I}$ and we want to forecast $y_t$. We then write $y_{t} | {\cal I}$ meaning “the random variable $y_{t}$ given what we know in ${\cal I}$”. The set of values that this random variable could take, along with their relative probabilities, is known as the “probability distribution” of $y_{t} |{\cal I}$. In forecasting, we call this the “forecast distribution”.
 
 When we talk about the “forecast”, we usually mean the average value of the forecast distribution, and we put a “hat” over $y$ to show this. Thus, we write the forecast of $y_t$ as $\hat{y}_t$, meaning the average of the possible values that $y_t$ could take given everything we know. Occasionally, we will use $\hat{y}_t$ to refer to the *median* (or middle value) of the forecast distribution instead.
 

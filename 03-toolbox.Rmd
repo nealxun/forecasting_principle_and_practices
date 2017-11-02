@@ -189,11 +189,11 @@ For a Box-Cox transformation, the backtransformed mean is given by
 (\#eq:backtransformmean)
 y_t =
   \begin{cases}
-     \exp(w_t)\left[1 + \frac{\sigma^2}{2}\right] & \text{if $\lambda=0$;}\\
-     (\lambda w_t+1)^{1/\lambda}\left[1 + \frac{\sigma^2(1-\lambda)}{2(\lambda w_t+1)^{2}}\right] & \text{otherwise;}
+     \exp(w_t)\left[1 + \frac{\sigma_h^2}{2}\right] & \text{if $\lambda=0$;}\\
+     (\lambda w_t+1)^{1/\lambda}\left[1 + \frac{\sigma_h^2(1-\lambda)}{2(\lambda w_t+1)^{2}}\right] & \text{otherwise;}
   \end{cases}
 \end{equation}
-where $\sigma^2$ is the forecast variance. The larger the forecast variance, the bigger the difference between the mean and the median.
+where $\sigma_h^2$ is the $h$-step forecast variance. The larger the forecast variance, the bigger the difference between the mean and the median.
 
 The difference between the simple back-transformed forecast given by \@ref(eq:backtransform) and the mean given by \@ref(eq:backtransformmean) is called the "bias". When we use the mean, rather than the median, we say the point forecasts have been "bias-adjusted". To see how much difference this bias-adjustment makes, consider the following example.  Here we are forecasting the average annual price of eggs using the drift method with a log transformation $(\lambda=0)$. The log transformation is useful in this case to ensure the forecasts and the prediction intervals stay positive.
 
@@ -253,7 +253,7 @@ In addition to these essential properties, it is useful (but not necessary) for 
   3. The residuals have constant variance.
   4. The residuals are normally distributed.
 
-These two properties make the calculation of prediction intervals easier (see the [next section](http://otexts.com/fpp/2/7) for an example). However, a forecasting method that does not satisfy these properties cannot necessarily be improved. Sometimes applying a Box-Cox transformation  may assist with these properties, but otherwise there is usually little that you can do to ensure that your residuals have constant variance and a normal distribution. Instead, an alternative approach to obtaining prediction intervals is necessary. Again, we will not address how to do this until later in the book.
+These two properties make the calculation of prediction intervals easier (see Section \@ref(sec:PI) for an example). However, a forecasting method that does not satisfy these properties cannot necessarily be improved. Sometimes applying a Box-Cox transformation  may assist with these properties, but otherwise there is usually little that you can do to ensure that your residuals have constant variance and a normal distribution. Instead, an alternative approach to obtaining prediction intervals is necessary. Again, we will not address how to do this until later in the book.
 
 ###Example: Forecasting the Dow-Jones Index {-}
 
@@ -613,27 +613,31 @@ data.frame(h = 1:8, MSE = mse) %>%
   ggplot(aes(x = h, y = MSE)) + geom_point()
 ```
 
-```{r , eval=FALSE, include=FALSE}
-e <- matrix(NA_real_, nrow = length(dj), ncol = 8)
-for (h in 1:8)
-  e[, h] <- tsCV(dj, forecastfunction = naive, h = h)
+## Prediction intervals {#sec:PI}
   
-# Compute the MSE values and remove missing values
-mse <- colMeans(e^2, na.rm = T)
+As discussed in Section \@ref(sec-perspective), a prediction interval gives an interval within which we expect $y_{t}$ to lie with a specified probability. For example, assuming that the forecast errors are normally distributed, a 95% prediction interval for the $h$-step forecast is
+$$
+  \hat{y}_{T+h|T} \pm 1.96 \hat\sigma_h,
+$$
+where $\hat\sigma_h$ is an estimate of the standard deviation of the $h$-step forecast distribution.
 
-# Plot the MSE values against the forecast horizon
-data.frame(h = 1:8, MSE = mse) %>%
-  ggplot(aes(x = h, y = MSE)) + geom_point()
+More generally, a prediction interval can be written as 
+$$
+  \hat{y}_{T+h|T} \pm k \hat\sigma_h
+$$ 
+where the multiplier $k$ depends on the coverage probability. In this book we usually calculate 80% intervals and 95% intervals, although any percentage may be used. The following table gives the value of $k$ for a range of coverage probabilities assuming normally distributed forecast errors.
 
+```{r pcmultipliers, echo=FALSE}
+p <- c(seq(50,95,by=5),96:99)
+tab <- data.frame(Percentage=p, Multiplier=qnorm(0.5+p/200))
+knitr::kable(tab, digits=2, booktabs=TRUE,
+             caption="Multipliers to be used for prediction intervals.")
 ```
 
-## Prediction intervals
 
-As discussed in Section \@ref(sec-perspective), a prediction interval gives an interval within which we expect $y_{t}$ to lie with a specified probability. For example, assuming that the forecast errors are uncorrelated and normally distributed, a simple 95% prediction interval for the next observation in a time series is
-$$
-  \hat{y}_{t} \pm 1.96 \hat\sigma,
-$$
-where $\hat\sigma$ is an estimate of the standard deviation of the forecast distribution. In this book we usually calculate 80% intervals and 95% intervals, although any percentage may be used.
+The value of prediction intervals is that they express the uncertainty in the forecasts. If we only produce point forecasts, there is no way of telling how accurate the forecasts are. However, if we also produce prediction intervals, then it is clear how much uncertainty is associated with each forecast. For this reason, point forecasts can be of almost no value without the accompanying prediction intervals.
+
+### One-step prediction intervals {-}
 
 When forecasting one step ahead, the standard deviation of the forecast distribution is almost the same as the standard deviation of the residuals. (In fact, the two standard deviations are identical if there are no parameters to be estimated, as is the case with the naïve method. For forecasting methods involving parameters to be estimated, the standard deviation of the forecast distribution is slightly larger than the residual standard deviation, although this difference is often ignored.)
 
@@ -654,27 +658,32 @@ $$
   `r djf` \pm `r format(mult[1],digits=3)`(`r format(djsd,digits=2,nsmall=2)`) = [`r format(lower[1],digits=4)`, `r format(upper[1],digits=4)`].
 $$
 
-The value of the multiplier (1.96 or 1.28) determines the percentage of the prediction interval. The following table gives the values to be used for different percentages.
+The value of the multiplier (1.96 or 1.28) is taken from Table \@ref(tab:pcmultipliers).
 
 
-```{r pcmultipliers, echo=FALSE}
-p <- c(seq(50,95,by=5),96:99)
-tab <- data.frame(Percentage=p, Multiplier=qnorm(0.5+p/200))
-knitr::kable(tab, digits=2, booktabs=TRUE,
-             caption="Multipliers to be used for prediction intervals.")
-```
 
-The use of this table and the formula $\hat{y}_{t} \pm k \hat\sigma$ (where $k$ is the multiplier) assumes that the residuals are normally distributed and uncorrelated. If either of these conditions does not hold, then this method of producing a prediction interval cannot be used.
+### Multi-step prediction intervals {-}
 
-The value of prediction intervals is that they express the uncertainty in the forecasts. If we only produce point forecasts, there is no way of telling how accurate the forecasts are. However, if we also produce prediction intervals, then it is clear how much uncertainty is associated with each forecast. For this reason, point forecasts can be of almost no value without the accompanying prediction intervals.
+A common feature of prediction intervals is that they increase in length as the forecast horizon increases. The further ahead we forecast, the more uncertainty is associated with the forecast, and thus the wider the prediction intervals. That is, $\sigma_h$ usually increases with $h$ (although there are some non-linear forecasting methods that do not have this property).
 
-To produce a prediction interval, it is necessary to have an estimate of the standard deviation of the forecast distribution. For one-step forecasts, the residual standard deviation provides a good estimate of the forecast standard deviation. But multi-step forecasts, a more complicated method of calculation is required. These calculations are usually done with standard forecasting software and need not trouble the forecaster (unless he or she is writing the software!).
+To produce a prediction interval, it is necessary to have an estimate of $\sigma_h$. As already noted, for one-step forecasts ($h=1$),  the residual standard deviation provides a good estimate of the forecast standard deviation $\sigma_1$. For multi-step forecasts, a more complicated method of calculation is required. These calculations assume that the residuals are uncorrelated.
 
-A common feature of prediction intervals is that they increase in length as the forecast horizon increases. The further ahead we forecast, the more uncertainty is associated with the forecast, and thus the wider the prediction intervals. However, there are some (non-linear) forecasting methods that do not have this property.
+### Benchmark methods {-}
 
-If a transformation has been used, then the prediction interval should be computed on the transformed scale, and the end points back-transformed to give a prediction interval on the original scale. This approach preserves the probability coverage of the prediction interval, although it will no longer be symmetric around the point forecast.
+For the four benchmark methods, it is possible to mathematically derive the forecast standard deviation under the assumption of uncorrelated residuals. If $\hat{\sigma}_h$ denotes the standard deviation of the $h$-step forecast distribution, and $\hat{\sigma}$ is the residual standard deviation, then we can use the following expressions.
 
-Prediction intervals are computed for you when using any of the benchmark forecasting methods. For example, here is the output when using the naïve method for the Dow-Jones index.
+**Mean forecasts**: $\hat\sigma_h = \hat\sigma\sqrt{1 + 1/T}$
+
+**Naïve forecasts**: $\hat\sigma_h = \hat\sigma\sqrt{h}$
+
+**Seasonal naïve forecasts** $\hat\sigma_h = \hat\sigma\sqrt{\lfloor (h-1)/m \rfloor + 1}$.
+
+**Drift forecasts**: $\hat\sigma_h = \hat\sigma\sqrt{h(1+h/T)}$.
+
+Note that when $h=1$ and $T$ is large, these all give the same approximate value $\hat\sigma$.
+
+
+Prediction intervals will be computed for you when using any of the benchmark forecasting methods. For example, here is the output when using the naïve method for the Dow-Jones index.
 
 ```{r djforecasts, echo=TRUE}
 naive(dj2)
@@ -686,10 +695,43 @@ When plotted, the prediction intervals are shown as shaded region, with the stre
 autoplot(naive(dj2))
 ```
 
+### Bootstrapped prediction intervals {-}
+
+When a normal distribution for the forecast errors is an unreasonable assumption, one alternative is to use bootstrapping, which only assumes that the forecast errors are uncorrelated.
+
+A forecast error is defined as $e_t = y_t - \hat{y}_{t|t-1}$. We can re-write this as
+$$
+  y_t = \hat{y}_{t|t-1} + e_t.
+$$
+So we can simulate the next observation of a time series using
+$$
+  y_{T+1} = \hat{y}_{T+1|T} + e_{T+1}
+$$
+where $\hat{y}_{T+1|T}$ is the one-step forecast and $e_{T+1}$ is the unknown future error. Assuming future errors will be similar to past errors, we can replace $e_{T+1}$ by sampling from the collection of errors we have seen in the past (i.e., the residuals). Adding the new simulated observation to our data set, we can repeat the process to obtain
+$$
+  y_{T+2} = \hat{y}_{T+2|T+1} + e_{T+2}
+$$
+where $e_{T+2}$ is another draw from the collection of residuals. Continuing in this way, we can simulate an entire set of future values for our time series.
+
+Doing this repeatedly, we obtain many possible futures. Then we can compute prediction intervals by calculating percentiles for each forecast horizon. The result is called a "bootstrapped" prediction interval. The name "bootstrap" is a reference to pulling ourselves up by our bootstraps, because the process allows us to measure future uncertainty by only using the historical data.
+
+To generate such intervals, we can simply add the `bootstrap` argument to our forecasting functions. For example:
+
+```{r djforecastsboot, echo=TRUE}
+naive(dj2, bootstrap=TRUE)
+```
+
+In this case, they are very similar (but not identical) to the prediction intervals based on the normal distribution.
+
+### Prediction intervals with transformations {-}
+
+If a transformation has been used, then the prediction interval should be computed on the transformed scale, and the end points back-transformed to give a prediction interval on the original scale. This approach preserves the probability coverage of the prediction interval, although it will no longer be symmetric around the point forecast.
+
+The back-transformation of prediction intervals is done automatically using the functions in the `forecast` package in R, provided you have used the `lambda` argument when computing the forecasts.
 
 ## The forecast package in R
 
-This book uses the facilities in the `forecast` package in R (which is loaded automatically whenever you load the `fpp` package). This appendix briefly summarises some of the features of the package. Please refer to the help files for individual functions to learn more, and to see some examples of their use.
+This book uses the facilities in the `forecast` package in R (which is loaded automatically whenever you load the `fpp2` package). This appendix briefly summarises some of the features of the package. Please refer to the help files for individual functions to learn more, and to see some examples of their use.
 
 ### Functions that output a forecast object: {-}
 

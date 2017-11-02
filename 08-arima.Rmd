@@ -552,12 +552,12 @@ knitr::include_graphics("arimaflowchart.png")
 We will apply this procedure to the seasonally adjusted electrical equipment orders data shown in Figure \@ref(fig:ee1).
 
 ```{r ee1, fig.cap="Seasonally adjusted electrical equipment orders index in the Euro area."}
-elecequip %>% stl(s.window='periodic') %>% seasadj -> eeadj
+elecequip %>% stl(s.window='periodic') %>% seasadj() -> eeadj 
 autoplot(eeadj)
 ```
 
 ```{r ee2, fig.cap="Time plot and ACF and PACF plots for the differenced seasonally adjusted electrical equipment data."}
-eeadj %>% diff %>% ggtsdisplay(main="")
+eeadj %>% diff() %>% ggtsdisplay(main="")
 ```
 
 1.  The time plot shows some sudden changes, particularly the big drop in 2008/2009. These changes are due to the global economic environment. Otherwise there is nothing unusual about the time plot and there appears to be no need to do any data adjustments.
@@ -942,8 +942,42 @@ The following table gives the equivalence relationships for the two classes of m
 | ETS(A,A,A)    | ARIMA(0,1,$m+1$)(0,1,0)$_m$ |                                      |
 | ETS(A,A,A)    | ARIMA(1,0,$m+1$)(0,1,0)$_m$ |                                      |
 
-
 For the seasonal models, the ARIMA parameters have a large number of restrictions.
+
+The AICc is useful for selecting between models in the same class. For example, we can use it to select an ARIMA model between candidate ARIMA models^[Note that comparing information criteria is only valid for ARIMA models of the same orders of differencing.] or an ETS model between candidate ETS models. However, it cannot be used to compare between ETS and ARIMA models because they are in different model classes. The examples below demonastrate selecting between these classes of models. 
+
+###Example: Comparing `auto.arima()` and `ets()` on non-seasonal data {-}
+
+We can use time series cross-validation to compare an ARIMA model and an ETS model. The code below provides functions that return forecast objects from `auto.arima()` and `ets()` respectively. 
+
+```{r}
+fets <- function(x, h) {
+  forecast(ets(x), h = h)
+}
+farima <- function(x, h) {
+  forecast(auto.arima(x), h=h)
+}
+```
+The returned objects can then be passed into `tsCV`. Let's consider models ARIMA and ETS models for the `aus` data. 
+
+Let's consider `air` as introduced in Section \@ref(sec-7-trendmethods) where
+```r
+air <- window(ausair, start=1990)
+```
+
+
+```{r echo=TRUE}
+# Compute CV errors for ETS as e1
+e1 <- tsCV(austa, fets, h=1)
+
+# Compute CV errors for ARIMA as e2
+e2 <- tsCV(austa, farima, h=1)
+
+# Find MSE of each model class
+mean(e1^2, na.rm=TRUE)
+mean(e2^2, na.rm=TRUE)
+```
+
 
 
 ##Exercises
@@ -976,7 +1010,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
 
 4. For the `enplanements` data, write down the differences you chose above using backshift operator notation.
 
-5. For your retail data (Exercise 1 of Section \@ref(ex:graphics)), find the appropriate order of differencing (after transformation if necessary) to obtain stationary data.
+5. For your retail data (from Exercise 3 in Section \@ref(ex-graphics)), find the appropriate order of differencing (after transformation if necessary) to obtain stationary data.
 
 6. Use R to simulate and plot some data from simple ARIMA models.
     (a) Use the following R code to generate data from an AR(1) model with $\phi_{1} = 0.6$ and $\sigma^2=1$. The process starts with $y_1=0$.
@@ -995,8 +1029,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (f) Generate data from an AR(2) model with $\phi_{1} =-0.8$, $\phi_{2} = 0.3$ and $\sigma^2=1$. (Note that these parameters will give a non-stationary series.)
     (g) Graph the latter two series and compare them.
 
-7. Consider the number of women murdered each year (per 100,000 standard population) in the United States (data set `wmurders`).
-
+7. Consider the number of women murdered each year (per 100,000 standard population) in the United States. (Data set `wmurders`).
     (a) By studying appropriate graphs of the series in R, find an appropriate ARIMA($p,d,q$) model for these data.
     (b) Should you include a constant in the model? Explain.
     (c) Write this model in terms of the backshift operator.
@@ -1004,6 +1037,13 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
     (e) Forecast three times ahead. Check your forecasts by hand to make sure that you know how they have been calculated.
     (f) Create a plot of the series with forecasts and prediction intervals for the next three periods shown.
     (g) Does `auto.arima` give the same model you have chosen? If not, which model do you think is better?
+
+8. Consider the total international visitors to Australia (in millions) for the period 1980-2015. (Data set `austa`.) 
+    a. Use `auto.arima` to find an appropriate ARIMA model. What model was selected. Check that the residuals look like white noise. Plot forecasts for the next 10 periods. 
+    b. Plot forecasts from an ARIMA(0,1,1) model with no drift and compare these to part (a). Remove the MA term and plot again.
+    c. Plot forecasts from an ARIMA(2,1,3) model with drift. Remove the constant and see what happens.
+    d. Plot forecasts from an ARIMA(0,0,1) model with a constant. Remove the MA term and plot again.
+    e. Plot forecasts from an ARIMA(0,2,1) model with no constant.
 
 8. For the `usgdp` series:
 	  a. if necessary, find a suitable Box-Cox transformation for the data;
@@ -1013,7 +1053,7 @@ For the seasonal models, the ARIMA parameters have a large number of restriction
 	  e. produce forecasts of your fitted model. Do the forecasts look reasonable?
 	  f. compare the results with what you would obtain using `ets()` (with no transformation).
 
-9. Consider the quarterly number of international tourists to Australia for the period 1999--2010. (Data set `austourists`.)
+9. Consider `austourists`, the quarterly number of international tourists to Australia for the period 1999--2010. (Data set `austourists`.)
     (a) Describe the time plot.
     (b) What can you learn from the ACF graph?
     (c) What can you learn from the PACF graph?

@@ -370,18 +370,15 @@ extracts all the first quarters.
 
 ### Forecast errors  {-}
 
-A forecast "error" is the difference between an observed value and its forecast. Here "error" does not mean a mistake, it means the unpredictable part of an observation.
-
-`We say here WHEN COMPUTED - did you have something in mind or should be change this to simply say - A forecast error is the difference between the observed value and the forecast using the training data:` 
-When computed on the test set, the forecast error is the difference between the observed values and the forecasts obtaining using the training data:
+A forecast "error" is the difference between an observed value and its forecast. Here "error" does not mean a mistake, it means the unpredictable part of an observation. It can be written as
 $$
   e_{T+h} = y_{T+h} - \hat{y}_{T+h|T},
 $$
 where the training data is given by $\{y_1,\dots,y_T\}$ and the test data is given by $\{y_{T+1},y_{T+2},\dots\}$. 
 
-Note that forecast errors are different from residuals in two ways. Firstly, residuals are calculated on the training set while forecast errors are calculated on the test set. Secondly residuals are based on one-step forecasts while forecast errors can involve multi-step forecasts.
+Note that forecast errors are different from residuals in two ways. Firstly, residuals are calculated on the *training* set while forecast errors are calculated on the *test* set. Secondly residuals are based on *one-step* forecasts while forecast errors can involve *multi-step* forecasts.
 
-We measure forecast accuracy by summarising the forecast errors in different ways.
+We can measure forecast accuracy by summarising the forecast errors in different ways.
 
 ### Scale-dependent errors {-}
 

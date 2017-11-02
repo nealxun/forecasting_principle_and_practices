@@ -3,12 +3,6 @@
  * Add Datacamp examples
  * examples involving electricity demand, online shopping, and restaurant bookings.
 
-## Toolbox chapter
- * bias adjustment for Box-Cox transformations (blog post)
- * Some derivations of prediction intervals -- random walks, meanf, SES,
- * subset and window for time series
- * bootstrapped prediction intervals and simulations
-
 ## STLF chapter
  * different types of residuals for STLF.
 

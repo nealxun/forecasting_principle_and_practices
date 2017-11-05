@@ -958,26 +958,47 @@ farima <- function(x, h) {
   forecast(auto.arima(x), h=h)
 }
 ```
-The returned objects can then be passed into `tsCV`. Let's consider models ARIMA and ETS models for the `aus` data. 
-
-Let's consider `air` as introduced in Section \@ref(sec-7-trendmethods) where
-```r
+The returned objects can then be passed into `tsCV`. Let's consider ARIMA models and ETS models for the `air` data as introduced in Section \@ref(sec-7-trendmethods) where, `air <- window(ausair, start=1990)`.
+```{r include=FALSE}
 air <- window(ausair, start=1990)
 ```
 
 
 ```{r echo=TRUE}
 # Compute CV errors for ETS as e1
-e1 <- tsCV(austa, fets, h=1)
-
+e1 <- tsCV(air, fets, h=1)
 # Compute CV errors for ARIMA as e2
-e2 <- tsCV(austa, farima, h=1)
-
+e2 <- tsCV(air, farima, h=1)
 # Find MSE of each model class
 mean(e1^2, na.rm=TRUE)
 mean(e2^2, na.rm=TRUE)
 ```
+In this case the ets model should be used as it has a lower tsCV statistic based on MSEs. Below we generate and plot forecasts for the next 5 years
 
+```{r echo=TRUE}
+air %>% ets() %>% forecast() %>% autoplot()
+```
+
+
+###Example: Comparing `auto.arima()` and `ets()` on seasonal data {-}
+ 
+In this case we want to compare seasonal ARIMA and ETS models applied to the quarterly cement production data `qcement`. Because the series is very long, we can afford to use a training and test set rather than time series cross-validation. The advantage is that this is much faster.
+
+We create the training set from the beginning of 1988 to the end of 2007 and select an ARIMA and an ETS model using the `auto.arima` and `ets` functions. 
+
+```{r, echo=TRUE}
+# Use 20 years of the qcement data beginning in 1988
+train <- window(qcement, start = 1988, end = c(2007,4))
+
+# Fit an ARIMA and an ETS model to the training data
+fit1 <- auto.arima(train) %>% checkresiduals()
+fit2 <- ets(train) %>% checkresiduals()
+
+fc1 <- forecast(fit1, h = 1+4*(2013-2007))
+fc2 <- forecast(fit2, h = 1+4*(2013-2007))
+
+
+```
 
 
 ##Exercises

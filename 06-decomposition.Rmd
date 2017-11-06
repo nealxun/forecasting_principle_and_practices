@@ -477,7 +477,7 @@ As well as the naïve method, several other possible forecasting methods are ava
     (e) Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier?
     (f) Does it make any difference if the outlier is near the end rather than in the middle of the time series?
 
-3. Recall your retail time series data  (from Exercise 1 in Section \@ref(ex:graphics)).
+3. Recall your retail time series data  (from Exercise 3 in Section \@ref(ex-graphics)).
    Decompose the series using X11. Does it reveal any outliers, or unusual features that you had not noticed previously?
 
 4. Figures \@ref(fig:labour) and \@ref(fig:labour2) shows the result of decomposing the number of persons in the civilian labor force in Australia each month from February 1978 to August 1995.

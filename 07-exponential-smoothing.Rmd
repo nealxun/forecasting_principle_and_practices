@@ -186,7 +186,7 @@ The forecasts for the period 2014--2018 are plotted in Figure \@ref(fig:ses). Al
 
 The prediction intervals shown here are calculated using the methods described in Section \@ref(sec-7-ETS). The prediction intervals show that there is considerable uncertainty in the future values of oil production over the five-year forecast period. So interpreting the point forecasts without accounting for the large uncertainty can be very misleading.
 
-## Trend methods
+## Trend methods {#sec-7-trendmethods}
 
 ###Holt’s linear trend method {-}
 

@@ -6,7 +6,7 @@ But before we produce graphs, we need to set up our time series in R.
 
 ## `ts` objects
 
-A time series can be thought of as a list of numbers, along with some information about what times those numbers were recorded. This information is stored in a `ts` object in R.
+A time series can be thought of as a list of numbers, along with some information about what times those numbers were recorded. This information can be stored as a `ts` object in R.
 
 Suppose you have annual observations for the last few years:
 
@@ -22,7 +22,7 @@ We turn this into a `ts` object using the `ts` function:
 y <- ts(c(123,39,78,52,110), start=2012)
 ```
 
-It is assumed that you have annual data, with one observation per year, so you only need to provide the starting year.
+If you have annual data, with one observation per year, you only need to provide the starting year (or the ending year).
 
 For observations that are more frequent than once per year, you simply add a `frequency` argument. For example, if your monthly data is already stored as a numerical vector `z`, then it can be converted to a `ts` object like this:
 
@@ -80,7 +80,8 @@ autoplot(a10) +
   ylab("$ million") + xlab("Year")
 ```
 
-Here, there is a clear and increasing trend. There is also a strong seasonal pattern that increases in size as the level of the series increases. The sudden drop at the end of each year is caused by a government subsidisation scheme that makes it cost-effective for patients to stockpile drugs at the end of the calendar year. Any forecasts of this series would need to capture the seasonal pattern, and the fact that the trend is changing slowly.
+Here, there is a clear and increasing trend. There is also a strong seasonal pattern that increases in size as the level of the series increases. The sudden drop at the start of each year is caused by a government subsidisation scheme that makes it cost-effective for patients to stockpile drugs at the end of the calendar year.   
+Any forecasts of this series would need to capture the seasonal pattern, and the fact that the trend is changing slowly.
 
 ##Time series patterns {#tspatterns}
 
@@ -163,22 +164,25 @@ The horizontal lines indicate the means for each month. This form of plot enable
 
 The graphs discussed so far are useful for visualizing individual time series. It is also useful to explore relationships *between* time series.
 
-Figure \@ref(fig:motel) shows two time series: monthly takings (in \$million) from accommodation at hotels, motels and guest houses in Victoria (top) and total room nights for each corresponding month (in thousands). "Room nights" is the total number of rooms booked multiplied by the number of nights people stayed in those rooms.
+Figure \@ref(fig:edemand) shows two time series: half-hourly electricity demand (in GigaWatts) and temperature (in degrees Celsius), for 2014 in Victoria, Australia. The temperatures are for Melbourne, the largest city in Victoria, while the demand values are for the entire state.
 
-```{r motel, fig.cap="Monthly takings and room nights for accommodation in Victoria, Australia."}
-autoplot(motel[,2:1]/1000, facet=TRUE) +
-  xlab("Year") + ylab("") +
-  ggtitle("Total monthly accommodation: Victoria, Australia")
+```{r edemand, fig.cap="Half hourly electricity demand and temperatures in Victoria, Australia, for 2014."}
+month.breaks <- cumsum(c(0,31,28,31,30,31,30,31,31,30,31,30,31)*48)
+autoplot(elecdemand[,c(1,3)], facet=TRUE) +
+  xlab("Year: 2014") + ylab("") +
+  ggtitle("Half-hourly electricity demand: Victoria, Australia") +
+  scale_x_continuous(breaks=2014+month.breaks/max(month.breaks), 
+    minor_breaks=NULL, labels=c(month.abb,month.abb[1]))
 ```
 
-We can study the relationship between takings and room nights by plotting one series against the other.
+We can study the relationship between demand and temperature by plotting one series against the other.
 
-```{r motel2, fig.cap="Monthly takings plotted against room nights for accommodation in Victoria, Australia."}
-qplot(Roomnights/1000, Takings/1000, data=as.data.frame(motel)) +
-  ylab("Takings ($million)") + xlab("Room nights (thousands)")
+```{r edemand2, fig.cap="Half-hourly electricity demand plotted against temperature for 2014 in Victoria, Australia."}
+qplot(Temperature, Demand, data=as.data.frame(elecdemand)) +
+  ylab("Demand (GW)") + xlab("Temperature (Celsius)")
 ```
 
-This scatterplot helps us to visualize the relationship between the variables.
+This scatterplot helps us to visualize the relationship between the variables. It is clear that high demand occurs when temperatures are high due to the effect of air-conditioning. But there is also a heating effect, where demand increases for very low temperatures. 
 
 
 
@@ -293,9 +297,14 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
     c. Use `which.max()` to spot the outlier in the `gold` series. Which observation was it?
 
 
-2. Download some data from [http://robjhyndman.com/data/tute1.csv](http://robjhyndman.com/data/tute1.csv). Open the file `tute1.csv` in Excel and review its contents. You should find four columns of information. Columns B through D each contain a quarterly series, labelled Sales, AdBudget and GDP. Sales contains the quarterly sales for a small company over the period 1981-2005. AdBudget is the advertising budget and GDP is the gross domestic product. All series have been adjusted for inflation.
+2. Download some data from [OTexts.org/fpp2/extrafiles/tute1.csv](extrafiles/tute1.csv). Open the file `tute1.csv` in Excel (or some other spreadsheet application) and review its contents. You should find four columns of information. Columns B through D each contain a quarterly series, labelled Sales, AdBudget and GDP. Sales contains the quarterly sales for a small company over the period 1981-2005. AdBudget is the advertising budget and GDP is the gross domestic product. All series have been adjusted for inflation.
 
-    a.  Using the File menu in RStudio, import the downloaded file. You should see the data in a table within a panel in RStudio.
+    a.  You can read the data into R with the following script:
+
+        ```r
+        tute1 <- read.csv("tute1.csv", header=TRUE)
+        View(tute1)
+        ```
 
     b.  Convert the data to time series
 

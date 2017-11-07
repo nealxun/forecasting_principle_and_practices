@@ -944,7 +944,7 @@ The following table gives the equivalence relationships for the two classes of m
 
 For the seasonal models, the ARIMA parameters have a large number of restrictions.
 
-The AICc is useful for selecting between models in the same class. For example, we can use it to select an ARIMA model between candidate ARIMA models^[Note that comparing information criteria is only valid for ARIMA models of the same orders of differencing.] or an ETS model between candidate ETS models. However, it cannot be used to compare between ETS and ARIMA models because they are in different model classes. The examples below demonastrate selecting between these classes of models. 
+The AICc is useful for selecting between models in the same class. For example, we can use it to select an ARIMA model between candidate ARIMA models^[<!-- Do we say this somewhere else??--> Note that comparing information criteria is only valid for ARIMA models of the same orders of differencing.] or an ETS model between candidate ETS models. However, it cannot be used to compare between ETS and ARIMA models because they are in different model classes. The examples below demonastrate selecting between these classes of models. 
 
 ###Example: Comparing `auto.arima()` and `ets()` on non-seasonal data {-}
 
@@ -973,7 +973,7 @@ e2 <- tsCV(air, farima, h=1)
 mean(e1^2, na.rm=TRUE)
 mean(e2^2, na.rm=TRUE)
 ```
-In this case the ets model should be used as it has a lower tsCV statistic based on MSEs. Below we generate and plot forecasts for the next 5 years
+In this case the ets model has a lower tsCV statistic based on MSEs. Below we generate and plot forecasts for the next 5 years from this model.
 
 ```{r echo=TRUE}
 air %>% ets() %>% forecast() %>% autoplot()
@@ -982,22 +982,31 @@ air %>% ets() %>% forecast() %>% autoplot()
 
 ###Example: Comparing `auto.arima()` and `ets()` on seasonal data {-}
  
-In this case we want to compare seasonal ARIMA and ETS models applied to the quarterly cement production data `qcement`. Because the series is very long, we can afford to use a training and test set rather than time series cross-validation. The advantage is that this is much faster.
+In this case we want to compare seasonal ARIMA and ETS models applied to the quarterly cement production data `qcement`. Because the series is very long, we can afford to use a training and test set rather than time series cross-validation. The advantage is that this is much faster. We create a training set from the beginning of 1988 to the end of 2007 and select an ARIMA and an ETS model using the `auto.arima` and `ets` functions.
 
-We create the training set from the beginning of 1988 to the end of 2007 and select an ARIMA and an ETS model using the `auto.arima` and `ets` functions. 
+<!-- I tried ausbeer, euretail also here but qcement gave the most interesting and straight forward example - so left this here - in all cases ets was best?? -->
+
+<!-- The commnets/text after the code does not become coloured/italics. Do we know why?? Tried to add spaces but did not work-->
 
 ```{r, echo=TRUE}
-# Use 20 years of the qcement data beginning in 1988
-train <- window(qcement, start = 1988, end = c(2007,4))
-
-# Fit an ARIMA and an ETS model to the training data
-fit1 <- auto.arima(train) %>% checkresiduals()
-fit2 <- ets(train) %>% checkresiduals()
-
-fc1 <- forecast(fit1, h = 1+4*(2013-2007))
-fc2 <- forecast(fit2, h = 1+4*(2013-2007))
-
-
+# Consider the qcement data beginning in 1988
+cement <- window(qcement, start=1988)
+# Use 20 years of the data as the training set
+train <- window(cement, end=c(2007,4))
+# Fit an ARIMA model to the training data
+fit1 <- auto.arima(train) 
+checkresiduals(fit1)
+# Fit an ETS model to the training data
+fit2 <- ets(train) 
+checkresiduals(fit2) 
+# Generate forecasts over the test set
+fc1 <- forecast(fit1, h = 4*(2013-2007)+1) 
+fc2 <- forecast(fit2, h = 4*(2013-2007)+1) 
+# Compare the accuracy over the test set
+accuracy(fc1, qcement)
+accuracy(fc2, qcement)
+# Generate forecasts with the selected model 
+cement %>% ets() %>% forecast(h=12) %>% autoplot()
 ```
 
 

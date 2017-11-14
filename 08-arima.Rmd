@@ -973,7 +973,7 @@ e2 <- tsCV(air, farima, h=1)
 mean(e1^2, na.rm=TRUE)
 mean(e2^2, na.rm=TRUE)
 ```
-In this case the ets model has a lower tsCV statistic based on MSEs. Below we generate and plot forecasts for the next 5 years from this model.
+In this case the ets model has a lower tsCV statistic based on MSEs. Below we generate and plot forecasts for the next 5 years generated from an ets model.
 
 ```{r echo=TRUE}
 air %>% ets() %>% forecast() %>% autoplot()
@@ -982,30 +982,37 @@ air %>% ets() %>% forecast() %>% autoplot()
 
 ###Example: Comparing `auto.arima()` and `ets()` on seasonal data {-}
  
-In this case we want to compare seasonal ARIMA and ETS models applied to the quarterly cement production data `qcement`. Because the series is very long, we can afford to use a training and test set rather than time series cross-validation. The advantage is that this is much faster. We create a training set from the beginning of 1988 to the end of 2007 and select an ARIMA and an ETS model using the `auto.arima` and `ets` functions.
+In this case we want to compare seasonal ARIMA and ETS models applied to the quarterly cement production data `qcement`. Because the series is very long, we can afford to use a training and a test set rather than time series cross-validation. The advantage is that this is much faster. We create a training set from the beginning of 1988 to the end of 2007 and select an ARIMA and an ETS model using the `auto.arima` and `ets` functions.
 
 <!-- I tried ausbeer, euretail also here but qcement gave the most interesting and straight forward example - so left this here - in all cases ets was best?? -->
-
-<!-- The commnets/text after the code does not become coloured/italics. Do we know why?? Tried to add spaces but did not work-->
 
 ```{r, echo=TRUE}
 # Consider the qcement data beginning in 1988
 cement <- window(qcement, start=1988)
 # Use 20 years of the data as the training set
 train <- window(cement, end=c(2007,4))
+```
+The output below shows the ARIMA model selected and estimated by `auto.arima`.  The ARIMA model does well in capturing all the dynamics in the data as the residuals seem to be white noise.
+```{r, echo=TRUE}
 # Fit an ARIMA model to the training data
-fit1 <- auto.arima(train) 
-checkresiduals(fit1)
+(fit.arima <- auto.arima(train))
+checkresiduals(fit.arima)
+```
+The output below also shows the ETS model selected and estimated by `ets`. This models also does well in capturing all the dynamics in the data as the residuals also seem to be white noise. 
+```{r, echo=TRUE}
 # Fit an ETS model to the training data
-fit2 <- ets(train) 
-checkresiduals(fit2) 
-# Generate forecasts over the test set
-fc1 <- forecast(fit1, h = 4*(2013-2007)+1) 
-fc2 <- forecast(fit2, h = 4*(2013-2007)+1) 
-# Compare the accuracy over the test set
-accuracy(fc1, qcement)
-accuracy(fc2, qcement)
-# Generate forecasts with the selected model 
+(fit.ets <- ets(train))
+checkresiduals(fit.ets)
+```
+The output below evaluates the forecasting performance of the two competing models over the test set. In this case the ETS model seems to be the slighlty more accuarate model based on the test set RMSE, MAPE and MASE. 
+```{r, echo=TRUE}
+# Generate forecasts and compare accuracy over the test set
+fit.arima %>% forecast(h = 4*(2013-2007)+1) %>% accuracy(qcement)
+fit.ets %>% forecast(h = 4*(2013-2007)+1) %>% accuracy(qcement)
+```
+Below we generate and plot forecasts from an ets model for the next 3 years.
+```{r, echo=TRUE}
+# Generate forecasts from an ETS model 
 cement %>% ets() %>% forecast(h=12) %>% autoplot()
 ```
 

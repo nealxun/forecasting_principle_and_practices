@@ -240,7 +240,7 @@ The only real disadvantage (compared to a seasonal ARIMA model) is that the seas
 
 In this example we demonstrate combining Fourier terms for capturing seasonality with ARIMA errors capturing other dynamics in the data. We use `auscafe`, the total monthly expenditure on cafes, restaurants and takeaway food services in Australia (\$billion), starting in 2004 up to November 2016 and we forecast 24 months ahead. We vary the number of Fourier terms from 1 to 6 (which is equivalent to including seasonal dummies). Figure \@ref(fig:eatout) shows the seasonal pattern projected forward as $K$ increases. Notice that as $K$ increases the Fourier terms capture and project a more "wiggly" seasonal pattern and simpler ARIMA models are required to capture other dynamics. The AICc value is maximised for $K=5$, with a significant jump going from $K=4$ to $K=5$,  hence the forecasts generated from this model would be the ones used.
 
-```{r eatout, fig.width=10, fig.asp=0.8,fig.cap="Forecasting Australian Cafe blah blah."}
+```{r eatout, fig.width=10, fig.asp=0.8,fig.cap="Using Fourier terms and ARIMA errors for forecasting monthly expenditure on eating out in Australia."}
 cafe04 <- window(auscafe, start=2004)
 
 plots <- list()

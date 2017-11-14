@@ -111,6 +111,67 @@ Forecasting with such models is difficult because we require future values of th
 #checkresiduals(fc)
 ```
 
+
+<!-- ?? Can we / should we simplify the above example with this below??  -->
+
+###Example: Forecasting electricity demand {-}
+
+<!-- ?? 
+- Should we just add `elecdaily` generated below to fpp2?
+- I'm trying to match the WorkDay variable to 2014 so I can generate forecasts ahead with the whole sample from elecdemand but I cannot do it - WorkDays get messy at the beginning and end of year. So I have cut the data short to obs 351 and I forecast the next 14 days starting from a Monday 
+- But even the beginning of the year does not match a Jan 1, 2014 is a Wedn 
+-->
+
+```{r include=FALSE}
+elecdaily <- cbind(aggregate.ts(elecdemand[,"Demand"],nfrequency = 365), 
+aggregate.ts(elecdemand[,c("WorkDay")],nfrequency = 365,mean),
+aggregate.ts(elecdemand[,c("Temperature")],nfrequency = 365,max))
+colnames(elecdaily)<-c("Demand","WorkDay","Temperature")
+elecdaily <-ts(elecdaily,frequency=7)
+elecdaily <- subset(elecdaily,end = 351)
+```
+
+Daily electricity demand can be modelled as a function of temperature. As you may have seen on your electricity bill, more electricity is used on hot days due to air conditioning and on cold days due to heating. Daily data for are stored as `elecdaily` including total daily demand, an indicator variable for workdays (a workday is represented with 1, and a non-workday is represented with 0), and daily maximum temperatures. Because there is weekly seasonality, the frequency has been set to 7.
+
+Figures \@ref(fig:electime) and \@ref(fig:elecscatter) present time and scatter plots of the data. These highlight the need for both a non-linear regression but also some time dynamics to be included in our model. In this example, we fit a quadratic regression model with a ARMA errors using the `auto.arima` function. Using the estimated model we forecast 14 days ahead starting from a Monday, i.e., workday. 
+
+
+```{r electime, echo=FALSE, fig.cap="Daily electricity demand and maximum daily temperature for the state of Victoria in Australia for 2014."}
+autoplot(elecdaily[,c("Demand","Temperature")],facets = TRUE,colour = TRUE)+
+  ylab("")+
+  guides(colour="none")
+```
+
+```{r elecscatter, echo=FALSE, fig.cap="Daily electricity demand versus maximum daily temperature for the state of Victoria in Australia for 2014."}
+elecdaily %>%
+  as.data.frame() %>%
+  ggplot(aes(x=Temperature, y=Demand)) +
+    ylab("Electicity demand (GW)") +
+    xlab("Maximum daily temperature") +
+    geom_point() 
+    
+```
+
+```{r}
+xreg <- cbind(MaxTemp = elecdaily[, "Temperature"], 
+              MaxTempSq = elecdaily[, "Temperature"]^2, 
+              Workday = elecdaily[, "WorkDay"])
+fit <- auto.arima(elecdaily[, "Demand"], xreg = xreg)
+checkresiduals(fit)
+
+autoplot(elecdaily[,'Demand'], series="Data") +
+  forecast::autolayer(fitted(fit), series="Fitted") +
+  ylab("") +
+  ggtitle("Daily electricity demand (GW)") +
+  guides(colour=guide_legend(title=" "))
+
+fcast <- forecast(fit, xreg = cbind(rep(22,14),rep(22^2,14), c(1,1,1,1,1,0,0,1,1,1,1,1,0,0)))
+autoplot(fcast) + ylab("Electicity demand (GW)") 
+
+```
+
+
+
 ##Forecasting counts
 
 croston

@@ -256,6 +256,64 @@ gridExtra::grid.arrange(plots[[1]],plots[[2]],plots[[3]],
 ```
 
 
+## Nonlinear dynamic regression
+<!-- ?? not exacty sure where/how to include this example but I think it's useful and can possibly be included here. We can refer to the more comlex version we look at in Ch 11 -->
+
+###Example: Forecasting electricity demand {-}
+
+<!-- ?? 
+- Should we just add `elecdaily` generated below to fpp2?
+- I'm trying to match the WorkDay variable to 2014 so I can generate forecasts ahead with the whole sample from elecdemand but I cannot do it - WorkDays get messy at the beginning and end of year. So I have cut the data short to obs 351 and I forecast the next 14 days starting from a Monday 
+- But even the beginning of the year does not match workdays -- Jan 1, 2014 is a Wedn 
+-->
+
+```{r include=FALSE}
+elecdaily <- cbind(aggregate.ts(elecdemand[,"Demand"],nfrequency = 365), 
+aggregate.ts(elecdemand[,c("WorkDay")],nfrequency = 365,mean),
+aggregate.ts(elecdemand[,c("Temperature")],nfrequency = 365,max))
+colnames(elecdaily)<-c("Demand","WorkDay","Temperature")
+elecdaily <-ts(elecdaily,frequency=7)
+elecdaily <- subset(elecdaily,end = 351)
+```
+
+Daily electricity demand can be modelled as a function of temperature. As can be observed on an electricity bill, more electricity is used on cold days due to heating and hot days due to air conditioning. The higher demand on cold and hot days is reflected in the u-shape of Figure \@ref(fig:elecscatter), where daily demand is plotted versus daily maximum temperature. 
+
+```{r elecscatter, echo=FALSE, fig.cap="Daily electricity demand versus maximum daily temperature for the state of Victoria in Australia for 2014."}
+elecdaily %>%
+  as.data.frame() %>%
+  ggplot(aes(x=Temperature, y=Demand)) +
+    ylab("Electicity demand (GW)") +
+    xlab("Maximum daily temperature") +
+    geom_point() 
+    
+```
+
+The data are stored as `elecdaily` including total daily demand, an indicator variable for workdays (a workday is represented with 1, and a non-workday is represented with 0), and daily maximum temperatures. Because there is weekly seasonality, the frequency has been set to 7. Figure \@ref(fig:electime) show the time series of both daily demand and daily maximum temperatures. The plots highlight the need for both a non-linear and also dynamic model. 
+```{r electime, echo=FALSE, fig.cap="Daily electricity demand and maximum daily temperature for the state of Victoria in Australia for 2014."}
+autoplot(elecdaily[,c("Demand","Temperature")],facets = TRUE,colour = TRUE)+
+  ylab("")+
+  guides(colour="none")
+```
+In this example, we fit a quadratic regression model with a ARMA errors using the `auto.arima` function. Using the estimated model we forecast 14 days ahead starting from a Monday, i.e., a workday using scenario based forecasting (as introduced in Section \@ref(Regr-ForeWithRegr)) where we set the temperature for the next 14 days to a constant 26 degrees. 
+
+```{r}
+xreg <- cbind(MaxTemp = elecdaily[, "Temperature"], 
+              MaxTempSq = elecdaily[, "Temperature"]^2, 
+              Workday = elecdaily[, "WorkDay"])
+fit <- auto.arima(elecdaily[, "Demand"], xreg = xreg)
+checkresiduals(fit)
+
+autoplot(elecdaily[,'Demand'], series="Data") +
+  forecast::autolayer(fitted(fit), series="Fitted") +
+  ylab("") +
+  ggtitle("Daily electricity demand (GW)") +
+  guides(colour=guide_legend(title=" "))
+
+fcast <- forecast(fit, xreg = cbind(rep(26,14),rep(26^2,14), c(1,1,1,1,1,0,0,1,1,1,1,1,0,0)))
+autoplot(fcast) + ylab("Electicity demand (GW)") 
+
+```
+
 ## Lagged predictors
 
 Sometimes, the impact of a predictor which is included in a regression model will not be simple and immediate. For example, an advertising campaign may impact sales for some time beyond the end of the campaign, and sales in one month will depend on the advertising expenditure in each of the past few months. Similarly, a change in a company's safety policy may reduce accidents immediately, but have a diminishing effect over time as employees take less care when they become familiar with the new working conditions.

@@ -369,7 +369,7 @@ extracts all data from 1995 onwards.
 Another useful function is `subset` which allows for more types of subsetting. A great advantage of this function is that it allows the use of indices to choose a subset. For example,
 
 ```r
-subset(ausbeer,start=length(ausbeer)-4*5)
+subset(ausbeer, start=length(ausbeer)-4*5)
 ```
 
 extracts the last 5 years of observations from `ausbeer`. It also allows extracting all values for a specific season. For example,
@@ -394,7 +394,7 @@ $$
 $$
 where the training data is given by $\{y_1,\dots,y_T\}$ and the test data is given by $\{y_{T+1},y_{T+2},\dots\}$. 
 
-Note that forecast errors are different from residuals in two ways. Firstly, residuals are calculated on the *training* set while forecast errors are calculated on the *test* set. Secondly residuals are based on *one-step* forecasts while forecast errors can involve *multi-step* forecasts.
+Note that forecast errors are different from residuals in two ways. First, residuals are calculated on the *training* set while forecast errors are calculated on the *test* set. Second, residuals are based on *one-step* forecasts while forecast errors can involve *multi-step* forecasts.
 
 We can measure forecast accuracy by summarising the forecast errors in different ways.
 
@@ -580,7 +580,7 @@ text(28,.95,"time")
 
 Time series cross validation is implemented with the `tsCV` function. In the following example, we compare the residual RMSE with the RMSE obtained via time series cross-validation.
 
-```{r }
+```{r tscvdj}
 e <- tsCV(dj, rwf, drift=TRUE, h=1)
 sqrt(mean(e^2, na.rm=TRUE))
 sqrt(mean(residuals(rwf(dj, drift=TRUE))^2, na.rm=TRUE))
@@ -615,9 +615,7 @@ autoplot(goog)
 The code below evaluates the forecasting performance of 1- to 8-step-ahead naïve  forecasts with `tsCV`, using MSE as the forecast error measure. The plot shows that the forecast error increases as the forecast horizon increases, as we would expect. 
 
 ```{r tsCVplot, echo=TRUE}
-e <- matrix(NA_real_, nrow = 1000, ncol = 8)
-for (h in seq_len(8))
-  e[, h] <- tsCV(goog, forecastfunction = naive, h = h)
+e <- tsCV(goog, forecastfunction=naive, h=8)
   
 # Compute the MSE values and remove missing values
 mse <- colMeans(e^2, na.rm = T)

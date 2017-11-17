@@ -57,6 +57,8 @@ Helpful readers of the earlier versions of the book let us know of any typos or 
 
 This second edition is still incomplete, especially the later chapters. We should have it finished by the end of 2017. A print edition will follow, probably in early 2018.
 
+We have used the latest v8.3 of the forecast package in preparing this book. The current CRAN version is 8.2, and a few examples will not work if you have v8.2.
+
 &nbsp;
 
 Happy forecasting!

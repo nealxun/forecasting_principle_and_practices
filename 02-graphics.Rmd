@@ -186,13 +186,24 @@ This scatterplot helps us to visualize the relationship between the variables. I
 
 
 
-<!-- ####Scatterplot matrices {-} -->
+### Scatterplot matrices {-}
 
-<!-- When there are several potential predictor variables, it is useful to plot each variable against each other variable. These plots can be arranged in a scatterplot matrix, as shown in Figure ?? -->
+When there are several potential predictor variables, it is useful to plot each variable against each other variable.  Consider the eight time series shown in Figure \@ref(fig:vntimeplots).
 
-<!-- For each panel, the variable on the vertical axis is given by the variable name in that row, and the variable on the horizontal axis is given by the variable name in that column. For example, -->
+```{r vntimeplots, fig.cap="Quarterly visitor nights for various regions of Australia.", fig.asp=1}
+autoplot(vn, facets=TRUE) +
+  ylab("Number of visitor nights each quarter")
+```
 
-<!-- The value of the scatterplot matrix is that it enables a quick view of the relationships between all pairs of variables. Outliers can also be seen. In this example, there are ????????? -->
+To see the relationships between these eight time series, we can plot each time series against the others. These plots can be arranged in a scatterplot matrix, as shown in Figure \@ref(fig:ScatterMatrixch2).
+
+```{r ScatterMatrixch2, echo=TRUE, fig.cap="A scatterplot matrix of the quarterly visitor nights in eight regions of Australia.", fig.asp=1, fig.height=10, fig.width=10}
+vn %>% as.data.frame() %>% GGally::ggpairs()
+```
+
+For each panel, the variable on the vertical axis is given by the variable name in that row, and the variable on the horizontal axis is given by the variable name in that column. There are many options available to produce different plots within each panel. In the default version, the correlations are shown in the upper right half of the plot, while the scatterplots are shown in the lower half. On the diagonal are shown density plots.
+
+The value of the scatterplot matrix is that it enables a quick view of the relationships between all pairs of variables. Outliers can also be seen. In this example, there is one unusually high quarter for Sydney, corresponding to the 2000 Sydney Olympics.
 
 
 ##Lag plots

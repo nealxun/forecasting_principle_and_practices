@@ -953,7 +953,7 @@ The AICc is useful for selecting between models in the same class. For example, 
 
 We can use time series cross-validation to compare an ARIMA model and an ETS model. The code below provides functions that return forecast objects from `auto.arima()` and `ets()` respectively. 
 
-```{r}
+```{r tscvfunctions}
 fets <- function(x, h) {
   forecast(ets(x), h = h)
 }
@@ -967,7 +967,7 @@ air <- window(ausair, start=1990)
 ```
 
 
-```{r echo=TRUE}
+```{r tscvair, echo=TRUE}
 # Compute CV errors for ETS as e1
 e1 <- tsCV(air, fets, h=1)
 # Compute CV errors for ARIMA as e2
@@ -978,7 +978,7 @@ mean(e2^2, na.rm=TRUE)
 ```
 In this case the ets model has a lower tsCV statistic based on MSEs. Below we generate and plot forecasts for the next 5 years generated from an ets model.
 
-```{r echo=TRUE}
+```{r airetsplot, echo=TRUE}
 air %>% ets() %>% forecast() %>% autoplot()
 ```
 
@@ -989,7 +989,7 @@ In this case we want to compare seasonal ARIMA and ETS models applied to the qua
 
 <!-- I tried ausbeer, euretail also here but qcement gave the most interesting and straight forward example - so left this here - in all cases ets was best?? -->
 
-```{r, echo=TRUE}
+```{r qcement1, echo=TRUE}
 # Consider the qcement data beginning in 1988
 cement <- window(qcement, start=1988)
 # Use 20 years of the data as the training set
@@ -997,7 +997,7 @@ train <- window(cement, end=c(2007,4))
 ```
 The output below shows the ARIMA model selected and estimated by `auto.arima`.  The ARIMA model does well in capturing all the dynamics in the data as the residuals seem to be white noise.
 
-```{r, echo=TRUE}
+```{r qcement2, echo=TRUE}
 # Fit an ARIMA model to the training data
 (fit.arima <- auto.arima(train))
 checkresiduals(fit.arima)
@@ -1005,7 +1005,7 @@ checkresiduals(fit.arima)
 
 The output below also shows the ETS model selected and estimated by `ets`. This models also does well in capturing all the dynamics in the data as the residuals also seem to be white noise. 
 
-```{r, echo=TRUE}
+```{r qcement3, echo=TRUE}
 # Fit an ETS model to the training data
 (fit.ets <- ets(train))
 checkresiduals(fit.ets)
@@ -1013,7 +1013,7 @@ checkresiduals(fit.ets)
 
 The output below evaluates the forecasting performance of the two competing models over the test set. In this case the ETS model seems to be the slighlty more accuarate model based on the test set RMSE, MAPE and MASE. 
 
-```{r, echo=TRUE}
+```{r qcement4, echo=TRUE}
 # Generate forecasts and compare accuracy over the test set
 fit.arima %>% forecast(h = 4*(2013-2007)+1) %>% accuracy(qcement)
 fit.ets %>% forecast(h = 4*(2013-2007)+1) %>% accuracy(qcement)
@@ -1021,7 +1021,7 @@ fit.ets %>% forecast(h = 4*(2013-2007)+1) %>% accuracy(qcement)
 
 Below we generate and plot forecasts from an ets model for the next 3 years.
 
-```{r, echo=TRUE}
+```{r qcement5, echo=TRUE}
 # Generate forecasts from an ETS model 
 cement %>% ets() %>% forecast(h=12) %>% autoplot()
 ```

@@ -114,26 +114,7 @@ autoplot(uschange[,3:5], facets = TRUE, colour=TRUE) +
 
 The first column of Figure \@ref(fig:ScatterMatrix) below shows the relationships between consumption and each of the predictors. The scatterplots show positive relationships with income and industrial production, and negative relationships with savings and unemployment. The strength of these relationships are shown by the correlation coefficients across the first row. The remaining scatterplots and correlation coefficients show the relationships between the predictors.
 
-<!--
-```{r ScatterMatrixold, echo=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
-my_fn <- function(data, mapping, ...){
-  ggplot(data = data, mapping = mapping) +
-    geom_point() +
-    geom_smooth(method=lm, se=FALSE)
-}
-uschange %>%
-  as.data.frame %>%
-  GGally::ggpairs(lower = list(continuous = my_fn))
-##TODO
-# Not sure we should have regression lines for predictors against predictors?
-# George: I think the correlations are useful highlighting possible strong multicollinearity - why are the lines a problem??
-# Rob: Because they are asymmetric - reversing the axes gives a different line,
-#  unlike correlations. Also, the slopes do not correspond to the parameters of the
-#  multiple regression equation which is confusing to students.
-```
--->
-
-```{r ScatterMatrix, echo=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors."}
+```{r ScatterMatrix, echo=TRUE, fig.cap="A scatterplot matrix of US consumption expenditure and the four predictors.", fig.asp=1}
 uschange %>%
   as.data.frame() %>%
   GGally::ggpairs()

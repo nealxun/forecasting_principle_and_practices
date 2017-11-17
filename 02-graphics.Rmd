@@ -302,11 +302,8 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 1. Use the help menu to explore what the series `gold`, `woolyrnq` and `gas` represent. These are available in the `forecast` package.
   
     a. Use `autoplot` to plot each of these in separate plots.
-  
-    b. What is the frequency of each commodity series? Hint: apply the `frequency()` function. 
-
+    b. What is the frequency of each commodity series? Hint: apply the `frequency()` function.
     c. Use `which.max()` to spot the outlier in the `gold` series. Which observation was it?
-
 
 2. Download some data from [OTexts.org/fpp2/extrafiles/tute1.csv](extrafiles/tute1.csv). Open the file `tute1.csv` in Excel (or some other spreadsheet application) and review its contents. You should find four columns of information. Columns B through D each contain a quarterly series, labelled Sales, AdBudget and GDP. Sales contains the quarterly sales for a small company over the period 1981-2005. AdBudget is the advertising budget and GDP is the gross domestic product. All series have been adjusted for inflation.
 
@@ -333,15 +330,15 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
         Check what happens when you don't include `facets=TRUE`.
 
-3. Download some monthly Australian retail data from [http://robjhyndman.com/data/retail.xlsx](http://robjhyndman.com/data/retail.xlsx). These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.
+3. Download some monthly Australian retail data from [OTexts.org/fpp2/extrafiles/retail.xlsx](extrafiles/retail.xlsx). These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.
 
     a. You can read the data into R with the following script:
 
         ```r
-        retaildata <- readxl::read_excel("retail.xlsx", skip = 1)
+        retaildata <- readxl::read_excel("retail.xlsx", skip=1)
         ```
 
-        You may need to first install the `readxl` package.
+        You may need to first install the `readxl` package. The second argument (`skip=1`) is required because the Excel sheet has two header rows.
 
     b. Select one of the time series as follows (but replace the column name with your own chosen column):
 
@@ -361,8 +358,7 @@ In this example, $T=50$ and so the bounds are at $\pm 2/\sqrt{50} = \pm `r forma
 
     Use the help files to find out what the series are.
 
-5. The `arrivals` data set comprises quarterly international arrivals (in thousands) to Australia from Japan, New Zealand, UK and the US. Use `autoplot` and `ggseasonplot` and compare the differences between the arrivals from these four countries. Can  you identify any unusual observations?
-
+5. The `arrivals` data set comprises quarterly international arrivals (in thousands) to Australia from Japan, New Zealand, UK and the US. Use `autoplot` and `ggseasonplot` to compare the differences between the arrivals from these four countries. Can you identify any unusual observations?
 
 6. The following time plots and ACF plots correspond to four different time series. Your task is to match each  time plot in the first row with one of the ACF plots in the second row.
 

@@ -297,7 +297,7 @@ p3<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = legal, colour = 
   theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Number of prisonLFers") +
+  ylab("Number of prisoners") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
   scale_colour_discrete(guide = guide_legend(title = "Legal status"))
 
@@ -309,7 +309,7 @@ p4<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = gender, colour =
   theme(plot.title = element_text(size=12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Number of prisonLFers") +
+  ylab("Number of prisoners") +
   scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
   scale_colour_discrete(guide = guide_legend(title = "Gender"))
 
@@ -377,12 +377,12 @@ p6 <- ggplot(data = prisonLF, aes(x = quarter, y = count, group = gender, colour
 p7<-ggplot(data = prisonLF, aes(x = quarter, y = count, group = gender, colour = gender))  +
   stat_summary(fun.y = sum, geom = "line") +
   scale_x_date(labels = date_format("%m/%Y"), date_breaks= "8 months") +
-  ggtitle("Australian adult prisonLF by legal status and gender") +
+  ggtitle("Australian adult prison by legal status and gender") +
   theme(plot.title = element_text(size=12)) +
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   xlab("Quarter") +
-  ylab("Total number of prisonLFers") +
+  ylab("Total number of prisoners") +
 #  scale_y_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000))+
   scale_colour_discrete(guide = guide_legend(title = "Gender"))+
   facet_grid(.~legal)

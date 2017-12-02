@@ -221,12 +221,12 @@ fc <- holt(air, h=5)
 # Now set up table
 tmp <- cbind(air, fc$model$state, fitted(fc))
 tsp(tmp) <- NULL
-tmp <- cbind(1989:2014,0:(NROW(tmp)-1),tmp)
+tmp <- cbind(1989:2016,0:(NROW(tmp)-1),tmp)
 tmp <- rbind(rep(NA,6),tmp, matrix(NA, nrow=6, ncol=ncol(tmp)))
 colnames(tmp) <- c("Year","Time","Observation","Level","Slope","Forecast")
 # Add in forecasts
-tmp[29:33,6] <- fc$mean[1:5]
-tmp[29:33,2] <- 1:5
+tmp[31:35,6] <- fc$mean[1:5]
+tmp[31:35,2] <- 1:5
 # Convert to characters
 tmp <- as.data.frame(tmp)
 class(tmp[["Year"]]) <- class(tmp[["Time"]]) <- "integer"
@@ -236,13 +236,13 @@ tmp <- apply(tmp, 2, function(x){j <- grep("[ ]*NA",x); x[j] <- ""; return(x)})
 # Add math notation
 tmp[1,] <- c("","$t$","$y_t$","$\\ell_t$",
                    "$b_t$", "$\\hat{y}_{t|t-1}$")
-tmp[28,] <- c("","$h$","","","", "$\\hat{y}_{t+h|t}$")
+tmp[30,] <- c("","$h$","","","", "$\\hat{y}_{t+h|t}$")
 knitr::kable(tmp, booktabs=TRUE,
              caption="Applying Holt's linear method with $\\alpha=0.8321$ and $\\beta^*=0.0001$ to Australian air passenger data (millions of passengers).")
 ```
 
 ```{r checkholt, echo=FALSE}
-if(sum(abs(fc$model$par[1:2] - c(0.8321,0.0001))) > 1e-4)
+if(sum(abs(fc$model$par[1:2] - c(0.8302,0.0001))) > 1e-4)
   stop("Parameter error")
 ```
 
@@ -270,8 +270,8 @@ Figure \@ref(fig:dampedtrend) shows the forecasts for years 2014--2018 generated
 fc <- holt(air, h=15)
 fc2 <- holt(air, damped=TRUE, phi = 0.9, h=15)
 autoplot(air) +
-  forecast::autolayer(fc, PI=FALSE, series="Holt's method") +
-  forecast::autolayer(fc2, PI=FALSE, series="Damped Holt's method") +
+  forecast::autolayer(fc$mean, series="Holt's method") +
+  forecast::autolayer(fc2$mean, series="Damped Holt's method") +
   ggtitle("Forecasts from Holt's method") +
   xlab("Year") + ylab("Air passengers in Australia (millions)") +
   guides(colour=guide_legend(title="Forecast"))
@@ -369,8 +369,8 @@ aust <- window(austourists,start=2005)
 fit1 <- hw(aust,seasonal="additive")
 fit2 <- hw(aust,seasonal="multiplicative")
 autoplot(aust) +
-  forecast::autolayer(fit1, PI=FALSE, series="HW additive forecasts") +
-  forecast::autolayer(fit2, PI=FALSE, series="HW multiplicative forecasts") +
+  forecast::autolayer(fit1$mean, series="HW additive forecasts") +
+  forecast::autolayer(fit2$mean, series="HW multiplicative forecasts") +
   xlab("Year") + ylab("International visitor night in Australia (millions)") +
   guides(colour=guide_legend(title="Forecast"))
 ```
@@ -482,7 +482,7 @@ fc <- hw(subset(hyndsight,end=length(hyndsight)-35),
          damped = TRUE, seasonal="multiplicative", h=35)
 
 autoplot(hyndsight) +
-  forecast::autolayer(fc, PI=FALSE,series="HW multi damped")+
+  forecast::autolayer(fc$mean, series="HW multi damped")+
   guides(colour=guide_legend(title="Daily forecasts"))
 
 ```

@@ -995,6 +995,7 @@ cement <- window(qcement, start=1988)
 # Use 20 years of the data as the training set
 train <- window(cement, end=c(2007,4))
 ```
+
 The output below shows the ARIMA model selected and estimated by `auto.arima`.  The ARIMA model does well in capturing all the dynamics in the data as the residuals seem to be white noise.
 
 ```{r qcement2, echo=TRUE}

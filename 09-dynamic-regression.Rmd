@@ -104,7 +104,9 @@ cbind("Regression Errors" = residuals(fit, type="regression"),
 ```
 
 It is the ARIMA errors that should resemble a white noise series.
+
 <!--?? Should we change the test to BG test when reg argument is used in auto.arima? -->
+
 ```{r usconsumpres2, fig.cap="The residuals (i.e., the ARIMA errors) are not significantly different from white noise."}
 checkresiduals(fit)
 ```
@@ -113,7 +115,10 @@ checkresiduals(fit)
 
 To forecast a regression model with ARIMA errors, we need to forecast the regression part of the model and the ARIMA part of the model, and combine the results. As with ordinary regression models, in order to obtain forecasts we first need to forecast the predictors. When the predictors are known into the future (e.g., calendar-related variables such as time, day-of-week, etc.), this is straightforward. But when the predictors are themselves unknown, we must either model them separately, or use assumed future values for each predictor.
 
-To continue the previous example, we will calculate forecasts for the next eight quarters assuming that the future percentage changes in personal disposable income will be equal to the mean percentage change from the last forty years.
+
+###Example: US Personal Consumption and Income {-}
+
+We will calculate forecasts for the next eight quarters assuming that the future percentage changes in personal disposable income will be equal to the mean percentage change from the last forty years.
 
 ```{r usconsump3, fig.cap="Forecasts obtained from regressing the percentage change in consumption expenditure on the percentage change in disposable income, with an ARIMA(1,0,2) error model."}
 fcast <- forecast(fit, xreg=rep(mean(uschange[,2]),8))
@@ -125,6 +130,54 @@ The prediction intervals for this model are narrower than those for the model de
 
 It is important to realise that the prediction intervals from regression models (with or without ARIMA errors) do not take into account the uncertainty in the forecasts of the predictors. So they should be interpreted as being conditional on the assumed (or estimated) future values of the predictor variables.
 
+### Example: Forecasting electricity demand {-}
+
+Daily electricity demand can be modelled as a function of temperature. As can be observed on an electricity bill, more electricity is used on cold days due to heating and hot days due to air conditioning. The higher demand on cold and hot days is reflected in the u-shape of Figure \@ref(fig:elecscatter), where daily demand is plotted versus daily maximum temperature. 
+
+```{r elecscatter, echo=FALSE, fig.cap="Daily electricity demand versus maximum daily temperature for the state of Victoria in Australia for 2014."}
+elecdaily %>%
+  as.data.frame() %>%
+  ggplot(aes(x=Temperature, y=Demand)) +
+    ylab("Electicity demand (GW)") +
+    xlab("Maximum daily temperature") +
+    geom_point() 
+```
+
+The data are stored as `elecdaily` including total daily demand, an indicator variable for workdays (a workday is represented with 1, and a non-workday is represented with 0), and daily maximum temperatures. Because there is weekly seasonality, the frequency has been set to 7. Figure \@ref(fig:electime) show the time series of both daily demand and daily maximum temperatures. The plots highlight the need for both a non-linear and also dynamic model. 
+
+```{r electime, echo=FALSE, fig.cap="Daily electricity demand and maximum daily temperature for the state of Victoria in Australia for 2014."}
+autoplot(elecdaily[,c("Demand","Temperature")],
+         facets = TRUE, colour = TRUE) +
+  ylab("") + guides(colour="none")
+```
+
+In this example, we fit a quadratic regression model with ARMA errors using the `auto.arima` function. Using the estimated model we forecast 14 days ahead starting from Thursday 1 January 2015 (a non-work-day being a public holiday for New Years Day). 
+
+In this case, we could obtain weather forecasts from the weather bureau for the next 14 days. But for the sake of illustration, we will use scenario based forecasting (as introduced in Section \@ref(Regr-ForeWithRegr)) where we set the temperature for the next 14 days to a constant 26 degrees. 
+
+```{r elecdailyfit}
+xreg <- cbind(MaxTemp = elecdaily[, "Temperature"], 
+              MaxTempSq = elecdaily[, "Temperature"]^2, 
+              Workday = elecdaily[, "WorkDay"])
+fit <- auto.arima(elecdaily[, "Demand"], xreg = xreg)
+checkresiduals(fit)
+```
+
+The model has some significant autocorrelation in the residuals, which means the prediction intervals may not provide accurate coverage. Also, the histogram of the residuals shows one positive outlier, which will also affect the coverage of the prediction intervals.
+
+```{r elecdailyf}
+autoplot(elecdaily[,'Demand'], series="Data") +
+  forecast::autolayer(fitted(fit), series="Fitted") +
+  ylab("") +
+  ggtitle("Daily electricity demand (GW)") +
+  guides(colour=guide_legend(title=" "))
+
+fcast <- forecast(fit, 
+  xreg = cbind(rep(26,14), rep(26^2,14), c(0,1,0,0,1,1,1,1,1,0,0,1,1,1)))
+autoplot(fcast) + ylab("Electicity demand (GW)") 
+```
+
+The point forecasts look reasonable for the first two weeks of 2015. The slow down in electricity demand at the end of 2014 has caused the forecasts for the next two weeks to show similarly low demand values.
 
 ## Stochastic and deterministic trends
 
@@ -255,64 +308,6 @@ gridExtra::grid.arrange(plots[[1]],plots[[2]],plots[[3]],
   
 ```
 
-
-## Nonlinear dynamic regression
-<!-- ?? not exacty sure where/how to include this example but I think it's useful and can possibly be included here. We can refer to the more comlex version we look at in Ch 11 -->
-
-###Example: Forecasting electricity demand {-}
-
-<!-- ?? 
-- Should we just add `elecdaily` generated below to fpp2?
-- I'm trying to match the WorkDay variable to 2014 so I can generate forecasts ahead with the whole sample from elecdemand but I cannot do it - WorkDays get messy at the beginning and end of year. So I have cut the data short to obs 351 and I forecast the next 14 days starting from a Monday 
-- But even the beginning of the year does not match workdays -- Jan 1, 2014 is a Wedn 
--->
-
-```{r include=FALSE}
-elecdaily <- cbind(aggregate.ts(elecdemand[,"Demand"],nfrequency = 365), 
-aggregate.ts(elecdemand[,c("WorkDay")],nfrequency = 365,mean),
-aggregate.ts(elecdemand[,c("Temperature")],nfrequency = 365,max))
-colnames(elecdaily)<-c("Demand","WorkDay","Temperature")
-elecdaily <-ts(elecdaily,frequency=7)
-elecdaily <- subset(elecdaily,end = 351)
-```
-
-Daily electricity demand can be modelled as a function of temperature. As can be observed on an electricity bill, more electricity is used on cold days due to heating and hot days due to air conditioning. The higher demand on cold and hot days is reflected in the u-shape of Figure \@ref(fig:elecscatter), where daily demand is plotted versus daily maximum temperature. 
-
-```{r elecscatter, echo=FALSE, fig.cap="Daily electricity demand versus maximum daily temperature for the state of Victoria in Australia for 2014."}
-elecdaily %>%
-  as.data.frame() %>%
-  ggplot(aes(x=Temperature, y=Demand)) +
-    ylab("Electicity demand (GW)") +
-    xlab("Maximum daily temperature") +
-    geom_point() 
-    
-```
-
-The data are stored as `elecdaily` including total daily demand, an indicator variable for workdays (a workday is represented with 1, and a non-workday is represented with 0), and daily maximum temperatures. Because there is weekly seasonality, the frequency has been set to 7. Figure \@ref(fig:electime) show the time series of both daily demand and daily maximum temperatures. The plots highlight the need for both a non-linear and also dynamic model. 
-```{r electime, echo=FALSE, fig.cap="Daily electricity demand and maximum daily temperature for the state of Victoria in Australia for 2014."}
-autoplot(elecdaily[,c("Demand","Temperature")],facets = TRUE,colour = TRUE)+
-  ylab("")+
-  guides(colour="none")
-```
-In this example, we fit a quadratic regression model with a ARMA errors using the `auto.arima` function. Using the estimated model we forecast 14 days ahead starting from a Monday, i.e., a workday using scenario based forecasting (as introduced in Section \@ref(Regr-ForeWithRegr)) where we set the temperature for the next 14 days to a constant 26 degrees. 
-
-```{r}
-xreg <- cbind(MaxTemp = elecdaily[, "Temperature"], 
-              MaxTempSq = elecdaily[, "Temperature"]^2, 
-              Workday = elecdaily[, "WorkDay"])
-fit <- auto.arima(elecdaily[, "Demand"], xreg = xreg)
-checkresiduals(fit)
-
-autoplot(elecdaily[,'Demand'], series="Data") +
-  forecast::autolayer(fitted(fit), series="Fitted") +
-  ylab("") +
-  ggtitle("Daily electricity demand (GW)") +
-  guides(colour=guide_legend(title=" "))
-
-fcast <- forecast(fit, xreg = cbind(rep(26,14),rep(26^2,14), c(1,1,1,1,1,0,0,1,1,1,1,1,0,0)))
-autoplot(fcast) + ylab("Electicity demand (GW)") 
-
-```
 
 ## Lagged predictors
 

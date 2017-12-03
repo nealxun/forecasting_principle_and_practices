@@ -1,21 +1,23 @@
 # Use the last 280 obs of goog
 # The reason is that anymore in the training set goog2
-# we get a sign spike in the ACF of diff(goog1) at lag 3 which 
-# I think it is too confusing to explain so early on - or maybe 
+# we get a sign spike in the ACF of diff(goog1) at lag 3 which
+# I think it is too confusing to explain so early on - or maybe
 # it is a good thing?? What do you think?
 
 # Run this to see
 # goog1 <- ts(subset(goog,start=(length(goog)-350)))
 # ggAcf(diff(goog1))
 
-# Note we get a sign spike when we look at the ACF of 
-# goog1 in Chapter 8 -- see further below lines 120-122 -- we 
-# can make a point there when reading ACFs and PACFs 
+# Note we get a sign spike when we look at the ACF of
+# goog1 in Chapter 8 -- see further below lines 120-122 -- we
+# can make a point there when reading ACFs and PACFs
 
 # Should we add goog1 in the fpp2 package as a
 # shorter version of goog???
 goog1 <- ts(subset(goog,start=(length(goog)-280)))
 goog2 <- subset(goog1, end = 240)
+
+#RJH Maybe use first 200 days of the series and I'll add goog200 to the package.
 
 # Chapter 2
 

@@ -2,7 +2,7 @@
 
 In this chapter, we briefly discuss four more advanced forecasting methods that build on the models discussed in earlier chapters.
 
-##Complex seasonality {}
+## Complex seasonality {}
 
 So far, we have considered relatively simple seasonal patterns such as quarterly and monthly data. However, higher frequency data often exhibits more complicated seasonal patterns. For example, daily data may have a weekly pattern as well as an annual pattern.  Hourly data usually has three types of seasonality: a daily pattern, a weekly pattern, and an annual pattern. Even weekly data can be difficult as it typically has an annual pattern with seasonal period of $365.25/7\approx 52.179$ on average.
 
@@ -111,7 +111,7 @@ Forecasting with such models is difficult because we require future values of th
 #checkresiduals(fc)
 ```
 
-##Forecasting counts
+## Forecasting counts
 
 croston
 
@@ -120,7 +120,7 @@ Poisson models?
 Other intermittent demand models
 
 
-##Vector autoregressions {#sec-9-2-VAR}
+## Vector autoregressions {#VAR}
 
 One limitation with the models we have considered so far is that they impose a unidirectional relationship --- the forecast variable is influenced by the predictor variables, but not vice versa. However, there are many cases where the reverse should also be allowed for --- where all variables affect each other. In Chapter 9, the changes in personal consumption expenditure ($C_t$) were forecast based on the changes in personal disposable income ($I_t$). However, in this case a bi-directional relationship may be more suitable: an increase in $I_t$ will lead to an increase in $C_t$ and vice versa.
 
@@ -128,36 +128,36 @@ An example of such a situation occurred in Australia during the Global Financial
 
 Such feedback relationships are allowed for in the vector autoregressive (VAR) framework. In this framework, all variables are treated symmetrically. They are all modelled as if they influence each other equally. In more formal terminology, all variables are now treated as "endogenous". To signify this we now change the notation and write all variables as $y$s: $y_{1,t}$ denotes the $t$th observation of variable $y_1$, $y_{2,t}$ denotes the $t$th observation of variable $y_2$, and so on.
 
-A VAR model is a generalisation of the univariate autoregressive model for forecasting a collection of variables; that is, a vector of time series.^[A more flexible generalisation would be a Vector ARMA process. However, the relative simplicity of VARs has led to their dominance in forecasting. Interested readers may refer to ??.] It comprises one equation per variable considered in the system. The right hand side of each equation includes a constant and lags of all the variables in the system. To keep it simple, we will consider a two variable VAR with one lag. We write a 2-dimensional VAR(1) as
+A VAR model is a generalisation of the univariate autoregressive model for forecasting a collection of variables; that is, a vector of time series.^[A more flexible generalisation would be a Vector ARMA process. However, the relative simplicity of VARs has led to their dominance in forecasting. Interested readers may refer to @AthEtAl2012.] It comprises one equation per variable considered in the system. The right hand side of each equation includes a constant and lags of all the variables in the system. To keep it simple, we will consider a two variable VAR with one lag. We write a 2-dimensional VAR(1) as
 \begin{align}
 \label{var1a}
-  y_{1,t} &= c_1+\phi _{11,1}y_{1,t-1}+\phi _{12,1}y_{2,t-1}+e_{1,t} \\
-  y_{2,t} &= c_2+\phi _{21,1}y_{1,t-1}+\phi _{22,1}y_{2,t-1}+e_{2,t}\label{var1b}
+  y_{1,t} &= c_1+\phi _{11,1}y_{1,t-1}+\phi _{12,1}y_{2,t-1}+e_{1,t} (\#eq:var1a)\\
+  y_{2,t} &= c_2+\phi _{21,1}y_{1,t-1}+\phi _{22,1}y_{2,t-1}+e_{2,t} (\#eq:var1b)
 \end{align}
 where $e_{1,t}$ and $e_{2,t}$ are white noise processes that may be contemporaneously correlated. Coefficient $\phi_{ii,\ell}$ captures the influence of the $\ell$th lag of variable $y_i$ on itself, while coefficient $\phi_{ij,\ell}$ captures the influence of the $\ell$th lag of variable $y_j$ on $y_i$.
 
 If the series modelled are stationary we forecast them by directly fitting a VAR to the data (known as a "VAR in levels"). If the series are non-stationary we take differences to make them stationary and then we fit a VAR model (known as a "VAR in differences"). In both cases, the models are estimated equation by equation using the principle of least squares. For each equation, the parameters are estimated by minimising the sum of squared $e_{i,t}$ values.
 
-The other possibility which is beyond the scope of this book and therefore we do not explore here, is that series may be non-stationary but they are cointegrated, which means that there exists a linear combination of them that is stationary. In this case a VAR specification that includes an error correction mechanism (usually referred to as a vector error correction model) should be included and alternative estimation methods to least squares estimation should be used.^[Interested readers should refer to ??, and ??.]
+The other possibility which is beyond the scope of this book and therefore we do not explore here, is that series may be non-stationary but they are cointegrated, which means that there exists a linear combination of them that is stationary. In this case a VAR specification that includes an error correction mechanism (usually referred to as a vector error correction model) should be included and alternative estimation methods to least squares estimation should be used.^[Interested readers should refer to @Ham1994 and @Lut2007.]
 
-Forecasts are generated from a VAR in a recursive manner. The VAR generates forecasts for *each* variable included in the system. To illustrate the process, assume that we have fitted the 2-dimensional VAR(1) described in equations ?? -- for all observations up to time $T$. Then the one-step-ahead forecasts are generated by
+Forecasts are generated from a VAR in a recursive manner. The VAR generates forecasts for *each* variable included in the system. To illustrate the process, assume that we have fitted the 2-dimensional VAR(1) described in equations \@ref(eq:var1a)--\@ref(eq:var1b), for all observations up to time $T$. Then the one-step-ahead forecasts are generated by
 \begin{align*}
   \hat y_{1,T+1|T} &=\hat{c}_1+\hat\phi_{11,1}y_{1,T}+\hat\phi_{12,1}y_{2,T} \\
   \hat y_{2,T+1|T} &=\hat{c}_2+\hat\phi _{21,1}y_{1,T}+\hat\phi_{22,1}y_{2,T}.
 \end{align*}
 
-This is the same form as ?? -- except that the errors have been set to zero and parameters have been replaced with their estimates. For $h=2$, the forecasts are given by
+This is the same form as \@ref(eq:var1a)--\@ref(eq:var1b), except that the errors have been set to zero and parameters have been replaced with their estimates. For $h=2$, the forecasts are given by
 \begin{align*}
   \hat y_{1,T+2|T} &=\hat{c}_1+\hat\phi_{11,1}\hat y_{1,T+1}+\hat\phi_{12,1}\hat y_{2,T+1}\\
   \hat y_{2,T+2|T}&=\hat{c}_2+\hat\phi_{21,1}\hat y_{1,T+1}+\hat\phi_{22,1}\hat y_{2,T+1}.
 \end{align*}
-Again, this is the same form as ?? -- except that the errors have been set to zero, parameters have been replaced with their estimates, and the unknown values of $y_1$ and $y_2$ have been replaced with their forecasts. The process can be iterated in this manner for all future time periods.
+Again, this is the same form as \@ref(eq:var1a)--\@ref(eq:var1b), except that the errors have been set to zero, parameters have been replaced with their estimates, and the unknown values of $y_1$ and $y_2$ have been replaced with their forecasts. The process can be iterated in this manner for all future time periods.
 
 There are two decisions one has to make when using a VAR to forecast. They are, how many variables (denoted by $K$) and how many lags (denoted by $p$) should be included in the system. The number of coefficients to be estimated in a VAR is equal to $K+pK^2$ (or $1+pK$ per equation). For example, for a VAR with $K=5$ variables and $p=3$ lags, there are 16 coefficients per equation making for a total of 80 coefficients to be estimated. The more coefficients to be estimated the larger the estimation error entering the forecast.
 
 In practice it is usual to keep $K$ small and include only variables that are correlated to each other and therefore useful in forecasting each other. Information criteria are commonly used to select the number of lags to be included.
 
-VARs are implemented in the **vars** package in R. It contains a function `VARselect` to choose the number of lags $p$ using four different information criteria: AIC, HQ, SC and FPE. We have met the AIC before, and SC is simply another name for the BIC (SC stands for Schwarz Criterion after Gideon Schwarz who proposed it). HQ is the Hannan-Quinn criterion and FPE is the "Final Prediction Error" criterion.^[For a detailed comparison of these criteria, see Chapter 4.3 of ??.] Care should be taken using the AIC as it tends to choose large numbers of lags. Instead, for VAR models, we prefer to use the BIC.
+VARs are implemented in the **vars** package in R. It contains a function `VARselect` to choose the number of lags $p$ using four different information criteria: AIC, HQ, SC and FPE. We have met the AIC before, and SC is simply another name for the BIC (SC stands for Schwarz Criterion after Gideon Schwarz who proposed it). HQ is the Hannan-Quinn criterion and FPE is the "Final Prediction Error" criterion.^[For a detailed comparison of these criteria, see Chapter 4.3 of @Lut2005.] Care should be taken using the AIC as it tends to choose large numbers of lags. Instead, for VAR models, we prefer to use the BIC.
 
 A criticism VARs face is that they are atheoretical. They are not built on some economic theory that imposes a theoretical structure to the equations. Every variable is assumed to influence every other variable in the system, which makes direct interpretation of the estimated coefficients very difficult. Despite this, VARs are useful in several contexts:
 
@@ -181,12 +181,12 @@ serial.test(var, lags.pt=10, type="PT.asymptotic")
 summary(var)
 ```
 
-The R output on the following page shows the lag length selected by each of the information criteria available in the **vars** package. There is a large discrepancy between a VAR(5) selected by the AIC and a VAR(1) selected by the BIC. This is not unusual. As a result we first fit a VAR(1), selected by the BIC. In similar fashion to the univariate ARIMA methodology we test that the residuals are uncorrelated using a Portmanteau test^[The tests for serial correlation in the "vars" package are multivariate generalisations of the tests presented in Section \@ref(toolbox-resids}).] The null hypothesis of no serial correlation in the residuals is rejected for both a VAR(1) and a VAR(2) and therefore we fit a VAR(3) as now the null is not rejected. The forecasts generated by the VAR(3) are plotted in Figure \@ref(fig-9-2-VARforecasts).
+The R output on the following page shows the lag length selected by each of the information criteria available in the **vars** package. There is a large discrepancy between a VAR(5) selected by the AIC and a VAR(1) selected by the BIC. This is not unusual. As a result we first fit a VAR(1), selected by the BIC. In similar fashion to the univariate ARIMA methodology we test that the residuals are uncorrelated using a Portmanteau test^[The tests for serial correlation in the "vars" package are multivariate generalisations of the tests presented in Section \@ref(residuals).] The null hypothesis of no serial correlation in the residuals is rejected for both a VAR(1) and a VAR(2) and therefore we fit a VAR(3) as now the null is not rejected. The forecasts generated by the VAR(3) are plotted in Figure \@ref(fig:VAR3).
 
 
 ```{r VAR3, fig.cap="Forecasts for US consumption and income generated from a VAR(3).", cache=TRUE}
-fcst <- forecast(var)
-autoplot(fcst, xlab="Year")
+forecast(var) %>%
+  autoplot() + xlab("Year")
 ```
 
 ## Neural network models {#sec-9-3-nnet}

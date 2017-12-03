@@ -135,13 +135,11 @@ cbind("Billion kWh" = usmelec,
 There is a degree of subjectivity in selecting which differences to apply. The seasonally differenced data in Figure \@ref(fig:a10diff) do not show substantially different behaviour from the seasonally differenced data in Figure \@ref(fig:usmelec). In the latter case, we could have decided to stop with the seasonally differenced data, and not done an extra round of differencing. In the former case, we could have decided that the data were not sufficiently stationary and taken an extra round of differencing. Some formal tests for differencing will be discussed later, but there are always some choices to be made in the modeling process, and different analysts may make different choices.
 
 If $y'_t = y_t - y_{t-m}$ denotes a seasonally differenced series, then the twice-differenced series is
-
 \begin{align*}
 y''_t &= y'_t - y'_{t-1} \\
       &= (y_t - y_{t-m}) - (y_{t-1} - y_{t-m-1}) \\
       &= y_t -y_{t-1} - y_{t-m} + y_{t-m-1}\:
 \end{align*}
-
 When both seasonal and first differences are applied, it makes no difference which is done first---the result will be the same. However, if the data have a strong seasonal pattern, we recommend that seasonal differencing be done first, because the resulting series will sometimes be stationary and there will be no need for a further first difference. If first differencing is done first, there will still be seasonality present.
 
 It is important that if differencing is used, the differences are interpretable. First differences are the change between **one observation and the next**. Seasonal differences are the change between **one year to the next**. Other lags are unlikely to make much interpretable sense and should be avoided.

@@ -212,7 +212,7 @@ The blue line shows the forecast medians while the red line shows the forecast m
 Bias adjustment is not done by default in the forecast package. If you want your forecasts to be means rather than medians, use the argument `biadadj=TRUE` when you select your Box-Cox transformation parameter.
 
 
-## Residual diagnostics {#toolbox-resids}
+## Residual diagnostics {#residuals}
 
 ### Fitted values {-}
 

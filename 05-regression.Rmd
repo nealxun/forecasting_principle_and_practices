@@ -395,7 +395,7 @@ It is always a good idea to check if the residuals are normally distributed. As 
 
 #### Example {-}
 
-Using the `checkresiduals` function introduced in Section \@ref(toolbox-resids), we can obtain all the useful residual diagnostics mentioned above. Figure \@ref(fig:beerresidcheck) shows a time plot, the ACF and the histogram of the residuals from the model fitted to the beer production data as well as the Breusch-Godfrey test for testing up to 8th order autocorrelation. (The `checkresiduals` function will use the Breusch-Godfrey test for regression models, but the Ljung-Box test otherwise.)
+Using the `checkresiduals` function introduced in Section \@ref(residuals), we can obtain all the useful residual diagnostics mentioned above. Figure \@ref(fig:beerresidcheck) shows a time plot, the ACF and the histogram of the residuals from the model fitted to the beer production data as well as the Breusch-Godfrey test for testing up to 8th order autocorrelation. (The `checkresiduals` function will use the Breusch-Godfrey test for regression models, but the Ljung-Box test otherwise.)
 
 The time plot shows a large negative value in the residuals at 2004 Q4, which suggests that  something unusual may have happened in that quarter. It would be worth investigating to see if there were any unusual circumstances or events which may have significantly reduced beer production for that quarter.
 

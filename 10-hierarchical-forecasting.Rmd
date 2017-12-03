@@ -656,7 +656,7 @@ Note that the MinT estimator involves $\bm{W}_h$ the forecast error variance of 
     \[
         \hat{\bm{W}}_{1} = \frac{1}{T}\sum_{t=1}^{T}\hat{\bm{e}}_{t}\hat{\bm{e}}_{t}'
     \]
-where $\hat{\bm{e}}_{t}$ is an $n$-dimensional vector of residuals of the models that generated the base forecasts stacked in the same order as the data. Each element in this vector is the same as defined in Section \@ref(toolbox-resids). The approach is implemented by setting 
+where $\hat{\bm{e}}_{t}$ is an $n$-dimensional vector of residuals of the models that generated the base forecasts stacked in the same order as the data. Each element in this vector is the same as defined in Section \@ref(residuals). The approach is implemented by setting 
     ```r
     forecast(..., method = "comb", weights = "wls", ...). 
     ```

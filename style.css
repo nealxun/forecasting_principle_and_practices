@@ -64,14 +64,14 @@ dd {
 }
 
 .book .book-body .page-wrapper .page-inner section.normal th {
-  background: #D9E6CA;
+  background: #99afc4;
   font-weight: bold;
 }
 
 .book .book-body .page-wrapper .page-inner section.normal blockquote {
   quotes: none;
   text-shadow: none;
-  background: #D9E6CA;
+  background: #99afc4;
   padding:  7px 20px 1px 20px;
   color: #333333;
   -moz-border-radius: 5px;

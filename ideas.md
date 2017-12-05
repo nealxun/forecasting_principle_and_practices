@@ -1,6 +1,5 @@
-# fpp2 ideas to add
+# fpp2 ideas to add?
 
- * Add Datacamp examples
  * examples involving electricity demand, online shopping, and restaurant bookings.
 
 ## STLF chapter
@@ -8,10 +7,6 @@
 
 ## ETS chapter
  * exponential smoothing with covariates?
- * different types of residuals for ETS models.
- * Some derivations of prediction intervals -- SES,
- * Formulas for forecast variance in ETS chapter.
- * Bagged ETS
 
 ## ARIMA chapter
  * Formulas for forecast variance in ARIMA chapter using psi weights

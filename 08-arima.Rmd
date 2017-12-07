@@ -619,6 +619,27 @@ There is also an argument `include.constant` which, if `TRUE`, will set `include
 
 The `auto.arima()` function automates the inclusion of a constant. By default, for $d=0$ or $d=1$, a constant will be included if it improves the AICc value; for $d>1$ the constant is always omitted. If `allowdrift=FALSE` is specified, then the constant is only allowed when $d=0$.
 
+### Plotting the characteristic roots {-}
+
+*(This is a more advanced section and can be skipped if desired.)*
+
+We can re-write equation \@ref(eq:c) as
+$$\phi(B) (1-B)^d y_t = c + \theta(B) e_t$$
+where $\phi(B)=  (1-\phi_1B - \cdots - \phi_p B^p)$ is a $p$th order polynomial in $B$ and $\theta(B) = (1 + \theta_1 B + \cdots + \theta_q B^q)$ is a $q$th order polynomial in $B$. 
+
+The stationarity conditions for the model are that the $p$ complex roots of $\phi(B)$ lie outside the unit circle, and the invertibility conditions are that the $q$ complex roots of $\theta(B)$ lie outside the unit circle. So we can see whether the model is close to invertibility or stationarity by a plot of the roots in relation to the complex unit circle. 
+
+It is easier to plot the inverse roots instead, as they should all lie *within* the unit circle. This is easily done in R. For the ARIMA(3,1,1) model fitted to the seasonally adjusted electrical equipment index, we obtain the following plot.
+
+```{r armaroots}
+autoplot(fit)
+```
+
+The three red dots in the left hand plot correspond to the roots of the polynomials $\phi(B)$, while the red dot in the right hand plot corresponds to the root of $\theta(B)$. They are all inside the unit circle, as we would expect because R ensures the fitted model is both stationary and invertible. Any roots close to the unit circle may be numerically unstable, and the corresponding model will not be good for forecasting.
+
+The `Arima` function will never return a model with inverse roots outside the unit circle. The `auto.arima` function is even stricter and will not select a model with roots close to the unit circle either.
+
+
 ##Forecasting
 
 ### Point forecasts {-}

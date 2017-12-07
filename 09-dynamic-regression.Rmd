@@ -267,7 +267,7 @@ autoplot(austa) +
 
 There is an implicit assumption with deterministic trends that the slope of the trend is not going to change over time. On the other hand, stochastic trends can change, and the estimated growth is only assumed to be the average growth over the historical period, not necessarily the rate of growth that will be observed into the future. Consequently, it is safer to forecast with stochastic trends, especially for longer forecast horizons, as the prediction intervals allow for greater uncertainty in future growth.
 
-## Dynamic harmonic regression
+## Dynamic harmonic regression {#sec-dhr}
 
 When there are long seasonal periods, a dynamic regression with Fourier terms is often better than other models we have considered in this book.
 

@@ -2,7 +2,7 @@
 
 In this chapter, we briefly discuss four more advanced forecasting methods that build on the models discussed in earlier chapters.
 
-## Complex seasonality {}
+## Complex seasonality {#sec:complexseasonality}
 
 So far, we have considered relatively simple seasonal patterns such as quarterly and monthly data. However, higher frequency data often exhibits more complicated seasonal patterns. For example, daily data may have a weekly pattern as well as an annual pattern.  Hourly data usually has three types of seasonality: a daily pattern, a weekly pattern, and an annual pattern. Even weekly data can be difficult as it typically has an annual pattern with seasonal period of $365.25/7\approx 52.179$ on average.
 

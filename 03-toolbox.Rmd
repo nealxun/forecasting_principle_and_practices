@@ -284,7 +284,7 @@ gghistogram(res) + ggtitle("Histogram of residuals")
 ggAcf(res) + ggtitle("ACF of residuals")
 ```
 
-These graphs show that the naïve method produces forecasts that appear to account for all available information. The mean of the residuals is very close to zero and there is no significant correlation in the residuals series. The time plot of the residuals shows that the variation of the residuals stays much the same across the historical data, so the residual variance can be treated as constant. However, the histogram suggests that the residuals may not follow a normal distribution --- the left tail looks a little too long. Consequently, forecasts from this method will probably be quite good, but prediction intervals computed assuming a normal distribution may be inaccurate.
+These graphs show that the naïve method produces forecasts that appear to account for all available information. The mean of the residuals is very close to zero and there is no significant correlation in the residuals series. The time plot of the residuals shows that the variation of the residuals stays much the same across the historical data, so the residual variance can be treated as constant. However, the histogram suggests that the residuals may not follow a normal distribution --- the left tail looks a little too long. Consequently, forecasts from this method will probably be quite good, but prediction intervals that are computed assuming a normal distribution may be inaccurate.
 
 ###Portmanteau tests for autocorrelation {-}
 

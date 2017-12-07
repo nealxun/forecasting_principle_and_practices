@@ -528,7 +528,7 @@ Notice that here we divide by $T-k-1$ in order to account for the number of esti
 
 The standard error is related to the size of the average error that the model produces. We can compare this error to the sample mean of $y$ or with the standard deviation of $y$ to gain some perspective on the accuracy of the model.
 
-We should warn here that the evaluation of the standard error can be highly subjective as it is scale dependent. The main reason we introduce it here is that it is required when generating forecast intervals, discussed in Section \@ref(Regr-ForeWithRegr).
+We should warn here that the evaluation of the standard error can be highly subjective as it is scale dependent. The main reason we introduce it here is that it is required when generating prediction intervals, discussed in Section \@ref(Regr-ForeWithRegr).
 
 ### Spurious regression {-}
 
@@ -775,14 +775,14 @@ Including lagged values of the predictors does not only make the model operation
 
 With each forecast for the change in consumption Figure \@ref(fig:ConsInc4) 95% and 80% prediction intervals are also included. The general formulation of how to calculate prediction intervals for multiple regression models is presented in Section \@ref(Regr-MatrixEquations). As this involves some advanced matrix algebra we present here the case for calculating prediction intervals for a simple regression, where a forecast can be generated using the equation,
 $$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x.$$
-Assuming that the regression errors are normally distributed, an approximate 95% prediction interval (also called a forecast interval) associated with this forecast is given by
+Assuming that the regression errors are normally distributed, an approximate 95% prediction interval (also called a prediction interval) associated with this forecast is given by
 \begin{equation}
   \hat{y} \pm 1.96 \hat{\sigma}_e\sqrt{1+\frac{1}{T}+\frac{(x-\bar{x})^2}{(T-1)s_x^2}},
   (\#eq:Regr-pi)
 \end{equation}
-where $T$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $\hat{\sigma}_e$ is the standard error of the regression given by Equation \@ref(eq:Regr-se). Similarly, an 80% forecast interval can be obtained by replacing 1.96 by 1.28. Other prediction intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain forecast intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by Equation \@ref(eq:Regr-pi).
+where $T$ is the total number of observations, $\bar{x}$ is the mean of the observed $x$ values, $s_x$ is the standard deviation of the observed $x$ values and $\hat{\sigma}_e$ is the standard error of the regression given by Equation \@ref(eq:Regr-se). Similarly, an 80% prediction interval can be obtained by replacing 1.96 by 1.28. Other prediction intervals can be obtained by replacing the 1.96 with the appropriate value given in Table \@ref(tab:pcmultipliers). If R is used to obtain prediction intervals, more exact calculations are obtained (especially for small values of $T$) than what is given by Equation \@ref(eq:Regr-pi).
 
-Equation \@ref(eq:Regr-pi) shows that the forecast interval is wider when $x$ is far from $\bar{x}$. That is,  we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
+Equation \@ref(eq:Regr-pi) shows that the prediction interval is wider when $x$ is far from $\bar{x}$. That is,  we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
 #### Example {-}
 `TODO: This is to higligh the extreme case. If not useful just remove`.
 
@@ -1097,7 +1097,7 @@ Note that if you are using good statistical software, if you are not interested 
 
 5. `TODO: you got to this before me ;-)` The `gasoline` series consists of weekly data for supplies of US finished motor gasoline product, from 2 February 1991 to 20 January 2017. The units are in "thousand barrels per day". Consider only the data to the end of 2004.
     a. Fit a harmonic regression with trend to the data. Select the appropriate number of Fourier terms to include by minimizing the AICc or CV value.
-    b. Check the residuals of the final model using the `checkresiduals()` function. Even though the residuals fail the correlation tests, the results are probably not severe enough to make much difference to the forecasts and forecast intervals. (Note that the correlations are relatively small, even though they are significant.)
+    b. Check the residuals of the final model using the `checkresiduals()` function. Even though the residuals fail the correlation tests, the results are probably not severe enough to make much difference to the forecasts and prediction intervals. (Note that the correlations are relatively small, even though they are significant.)
     c. To forecast using harmonic regression, you will need to generate the future values of the Fourier terms. This can be done as follows.
 
         ```r

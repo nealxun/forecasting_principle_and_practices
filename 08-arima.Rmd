@@ -673,13 +673,13 @@ $$
 
 The process continues in this manner for all future time periods. In this way, any number of point forecasts can be obtained.
 
-### Forecast intervals  {-}
+### Prediction intervals  {-}
 
-The calculation of ARIMA forecast intervals is more difficult, and the details are largely beyond the scope of this book. We will only give some simple examples.
+The calculation of ARIMA prediction intervals is more difficult, and the details are largely beyond the scope of this book. We will only give some simple examples.
 
-The first forecast interval is easy to calculate. If $\hat{\sigma}$ is the standard deviation of the residuals, then a 95% forecast interval is given by $\hat{y}_{T+1|T} \pm 1.96\hat{\sigma}$. This result is true for all ARIMA models regardless of their parameters and orders.
+The first prediction interval is easy to calculate. If $\hat{\sigma}$ is the standard deviation of the residuals, then a 95% prediction interval is given by $\hat{y}_{T+1|T} \pm 1.96\hat{\sigma}$. This result is true for all ARIMA models regardless of their parameters and orders.
 
-Multi-step forecast intervals for ARIMA(0,0,$q$) models are relatively
+Multi-step prediction intervals for ARIMA(0,0,$q$) models are relatively
 easy to calculate. We can write the model as
 $$
   y_t = e_t + \sum_{i=1}^q \theta_i e_{t-i}.
@@ -688,17 +688,17 @@ Then, the estimated forecast variance can be written as
 $$
   v_{T+h|T} = \hat{\sigma}^2 \left[ 1 + \sum_{i=1}^{h-1} \hat{\theta}_i^2\right], \qquad\text{for $h=2,3,\dots$,}
 $$
-and a 95% forecast interval is given by $\hat{y}_{T+h|T} \pm 1.96\sqrt{v_{T+h|T}}$.
+and a 95% prediction interval is given by $\hat{y}_{T+h|T} \pm 1.96\sqrt{v_{T+h|T}}$.
 
-In Section \@ref(sec:mamodels), we showed that an AR(1) model can be written as an MA($\infty$) model. Using this equivalence, the above result for MA($q$) models can also be used to obtain forecast intervals for AR(1) models.
+In Section \@ref(sec:mamodels), we showed that an AR(1) model can be written as an MA($\infty$) model. Using this equivalence, the above result for MA($q$) models can also be used to obtain prediction intervals for AR(1) models.
 
-More general results, and other special cases of multi-step forecast intervals for an ARIMA($p$,$d$,$q$) model, are given in more advanced textbooks such as @BDbook16.
+More general results, and other special cases of multi-step prediction intervals for an ARIMA($p$,$d$,$q$) model, are given in more advanced textbooks such as @BDbook16.
 
-The forecast intervals for ARIMA models are based on assumptions that the residuals are uncorrelated and normally distributed. If either of these assumptions does not hold, then the forecast intervals may be incorrect. For this reason, always plot the ACF and histogram of the residuals to check the assumptions before producing forecast intervals.
+The prediction intervals for ARIMA models are based on assumptions that the residuals are uncorrelated and normally distributed. If either of these assumptions does not hold, then the prediction intervals may be incorrect. For this reason, always plot the ACF and histogram of the residuals to check the assumptions before producing prediction intervals.
 
-In general, forecast intervals from ARIMA models increase as the forecast horizon increases. For stationary models (i.e., with $d=0$) they will converge, so that forecast intervals for long horizons are all essentially the same. For $d>1$, the forecast intervals will continue to grow into the future.
+In general, prediction intervals from ARIMA models increase as the forecast horizon increases. For stationary models (i.e., with $d=0$) they will converge, so that prediction intervals for long horizons are all essentially the same. For $d>1$, the prediction intervals will continue to grow into the future.
 
-As with most forecast interval calculations, ARIMA-based intervals tend to be too narrow. This occurs because only the variation in the errors has been accounted for. There is also variation in the parameter estimates, and in the model order, that has not been included in the calculation. In addition, the calculation assumes that the historical patterns that have been modelled will continue into the forecast period.
+As with most prediction interval calculations, ARIMA-based intervals tend to be too narrow. This occurs because only the variation in the errors has been accounted for. There is also variation in the parameter estimates, and in the model order, that has not been included in the calculation. In addition, the calculation assumes that the historical patterns that have been modelled will continue into the forecast period.
 
 ##Seasonal ARIMA models {#sec-seasonal-arima}
 

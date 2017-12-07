@@ -686,9 +686,9 @@ $$
 $$
 Then, the estimated forecast variance can be written as
 $$
-  v_{T+h|T} = \hat{\sigma}^2 \left[ 1 + \sum_{i=1}^{h-1} \hat{\theta}_i^2\right], \qquad\text{for $h=2,3,\dots$,}
+  \sigma_h = \hat{\sigma}^2 \left[ 1 + \sum_{i=1}^{h-1} \hat{\theta}_i^2\right], \qquad\text{for $h=2,3,\dots$,}
 $$
-and a 95% prediction interval is given by $\hat{y}_{T+h|T} \pm 1.96\sqrt{v_{T+h|T}}$.
+and a 95% prediction interval is given by $\hat{y}_{T+h|T} \pm 1.96\sqrt{\sigma_h}$.
 
 In Section \@ref(sec:mamodels), we showed that an AR(1) model can be written as an MA($\infty$) model. Using this equivalence, the above result for MA($q$) models can also be used to obtain prediction intervals for AR(1) models.
 

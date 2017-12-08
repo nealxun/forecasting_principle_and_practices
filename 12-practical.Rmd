@@ -122,7 +122,7 @@ TBATS <- forecast(tbats(train), h=h)
 Combination <- (ETS$mean + ARIMA$mean + STL$mean + NNAR$mean + TBATS$mean)/5
 ```
 
-```{r combineplot}
+```{r combineplot, dependson="combine1"}
 autoplot(auscafe) +
   forecast::autolayer(ETS$mean, series="ETS") +
   forecast::autolayer(ARIMA$mean, series="ARIMA") +
@@ -134,7 +134,7 @@ autoplot(auscafe) +
   ggtitle("Australian monthly expenditure on eating out")
 ```
 
-```{r combineaccuracy}
+```{r combineaccuracy, dependson="combine1"}
 c(ETS=accuracy(ETS, auscafe)["Test set","RMSE"],
   ARIMA=accuracy(ARIMA, auscafe)["Test set","RMSE"],
   `STL-ETS`=accuracy(STL, auscafe)["Test set","RMSE"],
@@ -172,14 +172,14 @@ meanagg <- mean(sim)
 
 The mean of the simulations is very close to the sum of the individual forecasts:
 
-```{r aggregates2}
+```{r aggregates2, dependson="aggregates"}
 sum(fc$mean[1:6])
 meanagg
 ```
 
 Prediction intervals are also easy to obtain:
 
-```{r aggregates3}
+```{r aggregates3, dependson="aggregates"}
 #80% interval:
 quantile(sim, prob=c(0.1, 0.9))
 #95% interval:
@@ -213,7 +213,7 @@ reverse_forecast <- function(object)
 
 Then we can apply these function to backcast any time series. Here is an example applied to quarterly retail trade in the Euro area. The data are from 1996-2011. We backcast to predict the years 1994-1995.
 
-```{r backcasting}
+```{r backcasting, dependson="backcasting_functions"}
 # Backcast example
 euretail %>%
   reverse_ts() %>%

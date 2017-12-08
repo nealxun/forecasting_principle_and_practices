@@ -47,6 +47,8 @@ The best way to deal with moving holiday effects is to use dummy variables. Howe
 
 ## Time series of counts {#counts}
 
+Croston's method
+
 ## Ensuring forecasts stay within limits {#limits}
 
 It is common to want forecasts to be positive, or to require them to be within some specified range $[a,b]$. Both of these situations are relatively easy to handle using transformations.
@@ -100,10 +102,92 @@ The prediction intervals lie above 50 due to the transformation. As a result of 
 
 ## Forecast combinations {#combinations}
 
+An easy way to improve forecast accuracy is to use several different methods on the same time series, and to average the resulting forecasts. Nearly 50 years ago, John Bates and Clive Granger wrote a famous paper [@BatesGranger1969], showing that combining forecasts often leads to better forecast accuracy. Twenty years later, @Clemen89 wrote
+
+>The results have been virtually unanimous: combining multiple forecasts leads
+to increased forecast accuracy. \dots in many cases one can make dramatic performance improvements by simply averaging the forecasts. 
+
+While there has been considerable research on using weighted averages, or some other more complicated combination approach, using a simple average has proven hard to beat.
+
+Here is an example using monthly expenditure on eating out in Australia, from April 1982 to September 2017. We use forecast from the following models: ETS, ARIMA, STL-ETS, NNAR, and TBATS; and we compare the results using the last 5 years (60 months) of observations.
+
+```{r combine1, message=FALSE, warning=FALSE}
+train <- window(auscafe, end=c(2012,9))
+h <- length(auscafe) - length(train)
+ETS <- forecast(ets(train), h=h)
+ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
+STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
+NNAR <- forecast(nnetar(train), h=h)
+TBATS <- forecast(tbats(train), h=h)
+Combination <- (ETS$mean + ARIMA$mean + STL$mean + NNAR$mean + TBATS$mean)/5
+```
+
+```{r combineplot}
+autoplot(auscafe) +
+  forecast::autolayer(ETS$mean, series="ETS") +
+  forecast::autolayer(ARIMA$mean, series="ARIMA") +
+  forecast::autolayer(STL$mean, series="STL") +
+  forecast::autolayer(STL$mean, series="NNAR") +
+  forecast::autolayer(STL$mean, series="TBATS") +
+  forecast::autolayer(Combination, series="Combination") +
+  xlab("Year") + ylab("$ billion") +
+  ggtitle("Australian monthly expenditure on eating out")
+```
+
+```{r combineaccuracy}
+c(ETS=accuracy(ETS, auscafe)["Test set","RMSE"],
+  ARIMA=accuracy(ARIMA, auscafe)["Test set","RMSE"],
+  `STL-ETS`=accuracy(STL, auscafe)["Test set","RMSE"],
+  NNAR=accuracy(NNAR, auscafe)["Test set","RMSE"],
+  TBATS=accuracy(TBATS, auscafe)["Test set","RMSE"],
+  Combination=accuracy(Combination, auscafe)["Test set","RMSE"])
+```
+
+TBATS does particularly well with this series, but the combination approach is not far behind. For other data, TBATS may be quite poor, while the combination approach is almost always close to, or better than, the best component method.
+
 ## Prediction intervals for aggregates {#aggregates}
+
+A common problem is to forecast the aggregate of several time periods of data, using a model fitted to the disaggregated data. For example, you may have monthly data but wish to forecast the total for the next year. Or you may have weekly data, and want to forecast the total for the next four weeks.
+
+If the point forecasts are means, then adding them up will give a good estimate of the total. But prediction intervals are more tricky due to the correlations between forecast errors.
+
+A general solution is to use simulations. Here is an example using ETS models applied to Australian monthly gas production data, assuming we wish to forecast the aggregate gas demand in the next six months.
+
+
+```{r aggregates}
+# First fit a model to the data
+fit <- ets(gas)
+
+# Forecast six months ahead
+fc <- forecast(fit, h=6)
+
+# Simulate 10000 future sample paths
+nsim <- 10000
+h <- 6 
+sim <- numeric(nsim)
+for(i in seq_len(nsim))
+  sim[i] <- sum(simulate(fit, future=TRUE, nsim=h))
+meanagg <- mean(sim)
+```
+
+The mean of the simulations is very close to the sum of the individual forecasts:
+
+```{r aggregates2}
+sum(fc$mean[1:6])
+```
+
+Prediction intervals are also easy to obtain:
+
+```{r aggregates3}
+#80% interval:
+quantile(sim, prob=c(0.1, 0.9))
+#95% interval:
+quantile(sim, prob=c(0.025, 0.975))
+```
 
 
 ## Backcasting {#backcasting}
+
 Sometimes it is useful to "backcast" a time series --- that is, forecast in reverse time. Although there are no in-built R functions to do this, it is very easy to implement. The following functions reverse a `ts` object and a `forecast` object. 
 
 ```{r backcasting_functions}
@@ -142,7 +226,74 @@ autoplot(bc) + ggtitle(paste("Backcasts from",bc$method))
 
 ## Forecasting very short time series  {#short-ts}
 
+We often get asked how *few* data points can be used to fit a time series model. As with almost all sample size questions, there is no easy answer. It depends on the *number of model parameters to be estimated and the amount of randomness in the data*. The sample size required increases with the number of parameters to be estimated, and the amount of noise in the data.
+
+Some textbooks provide rules-of-thumb giving minimum sample sizes for various time series models. These are misleading and unsubstantiated in theory or practice. Further, they ignore the underlying variability of the data and often overlook the number of parameters to be estimated as well. There is, for example, no justification whatever for the magic number of 30 often given as a minimum for ARIMA modelling. The only theoretical limit is that you need more observations than there are parameters in your forecasting model. However, in practice, you usually need substantially more observations than that.
+
+Ideally, we would test if our chosen model performs well out-of-sample compared to some simpler approaches. However, with short series, there is not enough data to allow some observations to be withheld for testing purposes, and even time series cross validation can be difficult to apply. The AICc is particularly useful here, because it is a proxy for the one-step forecast out-of-sample MSE. Choosing the model with the minimum AICc value allows both the number of parameters and the amount of noise to be taken into account.
+
+```{r shortseries, include=FALSE}
+library(Mcomp)
+library(purrr)
+
+n <- map_int(M1, function(x){length(x$x)})
+M1[n < 20] %>%
+  map_int(function(u){
+    u$x %>%
+      auto.arima() %>%
+      coefficients() %>%
+      length()
+    }) %>%
+  table ->
+  nptable
+if(length(nptable) != 4L)
+  stop("Problem with table")
+```
+
+What tends to happen with short series is that the AIC suggests very simple models because anything with more than one or two parameters will produce poor forecasts due to the estimation error.  We applied the `auto.arima()` function to all the series from the M-competition with fewer than 20 observations. There were a total of `r sum(nptable)` series, of which `r nptable[1L]` had models with zero parameters (white noise and random walks), `r nptable[2L]` had models with one parameter, `r nptable[3L]` had models with two parameters and `r nptable[4L]` series had models with three parameters. Interested readers can carry out the same exercise using the following code.
+
+```r
+library(Mcomp)
+library(purrr)
+n <- map_int(M1, function(x) {length(x$x)})
+M1[n < 20] %>%
+  map_int(function(u) {
+    u$x %>%
+      auto.arima() %>%
+      coefficients() %>%
+      length()
+  }) %>%
+  table()
+```
+
 ## Forecasting very long time series {#long-ts}
+
+Most time series models do not work well for very long time series. The problem is that real data do not come from the models we use. When the number of observations is not large (say up to about 200) the models often work well as an approximation to whatever process generated the data. But eventually you will have enough data that the difference between the true process and the model starts to become more obvious. An additional problem is that the optimization of the parameters becomes more time consuming because of the number of observations involved. 
+
+What to do about these issues depends on the purpose of the model. A more flexible and complicated model could be used, but this still assumes that the model structure will work over the whole period of the data. A better approach is usually to allow the model itself to change over time. ETS models are designed to handle this situation by allowing the trend and seasonal terms to evolve over time. 
+
+If you are only interested in forecasting the next few observations, it is roughly equivalent and simpler to throw away the earliest observations and only fit a model to the most recent observations.  
+
+For example, we fitted a dynamic harmonic regression model to 26 years of weekly gasoline production in Section \@ref(weekly). It is, perhaps, unrealistic to assume that the seasonal pattern remains the same over nearly three decades. So we can simply fit a model to the most recent years instead.
+
+```{r gasrecent}
+recentgas <- window(gasoline, start=2007)
+bestfit <- list(aicc=Inf)
+for(i in seq(25))
+{
+  fit <- auto.arima(gasoline, xreg=fourier(gasoline, K=i), seasonal=FALSE)
+  if(fit$aicc < bestfit$aicc)
+  {
+    bestfit <- fit
+    besti <- i
+  }
+}
+fc <- forecast(bestfit, xreg=fourier(gasoline, K=besti, h=104))
+autoplot(fc)
+```
+
+
+
 ## Out-of-sample one-step forecasts {#oosos}
 
 ## In-sample multi-step forecasts {#isms}

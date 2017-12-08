@@ -50,6 +50,55 @@ The best way to deal with moving holiday effects is to use dummy variables. Howe
 
 ## Ensuring forecasts stay within limits
 
+It is common to want forecasts to be positive, or to require them to be within some specified range $[a,b]$. Both of these situations are relatively easy to handle using transformations.
+
+### Positive forecasts {-}
+
+To impose a positivity constraint, simply work on the log scale, by specifying the Box-Cox parameter $\lambda=0$. For example, consider the real price of a dozen eggs (1900-1993; in cents):
+
+```{r positiveeggs}
+eggs %>%
+  ets(model="AAN", damped=FALSE, lambda=0) %>%
+  forecast(h=50, biasadj=TRUE) %>%
+  autoplot()
+```    
+
+Because we set `biasadj=TRUE`, the forecasts are the means of the forecast distributions.
+
+### Forecasts constrained to an interval {-}
+
+To see how to handle data constrained to an interval, imagine that the egg prices were constrained to lie within $a=50$ and $b=400$. Then we can transform the data using a scaled logit transform which maps $(a,b)$ to the whole real line:
+$$
+y = \log\left(\frac{x-a}{b-x}\right),
+$$
+where $x$ is on the original scale and $y$ is the transformed data. To reverse the transformation, we will use
+$$
+x  = \frac{(b-a)e^y}{1+e^y} + a.
+$$
+This is not a built-in transformation, so we will need to do more work.
+
+
+```{r constrained}
+    # Bounds
+    a <- 50
+    b <- 400
+    # Transform data and fit model
+    fit <- log((eggs-a)/(b-eggs)) %>%
+      ets(model="AAN", damped=FALSE)
+    fc <- forecast(fit, h=50)
+    # Back-transform forecasts
+    fc$mean <- (b-a)*exp(fc$mean)/(1+exp(fc$mean)) + a
+    fc$lower <- (b-a)*exp(fc$lower)/(1+exp(fc$lower)) + a
+    fc$upper <- (b-a)*exp(fc$upper)/(1+exp(fc$upper)) + a
+    fc$x <- eggs
+    # Plot result on original scale
+    autoplot(fc)
+```    
+
+No bias-adjustment has been used here, so the forecasts are the medians of the future distributions. The prediction intervals from these transformations have the same coverage probability as on the transformed scale, because quantiles are preserved under monotonically increasing transformations.
+
+The prediction intervals lie above 50 due to the transformation. As a result of this artificial (and unrealistic) constraint, the forecast distributions have become extremely skewed.
+
 ## Forecast combinations {#sec-combinations}
 
 ## Prediction intervals for aggregates

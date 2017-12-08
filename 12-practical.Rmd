@@ -32,33 +32,19 @@ The fitted model has `r besti` pairs of Fourier terms and can be written as
 $$
   y_t = bt + \sum_{j=1}^{`r besti`} \left[ \alpha_j\sin\left(\frac{2\pi j t}{52.18}\right) + \beta_j\cos\left(\frac{2\pi j t}{52.18}\right) \right] + n_t
 $$
-where $n_t$ is an `r as.character(bestfit)` process. Because $n_t$ is non-stationary, the model is actually estimated on the differences of the variables on both sides of this equation. That is why there is no need for an intercept term. There are `r 2*besti` parameters to capture the seasonality which is rather a lot, but apparently required according to the AICc selection.  The total number of degrees of freedom is `r length(coef(bestfit))` (the other three coming from the 2 MA parameters and the drift parameter).
+where $n_t$ is an `r as.character(bestfit)` process. Because $n_t$ is non-stationary, the model is actually estimated on the differences of the variables on both sides of this equation. There are `r 2*besti` parameters to capture the seasonality which is rather a lot, but apparently required according to the AICc selection.  The total number of degrees of freedom is `r length(coef(bestfit))` (the other three coming from the 2 MA parameters and the drift parameter).
 
-An alternative approach is the TBATS model introduced in Section \@ref(sec:complexseasonality). This was the subject of Exercise 11.2. In this example, the forecasts are almost identical and there is little to differentiate the two models. The TBATS model is preferable when the seasonality changes over time. The ARIMA approach is preferable if there are covariates that are useful predictors as these can be added as additional regressors.
+An alternative approach is the TBATS model introduced in Section \@ref(sec:complexseasonality). This was the subject of [Exercise 11.2](sec-ex-11.html). In this example, the forecasts are almost identical and there is little to differentiate the two models. The TBATS model is preferable when the seasonality changes over time. The ARIMA approach is preferable if there are covariates that are useful predictors as these can be added as additional regressors.
 
 ### Daily and sub-daily data {-}
 
 Daily and sub-daily data are challenging for a different reason --- they often involve multiple seasonal patterns, and so we need to use a method that handles such complex seasonality.
 
-Of course, if the data is relatively short so that only one type of seasonality is present, than it will be possible to use one of the single-seasonal methods we have discussed (e.g., ETS or seasonal ARIMA). But when the time series is long enough so that some of the longer seasonal periods become apparent, it will be necessary to use dynamic harmonic regression or TBATS, as discussed in Section \@ref(sec:complexseasonality).
+Of course, if the time series is relatively short so that only one type of seasonality is present, than it will be possible to use one of the single-seasonal methods we have discussed (e.g., ETS or seasonal ARIMA). But when the time series is long enough so that some of the longer seasonal periods become apparent, it will be necessary to use dynamic harmonic regression or TBATS, as discussed in Section \@ref(sec:complexseasonality).
 
-However, note that even these models only allow for regular seasonality. Capturing seasonality associated with moving events such as Easter or the Chinese New Year is more difficult. Even with monthly data, this can be tricky as the festivals can fall in either March or April (for Easter) or in January or February (for the Chinese New Year). 
+However, note that even these models only allow for regular seasonality. Capturing seasonality associated with moving events such as Easter, Id, or the Chinese New Year is more difficult. Even with monthly data, this can be tricky as the festivals can fall in either March or April (for Easter), in January or February (for the Chinese New Year), or at any time of the year (for Id).
 
-The best way to deal with moving holiday effects is to use dummy variables. However, neither ETS nor TBATS models allow for covariates.  A state space model of the same form as TBATS but with multiple sources of error and covariates could be used, but I don't have any R code to do that.
-
-Instead, I would use a regression model with ARIMA errors, where the regression terms include any dummy holiday effects as well as the longer annual seasonality. Unless there are many decades of data, it is usually reasonable to assume that the annual seasonal shape is unchanged from year to year, and so Fourier terms can be used to model the annual seasonality. Suppose we use $K=5$ Fourier terms to model annual seasonality, and that the holiday dummy variables are in the vector `holiday` with 100 future values in `holidayf`. Then the following code will fit an appropriate model.
-
-```
-y <- ts(x, frequency=7)
-z <- fourier(ts(x, frequency=365.25), K=5)
-zf <- fourier(ts(x, frequency=365.25), K=5, h=100)
-fit <- auto.arima(y, xreg=cbind(z,holiday), seasonal=FALSE)
-fc <- forecast(fit, xreg=cbind(zf,holidayf), h=100)
-```
-
-The order $K$ can be chosen by minimizing the AIC of the fitted model.
-
-
+The best way to deal with moving holiday effects is to use dummy variables. However, neither ETS nor TBATS models allow for covariates. Amongst the models discussed in this book (and implemented in the forecast package for R), the only choice is a dynamic regression model, where the predictors include any dummy holiday effects (and possibly also the seasonality using Fourier terms).
 
 ## Time series of counts
 

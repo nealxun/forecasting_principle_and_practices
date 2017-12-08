@@ -339,7 +339,7 @@ Because it is a little slow, `PI=FALSE` is the default, so prediction intervals 
 
 
 
-## Exercises
+## Exercises {#sec-ex-11}
 
 1. Use the tbats function to model your retail time series.
     a. Check the residuals and produce forecasts.

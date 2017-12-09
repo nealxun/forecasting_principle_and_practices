@@ -236,7 +236,7 @@ where $T$ is the length of the time series.
 
 The first nine autocorrelation coefficients for the beer production data are given in the following table.
 
-```{r beeracftable, echo=FALSE}
+```{r beeracftable, echo=FALSE, dependson="beerlagplot"}
 beeracf <- matrix(acf(c(beer2), lag.max=9,
                       plot=FALSE)$acf[-1,,1], nrow=1)
 colnames(beeracf) <- paste("$r_",1:9,"$",sep="")
@@ -247,7 +247,7 @@ knitr::kable(beeracf, booktabs=TRUE, format="pandoc",
 
 These correspond to the nine scatterplots in Figure \@ref(fig:beerlagplot). The autocorrelation coefficients are normally plotted to form the *autocorrelation function* or ACF. The plot is also known as a *correlogram*.
 
-```{r beeracf, fig.cap="Autocorrelation function of quarterly beer production.", fig.asp=0.35}
+```{r beeracf, fig.cap="Autocorrelation function of quarterly beer production.", fig.asp=0.35, dependson="beerlagplot"}
 ggAcf(beer2)
 ```
 
@@ -272,7 +272,7 @@ aelec <- window(elec, start=1980)
 autoplot(aelec) + xlab("Year") + ylab("GWh")
 ```
 
-```{r acfelec, echo=TRUE, fig.cap="ACF of monthly Australian electricity demand.", fig.asp=0.35}
+```{r acfelec, echo=TRUE, fig.cap="ACF of monthly Australian electricity demand.", fig.asp=0.35, dependson="aelec"}
 ggAcf(aelec, lag=48)
 ```
 
@@ -288,7 +288,7 @@ y <- ts(rnorm(50))
 autoplot(y) + ggtitle("White noise")
 ```
 
-```{r wnoiseacf, fig.cap="Autocorrelation function for the white noise series.", fig.asp=0.35}
+```{r wnoiseacf, fig.cap="Autocorrelation function for the white noise series.", fig.asp=0.35, dependson="wnoise"}
 ggAcf(y)
 ```
 

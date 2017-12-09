@@ -47,7 +47,30 @@ The best way to deal with moving holiday effects is to use dummy variables. Howe
 
 ## Time series of counts {#counts}
 
-Croston's method
+All of the methods discussed in this book assume that the data have a continuous sample space. But very often data comes in the form of counts. For example, we may wish to forecast the number of customers who enter a store each day. We could have 0, 1, 2, \dots, customers, but we cannot have 3.45693 customers.
+
+In practice, this rarely matters provided our counts are sufficiently large. If the minimum number of customers is at least 100, then the difference between a continuous sample space $[100,\infty)$ and the discrete sample space $\{100,101,102,\dots\}$ has no perceivable effect on our forecasts. However, if our data contains small counts $(0, 1, 2, \dots)$, then we need to use forecasting methods that are more appropriate for a sample space of non-negative integers.
+
+Such models are beyond the scope of this book. However, there is one simple method which gets used in this context, that we would like to mention. It is "Croston's method", named after its British inventor, John Croston, and first described in @Croston72. Actually, this method does not properly deal with the count nature of the data either, but it is used so often, that it is worth knowing about it.
+
+With Croston's method, we construct two new series from our original time series by noting which time periods contain zero values, and which periods contain non-zero values. Let $q_i$ be the $i$th non-zero quantity, and let $a_i$ be the time between $q_{i-1}$ and $q_i$. Croston's method involves separate simple exponential smoothing forecasts on the two new series $a$ and $q$.
+
+If $\hat{q}_{j+1|j}$ and $\hat{a}_{j+1|j}$ are the one-step forecasts of the $(j+1)$th demand size and inter-arrival time respectively, based on data up to demand $j$, then Croston's method gives
+\begin{align}
+\hat{q}_{j+1|j} & = (1-\alpha)\hat{q}_{j|j-1} + \alpha q_j,\label{c2method1}\\
+\hat{a}_{j+1|j} & = (1-\alpha)\hat{a}_{j|j-1} + \alpha a_j.\label{c2method2}
+\end{align}
+The smoothing parameter $\alpha$ takes values between 0 and 1 and
+is assumed to be the same for both equations. Let $\ell
+= j_n$ denote the last period of demand. Then the mean demand
+rate, which is used as the $h$-step ahead forecast for the demand
+at time $n+h$, is estimated by the ratio
+\begin{equation}\label{c2ratio}
+\hat{y}_{T+h|T} = q_{\ell}/a_{\ell}.
+\end{equation}
+
+
+
 
 ## Ensuring forecasts stay within limits {#limits}
 

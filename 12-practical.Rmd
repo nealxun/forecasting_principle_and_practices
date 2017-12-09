@@ -27,6 +27,11 @@ fc <- forecast(bestfit, xreg=fourier(gasoline, K=besti, h=104))
 autoplot(fc)
 ```
 
+```{r gasstop, include=FALSE, dependson="gasweekly"}
+if(length(coef(bestfit)) - 2L*besti != 3L)
+  stop("Gas model has changed")
+```
+
 The fitted model has `r besti` pairs of Fourier terms and can be written as
 $$
   y_t = bt + \sum_{j=1}^{`r besti`} \left[ \alpha_j\sin\left(\frac{2\pi j t}{52.18}\right) + \beta_j\cos\left(\frac{2\pi j t}{52.18}\right) \right] + n_t

@@ -230,7 +230,7 @@ When we obtain a forecast, we are estimating the *middle* of the range of possib
 
 Instead of plotting individual possible futures as shown in Figure \@ref(fig:austa1), we normally show these prediction intervals instead. The plot below shows 80% and 95% intervals for the future Australian international visitors. The blue line is the average of the possible future values, which we call the "point forecasts".
 
-```{r austa2, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Total international visitors to Australia (1980--2015) along with 10-year forecasts and 80% and 95% prediction intervals."}
+```{r austa2, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Total international visitors to Australia (1980--2015) along with 10-year forecasts and 80% and 95% prediction intervals.", dependson="austa1"}
 autoplot(forecast(fit)) +
   ylab("Millions of visitors") + xlab("Year") +
   ggtitle("Forecasts of total international visitors to Australia")

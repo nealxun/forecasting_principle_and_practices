@@ -58,24 +58,52 @@ In practice, this rarely matters provided our counts are sufficiently large. If 
 
 Such models are beyond the scope of this book. However, there is one simple method which gets used in this context, that we would like to mention. It is "Croston's method", named after its British inventor, John Croston, and first described in @Croston72. Actually, this method does not properly deal with the count nature of the data either, but it is used so often, that it is worth knowing about it.
 
-With Croston's method, we construct two new series from our original time series by noting which time periods contain zero values, and which periods contain non-zero values. Let $q_i$ be the $i$th non-zero quantity, and let $a_i$ be the time between $q_{i-1}$ and $q_i$. Croston's method involves separate simple exponential smoothing forecasts on the two new series $a$ and $q$.
+With Croston's method, we construct two new series from our original time series by noting which time periods contain zero values, and which periods contain non-zero values. Let $q_i$ be the $i$th non-zero quantity, and let $a_i$ be the time between $q_{i-1}$ and $q_i$. Croston's method involves separate simple exponential smoothing forecasts on the two new series $a$ and $q$. Because the method is usually applied to time series of demand for items, $q$ is often called the "demand" and $a$ the "inter-arrival time".
 
-If $\hat{q}_{j+1|j}$ and $\hat{a}_{j+1|j}$ are the one-step forecasts of the $(j+1)$th demand size and inter-arrival time respectively, based on data up to demand $j$, then Croston's method gives
+If $\hat{q}_{i+1|i}$ and $\hat{a}_{i+1|i}$ are the one-step forecasts of the $(i+1)$th demand and inter-arrival time respectively, based on data up to demand $i$, then Croston's method gives
 \begin{align}
-\hat{q}_{j+1|j} & = (1-\alpha)\hat{q}_{j|j-1} + \alpha q_j,\label{c2method1}\\
-\hat{a}_{j+1|j} & = (1-\alpha)\hat{a}_{j|j-1} + \alpha a_j.\label{c2method2}
+\hat{q}_{i+1|i} & = (1-\alpha)\hat{q}_{i|i-1} + \alpha q_i, (\#eq:c2method1)\\
+\hat{a}_{i+1|i} & = (1-\alpha)\hat{a}_{i|i-1} + \alpha a_i. (\#eq:c2method2)
 \end{align}
-The smoothing parameter $\alpha$ takes values between 0 and 1 and
-is assumed to be the same for both equations. Let $\ell
-= j_n$ denote the last period of demand. Then the mean demand
-rate, which is used as the $h$-step ahead forecast for the demand
-at time $n+h$, is estimated by the ratio
+The smoothing parameter $\alpha$ takes values between 0 and 1 and is assumed to be the same for both equations. Let $j$ be the time for the last observed positive observation. Then the $h$-step ahead forecast for the demand at time $T+h$, is given by the ratio
 \begin{equation}\label{c2ratio}
-\hat{y}_{T+h|T} = q_{\ell}/a_{\ell}.
+\hat{y}_{T+h|T} = q_{j+1|j}/a_{j+1|j}.
 \end{equation}
 
+There are no algebraic results allowing us to compute prediction intervals for this method, because the method does not correspond to any statistical model [@SH05]. 
 
+The `croston` function produces forecasts using Croston's method. In the following example, we apply the method to monthly sales of a lubricant that is rarely used. This data set was part of a consulting project that one of us did for an oil company several years ago.
 
+The data contain small counts, with many months registering no sales at all, and only small numbers of items sold in other months.
+
+```{r productC, echo=FALSE}
+productC %>% 
+  .preformat.ts() %>%
+  knitr::kable()
+```
+
+The demand and arrival series are computed from the above data.
+
+```{r crostondecomp, echo=FALSE}
+fit <- croston(productC)
+cbind(i=seq(length(fit$model$demand$x)),
+      q=fit$model$demand$x, 
+      a=fit$model$period$x) %>% 
+  knitr::kable()
+```
+
+The `croston` function simply uses $\alpha=0.1$ by default, and $\ell_0$ is set to be equal to the first observation in each of the series. This is consistent with the way Croston envisaged the method being used. This gives the demand forecast `r format(fit$model$demand$mean[1],digits=3,nsmall=3)` and the arrival forecast `r format(fit$model$period$mean[1],digits=3,nsmall=3)`. So the forecast of the original series is 
+$\hat{y}_{T+h|T} = `r format(fit$model$demand$mean[1],digits=3,nsmall=3)` /
+`r format(fit$model$period$mean[1],digits=3,nsmall=3)` =
+`r format(fit$model$demand$mean[1]/fit$model$period$mean[1], digits=3, nsmall=3)`$. In practice, R does these calculations for you: 
+
+```{r croston}
+productC %>% croston() %>% autoplot()
+```
+
+Implementations of Croston's method with more facilities including parameter estimation are available in ????.
+
+Models that deal with the count nature of the data are described in ????.Christou and Fokianos???
 
 ## Ensuring forecasts stay within limits {#limits}
 

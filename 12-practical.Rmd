@@ -209,7 +209,6 @@ If the point forecasts are means, then adding them up will give a good estimate 
 
 A general solution is to use simulations. Here is an example using ETS models applied to Australian monthly gas production data, assuming we wish to forecast the aggregate gas demand in the next six months.
 
-
 ```{r aggregates}
 # First fit a model to the data
 fit <- ets(gas/1000)
@@ -279,8 +278,6 @@ euretail %>%
 autoplot(bc) + ggtitle(paste("Backcasts from",bc$method))
 ```
 
-
-
 ## Forecasting very short time series  {#short-ts}
 
 We often get asked how *few* data points can be used to fit a time series model. As with almost all sample size questions, there is no easy answer. It depends on the *number of model parameters to be estimated and the amount of randomness in the data*. The sample size required increases with the number of parameters to be estimated, and the amount of noise in the data.
@@ -334,7 +331,7 @@ If you are only interested in forecasting the next few observations, one simple 
 For example, we fitted a dynamic harmonic regression model to 26 years of weekly gasoline production in Section \@ref(weekly). It is, perhaps, unrealistic to assume that the seasonal pattern remains the same over nearly three decades. So we could simply fit a model to the most recent years instead.
 
 
-## Out-of-sample one-step forecasts {#oosos}
+## One-step forecasts on test data {#oosos}
 
 It is common practice to fit a model using training data, and then to evaluate its performance on a test data set. The way this is usually done means the comparisions on the test data use different forecast horizons. For example, suppose we use the last twenty observations for the test data, and estimate our forecasting model on the training data. Then the forecast errors will be for 1-step, 2-steps, ..., 20-steps ahead. The forecast variance usually increases with the forecast horizon, so if we simply averaging the absolute or squared errors from the test set, we are combining results with different variances.
 
@@ -363,7 +360,16 @@ Note that the second call to `Arima` does not involve the model being re-estimat
 
 Because the model was not re-estimated, the "residuals" obtained here are actually one-step forecast errors. Consequently, the results produced from the `accuracy` command are actually on the test set (despite the output saying "Training set"). 
 
-## In-sample multi-step forecasts {#isms}
+## Multi-step forecasts on training data {#isms}
+
+Just as it is useful to obtain one-step forecasts on the test set, it is sometimes useful to compute multi-step forecasts on the training set. We normally define fitted values to be one-step forecasts on the training set (see Section \@ref(residuals)), but a similar idea can be used for multi-step forecasts. The `fitted()` function has an `h` argument to allow for $h$-step "fitted values" on the training set. 
+
+Here is a plot of 12-step (one year) forecasts on the training set used for the model of Australian eating-out expenditure in the previous section. Because the model involves both seasonal (lag 12) and first (lag 1) differencing, it is not possible to compute these forecasts for the first 25 observations.
+
+```{r isms, dependson="oosos", warning=FALSE}
+autoplot(training, series="Training data") +
+  forecast::autolayer(fitted(cafe.train, h=12), series="12-step fitted values")
+```
 
 ## Dealing with missing values and outliers {#missing-outliers}
 

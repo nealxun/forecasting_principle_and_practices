@@ -327,27 +327,15 @@ M1[n < 20] %>%
 
 Most time series models do not work well for very long time series. The problem is that real data do not come from the models we use. When the number of observations is not large (say up to about 200) the models often work well as an approximation to whatever process generated the data. But eventually you will have enough data that the difference between the true process and the model starts to become more obvious. An additional problem is that the optimization of the parameters becomes more time consuming because of the number of observations involved. 
 
-What to do about these issues depends on the purpose of the model. A more flexible and complicated model could be used, but this still assumes that the model structure will work over the whole period of the data. A better approach is usually to allow the model itself to change over time. ETS models are designed to handle this situation by allowing the trend and seasonal terms to evolve over time. 
+What to do about these issues depends on the purpose of the model. A more flexible and complicated model could be used, but this still assumes that the model structure will work over the whole period of the data. A better approach is usually to allow the model itself to change over time. ETS models are designed to handle this situation by allowing the trend and seasonal terms to evolve over time. ARIMA models with differencing have a similar property. But dynamic regression models do not allow any evolution of model components.
 
-If you are only interested in forecasting the next few observations, it is roughly equivalent and simpler to throw away the earliest observations and only fit a model to the most recent observations.  
+If you are only interested in forecasting the next few observations, one simple approach is to throw away the earliest observations and only fit a model to the most recent observations.  Then an inflexible model can work well because there is not enough time for the relationships to change substantially.
 
-For example, we fitted a dynamic harmonic regression model to 26 years of weekly gasoline production in Section \@ref(weekly). It is, perhaps, unrealistic to assume that the seasonal pattern remains the same over nearly three decades. So we can simply fit a model to the most recent years instead.
+For example, we fitted a dynamic harmonic regression model to 26 years of weekly gasoline production in Section \@ref(weekly). It is, perhaps, unrealistic to assume that the seasonal pattern remains the same over nearly three decades. So we could simply fit a model to the most recent years instead.
 
-```{r gasrecent}
-recentgas <- window(gasoline, start=2007)
-bestfit <- list(aicc=Inf)
-for(i in seq(25))
-{
-  fit <- auto.arima(gasoline, xreg=fourier(gasoline, K=i), seasonal=FALSE)
-  if(fit$aicc < bestfit$aicc)
-  {
-    bestfit <- fit
-    besti <- i
-  }
-}
-fc <- forecast(bestfit, xreg=fourier(gasoline, K=besti, h=104))
-autoplot(fc)
-```
+
+
+
 
 
 

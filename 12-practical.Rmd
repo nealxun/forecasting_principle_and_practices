@@ -101,9 +101,9 @@ $\hat{y}_{T+h|T} = `r format(fit$model$demand$mean[1],digits=3,nsmall=3)` /
 productC %>% croston() %>% autoplot()
 ```
 
-Implementations of Croston's method with more facilities including parameter estimation are available in ????.
+An implementation of Croston's method with more facilities (including parameter estimation) is available in the [tsintermittent](https://cran.r-project.org/package=tsintermittent) package for R.
 
-Models that deal with the count nature of the data are described in ????.Christou and Fokianos???
+Forecasting models that deal more directly with the count nature of the data are described in @christou2015count.
 
 ## Ensuring forecasts stay within limits {#limits}
 

@@ -1,6 +1,6 @@
 # Some practical forecasting issues {#ch-practical}
 
-In this final chapter, we address many practical issues that arise in forecasting, and discuss some possible solutions.
+In this final chapter, we address many practical issues that arise in forecasting, and discuss some possible solutions. Several of these sections are adapated from [Hyndsight blog posts](https://robjhyndman.com/hyndsight/).
 
 ## Weekly, daily and sub-daily data {#weekly}
 

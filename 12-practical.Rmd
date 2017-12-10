@@ -14,29 +14,29 @@ The simplest approach is to use a dynamic harmonic regression model, as discusse
 
 ```{r gasweekly, message=FALSE}
 bestfit <- list(aicc=Inf)
-for(i in seq(25))
+for(K in seq(25))
 {
-  fit <- auto.arima(gasoline, xreg=fourier(gasoline, K=i), seasonal=FALSE)
+  fit <- auto.arima(gasoline, xreg=fourier(gasoline, K=K), seasonal=FALSE)
   if(fit$aicc < bestfit$aicc)
   {
     bestfit <- fit
-    besti <- i
+    bestK <- K
   }
 }
-fc <- forecast(bestfit, xreg=fourier(gasoline, K=besti, h=104))
+fc <- forecast(bestfit, xreg=fourier(gasoline, K=bestK, h=104))
 autoplot(fc)
 ```
 
 ```{r gasstop, include=FALSE, dependson="gasweekly"}
-if(length(coef(bestfit)) - 2L*besti != 3L)
+if(length(coef(bestfit)) - 2L*bestK != 3L)
   stop("Gas model has changed")
 ```
 
-The fitted model has `r besti` pairs of Fourier terms and can be written as
+The fitted model has `r bestK` pairs of Fourier terms and can be written as
 $$
-  y_t = bt + \sum_{j=1}^{`r besti`} \left[ \alpha_j\sin\left(\frac{2\pi j t}{52.18}\right) + \beta_j\cos\left(\frac{2\pi j t}{52.18}\right) \right] + n_t
+  y_t = bt + \sum_{j=1}^{`r bestK`} \left[ \alpha_j\sin\left(\frac{2\pi j t}{52.18}\right) + \beta_j\cos\left(\frac{2\pi j t}{52.18}\right) \right] + n_t
 $$
-where $n_t$ is an `r as.character(bestfit)` process. Because $n_t$ is non-stationary, the model is actually estimated on the differences of the variables on both sides of this equation. There are `r 2*besti` parameters to capture the seasonality which is rather a lot, but apparently required according to the AICc selection.  The total number of degrees of freedom is `r length(coef(bestfit))` (the other three coming from the 2 MA parameters and the drift parameter).
+where $n_t$ is an `r as.character(bestfit)` process. Because $n_t$ is non-stationary, the model is actually estimated on the differences of the variables on both sides of this equation. There are `r 2*bestK` parameters to capture the seasonality which is rather a lot, but apparently required according to the AICc selection.  The total number of degrees of freedom is `r length(coef(bestfit))` (the other three coming from the 2 MA parameters and the drift parameter).
 
 An alternative approach is the TBATS model introduced in Section \@ref(sec:complexseasonality). This was the subject of [Exercise 11.2](sec-ex-11.html). In this example, the forecasts are almost identical and there is little to differentiate the two models. The TBATS model is preferable when the seasonality changes over time. The ARIMA approach is preferable if there are covariates that are useful predictors as these can be added as additional regressors.
 
